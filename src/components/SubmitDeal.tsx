@@ -15,17 +15,43 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
   const [file, setFile] = useState<File | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [dealResult, setDealResult] = useState<any | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!url.trim() && !tip.trim()) return;
 
     setLoading(true);
-    // Simulate submission to backend
-    setTimeout(() => {
-      setLoading(false);
+    setError(null);
+    try {
+      const targetUrl = url.trim() || tip.trim();
+      const res = await fetch('https://api.rudranil.me/api/v1/deals/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: targetUrl,
+          store,
+          price: price ? parseFloat(price) : null,
+          mrp: mrp ? parseFloat(mrp) : null,
+          tip,
+          email: email.trim(),
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.detail || 'Failed to submit deal. Please verify the URL.');
+      }
+
+      const data = await res.json();
+      setDealResult(data);
       setSubmitted(true);
-    }, 800);
+    } catch (err: any) {
+      setError(err.message || 'Submission failed. Please check your internet connection or URL.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleReset = () => {
@@ -36,6 +62,8 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
     setMrp('');
     setTip('');
     setFile(null);
+    setError(null);
+    setDealResult(null);
     setSubmitted(false);
   };
 
@@ -125,6 +153,12 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
                 <h3 className="text-2xl font-black text-white">Deal Submitted Successfully!</h3>
+                {dealResult?.title && (
+                  <div className="p-3 bg-slate-950/60 rounded-xl border border-emerald-500/20 text-xs text-emerald-400 font-medium max-w-md mx-auto">
+                    <span>Verified item: <strong>{dealResult.title}</strong></span>
+                    {dealResult.price && <span className="ml-2">(@ ₹{dealResult.price.toLocaleString('en-IN')})</span>}
+                  </div>
+                )}
                 <p className="text-slate-300 text-sm max-w-md mx-auto">
                   Thank you for contributing! Our verification engine and curation team have received your tip and are validating it now. Once verified, it will appear live across IndiaDealHunts and our Telegram channel.
                 </p>
@@ -147,6 +181,12 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5 relative">
+                {error && (
+                  <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{error}</span>
+                  </div>
+                )}
                 <div className="flex items-center justify-between pb-2 border-b border-slate-800">
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Deal Tip Form</span>
                   <span className="text-[11px] text-slate-400">* Required fields</span>

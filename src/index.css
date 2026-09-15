@@ -254,6 +254,116 @@
   -webkit-text-fill-color: transparent;
 }
 
+.text-gradient-gold {
+  background: linear-gradient(135deg, #FDE68A 0%, #F59E0B 50%, #D97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 3D Perspective Canvas & Spatial Dynamics */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+/* Laser Scanner Beam Keyframe for Deal Lookup Modal */
+@keyframes laser-sweep {
+  0% {
+    top: -5%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 105%;
+    opacity: 0;
+  }
+}
+
+.animate-laser {
+  animation: laser-sweep 2.4s ease-in-out infinite;
+}
+
+/* Holographic Foil Pan Animation */
+@keyframes holographic-pan {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.holographic-border {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(16, 185, 129, 0.5) 25%,
+    rgba(6, 182, 212, 0.5) 50%,
+    rgba(139, 92, 246, 0.5) 75%,
+    rgba(249, 115, 22, 0.5) 100%
+  );
+  background-size: 300% 300%;
+  animation: holographic-pan 6s ease infinite;
+}
+
+.holographic-gold-border {
+  background: linear-gradient(
+    135deg,
+    rgba(254, 243, 199, 0.4) 0%,
+    rgba(245, 158, 11, 0.65) 30%,
+    rgba(217, 119, 6, 0.7) 60%,
+    rgba(251, 191, 36, 0.5) 100%
+  );
+  background-size: 250% 250%;
+  animation: holographic-pan 4.5s ease infinite;
+}
+
+/* CTA Pulsing Beam Sweep */
+@keyframes beam-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.animate-beam-sweep {
+  animation: beam-sweep 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Store-Specific Semantic Ambient Halos */
+.glow-store-amazon {
+  box-shadow: 0 0 25px -4px rgba(245, 158, 11, 0.25);
+}
+
+.glow-store-flipkart {
+  box-shadow: 0 0 25px -4px rgba(40, 116, 240, 0.3);
+}
+
+.glow-store-myntra {
+  box-shadow: 0 0 25px -4px rgba(244, 63, 94, 0.3);
+}
+
+.glow-store-swiggy {
+  box-shadow: 0 0 25px -4px rgba(249, 115, 22, 0.3);
+}
+
+.glow-loot-emerald {
+  box-shadow: 0 0 30px -4px rgba(16, 185, 129, 0.35);
+}
+
 /* Reduced-Motion Support */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {

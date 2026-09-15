@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { ExternalLink, Copy, Check, MessageCircle, ZoomIn, Clock, Flame, Star, TrendingDown, ShieldCheck, Scissors, AlertOctagon } from 'lucide-react';
+import { ExternalLink, Copy, Check, MessageCircle, ZoomIn, Clock, Flame, Star, TrendingDown, ShieldCheck, Scissors, AlertOctagon, Zap } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { PublicDeal } from '../types';
 import { calculateWorthScore, getEndingSoonMins } from '../utils/worthScore';
+import { getCleanImageUrl } from '../utils/imageUrl';
 
 interface PublicDealCardProps {
   deal: PublicDeal;
@@ -35,7 +37,7 @@ const WorthScoreRing: React.FC<{ score: number; label: string }> = ({ score, lab
 
   return (
     <div 
-      className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#070A11]/80 border border-white/10 shadow-sm backdrop-blur-sm"
+      className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#070A11]/85 border border-white/10 shadow-sm backdrop-blur-md transition-transform group-hover:scale-105"
       title={`DealFlow Worth Index: ${score}/100 (${label})`}
     >
       <div className="relative w-5 h-5 flex items-center justify-center shrink-0">
@@ -58,6 +60,7 @@ const WorthScoreRing: React.FC<{ score: number; label: string }> = ({ score, lab
             strokeDashoffset={circumference - progress}
             strokeLinecap="round"
             fill="transparent"
+            className="transition-all duration-700 ease-out"
           />
         </svg>
         <span className="absolute text-[9px] font-black text-white font-mono">{score}</span>
@@ -72,7 +75,7 @@ const StoreLogo: React.FC<{ store: string }> = ({ store }) => {
   const s = (store || '').toLowerCase();
   if (s.includes('amazon')) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#232F3E] border border-amber-500/30 text-amber-300 text-[11px] font-black shadow-xs">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#232F3E] border border-amber-500/40 text-amber-300 text-[11px] font-black shadow-xs">
         <svg className="w-3 h-3 fill-amber-400" viewBox="0 0 24 24">
           <path d="M15.93 17.09c-2.83 2.08-6.95 3.19-10.49 1.57-1.44-.66-2.6-1.74-3.44-3.09-.23-.37.05-.83.47-.73 3.65.86 7.6.61 10.98-1.02.43-.21.9.21.62.61-.41.59-.83 1.14-1.32 1.66l3.18 1zm4.72-2.19c.14-.84.22-1.7.22-2.58 0-6.07-4.93-11-11-11S-.13 6.25-.13 12.32 4.8 23.32 10.87 23.32c3.55 0 6.72-1.68 8.76-4.31.25-.32.06-.79-.34-.84l-2.02-.27c-.22-.03-.43.08-.54.27-1.41 1.94-3.7 3.2-6.28 3.2-4.38 0-7.94-3.44-8.09-7.78 3.73 1.83 8.16 1.87 11.96.11l.07-.03c.53-.25.86-.79.82-1.38-.05-.81-.69-1.44-1.5-1.47-2.9-.11-5.74.88-8.08 2.59.34-3.37 3.18-5.99 6.64-5.99 3.69 0 6.68 3 6.68 6.68 0 .42-.04.83-.11 1.23-.05.3.16.58.46.61l2.45.24c.26.03.48-.15.52-.41z"/>
         </svg>
@@ -135,6 +138,27 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
 
+  // 3D Perspective Gyro Tilt & Glare State
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [glare, setGlare] = useState({ x: 50, y: 50, opacity: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -5.5;
+    const rotateY = ((x - centerX) / centerX) * 5.5;
+    setTilt({ x: rotateX, y: rotateY });
+    setGlare({ x: (x / rect.width) * 100, y: (y / rect.height) * 100, opacity: 0.12 });
+  };
+
+  const handleMouseLeave = () => {
+    setTilt({ x: 0, y: 0 });
+    setGlare((prev) => ({ ...prev, opacity: 0 }));
+  };
+
   // Calculate Worth Score & Urgency
   const worth = calculateWorthScore(deal);
   const endingMins = getEndingSoonMins(deal.id);
@@ -149,13 +173,28 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
     setTimeout(() => setCopied(false), 1800);
   };
 
-  // Copy Coupon Code Action
+  // Copy Coupon Code Action with Particle Confetti Burst
   const handleCopyCoupon = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!deal.coupon) return;
     navigator.clipboard.writeText(deal.coupon);
     setCouponCopied(true);
-    setTimeout(() => setCouponCopied(false), 2000);
+
+    try {
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const x = (rect.left + rect.width / 2) / window.innerWidth;
+      const y = (rect.top + rect.height / 2) / window.innerHeight;
+      confetti({
+        particleCount: 26,
+        spread: 55,
+        origin: { x, y },
+        colors: ['#F59E0B', '#10B981', '#FBBF24', '#34D399', '#38BDF8'],
+        disableForReducedMotion: true,
+        zIndex: 9999,
+      });
+    } catch {}
+
+    setTimeout(() => setCouponCopied(false), 2200);
   };
 
   // WhatsApp Share Action with IndiaDealHunts Branding
@@ -173,31 +212,43 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 
-  // Sanitize image URL to prevent mixed content HTTP blocks
-  const sanitizeImageUrl = (url?: string) => {
-    if (!url) return '';
-    if (url.startsWith('http://74.225.250.0')) {
-      return url.replace('http://74.225.250.0', 'https://api.rudranil.me');
-    }
-    if (url.startsWith('http://') && !url.includes('localhost') && !url.includes('127.0.0.1')) {
-      return url.replace('http://', 'https://');
-    }
-    return url;
-  };
-
-  const cleanImageUrl = sanitizeImageUrl(deal.image);
+  const cleanImageUrl = getCleanImageUrl(deal.image);
   const savings = (deal.mrp || 0) - (deal.price || 0);
   const displayTitle = deal.title
     ? deal.title.replace(/^[\s\u2700-\u27BF\uE000-\uF8FF\uD83C-\uDBFF\uDC00-\uDFFF\u2011-\u26FF\uFE0E-\uFE0F\u00A0-\u00BF👉⚡🔥✅🎁📦🚨📢🏷️💎⏰‼️💥]+\s*/gu, '').trim() || deal.title
     : 'Verified Deal Drop';
 
+  // Store Brand Semantic Ambient Glow Class
+  const storeLower = (deal.store || '').toLowerCase();
+  const storeGlowClass = (() => {
+    if (deal.discount_pct && deal.discount_pct >= 70) return 'hover:border-emerald-400 hover:glow-loot-emerald';
+    if (storeLower.includes('amazon')) return 'hover:border-amber-500/50 hover:glow-store-amazon';
+    if (storeLower.includes('flipkart')) return 'hover:border-blue-500/50 hover:glow-store-flipkart';
+    if (storeLower.includes('myntra')) return 'hover:border-pink-500/50 hover:glow-store-myntra';
+    if (storeLower.includes('swiggy')) return 'hover:border-orange-500/50 hover:glow-store-swiggy';
+    return 'hover:border-emerald-500/40 hover:shadow-2xl';
+  })();
+
   return (
     <article 
-      className={`group relative flex flex-col rounded-3xl border border-white/[0.09] bg-gradient-to-b from-[#0E1424] to-[#080B13] hover:border-emerald-500/40 hover:shadow-2xl hover:shadow-emerald-500/10 card-elevation overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500/50 transition-all ${
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+        transition: 'transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms ease, border-color 220ms ease',
+      }}
+      className={`group relative flex flex-col rounded-3xl border border-white/[0.09] bg-gradient-to-b from-[#0E1424] to-[#080B13] ${storeGlowClass} card-elevation overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500/50 ${
         isOver ? 'opacity-70 grayscale-[25%]' : ''
       } ${isBestWorthView ? 'md:p-1' : ''}`}
       aria-label={`${deal.title} on ${deal.store}`}
     >
+      {/* Specular Interactive Cursor Glare */}
+      <div 
+        className="pointer-events-none absolute inset-0 rounded-3xl transition-opacity duration-300 z-30"
+        style={{
+          background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(255, 255, 255, ${glare.opacity}) 0%, transparent 60%)`,
+        }}
+      />
       
       {/* 1. Header Meta Bar: Store Logo, Relative Time & Circular SVG Worth Ring */}
       <div className="flex items-center justify-between px-3.5 pt-3 pb-2 gap-2">

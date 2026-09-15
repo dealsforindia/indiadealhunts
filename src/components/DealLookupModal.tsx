@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, ArrowRight, ExternalLink, ShieldCheck, RefreshCw, X, Link as LinkIcon, AlertTriangle } from 'lucide-react';
 import { LookupResult } from '../types';
+import { getCleanImageUrl } from '../utils/imageUrl';
 
 interface DealLookupProps {
   isOpen?: boolean;
@@ -93,10 +94,7 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
         return 'Online Store';
       })();
 
-      let cleanImg = data.store_img_url || data.img_url || data.image || '';
-      if (cleanImg.startsWith('http://74.225.250.0')) {
-        cleanImg = cleanImg.replace('http://74.225.250.0', 'https://api.rudranil.me');
-      }
+      const cleanImg = getCleanImageUrl(data.store_img_url || data.img_url || data.image || '');
 
       setResult({
         title: data.title || data.prod_name || 'Verified Product Drop',

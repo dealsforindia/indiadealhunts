@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, ExternalLink, Tag, ShoppingBag } from 'lucide-react';
 import { PublicDeal } from '../types';
+import { getCleanImageUrl } from '../utils/imageUrl';
 
 interface ImageModalProps {
   deal: PublicDeal | null;
@@ -59,7 +60,7 @@ export const ImageModal: React.FC<ImageModalProps> = ({ deal, onClose }) => {
           <div className="w-full md:w-1/2 aspect-square bg-white rounded-2xl p-4 flex items-center justify-center border border-white/[0.06] overflow-hidden shadow-inner">
             {deal.image && !imageError ? (
               <img
-                src={deal.image.startsWith('http://74.225.250.0') ? deal.image.replace('http://74.225.250.0', 'https://api.rudranil.me') : deal.image}
+                src={getCleanImageUrl(deal.image)}
                 alt={deal.title}
                 onError={() => setImageError(true)}
                 className="max-h-full max-w-full object-contain filter drop-shadow-xl"

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Sparkles, ExternalLink, ArrowRight, ShieldCheck, Tag, MessageCircle, Send, CheckCircle2, Star, X, Zap } from 'lucide-react';
 import { PublicDeal } from '../types';
 import { calculateWorthScore } from '../utils/worthScore';
+import { getCleanImageUrl } from '../utils/imageUrl';
 
 interface HeroBannerProps {
   searchQuery: string;
@@ -274,11 +275,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 
                   {spotlightDeal.image && !spotlightImgError ? (
                     <img
-                      src={
-                        spotlightDeal.image.startsWith('http://74.225.250.0')
-                          ? spotlightDeal.image.replace('http://74.225.250.0', 'https://api.rudranil.me')
-                          : spotlightDeal.image
-                      }
+                      src={getCleanImageUrl(spotlightDeal.image)}
                       alt={spotlightDisplayTitle}
                       onLoad={() => setSpotlightImgLoaded(true)}
                       onError={() => {
