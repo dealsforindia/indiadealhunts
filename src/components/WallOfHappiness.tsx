@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, CheckCircle2, ShieldCheck, MessageCircle, Send, Smartphone, Apple, Home, Shirt, Sparkles } from 'lucide-react';
+import { Heart, CheckCircle2, ShieldCheck, MessageCircle, Send, Smartphone, Apple, Home, Shirt, Sparkles, X, ZoomIn } from 'lucide-react';
 
 interface ProofItem {
   id: string;
@@ -108,6 +108,7 @@ const TELEGRAM_CHANNEL_URL = 'https://t.me/dealsforindiachannel';
 
 export const WallOfHappiness: React.FC = () => {
   const [selectedCat, setSelectedCat] = useState<'all' | 'electronics' | 'grocery' | 'fashion' | 'home'>('all');
+  const [previewProof, setPreviewProof] = useState<ProofItem | null>(null);
 
   const filteredProofs = selectedCat === 'all' ? proofs : proofs.filter((p) => p.category === selectedCat);
 
@@ -203,17 +204,26 @@ export const WallOfHappiness: React.FC = () => {
                 </span>
               </div>
 
-              {/* Product Photo Stage with Aspect Ratio Lock */}
-              <div className="relative aspect-[16/10] bg-white rounded-2xl p-3 flex items-center justify-center overflow-hidden mb-3.5 shadow-inner">
+              {/* Product Photo Stage with Aspect Ratio Lock & Click to Zoom */}
+              <div 
+                onClick={() => setPreviewProof(p)}
+                className="relative aspect-[16/10] bg-white rounded-2xl p-3 flex items-center justify-center overflow-hidden mb-3.5 shadow-inner cursor-pointer group/img"
+              >
                 <img
                   src={p.imageUrl}
                   alt={p.product}
-                  className="max-h-full max-w-full object-contain filter drop-shadow"
+                  className="max-h-full max-w-full object-contain filter drop-shadow transition-transform duration-300 group-hover/img:scale-105"
                   loading="lazy"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = 'https://m.media-amazon.com/images/I/417Vj5lRL+L._SY300_SX300_QL70_ML2_.jpg';
                   }}
                 />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                  <span className="px-3 py-1.5 rounded-xl bg-slate-950/85 text-white text-xs font-bold flex items-center gap-1.5 backdrop-blur-sm shadow-lg">
+                    <ZoomIn className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>View Delivery</span>
+                  </span>
+                </div>
                 <div className="absolute top-2 right-2 px-2.5 py-0.5 rounded-full bg-emerald-500 text-black text-[10px] font-bold shadow-md">
                   Saved ₹{p.savings.toLocaleString('en-IN')}
                 </div>
@@ -283,6 +293,68 @@ export const WallOfHappiness: React.FC = () => {
           </a>
         </div>
       </div>
+
+      {/* Lightbox Modal for Unboxing Photos */}
+      {previewProof && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setPreviewProof(null)}
+        >
+          <div 
+            className="relative w-full max-w-2xl rounded-3xl border border-white/15 bg-[#0E1424] p-6 sm:p-8 shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setPreviewProof(null)}
+              className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
+              aria-label="Close image preview"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-2 mb-4">
+              <span className="px-3 py-1 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold">
+                Verified Community Delivery
+              </span>
+              <span className="text-xs text-slate-400">{previewProof.store}</span>
+            </div>
+
+            <div className="aspect-[4/3] bg-white rounded-2xl p-4 flex items-center justify-center overflow-hidden mb-5 shadow-inner">
+              <img
+                src={previewProof.imageUrl}
+                alt={previewProof.product}
+                className="max-h-full max-w-full object-contain filter drop-shadow"
+              />
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="font-bold text-white text-lg font-brand">{previewProof.product}</h3>
+              <div className="flex items-baseline gap-3">
+                <span className="text-2xl font-price font-bold text-emerald-400">
+                  Looted at ₹{previewProof.lootedPrice.toLocaleString('en-IN')}
+                </span>
+                <span className="text-sm text-slate-400 line-through font-mono">
+                  MRP ₹{previewProof.regularPrice.toLocaleString('en-IN')}
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold">
+                  Saved ₹{previewProof.savings.toLocaleString('en-IN')}
+                </span>
+              </div>
+              <blockquote className="text-sm text-slate-300 italic bg-white/[0.04] p-4 rounded-xl border border-white/5 leading-relaxed">
+                "{previewProof.comment}"
+              </blockquote>
+              <div className="text-xs text-slate-400 flex items-center justify-between pt-2 border-t border-white/5">
+                <span>Shared by {previewProof.author} from {previewProof.city}</span>
+                <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                  <CheckCircle2 className="w-4 h-4" /> Verified Telegram Subscriber
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

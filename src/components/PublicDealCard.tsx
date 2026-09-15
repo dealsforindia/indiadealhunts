@@ -409,15 +409,22 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
               href={deal.url}
               target="_blank"
               rel="noopener noreferrer sponsored"
-              className={`flex-1 min-h-[44px] py-2.5 px-3.5 rounded-xl font-bold text-xs tracking-tight flex items-center justify-center gap-1.5 shadow-md transition-all duration-150 active:scale-[0.98] focus-ring ${
+              className={`relative overflow-hidden flex-1 min-h-[46px] py-2.5 px-3.5 rounded-xl font-black text-xs tracking-tight flex items-center justify-center gap-2 shadow-lg transition-all duration-200 active:scale-[0.98] focus-ring group/btn ${
                 isOver 
                   ? 'bg-slate-800 hover:bg-slate-700 text-slate-300' 
-                  : 'bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black shadow-emerald-500/20 hover:shadow-emerald-500/35'
+                  : 'bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.01]'
               }`}
               aria-label={`Claim deal on ${deal.store} for ₹${(deal.price || 0).toLocaleString('en-IN')}`}
             >
-              <span>{isOver ? 'View Product' : `Claim on ${deal.store}`}</span>
-              <ExternalLink className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+              {/* Animated Light Sweep Beam */}
+              {!isOver && (
+                <div className="pointer-events-none absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/35 to-transparent skew-x-[-20deg] animate-beam-sweep" />
+              )}
+              <span className="relative z-10 flex items-center gap-1.5 font-black">
+                {!isOver && <Zap className="w-3.5 h-3.5 fill-slate-950 text-slate-950 shrink-0" />}
+                {isOver ? 'View Product' : `Claim on ${deal.store}`}
+              </span>
+              <ExternalLink className="w-3.5 h-3.5 shrink-0 relative z-10 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" aria-hidden="true" />
             </a>
 
             {/* WhatsApp Share Button */}

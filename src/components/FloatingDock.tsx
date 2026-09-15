@@ -28,11 +28,11 @@ export const FloatingDock: React.FC<FloatingDockProps> = ({
   if (!visible) return null;
 
   const quickStores = [
-    { id: 'all', label: 'All', icon: Store },
-    { id: 'Amazon', label: 'Amazon', icon: ShoppingBag },
-    { id: 'Flipkart', label: 'Flipkart', icon: ShoppingCart },
-    { id: 'Myntra', label: 'Myntra', icon: Shirt },
-    { id: 'Swiggy', label: 'Swiggy', icon: Zap },
+    { id: 'all', label: 'All', icon: Store, activeGradient: 'from-emerald-500 to-teal-500 text-slate-950 shadow-emerald-500/30' },
+    { id: 'Amazon', label: 'Amazon', icon: ShoppingBag, activeGradient: 'from-amber-400 to-orange-500 text-slate-950 shadow-amber-500/30' },
+    { id: 'Flipkart', label: 'Flipkart', icon: ShoppingCart, activeGradient: 'from-blue-500 to-indigo-600 text-white shadow-blue-500/30' },
+    { id: 'Myntra', label: 'Myntra', icon: Shirt, activeGradient: 'from-pink-500 to-rose-600 text-white shadow-pink-500/30' },
+    { id: 'Swiggy', label: 'Swiggy', icon: Zap, activeGradient: 'from-orange-500 to-amber-500 text-slate-950 shadow-orange-500/30' },
   ];
 
   return (
@@ -52,7 +52,7 @@ export const FloatingDock: React.FC<FloatingDockProps> = ({
               onClick={() => onSelectStore(s.id)}
               className={`touch-target min-h-[44px] px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer select-none focus-ring ${
                 active
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black shadow-lg shadow-emerald-500/30 scale-[1.02]'
+                  ? `bg-gradient-to-r ${s.activeGradient} font-black shadow-lg scale-[1.03]`
                   : 'text-slate-300 hover:text-white hover:bg-white/10'
               }`}
               aria-label={`Filter by ${s.label}`}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, ArrowRight, ExternalLink, ShieldCheck, RefreshCw, X, Link as LinkIcon, AlertTriangle } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { LookupResult } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 
@@ -113,6 +114,19 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
           ? `Verified Genuine Price Drop: Current price of ₹${salePrice.toLocaleString('en-IN')} is ${discount}% lower than typical retail benchmarks.`
           : `Verified Listing: Currently active at ₹${salePrice.toLocaleString('en-IN')}. Good value for daily use.`
       });
+
+      if (discount >= 35 || salePrice > 0) {
+        try {
+          confetti({
+            particleCount: 38,
+            spread: 60,
+            origin: { y: 0.55 },
+            colors: ['#10B981', '#F59E0B', '#34D399', '#38BDF8', '#FBBF24'],
+            disableForReducedMotion: true,
+            zIndex: 99999,
+          });
+        } catch {}
+      }
     } catch (err: any) {
       console.error('Lookup error:', err);
       setError(err.message || 'Product lookup service temporarily unavailable.');
@@ -199,112 +213,155 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
         </div>
       )}
 
-      {/* Loading Skeleton State (Zero Layout Shift) */}
+      {/* Loading Cyberpunk Laser Scanner State (Zero Layout Shift) */}
       {loading && (
-        <div className="rounded-3xl border border-white/10 bg-[#111827] p-6 shadow-2xl animate-pulse space-y-4" aria-busy="true">
+        <div 
+          className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-[#0E1424] p-6 sm:p-7 shadow-2xl shadow-emerald-500/10 space-y-5" 
+          aria-busy="true"
+        >
+          {/* Animated Neon Laser Scan Beam */}
+          <div 
+            className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_18px_#10B981] animate-laser z-20 pointer-events-none" 
+            aria-hidden="true"
+          />
+
           <div className="flex justify-between items-center pb-3 border-b border-white/10">
-            <div className="h-6 w-24 bg-slate-700 rounded-md" />
-            <div className="h-6 w-32 bg-slate-700 rounded-full" />
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="radar-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
+              </span>
+              <span className="text-xs font-mono font-bold text-emerald-400 tracking-wider">
+                DEALFLOW AUDIT SCANNER RUNNING...
+              </span>
+            </div>
+            <span className="text-[11px] font-mono text-slate-400">Step 2/3: Price Graph</span>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-            <div className="md:col-span-4 aspect-square bg-slate-800 rounded-2xl" />
-            <div className="md:col-span-8 space-y-3">
-              <div className="h-5 w-3/4 bg-slate-700 rounded" />
-              <div className="h-8 w-1/3 bg-slate-700 rounded" />
-              <div className="h-16 w-full bg-slate-800 rounded-xl" />
-              <div className="h-11 w-48 bg-slate-700 rounded-xl" />
+            <div className="md:col-span-4 aspect-square bg-[#151E34] rounded-2xl flex flex-col items-center justify-center p-4 border border-white/5 relative overflow-hidden">
+              <RefreshCw className="w-8 h-8 text-emerald-400 animate-spin mb-2" />
+              <span className="text-[11px] font-mono text-slate-400 text-center">Unshortening URL & scraping OpenGraph...</span>
+            </div>
+            <div className="md:col-span-8 space-y-3.5">
+              <div className="h-5 w-3/4 bg-slate-700/60 rounded-lg animate-pulse" />
+              <div className="h-9 w-1/3 bg-slate-700/60 rounded-xl animate-pulse" />
+              <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-xs font-mono text-emerald-300/80 space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-emerald-400">✓</span> Checking merchant inflated MRP vs 90-day retail average
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-emerald-400">✓</span> Verifying instant affiliate coupon applicability
+                </div>
+              </div>
+              <div className="h-11 w-52 bg-slate-700/60 rounded-xl animate-pulse" />
             </div>
           </div>
         </div>
       )}
 
-      {/* Result Card */}
+      {/* Result Card with Holographic Ambient Border */}
       {result && (
-        <div className="rounded-3xl border border-emerald-500/30 bg-[#111827] p-5 sm:p-7 shadow-2xl shadow-emerald-500/10 transition-all">
-          
-          {/* Header Badge */}
-          <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-white/10">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold">
-                {result.store}
-              </span>
-              <span className="text-xs text-slate-400 font-medium">
-                Live Stream Verification
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-bold border border-emerald-500/30">
-              <ShieldCheck className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-              <span>{result.worth_label} ({result.worth_score}/100)</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <div className="relative p-[1.5px] rounded-3xl holographic-border shadow-2xl shadow-emerald-500/20 transition-all">
+          <div className="rounded-[23px] bg-[#0E1424] p-5 sm:p-7">
             
-            {/* Product Photo with Aspect Ratio Lock */}
-            {result.image && !resultImgError ? (
-              <div className="md:col-span-4 aspect-square rounded-2xl bg-white p-4 flex items-center justify-center overflow-hidden shadow-inner">
-                <img
-                  src={result.image}
-                  alt={result.title}
-                  onError={() => setResultImgError(true)}
-                  className="max-h-full max-w-full object-contain filter drop-shadow"
-                  loading="lazy"
-                />
-              </div>
-            ) : (
-              <div className="md:col-span-4 aspect-square rounded-2xl bg-slate-900/90 border border-slate-800 p-4 flex flex-col items-center justify-center gap-2 text-center shadow-inner">
-                <ShieldCheck className="w-10 h-10 text-emerald-400" aria-hidden="true" />
-                <span className="text-xs font-bold text-slate-300">Verified {result.store} Item</span>
-              </div>
-            )}
-
-            {/* Product Pricing & Analysis */}
-            <div className={result.image ? 'md:col-span-8 flex flex-col justify-between' : 'md:col-span-12'}>
-              <h3 className="font-semibold text-white text-base sm:text-lg line-clamp-2 mb-3 leading-snug">
-                {result.title}
-              </h3>
-
-              {/* Price Row */}
-              <div className="flex items-baseline gap-3 flex-wrap mb-3">
-                <span className="text-3xl font-price font-bold text-emerald-400">
-                  ₹{result.price.toLocaleString('en-IN')}
+            {/* Header Badge */}
+            <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-black">
+                  {result.store}
                 </span>
-
-                {result.usually_price && result.usually_price > result.price && (
-                  <span className="text-xs text-slate-400">
-                    Usually: <strong className="text-slate-200 line-through font-mono">₹{result.usually_price.toLocaleString('en-IN')}</strong>
-                  </span>
-                )}
-
-                {result.mrp && result.mrp > result.price && (
-                  <span className="text-xs text-slate-500 line-through font-mono">
-                    MRP ₹{result.mrp.toLocaleString('en-IN')}
-                  </span>
-                )}
-
-                {result.discount_pct && (
-                  <span className="px-2 py-0.5 rounded-md bg-orange-500/20 text-orange-400 font-bold text-xs border border-orange-500/30">
-                    {result.discount_pct}% OFF
-                  </span>
-                )}
+                <span className="text-xs text-slate-400 font-medium hidden sm:inline">
+                  Live Engine Verification
+                </span>
               </div>
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-black border border-emerald-500/30 shadow-xs">
+                <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" aria-hidden="true" />
+                <span>{result.worth_label} ({result.worth_score}/100)</span>
+              </div>
+            </div>
 
-              {/* Verified Verdict */}
-              <p className="text-xs text-emerald-300 bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20 mb-4 leading-relaxed">
-                {result.verdict}
-              </p>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+              
+              {/* Product Photo with Aspect Ratio Lock */}
+              {result.image && !resultImgError ? (
+                <div className="md:col-span-4 aspect-square rounded-2xl bg-white p-4 flex items-center justify-center overflow-hidden shadow-inner group relative">
+                  <img
+                    src={result.image}
+                    alt={result.title}
+                    onError={() => setResultImgError(true)}
+                    className="max-h-full max-w-full object-contain filter drop-shadow transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  {result.discount_pct && result.discount_pct >= 50 && (
+                    <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-amber-500 text-black text-[10px] font-black uppercase tracking-tight shadow-md">
+                      🔥 Steal Deal
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="md:col-span-4 aspect-square rounded-2xl bg-slate-900 border border-slate-800 p-4 flex flex-col items-center justify-center gap-2 text-center shadow-inner">
+                  <ShieldCheck className="w-12 h-12 text-emerald-400" aria-hidden="true" />
+                  <span className="text-xs font-bold text-slate-300">Verified {result.store} Item</span>
+                </div>
+              )}
 
-              {/* Grab Deal Button with 44px Touch Target */}
-              <a
-                href={result.url}
-                target="_blank"
-                rel="noopener noreferrer sponsored"
-                className="w-full sm:w-auto min-h-[44px] px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black font-bold text-sm tracking-tight flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all active:scale-95 cursor-pointer focus-ring"
-                aria-label={`Grab verified deal on ${result.store} for ₹${result.price.toLocaleString('en-IN')}`}
-              >
-                <span>Grab Deal on {result.store}</span>
-                <ExternalLink className="w-4 h-4 shrink-0" aria-hidden="true" />
-              </a>
+              {/* Product Pricing & Analysis */}
+              <div className={result.image ? 'md:col-span-8 flex flex-col justify-between' : 'md:col-span-12'}>
+                <h3 className="font-bold text-white text-base sm:text-lg line-clamp-2 mb-3 leading-snug font-brand">
+                  {result.title}
+                </h3>
+
+                {/* Price Row with High-Impact Typography */}
+                <div className="flex items-baseline gap-3 flex-wrap mb-3">
+                  <span className="text-3xl sm:text-4xl font-price font-black text-emerald-400 tracking-tight">
+                    ₹{result.price.toLocaleString('en-IN')}
+                  </span>
+
+                  {result.usually_price && result.usually_price > result.price && (
+                    <span className="text-xs text-slate-400">
+                      Regular: <strong className="text-slate-300 line-through font-mono">₹{result.usually_price.toLocaleString('en-IN')}</strong>
+                    </span>
+                  )}
+
+                  {result.mrp && result.mrp > result.price && (
+                    <span className="text-xs text-slate-500 line-through font-mono">
+                      MRP ₹{result.mrp.toLocaleString('en-IN')}
+                    </span>
+                  )}
+
+                  {result.discount_pct && (
+                    <span className="px-2.5 py-1 rounded-lg bg-orange-500/20 text-orange-400 font-black text-xs border border-orange-500/30">
+                      {result.discount_pct}% OFF
+                    </span>
+                  )}
+                </div>
+
+                {/* Instant Savings Badge */}
+                {result.savings && result.savings > 0 && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-black mb-3">
+                    <span>💰 Instant Rupee Savings: ₹{result.savings.toLocaleString('en-IN')}</span>
+                  </div>
+                )}
+
+                {/* Verified Verdict */}
+                <p className="text-xs text-emerald-300 bg-emerald-500/10 p-3.5 rounded-2xl border border-emerald-500/20 mb-4 leading-relaxed">
+                  {result.verdict}
+                </p>
+
+                {/* Grab Deal Button with Animated Beam Sweep */}
+                <a
+                  href={result.url}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="relative overflow-hidden w-full sm:w-auto min-h-[48px] px-7 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 text-slate-950 font-black text-sm tracking-tight flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all duration-200 active:scale-95 cursor-pointer focus-ring group"
+                  aria-label={`Grab verified deal on ${result.store} for ₹${result.price.toLocaleString('en-IN')}`}
+                >
+                  <div className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/35 to-transparent skew-x-12 animate-beam-sweep pointer-events-none" />
+                  <ExternalLink className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" aria-hidden="true" />
+                  <span>Grab Deal on {result.store}</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
