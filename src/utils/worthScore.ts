@@ -14,32 +14,28 @@ export function calculateWorthScore(deal: Partial<PublicDeal>): WorthScoreResult
   const discount = deal.discount_pct || (mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0);
   const savings = Math.max(0, mrp - price);
 
-  // Hash ID for deterministic variability
-  let idHash = 0;
-  if (deal.id) {
-    for (let i = 0; i < deal.id.length; i++) {
-      idHash = (idHash * 31 + deal.id.charCodeAt(i)) % 100;
-    }
-  }
+  // 100% Transparent Formula Based Purely On Verified Deal Metrics:
+  // Base score directly proportional to discount percentage
+  let baseScore = Math.min(60, discount * 0.7);
 
-  // Base score from discount percentage (40% discount -> 60 base, 80% discount -> 88 base)
-  let baseScore = 50 + (discount * 0.45);
+  // Additional points for verified absolute rupee savings
+  if (savings >= 10000) baseScore += 25;
+  else if (savings >= 5000) baseScore += 20;
+  else if (savings >= 2000) baseScore += 15;
+  else if (savings >= 1000) baseScore += 10;
+  else if (savings >= 500) baseScore += 5;
 
-  // Boost for high absolute rupee savings
-  if (savings >= 10000) baseScore += 12;
-  else if (savings >= 3000) baseScore += 8;
-  else if (savings >= 1000) baseScore += 5;
-  else if (savings >= 500) baseScore += 3;
+  // Coupon bonus
+  if (deal.coupon) baseScore += 5;
 
-  // Boost for trusted stores
+  // Store trust tier bonus
   const store = (deal.store || '').toLowerCase();
   if (store.includes('amazon') || store.includes('flipkart') || store.includes('myntra')) {
-    baseScore += 3;
+    baseScore += 5;
   }
 
-  // Small hash perturbation (+/- 3) for authentic variation
-  const variation = (idHash % 7) - 3;
-  let finalScore = Math.round(Math.min(99, Math.max(62, baseScore + variation)));
+  // Final score bounded 50 - 99
+  const finalScore = Math.min(99, Math.max(50, Math.round(baseScore)));
 
   if (finalScore >= 90) {
     return {
@@ -57,7 +53,7 @@ export function calculateWorthScore(deal: Partial<PublicDeal>): WorthScoreResult
       bgClass: 'bg-teal-500/15 border-teal-500/30',
       badgeClass: 'bg-teal-500/20 text-teal-300 border border-teal-500/30 font-bold',
     };
-  } else if (finalScore >= 72) {
+  } else if (finalScore >= 70) {
     return {
       score: finalScore,
       label: 'Worth Buying',
@@ -68,7 +64,7 @@ export function calculateWorthScore(deal: Partial<PublicDeal>): WorthScoreResult
   } else {
     return {
       score: finalScore,
-      label: 'Good Buy',
+      label: 'Good Offer',
       colorClass: 'text-slate-300',
       bgClass: 'bg-slate-500/15 border-slate-500/30',
       badgeClass: 'bg-slate-500/20 text-slate-300 border border-slate-500/30 font-medium',
@@ -76,13 +72,3 @@ export function calculateWorthScore(deal: Partial<PublicDeal>): WorthScoreResult
   }
 }
 
-/**
- * Deterministic remaining minutes for "Ending Soon" countdowns
- */
-export function getEndingSoonMins(dealId: string): number {
-  let hash = 0;
-  for (let i = 0; i < dealId.length; i++) {
-    hash = (hash * 33 + dealId.charCodeAt(i)) % 90;
-  }
-  return (hash % 45) + 3; // 3 to 48 minutes remaining
-}

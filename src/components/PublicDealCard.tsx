@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ExternalLink, Copy, Check, MessageCircle, ZoomIn, Clock, Flame, Star, TrendingDown, ShieldCheck, Scissors, AlertOctagon, Zap } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { PublicDeal } from '../types';
-import { calculateWorthScore, getEndingSoonMins } from '../utils/worthScore';
+import { calculateWorthScore } from '../utils/worthScore';
 import { getCleanImageUrl } from '../utils/imageUrl';
 
 interface PublicDealCardProps {
@@ -161,7 +161,6 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
 
   // Calculate Worth Score & Urgency
   const worth = calculateWorthScore(deal);
-  const endingMins = getEndingSoonMins(deal.id);
   const isOver = Boolean(deal.is_over || deal.expiry_mins === 0 || deal.stock_status === 'expired');
   const relativeTime = getRelativeTime(deal.posted_at);
 
