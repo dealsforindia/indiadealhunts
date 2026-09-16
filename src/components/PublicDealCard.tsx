@@ -344,28 +344,33 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
       {/* 3. Deal Info Body */}
       <div className="flex flex-col flex-1 p-3.5">
         
-        {/* Title */}
-        <h3
-          className="font-bold text-sm text-white line-clamp-2 mb-2 group-hover:text-emerald-300 transition-colors leading-snug"
-          title={displayTitle}
-        >
-          {displayTitle}
+        {/* Title - Direct Clickable Store Link */}
+        <h3 className="font-bold text-sm text-white line-clamp-2 mb-2 leading-snug">
+          <a
+            href={deal.url}
+            target="_blank"
+            rel="noopener noreferrer sponsored"
+            className="hover:text-emerald-300 transition-colors focus:outline-none focus:underline"
+            title={displayTitle}
+          >
+            {displayTitle}
+          </a>
         </h3>
 
         {/* Pricing & Savings Hierarchy */}
         <div className="mt-auto pt-2 space-y-2.5">
           <div className="flex items-baseline gap-2 flex-wrap">
             <span className="text-2xl sm:text-[1.7rem] font-price font-black text-emerald-400">
-              ₹{(deal.price || 0).toLocaleString('en-IN')}
+              ₹{Math.round(deal.price || 0).toLocaleString('en-IN')}
             </span>
 
             {deal.usually_price && deal.usually_price > (deal.price || 0) ? (
               <span className="text-xs text-slate-400">
-                Usually: <span className="line-through font-mono">₹{deal.usually_price.toLocaleString('en-IN')}</span>
+                Usually: <span className="line-through font-mono">₹{Math.round(deal.usually_price).toLocaleString('en-IN')}</span>
               </span>
             ) : deal.mrp && deal.mrp > (deal.price || 0) ? (
               <span className="text-xs text-slate-500 line-through font-mono">
-                ₹{deal.mrp.toLocaleString('en-IN')}
+                ₹{Math.round(deal.mrp).toLocaleString('en-IN')}
               </span>
             ) : null}
 

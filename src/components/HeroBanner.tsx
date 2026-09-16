@@ -261,13 +261,13 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                       <span>#1 Verified Loot Hunt</span>
                     </div>
 
-                    {/* Live Shoppers Urgent Velocity Pill */}
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 text-[11px] font-black">
+                    {/* Live Verified Drop Status Indicator */}
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] font-black">
                       <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                       </span>
-                      <span>24 buying now</span>
+                      <span>{spotlightDeal.discount_pct ? `${spotlightDeal.discount_pct}% PRICE CRASH` : 'VERIFIED IN STOCK'}</span>
                     </div>
                   </div>
 
@@ -317,19 +317,26 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                     )}
                   </div>
 
-                  {/* Title */}
-                  <h3 className="font-black text-white text-base sm:text-lg line-clamp-2 mb-3 leading-snug group-hover:text-amber-300 transition-colors">
-                    {spotlightDisplayTitle}
+                  {/* Title - Direct Store Link */}
+                  <h3 className="font-black text-white text-base sm:text-lg line-clamp-2 mb-3 leading-snug">
+                    <a
+                      href={spotlightDeal.url}
+                      target="_blank"
+                      rel="noopener noreferrer sponsored"
+                      className="hover:text-amber-300 transition-colors focus:outline-none focus:underline"
+                    >
+                      {spotlightDisplayTitle}
+                    </a>
                   </h3>
 
                   {/* Price and Savings Row with Extreme Anchoring */}
                   <div className="flex items-baseline gap-2.5 mb-5 flex-wrap">
                     <span className="text-3xl sm:text-4xl font-price font-black text-emerald-400">
-                      ₹{(spotlightDeal.price || 0).toLocaleString('en-IN')}
+                      ₹{Math.round(spotlightDeal.price || 0).toLocaleString('en-IN')}
                     </span>
                     {spotlightDeal.mrp && spotlightDeal.mrp > (spotlightDeal.price || 0) && (
                       <span className="text-sm sm:text-base text-slate-500 line-through font-mono">
-                        ₹{spotlightDeal.mrp.toLocaleString('en-IN')}
+                        ₹{Math.round(spotlightDeal.mrp).toLocaleString('en-IN')}
                       </span>
                     )}
                     {spotlightDeal.discount_pct && (
