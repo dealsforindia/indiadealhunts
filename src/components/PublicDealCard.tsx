@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { ExternalLink, Copy, Check, MessageCircle, ZoomIn, Clock, Flame, Star, TrendingDown, ShieldCheck, Scissors, AlertOctagon, Zap } from 'lucide-react';
+import { ExternalLink, Copy, Check, MessageCircle, ZoomIn, Clock, Flame, Star, TrendingDown, ShieldCheck, Scissors, AlertOctagon, Zap, CreditCard } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { PublicDeal } from '../types';
 import { calculateWorthScore } from '../utils/worthScore';
 import { getCleanImageUrl } from '../utils/imageUrl';
+import { getSavedCreditCard, POPULAR_CREDIT_CARDS, saveCreditCard } from '../utils/creditCardCalculator';
 
 interface PublicDealCardProps {
   deal: PublicDeal;
@@ -137,6 +138,10 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   const [couponCopied, setCouponCopied] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(() => {
+    return getSavedCreditCard()?.id || null;
+  });
+  const [showCardPicker, setShowCardPicker] = useState(false);
 
   // 3D Perspective Gyro Tilt & Glare State
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
@@ -326,6 +331,11 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             <Clock className="w-3.5 h-3.5 animate-pulse" aria-hidden="true" />
             <span>LIMITED DROP</span>
           </div>
+        ) : deal.is_community_verified || (deal.desidime_temperature && deal.desidime_temperature >= 100) ? (
+          <div className="absolute bottom-2 left-2 px-2.5 py-1 rounded-lg bg-gradient-to-r from-orange-600 via-amber-500 to-yellow-500 text-white text-[10px] font-black flex items-center gap-1.5 shadow-md shadow-orange-500/25 border border-amber-300/40 animate-pulse">
+            <Flame className="w-3.5 h-3.5 fill-white" aria-hidden="true" />
+            <span>COMMUNITY HEAT {deal.desidime_temperature ? `(${deal.desidime_temperature}°)` : ''}</span>
+          </div>
         ) : deal.discount_pct && deal.discount_pct >= 60 ? (
           <div className="absolute bottom-2 left-2 px-2.5 py-1 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 text-slate-950 text-[10px] font-black flex items-center gap-1.5 shadow-md">
             <Flame className="w-3.5 h-3.5 fill-slate-950" aria-hidden="true" />
@@ -380,6 +390,59 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
               </span>
             )}
           </div>
+
+          {/* Personalized Credit Card "Your Price" Badge (Feature 14) */}
+          {(() => {
+            const activeCard = POPULAR_CREDIT_CARDS.find(c => c.id === selectedCardId) || POPULAR_CREDIT_CARDS[0];
+            const cb = activeCard.calculateCashback(deal.price || 0, deal.store || '');
+            if ((deal.price || 0) < 150 || cb.amount <= 0) return null;
+            return (
+              <div className="relative">
+                <div
+                  onClick={(e) => { e.stopPropagation(); setShowCardPicker(!showCardPicker); }}
+                  className="cursor-pointer inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-bold bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/25 transition-colors shadow-2xs"
+                  title="Click to switch your credit card"
+                >
+                  <CreditCard className="w-3 h-3 text-indigo-400 shrink-0" />
+                  <span>With {activeCard.name}:</span>
+                  <span className="font-mono font-black text-emerald-300">₹{cb.yourPrice.toLocaleString('en-IN')}</span>
+                  <span className="text-[10px] text-slate-400">(-₹{cb.amount})</span>
+                </div>
+
+                {showCardPicker && (
+                  <div
+                    className="absolute left-0 bottom-full mb-1 z-50 p-2 bg-slate-900/95 border border-slate-700/80 rounded-xl shadow-2xl backdrop-blur-xl w-56 space-y-1 text-left"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1.5 py-0.5 border-b border-slate-800 flex justify-between items-center">
+                      <span>Select Your Card</span>
+                      <button onClick={() => setShowCardPicker(false)} className="text-slate-400 hover:text-white text-xs px-1">✕</button>
+                    </div>
+                    {POPULAR_CREDIT_CARDS.map(c => {
+                      const isSelected = c.id === activeCard.id;
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedCardId(c.id);
+                            saveCreditCard(c.id);
+                            setShowCardPicker(false);
+                          }}
+                          className={`w-full text-left px-2 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-between transition-colors ${
+                            isSelected ? 'bg-indigo-500/25 text-indigo-300 border border-indigo-500/40' : 'hover:bg-slate-800 text-slate-300'
+                          }`}
+                        >
+                          <span>{c.name}</span>
+                          <span className="text-[10px] text-slate-400 font-mono">{c.bank}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Coupon Code Pill (if available) */}
           {deal.coupon && (

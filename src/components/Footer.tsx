@@ -237,7 +237,7 @@ export const Footer: React.FC<FooterProps> = ({ onTabChange, onOpenLegal }) => {
 
         {/* Bottom Copyright & Disclaimer */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <p>© 2024–2026 IndiaDealHunts. All rights reserved. Transparent, algorithmically verified deals.</p>
+          <p>© 2025–2026 IndiaDealHunts. All rights reserved. Transparent, algorithmically verified deals.</p>
           <div className="flex items-center gap-4">
             <button onClick={() => onOpenLegal && onOpenLegal('terms')} className="hover:text-white transition focus-ring rounded">
               Terms

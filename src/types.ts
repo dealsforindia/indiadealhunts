@@ -19,6 +19,9 @@ export interface PublicDeal {
   expiry_mins?: number;
   stock_status?: string;
   is_over?: boolean;
+  desidime_temperature?: number | null;
+  is_community_verified?: boolean;
+  deal_score?: number | null;
 }
 
 export interface CuratedBundleItem {
