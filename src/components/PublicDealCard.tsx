@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
-import { ExternalLink, Copy, Check, MessageCircle, ZoomIn, Clock, Flame, ShieldCheck, Zap } from 'lucide-react';
+import { ExternalLink, Copy, Check, MessageCircle, ZoomIn, Clock, Flame, ShieldCheck, Zap, CreditCard, AlertTriangle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { PublicDeal } from '../types';
 import { calculateWorthScore } from '../utils/worthScore';
 import { getCleanImageUrl } from '../utils/imageUrl';
+import { calculateBestCardSavings, getSavedCards } from '../utils/cardSavings';
 
 interface PublicDealCardProps {
   deal: PublicDeal;
   onOpenImage: (deal: PublicDeal) => void;
   isEndingSoonView?: boolean;
   isBestWorthView?: boolean;
+  activeCards?: string[];
+  onOpenCardModal?: () => void;
 }
 
 // Relative time formatter
@@ -24,17 +27,6 @@ function getRelativeTime(timestamp?: number): string {
   if (diffHours < 24) return `${diffHours}h ago`;
   const diffDays = Math.floor(diffHours / 24);
   return `${diffDays}d ago`;
-}
-
-// Deterministic claimed count based on deal id for dynamic social status
-function getClaimedCount(dealId: string, discount: number = 50): number {
-  let hash = 0;
-  for (let i = 0; i < dealId.length; i++) {
-    hash = (hash << 5) - hash + dealId.charCodeAt(i);
-    hash |= 0;
-  }
-  const base = Math.abs(hash) % 45 + 12;
-  return Math.min(120, Math.round(base * (1 + discount / 100)));
 }
 
 // Clean Store Badge
@@ -83,6 +75,8 @@ const StoreLogo: React.FC<{ store: string }> = ({ store }) => {
 export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   deal,
   onOpenImage,
+  activeCards,
+  onOpenCardModal,
 }) => {
   const [copied, setCopied] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -92,7 +86,9 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   const relativeTime = getRelativeTime(deal.posted_at);
   const worth = calculateWorthScore(deal);
   const savings = (deal.mrp && deal.mrp > (deal.price || 0)) ? deal.mrp - (deal.price || 0) : 0;
-  const claimedCount = getClaimedCount(deal.id || deal.title, deal.discount_pct || 0);
+  const isExpired = Boolean(deal.is_expired || deal.status === 'expired' || deal.is_over);
+  const effectiveActiveCards = activeCards || getSavedCards();
+  const cardSavings = calculateBestCardSavings(deal, effectiveActiveCards);
 
   const displayTitle = deal.title
     ? deal.title.replace(/^[\s\u2700-\u27BF\uE000-\uF8FF\uD83C-\uDBFF\uDC00-\uDFFF\u2011-\u26FF\uFE0E-\uFE0F\u00A0-\u00BF👉⚡🔥✅🎁📦🚨📢🏷️💎⏰‼️💥]+\s*/gu, '').trim() || deal.title
@@ -112,21 +108,27 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   };
 
   const handleClaim = () => {
-    confetti({
-      particleCount: 25,
-      spread: 50,
-      origin: { y: 0.8 },
-      colors: ['#10B981', '#34D399', '#6EE7B7'],
-    });
+    if (!isExpired) {
+      confetti({
+        particleCount: 25,
+        spread: 50,
+        origin: { y: 0.8 },
+        colors: ['#10B981', '#34D399', '#6EE7B7'],
+      });
+    }
   };
 
   return (
-    <article className="group relative flex flex-col justify-between rounded-2xl border border-white/[0.08] bg-[#121522] hover:border-emerald-500/40 p-3 sm:p-3.5 transition-all duration-200 hover:shadow-xl hover:shadow-black/50 hover:-translate-y-0.5">
+    <article className={`group relative flex flex-col justify-between rounded-2xl border transition-all duration-200 p-3 sm:p-3.5 hover:shadow-xl hover:shadow-black/50 hover:-translate-y-0.5 ${
+      isExpired
+        ? 'bg-[#0E111C] border-rose-900/30 opacity-75'
+        : 'bg-[#121522] border-white/[0.08] hover:border-emerald-500/40'
+    }`}>
       
       <div>
-        {/* 1. Card Top Meta: Store Logo + Relative Time + Verified Status */}
+        {/* 1. Card Top Meta: Store Logo + Relative Time + Verified Status / Consensus Badge */}
         <div className="flex items-center justify-between gap-2 mb-2.5">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <StoreLogo store={deal.store || 'Retail'} />
             <span className="text-[10.5px] text-slate-400 flex items-center gap-1 font-mono">
               <Clock className="w-3 h-3 text-slate-500" />
@@ -135,7 +137,17 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           </div>
 
           <div className="flex items-center gap-1">
-            {deal.desidime_temperature && deal.desidime_temperature >= 100 ? (
+            {isExpired ? (
+              <span className="text-[10px] font-bold text-rose-300 bg-rose-500/20 border border-rose-500/30 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                <AlertTriangle className="w-2.5 h-2.5 text-rose-400" />
+                Sold Out
+              </span>
+            ) : deal.cluster_count && deal.cluster_count >= 2 ? (
+              <span className="text-[10px] font-black text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded flex items-center gap-0.5 animate-pulse" title={`Verified by ${deal.cluster_count} independent channels`}>
+                <Flame className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+                Spotted by {deal.cluster_count} channels
+              </span>
+            ) : deal.desidime_temperature && deal.desidime_temperature >= 100 ? (
               <span className="text-[10px] font-bold text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded flex items-center gap-0.5">
                 <Flame className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
                 {deal.desidime_temperature}°
@@ -174,7 +186,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
               }}
               className={`max-h-full max-w-full object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform duration-300 ${
                 imageLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
+              } ${isExpired ? 'grayscale-[50%]' : ''}`}
               loading="lazy"
             />
           ) : (
@@ -185,18 +197,29 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           )}
 
           {/* Discount Pill Overlay */}
-          {deal.discount_pct && deal.discount_pct > 0 && (
+          {deal.discount_pct && deal.discount_pct > 0 && !isExpired && (
             <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 font-mono text-[10px] font-black shadow-sm">
               {deal.discount_pct}% OFF
             </span>
           )}
 
+          {/* Sold out watermark overlay */}
+          {isExpired && (
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
+              <span className="px-3 py-1 rounded-xl bg-rose-500/80 text-white text-xs font-black tracking-wider uppercase shadow-lg backdrop-blur-sm border border-rose-400/40">
+                Out of Stock
+              </span>
+            </div>
+          )}
+
           {/* Zoom Hover Hint */}
-          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <span className="px-2.5 py-1 rounded-full bg-black/75 text-white text-[11px] font-medium flex items-center gap-1 backdrop-blur-sm border border-white/10">
-              <ZoomIn className="w-3 h-3" /> View
-            </span>
-          </div>
+          {!isExpired && (
+            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <span className="px-2.5 py-1 rounded-full bg-black/75 text-white text-[11px] font-medium flex items-center gap-1 backdrop-blur-sm border border-white/10">
+                <ZoomIn className="w-3 h-3" /> View
+              </span>
+            </div>
+          )}
         </div>
 
         {/* 3. Title */}
@@ -214,9 +237,9 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
 
       <div>
         {/* 4. Price & Savings Row */}
-        <div className="flex items-baseline justify-between gap-1 pt-2 border-t border-white/[0.06] mb-2">
+        <div className="flex items-baseline justify-between gap-1 pt-2 border-t border-white/[0.06] mb-1.5">
           <div className="flex items-baseline gap-1.5">
-            <span className="text-lg sm:text-xl font-bold font-mono text-emerald-400">
+            <span className={`text-lg sm:text-xl font-bold font-mono ${isExpired ? 'text-slate-400 line-through' : 'text-emerald-400'}`}>
               ₹{Math.round(deal.price || 0).toLocaleString('en-IN')}
             </span>
             {deal.mrp && deal.mrp > (deal.price || 0) && (
@@ -226,18 +249,41 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             )}
           </div>
 
-          {savings > 0 && (
+          {savings > 0 && !isExpired && (
             <span className="text-[10px] font-medium text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded">
               Save ₹{savings.toLocaleString('en-IN')}
             </span>
           )}
         </div>
 
-        {/* 5. Live Social Status (People Getting Deals Signal) */}
+        {/* 4b. Personalized Credit Card Savings Pill (Feature #14) */}
+        {cardSavings && !isExpired && (
+          <div
+            onClick={onOpenCardModal}
+            className="flex items-center justify-between gap-1 text-[10.5px] bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-emerald-500/10 border border-white/[0.08] hover:border-amber-400/40 px-2 py-1 rounded-lg mb-2 transition-all cursor-pointer group/card"
+            title="Click to customize your credit cards in My Cards"
+          >
+            <span className="flex items-center gap-1 font-bold text-amber-300 truncate">
+              <CreditCard className="w-3 h-3 text-amber-400 shrink-0" />
+              <span>₹{cardSavings.effectivePrice.toLocaleString('en-IN')} with {cardSavings.cardName}</span>
+            </span>
+            <span className="text-[9.5px] font-black text-emerald-400 font-mono shrink-0">
+              Save ₹{cardSavings.cashbackAmount}
+            </span>
+          </div>
+        )}
+
+        {/* 5. Live Telemetry Status */}
         <div className="flex items-center gap-1.5 text-[10.5px] text-slate-400 bg-white/[0.03] border border-white/[0.05] px-2 py-1 rounded-lg mb-2.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isExpired ? 'bg-rose-400' : 'bg-emerald-400 animate-pulse'}`} />
           <span className="truncate">
-            <strong className="text-slate-200">{claimedCount} shoppers</strong> claimed this today
+            {isExpired ? (
+              <strong className="text-rose-300">Offer expired or sold out on {deal.store}</strong>
+            ) : deal.cluster_count && deal.cluster_count >= 2 ? (
+              <span><strong className="text-amber-300">Spotted across {deal.cluster_count} channels</strong> — Verified drop</span>
+            ) : (
+              <span><strong className="text-slate-200">Live Verified</strong> — Direct {deal.store} checkout</span>
+            )}
           </span>
         </div>
 
@@ -248,10 +294,14 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             target="_blank"
             rel="noopener noreferrer sponsored"
             onClick={handleClaim}
-            className="flex-1 py-2 px-3 rounded-lg bg-white/[0.06] hover:bg-emerald-500 hover:text-slate-950 text-white font-bold text-xs flex items-center justify-center gap-1 border border-white/[0.08] hover:border-emerald-400 transition-all active:scale-[0.98]"
-            aria-label={`Claim deal on ${deal.store}`}
+            className={`flex-1 py-2 px-3 rounded-lg font-bold text-xs flex items-center justify-center gap-1 border transition-all active:scale-[0.98] ${
+              isExpired
+                ? 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border-slate-700'
+                : 'bg-white/[0.06] hover:bg-emerald-500 hover:text-slate-950 text-white border-white/[0.08] hover:border-emerald-400'
+            }`}
+            aria-label={isExpired ? `Check alternate sellers on ${deal.store}` : `Claim deal on ${deal.store}`}
           >
-            <span>Claim on {deal.store}</span>
+            <span>{isExpired ? `Check Sellers on ${deal.store}` : `Claim on ${deal.store}`}</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
 

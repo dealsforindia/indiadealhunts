@@ -1,11 +1,13 @@
 import React from 'react';
 import { NavTab } from '../types';
-import { Sparkles, MessageCircle, Send, Zap, CheckCircle2, Search, PlusCircle } from 'lucide-react';
+import { Sparkles, MessageCircle, Send, Zap, CheckCircle2, Search, PlusCircle, CreditCard } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: NavTab;
   onTabChange: (tab: NavTab) => void;
   totalDeals: number;
+  onOpenCardModal?: () => void;
+  activeCardCount?: number;
 }
 
 const WHATSAPP_CHANNEL_URL = 'https://whatsapp.com/channel/0029VaHCuZs2v1IkBRgH9w3z';
@@ -15,6 +17,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   onTabChange,
   totalDeals,
+  onOpenCardModal,
+  activeCardCount,
 }) => {
   return (
     <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-[#0B0D13]/90 backdrop-blur-xl transition-all shadow-sm">
@@ -122,8 +126,24 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </nav>
 
-          {/* Right Action: Clean Telegram & WhatsApp Channels */}
+          {/* Right Action: Clean Telegram & WhatsApp Channels & My Cards */}
           <div className="flex items-center gap-2 shrink-0">
+            {onOpenCardModal && (
+              <button
+                onClick={onOpenCardModal}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-bold transition-all active:scale-95 shadow-xs cursor-pointer"
+                title="Personalize cashback discounts for your credit cards"
+              >
+                <CreditCard className="w-3.5 h-3.5 text-amber-400 shrink-0" aria-hidden="true" />
+                <span className="hidden sm:inline">My Cards</span>
+                {typeof activeCardCount === 'number' && activeCardCount > 0 && (
+                  <span className="w-4 h-4 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black flex items-center justify-center font-mono">
+                    {activeCardCount}
+                  </span>
+                )}
+              </button>
+            )}
+
             <a
               href={TELEGRAM_CHANNEL_URL}
               target="_blank"
@@ -145,7 +165,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <MessageCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-              <span>WhatsApp Channel</span>
+              <span className="hidden sm:inline">WhatsApp Channel</span>
+              <span className="sm:hidden">WhatsApp</span>
             </a>
           </div>
         </div>
@@ -194,6 +215,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Search className="w-3 h-3 text-emerald-400 shrink-0" aria-hidden="true" />
             <span>Lookup</span>
           </button>
+          {onOpenCardModal && (
+            <button
+              onClick={onOpenCardModal}
+              className="min-h-[38px] px-3 py-1.5 text-xs font-bold whitespace-nowrap rounded-lg flex items-center justify-center gap-1 text-amber-300 bg-amber-500/15 border border-amber-500/30 transition-colors"
+            >
+              <CreditCard className="w-3 h-3 text-amber-400 shrink-0" aria-hidden="true" />
+              <span>Cards</span>
+            </button>
+          )}
           <button
             onClick={() => onTabChange('submit_deal')}
             className={`min-h-[38px] px-3 py-1.5 text-xs font-semibold whitespace-nowrap rounded-lg flex items-center justify-center gap-1 transition-colors ${

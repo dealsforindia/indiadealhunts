@@ -86,7 +86,7 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
 
       const salePrice = data.price || 0;
       const regularPrice = data.regular_price || data.displayRegularPrice || null;
-      const mrpPrice = data.mrp || (regularPrice ? Math.round(regularPrice * 1.25) : null);
+      const mrpPrice = data.mrp || null;
       const discount = data.discount_pct || 0;
 
       const storeName = data.store || (() => {
@@ -158,9 +158,9 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
     const range = maxP - minP || 1;
 
     const width = 460;
-    const height = 80;
-    const padX = 12;
-    const padY = 10;
+    const height = 90;
+    const padX = 14;
+    const padY = 12;
     const chartW = width - padX * 2;
     const chartH = height - padY * 2;
 
@@ -177,20 +177,44 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
     const lastX = Number(lastPoint[0]);
     const lastY = Number(lastPoint[1]);
 
+    const startDate = new Date(sorted[0][0] > 1e11 ? sorted[0][0] : sorted[0][0] * 1000);
+    const endDate = new Date(sorted[sorted.length - 1][0] > 1e11 ? sorted[sorted.length - 1][0] : sorted[sorted.length - 1][0] * 1000);
+    const formatDate = (d: Date) => {
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+    };
+
     return (
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full overflow-visible">
-        <defs>
-          <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#10B981" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
-          </linearGradient>
-        </defs>
-        <line x1={padX} y1={height - 6} x2={width - padX} y2={height - 6} stroke="rgba(255,255,255,0.08)" strokeDasharray="3 3" />
-        <path d={areaD} fill="url(#priceGradient)" />
-        <path d={pathD} fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        <circle cx={lastX} cy={lastY} r="6" fill="#10B981" opacity="0.3" className="animate-ping" />
-        <circle cx={lastX} cy={lastY} r="3.5" fill="#34D399" stroke="#0E1424" strokeWidth="1.5" />
-      </svg>
+      <div className="w-full">
+        <div className="flex justify-between items-center text-[10.5px] text-slate-400 font-mono mb-1.5 px-0.5">
+          <span className="text-slate-400">Peak: <strong className="text-slate-200">₹{maxP.toLocaleString('en-IN')}</strong></span>
+          <span className="text-emerald-400">All-Time Low: <strong className="text-emerald-300">₹{minP.toLocaleString('en-IN')}</strong></span>
+        </div>
+        <div className="w-full h-22 relative">
+          <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full overflow-visible">
+            <defs>
+              <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#10B981" stopOpacity="0.35" />
+                <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
+              </linearGradient>
+            </defs>
+            <line x1={padX} y1={padY} x2={width - padX} y2={padY} stroke="rgba(255,255,255,0.08)" strokeDasharray="3 3" />
+            <line x1={padX} y1={height - padY} x2={width - padX} y2={height - padY} stroke="rgba(16,185,129,0.2)" strokeDasharray="3 3" />
+            <path d={areaD} fill="url(#priceGradient)" />
+            <path d={pathD} fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx={lastX} cy={lastY} r="6" fill="#10B981" opacity="0.3" className="animate-ping" />
+            <circle cx={lastX} cy={lastY} r="3.5" fill="#34D399" stroke="#0E1424" strokeWidth="1.5" />
+          </svg>
+        </div>
+        <div className="flex justify-between items-center text-[10px] text-slate-400 font-mono mt-1 px-1">
+          <span>{formatDate(startDate) || '90 days ago'}</span>
+          <span className="text-emerald-400/90 font-medium flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+            100% Authentic Marketplace Crawl Log
+          </span>
+          <span>{formatDate(endDate) || 'Today'}</span>
+        </div>
+      </div>
     );
   };
 
@@ -454,14 +478,8 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
                         )}
                       </div>
                     </div>
-                    <div className="w-full h-20 relative">
+                    <div className="w-full relative">
                       {renderPriceHistoryChart(result.history, result.price)}
-                    </div>
-                    <div className="flex justify-between items-center text-[10px] text-slate-500 font-mono mt-1 px-1">
-                      <span>90 days ago</span>
-                      <span className={result.in_stock && result.price ? "text-emerald-400 font-bold" : "text-amber-400 font-bold"}>
-                        {result.in_stock && result.price ? `Today: ₹${result.price.toLocaleString('en-IN')}` : 'Status: Out of Stock'}
-                      </span>
                     </div>
                   </div>
                 )}

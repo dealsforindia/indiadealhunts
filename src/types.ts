@@ -25,6 +25,33 @@ export interface PublicDeal {
   is_lowest_price?: boolean;
   regular_price?: number | null;
   displayRegularPrice?: number | null;
+  cluster_count?: number;
+  cluster_channels?: string[];
+  consensus_badge?: string;
+  is_expired?: boolean;
+  status?: string;
+}
+
+export interface CreditCardProfile {
+  id: string;
+  name: string;
+  bank: string;
+  rewardText: string;
+  colorGradient: string;
+  borderColor: string;
+  accentColor: string;
+  cashbackPct: number;
+  stores: string[]; // e.g. ['Amazon'], ['Flipkart'], ['All']
+  monthlyCap?: number;
+}
+
+export interface CardSavingsResult {
+  cardName: string;
+  bank: string;
+  cashbackPct: number;
+  cashbackAmount: number;
+  effectivePrice: number;
+  colorGradient: string;
 }
 
 export interface CuratedBundleItem {
@@ -111,5 +138,5 @@ export interface LookupResult {
 }
 
 export type SortOption = 'worth' | 'newest' | 'discount' | 'price_low' | 'price_high';
-export type NavTab = 'home' | 'ending_soon' | 'best_worth' | 'active_offers' | 'lookup' | 'reviews' | 'submit_deal' | 'about' | 'how_we_verify' | 'contact';
+export type NavTab = 'home' | 'ending_soon' | 'best_worth' | 'active_offers' | 'lookup' | 'submit_deal' | 'about' | 'how_we_verify' | 'contact';
 

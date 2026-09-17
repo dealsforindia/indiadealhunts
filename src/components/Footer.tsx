@@ -141,15 +141,6 @@ export const Footer: React.FC<FooterProps> = ({ onTabChange, onOpenLegal }) => {
                 >
                   Contact & Support
                 </button>
-                {/* Hidden purposely: mock testimonials / Wall of Happiness
-                <button
-                  onClick={() => onTabChange && onTabChange('reviews')}
-                  className="text-sm text-slate-300 hover:text-emerald-400 transition-colors text-left focus-ring rounded flex items-center gap-1"
-                >
-                  <Heart className="w-3 h-3 text-pink-400" />
-                  Wall of Happiness
-                </button>
-                */}
               </nav>
             </div>
 

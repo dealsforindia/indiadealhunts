@@ -6,7 +6,8 @@ import { PublicDealCard } from './components/PublicDealCard';
 import { ImageModal } from './components/ImageModal';
 import { LegalModal, LegalDocType } from './components/LegalModal';
 import { DealLookupModal } from './components/DealLookupModal';
-import { WallOfHappiness } from './components/WallOfHappiness';
+import { CardCalculatorModal } from './components/CardCalculatorModal';
+import { getSavedCards } from './utils/cardSavings';
 import { FloatingDock } from './components/FloatingDock';
 import { Footer } from './components/Footer';
 import { SubmitDeal } from './components/SubmitDeal';
@@ -47,11 +48,14 @@ export const App: React.FC = () => {
   const [hasMore, setHasMore] = useState<boolean>(true);
   const PAGE_SIZE = 40;
 
-  // Modals
+  // Modals & User Customization
   const [lightboxDeal, setLightboxDeal] = useState<PublicDeal | null>(null);
   const [activeLegal, setActiveLegal] = useState<LegalDocType>(null);
   const [isLookupOpen, setIsLookupOpen] = useState<boolean>(false);
   const [lookupUrl, setLookupUrl] = useState<string>('');
+  const [isCardModalOpen, setIsCardModalOpen] = useState<boolean>(false);
+  const [activeCards, setActiveCards] = useState<string[]>(() => getSavedCards());
+  const [onlyConsensus, setOnlyConsensus] = useState<boolean>(false);
 
   // Fetch Deals from Backend
   const fetchDeals = useCallback(
@@ -225,6 +229,11 @@ export const App: React.FC = () => {
       }
     }
 
+    // Filter for Multi-Channel Consensus (spotted across 2+ channels)
+    if (onlyConsensus) {
+      result = result.filter((d) => Boolean(d.cluster_count && d.cluster_count >= 2));
+    }
+
     // Sorting Logic
     if (sortBy === 'worth') {
       result.sort((a, b) => (b.worth_score || 0) - (a.worth_score || 0));
@@ -239,7 +248,7 @@ export const App: React.FC = () => {
     }
 
     return result;
-  }, [deals, topShowcaseDeals, activeTab, sortBy, hideOverEndingSoon, endingSoonStoreFilter, selectedCategory]);
+  }, [deals, topShowcaseDeals, activeTab, sortBy, hideOverEndingSoon, endingSoonStoreFilter, selectedCategory, onlyConsensus]);
 
   const handleLoadMore = () => {
     if (!loadingMore && hasMore) {
@@ -265,6 +274,8 @@ export const App: React.FC = () => {
           }
         }}
         totalDeals={totalDeals}
+        onOpenCardModal={() => setIsCardModalOpen(true)}
+        activeCardCount={activeCards.length}
       />
 
       {/* 2. Main Content Area with Safe Bottom Padding */}
@@ -333,6 +344,8 @@ export const App: React.FC = () => {
                       key={`orn-${deal.id}`}
                       deal={deal}
                       onOpenImage={setLightboxDeal}
+                      activeCards={activeCards}
+                      onOpenCardModal={() => setIsCardModalOpen(true)}
                     />
                   ))}
                 </div>
@@ -373,6 +386,8 @@ export const App: React.FC = () => {
                       deal={deal}
                       onOpenImage={setLightboxDeal}
                       isEndingSoonView={true}
+                      activeCards={activeCards}
+                      onOpenCardModal={() => setIsCardModalOpen(true)}
                     />
                   ))}
                 </div>
@@ -389,6 +404,8 @@ export const App: React.FC = () => {
                 sortBy={sortBy}
                 onSortChange={setSortBy}
                 totalDeals={gridDeals.length}
+                onlyConsensus={onlyConsensus}
+                onToggleConsensus={() => setOnlyConsensus((prev) => !prev)}
               />
             </div>
 
@@ -451,6 +468,8 @@ export const App: React.FC = () => {
                       key={deal.id}
                       deal={deal}
                       onOpenImage={setLightboxDeal}
+                      activeCards={activeCards}
+                      onOpenCardModal={() => setIsCardModalOpen(true)}
                     />
                   ))}
                 </div>
@@ -555,6 +574,8 @@ export const App: React.FC = () => {
                   deal={deal}
                   onOpenImage={setLightboxDeal}
                   isEndingSoonView={true}
+                  activeCards={activeCards}
+                  onOpenCardModal={() => setIsCardModalOpen(true)}
                 />
               ))}
             </div>
@@ -585,6 +606,8 @@ export const App: React.FC = () => {
                   deal={deal}
                   onOpenImage={setLightboxDeal}
                   isBestWorthView={true}
+                  activeCards={activeCards}
+                  onOpenCardModal={() => setIsCardModalOpen(true)}
                 />
               ))}
             </div>
@@ -723,10 +746,6 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 5: WALL OF HAPPINESS (COMMUNITY UNBOXING & PROOF) VIEW */}
-        {activeTab === 'reviews' && (
-          <WallOfHappiness />
-        )}
 
         {/* Tab 6: SUBMIT DEAL VIEW (ShoppinGenie Feature) */}
         {activeTab === 'submit_deal' && (
@@ -802,6 +821,13 @@ export const App: React.FC = () => {
           setLookupUrl('');
           if (activeTab === 'lookup') setActiveTab('home');
         }}
+      />
+
+      {/* 8. Personalized Credit Card Price Calculator Modal */}
+      <CardCalculatorModal
+        isOpen={isCardModalOpen}
+        onClose={() => setIsCardModalOpen(false)}
+        onCardsUpdated={setActiveCards}
       />
 
     </div>

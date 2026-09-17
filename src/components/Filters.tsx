@@ -1,6 +1,6 @@
 import React from 'react';
 import { SortOption } from '../types';
-import { Store, Layers, ArrowUpDown, Smartphone, Shirt, Home, Utensils, Apple, Sparkles } from 'lucide-react';
+import { Store, Layers, ArrowUpDown, Smartphone, Shirt, Home, Utensils, Apple, Sparkles, Flame } from 'lucide-react';
 
 interface FiltersProps {
   selectedStore: string;
@@ -10,6 +10,8 @@ interface FiltersProps {
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
   totalDeals: number;
+  onlyConsensus?: boolean;
+  onToggleConsensus?: () => void;
 }
 
 const STORES = [
@@ -41,6 +43,8 @@ export const Filters: React.FC<FiltersProps> = ({
   sortBy,
   onSortChange,
   totalDeals,
+  onlyConsensus = false,
+  onToggleConsensus,
 }) => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-6 space-y-3" role="region" aria-label="Deal Filters and Sorting">
@@ -74,6 +78,21 @@ export const Filters: React.FC<FiltersProps> = ({
               </button>
             );
           })}
+          {onToggleConsensus && (
+            <button
+              onClick={onToggleConsensus}
+              className={`min-h-[34px] px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap transition-all border cursor-pointer select-none flex items-center gap-1.5 shrink-0 ${
+                onlyConsensus
+                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm'
+                  : 'bg-[#121522] text-slate-400 border-white/[0.06] hover:border-amber-500/30 hover:text-amber-300'
+              }`}
+              title="Filter deals confirmed by 2 or more independent Telegram channels"
+              aria-pressed={onlyConsensus}
+            >
+              <Flame className={`w-3.5 h-3.5 ${onlyConsensus ? 'fill-amber-400 text-amber-400' : 'text-slate-400'}`} />
+              <span>Consensus (2+ Channels)</span>
+            </button>
+          )}
         </div>
 
         {/* Right Sort Controls & Live Count Badge */}
