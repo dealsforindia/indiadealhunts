@@ -119,25 +119,13 @@ export const App: React.FC = () => {
     fetchDeals(0, false);
   }, [fetchDeals]);
 
-  // Spotlight Deal (Highest Rupee Savings Deal with verified physical product heuristics)
-  const spotlightDeal = useMemo(() => {
-    if (!deals || deals.length === 0) return null;
+  // Curated Top 3 Showcase Drops for Hero (Highest real savings on physical goods)
+  const topShowcaseDeals = useMemo(() => {
+    if (!deals || deals.length === 0) return [];
 
     const spamPhrases = [
-      'lab test',
-      'test @',
-      'recharge',
-      'refer',
-      'loot -',
-      'loot alert',
-      'voucher',
-      'minutes',
-      'short',
-      'bottle',
-      'party',
-      'watch video',
-      'survey',
-      'claim free',
+      'lab test', 'test @', 'recharge', 'refer', 'loot -', 'loot alert', 'voucher',
+      'minutes', 'short', 'bottle', 'party', 'watch video', 'survey', 'claim free',
     ];
 
     const candidates = deals.filter((d) => {
@@ -159,11 +147,9 @@ export const App: React.FC = () => {
       return 0;
     };
 
-    // Prefer deals with official high-res store images (e.g. Amazon, Flipkart, Myntra direct CDNs)
-    // and high discount / savings
     candidates.sort((a, b) => {
-      const aIsStoreCdn = a.image.includes('media-amazon.com') || a.image.includes('rukminim') || a.image.includes('myntassets');
-      const bIsStoreCdn = b.image.includes('media-amazon.com') || b.image.includes('rukminim') || b.image.includes('myntassets');
+      const aIsStoreCdn = a.image?.includes('media-amazon.com') || a.image?.includes('rukminim') || a.image?.includes('myntassets');
+      const bIsStoreCdn = b.image?.includes('media-amazon.com') || b.image?.includes('rukminim') || b.image?.includes('myntassets');
       if (aIsStoreCdn && !bIsStoreCdn) return -1;
       if (!aIsStoreCdn && bIsStoreCdn) return 1;
 
@@ -172,8 +158,10 @@ export const App: React.FC = () => {
       return saveB - saveA;
     });
 
-    return candidates[0] || deals[0];
+    return candidates.slice(0, 3);
   }, [deals]);
+
+  const spotlightDeal = topShowcaseDeals[0] || deals[0] || null;
 
   // Curated Carousels for Homepage (ShoppinGenie Pattern: "Order Right Now" + "Ending Soon")
   const orderRightNowDeals = useMemo(() => {
@@ -192,9 +180,10 @@ export const App: React.FC = () => {
   const gridDeals = useMemo(() => {
     let result = [...deals];
 
-    // Exclude spotlight in home tab
-    if (activeTab === 'home' && spotlightDeal) {
-      result = result.filter((d) => d.id !== spotlightDeal.id);
+    // Exclude showcase deals in home tab so they don't repeat
+    if (activeTab === 'home' && topShowcaseDeals.length > 0) {
+      const showcaseIds = new Set(topShowcaseDeals.map((d) => d.id));
+      result = result.filter((d) => !showcaseIds.has(d.id));
     }
 
     // Filter for 'loot70' (70%+ off steal deals)
@@ -232,7 +221,7 @@ export const App: React.FC = () => {
     }
 
     return result;
-  }, [deals, spotlightDeal, activeTab, sortBy, hideOverEndingSoon, endingSoonStoreFilter, selectedCategory]);
+  }, [deals, topShowcaseDeals, activeTab, sortBy, hideOverEndingSoon, endingSoonStoreFilter, selectedCategory]);
 
   const handleLoadMore = () => {
     if (!loadingMore && hasMore) {
@@ -266,7 +255,7 @@ export const App: React.FC = () => {
         {/* Tab 1: HOME VIEW */}
         {activeTab === 'home' && (
           <>
-            {/* Hero Banner with Search & Spotlight */}
+            {/* Hero Banner with Search & Top 3 Curated Drops Showcase */}
             <HeroBanner
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
@@ -276,6 +265,7 @@ export const App: React.FC = () => {
               }}
               dealCount={totalDeals}
               spotlightDeal={spotlightDeal}
+              showcaseDeals={topShowcaseDeals}
               onOpenLookup={(url) => {
                 setLookupUrl(url || '');
                 setIsLookupOpen(true);
