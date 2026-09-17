@@ -22,6 +22,9 @@ export interface PublicDeal {
   desidime_temperature?: number | null;
   is_community_verified?: boolean;
   deal_score?: number | null;
+  is_lowest_price?: boolean;
+  regular_price?: number | null;
+  displayRegularPrice?: number | null;
 }
 
 export interface CuratedBundleItem {
@@ -88,6 +91,7 @@ export interface PublicDealsResponse {
 export interface LookupResult {
   title: string;
   price: number;
+  regular_price?: number | null;
   mrp?: number | null;
   discount_pct?: number | null;
   image: string;
@@ -97,8 +101,12 @@ export interface LookupResult {
   worth_score?: number;
   worth_label?: string;
   is_verified_deal: boolean;
+  is_lowest_price?: boolean;
+  lowest_price?: number | null;
+  history?: Array<[number, number]>;
   savings?: number | null;
   verdict: string;
+  stock_text?: string | null;
 }
 
 export type SortOption = 'worth' | 'newest' | 'discount' | 'price_low' | 'price_high';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, ArrowRight, ExternalLink, ShieldCheck, RefreshCw, X, Link as LinkIcon, AlertTriangle } from 'lucide-react';
+import { Sparkles, ArrowRight, ExternalLink, ShieldCheck, RefreshCw, X, Link as LinkIcon, AlertTriangle, TrendingDown } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { LookupResult } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
@@ -34,7 +34,6 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
 
   // Handle Escape key to close modal
   useEffect(() => {
-    if (!isModal || !isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && onClose) {
         onClose();
@@ -42,11 +41,12 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isModal, isOpen, onClose]);
+  }, [onClose]);
 
   if (isOpen === false) return null;
 
   const sampleUrls = [
+    { label: 'Clovia Baby Doll', url: 'https://www.amazon.in/dp/B00ZFE7ZQI' },
     { label: 'Borosil Bottle', url: 'https://www.amazon.in/dp/B0FB3SZJN9' },
     { label: 'Converse Sneakers', url: 'https://www.myntra.com/casual-shoes/converse/converse-unisex-sneakers/12345/buy' },
     { label: 'Cello Dinner Set', url: 'https://www.flipkart.com/cello-opalware-dinner-set/p/itm12345' },
@@ -69,7 +69,7 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
     setResultImgError(false);
 
     try {
-      const res = await fetch(`${API_BASE}/api/v1/deals/quick-drop`, {
+      const res = await fetch(`${API_BASE}/api/v1/deals/lookup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: targetUrl }),
@@ -80,12 +80,16 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
       }
 
       const data = await res.json();
-      const salePrice = data.prices?.sale || data.price || 0;
-      const mrpPrice = data.prices?.mrp || data.mrp || 0;
-      const discount = data.prices?.discount_pct || (mrpPrice > salePrice && mrpPrice > 0 ? Math.round((1 - salePrice / mrpPrice) * 100) : 0);
-      const usually = mrpPrice > salePrice ? Math.round(salePrice * 1.35) : Math.round(salePrice * 1.15);
+      if (!data.success) {
+        throw new Error(data.error || 'Product lookup service temporarily unavailable.');
+      }
 
-      const storeName = (() => {
+      const salePrice = data.price || 0;
+      const regularPrice = data.regular_price || data.displayRegularPrice || null;
+      const mrpPrice = data.mrp || (regularPrice ? Math.round(regularPrice * 1.25) : null);
+      const discount = data.discount_pct || 0;
+
+      const storeName = data.store || (() => {
         const u = targetUrl.toLowerCase();
         if (u.includes('amazon')) return 'Amazon India';
         if (u.includes('flipkart') || u.includes('fkrt')) return 'Flipkart';
@@ -95,24 +99,29 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
         return 'Online Store';
       })();
 
-      const cleanImg = getCleanImageUrl(data.store_img_url || data.img_url || data.image || '');
+      const cleanImg = getCleanImageUrl(data.image || data.store_img_url || data.img_url || '');
 
       setResult({
-        title: data.title || data.prod_name || 'Verified Product Drop',
+        title: data.title || 'Verified Product Drop',
         price: salePrice,
-        mrp: mrpPrice > 0 ? mrpPrice : null,
+        regular_price: regularPrice,
+        mrp: mrpPrice,
         discount_pct: discount > 0 ? discount : null,
         image: cleanImg,
         url: data.aff_url || data.url || targetUrl,
         store: storeName,
-        usually_price: usually > salePrice ? usually : null,
-        worth_score: discount >= 50 ? 88 : discount >= 30 ? 76 : 65,
-        worth_label: discount >= 50 ? 'Steal Deal' : discount >= 30 ? 'Good Offer' : 'Fair Price',
+        usually_price: regularPrice && regularPrice > salePrice ? regularPrice : null,
+        worth_score: data.worth_score || (data.is_lowest_price ? 92 : (discount >= 40 ? 86 : 75)),
+        worth_label: data.worth_label || (data.is_lowest_price ? 'All-Time Low' : (discount >= 40 ? 'Steal Deal' : 'Good Offer')),
         is_verified_deal: salePrice > 0,
-        savings: mrpPrice > salePrice ? mrpPrice - salePrice : null,
-        verdict: discount >= 40 
-          ? `Verified Genuine Price Drop: Current price of ₹${salePrice.toLocaleString('en-IN')} is ${discount}% lower than typical retail benchmarks.`
-          : `Verified Listing: Currently active at ₹${salePrice.toLocaleString('en-IN')}. Good value for daily use.`
+        is_lowest_price: Boolean(data.is_lowest_price),
+        lowest_price: data.lowest_price,
+        history: data.history || [],
+        stock_text: data.stock_text,
+        savings: regularPrice && regularPrice > salePrice ? regularPrice - salePrice : (mrpPrice && mrpPrice > salePrice ? mrpPrice - salePrice : null),
+        verdict: data.verdict || (data.is_lowest_price
+          ? `🔥 All-Time Lowest Price: Current price of ₹${salePrice.toLocaleString('en-IN')} is the lowest recorded in 90 days (Usually sells for ₹${regularPrice?.toLocaleString('en-IN')}).`
+          : `Verified Price Drop: Current price of ₹${salePrice.toLocaleString('en-IN')} is ${discount}% lower than typical retail benchmarks.`),
       });
 
       if (discount >= 35 || salePrice > 0) {
@@ -133,6 +142,51 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
     } finally {
       setLoading(false);
     }
+  };
+
+  const renderPriceHistoryChart = (history: Array<[number, number]>, currentPrice: number) => {
+    if (!history || history.length < 2) return null;
+    const sorted = [...history].sort((a, b) => a[0] - b[0]);
+    const prices = sorted.map((p) => p[1]);
+    const minP = Math.min(...prices, currentPrice);
+    const maxP = Math.max(...prices, currentPrice);
+    const range = maxP - minP || 1;
+
+    const width = 460;
+    const height = 80;
+    const padX = 12;
+    const padY = 10;
+    const chartW = width - padX * 2;
+    const chartH = height - padY * 2;
+
+    const points = sorted.map((p, i) => {
+      const x = padX + (i / (sorted.length - 1)) * chartW;
+      const y = padY + chartH - ((p[1] - minP) / range) * chartH;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    });
+
+    const pathD = `M ${points.join(' L ')}`;
+    const areaD = `${pathD} L ${width - padX},${height - 4} L ${padX},${height - 4} Z`;
+
+    const lastPoint = points[points.length - 1].split(',');
+    const lastX = Number(lastPoint[0]);
+    const lastY = Number(lastPoint[1]);
+
+    return (
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full overflow-visible">
+        <defs>
+          <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#10B981" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
+          </linearGradient>
+        </defs>
+        <line x1={padX} y1={height - 6} x2={width - padX} y2={height - 6} stroke="rgba(255,255,255,0.08)" strokeDasharray="3 3" />
+        <path d={areaD} fill="url(#priceGradient)" />
+        <path d={pathD} fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx={lastX} cy={lastY} r="6" fill="#10B981" opacity="0.3" className="animate-ping" />
+        <circle cx={lastX} cy={lastY} r="3.5" fill="#34D399" stroke="#0E1424" strokeWidth="1.5" />
+      </svg>
+    );
   };
 
   const content = (
@@ -337,10 +391,52 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
                   )}
                 </div>
 
-                {/* Instant Savings Badge */}
-                {result.savings && result.savings > 0 && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-black mb-3">
-                    <span>💰 Instant Rupee Savings: ₹{result.savings.toLocaleString('en-IN')}</span>
+                {/* All-time lowest badge */}
+                {result.is_lowest_price && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gradient-to-r from-rose-500/25 to-amber-500/25 border border-rose-500/40 text-amber-300 text-xs font-black shadow-lg shadow-rose-500/10 mb-2 w-fit">
+                    <span className="animate-pulse">🔥</span>
+                    <span>ALL-TIME LOWEST PRICE IN 90 DAYS</span>
+                  </div>
+                )}
+
+                {/* Instant Savings Badge & Stock Indicator */}
+                <div className="flex items-center gap-2 flex-wrap mb-3">
+                  {result.savings && result.savings > 0 && (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-black">
+                      <span>💰 Instant Savings: ₹{result.savings.toLocaleString('en-IN')}</span>
+                    </div>
+                  )}
+                  {result.stock_text && (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-semibold">
+                      <span>📦 {result.stock_text}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* 90-Day Real Price History Chart */}
+                {result.history && result.history.length > 1 && (
+                  <div className="mb-4 p-3.5 rounded-2xl bg-black/40 border border-white/10 backdrop-blur-md">
+                    <div className="flex items-center justify-between text-xs mb-2">
+                      <span className="font-bold text-slate-200 flex items-center gap-1.5">
+                        <TrendingDown className="w-3.5 h-3.5 text-emerald-400" />
+                        90-Day Real Price History
+                      </span>
+                      <div className="flex items-center gap-2.5 text-[11px] font-mono">
+                        {result.lowest_price && (
+                          <span className="text-emerald-400 font-bold">Low: ₹{result.lowest_price.toLocaleString('en-IN')}</span>
+                        )}
+                        {result.regular_price && (
+                          <span className="text-slate-400">Regular: ₹{result.regular_price.toLocaleString('en-IN')}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="w-full h-20 relative">
+                      {renderPriceHistoryChart(result.history, result.price)}
+                    </div>
+                    <div className="flex justify-between items-center text-[10px] text-slate-500 font-mono mt-1 px-1">
+                      <span>90 days ago</span>
+                      <span className="text-emerald-400 font-bold">Today: ₹{result.price.toLocaleString('en-IN')}</span>
+                    </div>
                   </div>
                 )}
 

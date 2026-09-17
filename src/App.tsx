@@ -147,15 +147,33 @@ export const App: React.FC = () => {
       return 0;
     };
 
-    candidates.sort((a, b) => {
-      const aIsStoreCdn = a.image?.includes('media-amazon.com') || a.image?.includes('rukminim') || a.image?.includes('myntassets');
-      const bIsStoreCdn = b.image?.includes('media-amazon.com') || b.image?.includes('rukminim') || b.image?.includes('myntassets');
-      if (aIsStoreCdn && !bIsStoreCdn) return -1;
-      if (!aIsStoreCdn && bIsStoreCdn) return 1;
+    const now = Date.now() / 1000;
 
-      const saveA = calculateSavings(a);
-      const saveB = calculateSavings(b);
-      return saveB - saveA;
+    // Showcase Recent Best Deals (Fresh drops from recent hours + top worth scores & discounts)
+    candidates.sort((a, b) => {
+      const ageA = Math.max(0, (now - (a.posted_at || now)) / 3600); // hours
+      const ageB = Math.max(0, (now - (b.posted_at || now)) / 3600);
+
+      // Recency multiplier: top priority for fresh drops (<12h)
+      const recencyA = Math.exp(-ageA / 12);
+      const recencyB = Math.exp(-ageB / 12);
+
+      const aIsStoreCdn = a.image?.includes('media-amazon.com') || a.image?.includes('rukminim') || a.image?.includes('myntassets') ? 15 : 0;
+      const bIsStoreCdn = b.image?.includes('media-amazon.com') || b.image?.includes('rukminim') || b.image?.includes('myntassets') ? 15 : 0;
+
+      const worthA = a.worth_score || 75;
+      const worthB = b.worth_score || 75;
+
+      const discA = Math.min(90, a.discount_pct || 0);
+      const discB = Math.min(90, b.discount_pct || 0);
+
+      const lowestBonusA = a.is_lowest_price ? 15 : 0;
+      const lowestBonusB = b.is_lowest_price ? 15 : 0;
+
+      const scoreA = (worthA * 0.35 + discA * 0.35 + aIsStoreCdn + lowestBonusA) * (0.6 + 0.4 * recencyA);
+      const scoreB = (worthB * 0.35 + discB * 0.35 + bIsStoreCdn + lowestBonusB) * (0.6 + 0.4 * recencyB);
+
+      return scoreB - scoreA;
     });
 
     return candidates.slice(0, 3);
