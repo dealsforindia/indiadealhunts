@@ -46,10 +46,10 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
   if (isOpen === false) return null;
 
   const sampleUrls = [
-    { label: 'Clovia Baby Doll', url: 'https://www.amazon.in/dp/B00ZFE7ZQI' },
-    { label: 'Borosil Bottle', url: 'https://www.amazon.in/dp/B0FB3SZJN9' },
-    { label: 'Converse Sneakers', url: 'https://www.myntra.com/casual-shoes/converse/converse-unisex-sneakers/12345/buy' },
-    { label: 'Cello Dinner Set', url: 'https://www.flipkart.com/cello-opalware-dinner-set/p/itm12345' },
+    { label: 'Cricket Helmet (₹206)', url: 'https://www.amazon.in/dp/B09NQ5ZV2K' },
+    { label: 'Maybelline Lip Tint (₹372)', url: 'https://www.amazon.in/dp/B0D9WCCRMF' },
+    { label: 'SARIYA Midi Dress (₹569)', url: 'https://www.amazon.in/dp/B0DGX9N4LX' },
+    { label: 'Rosegold Spoon Set (₹499)', url: 'https://www.amazon.in/dp/B0CYH7F974' },
   ];
 
   const handleLookup = async (inputUrl: string) => {
@@ -100,6 +100,7 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
       })();
 
       const cleanImg = getCleanImageUrl(data.image || data.store_img_url || data.img_url || '');
+      const inStock = data.in_stock !== false && Boolean(salePrice && salePrice > 0);
 
       setResult({
         title: data.title || 'Verified Product Drop',
@@ -111,20 +112,23 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
         url: data.aff_url || data.url || targetUrl,
         store: storeName,
         usually_price: regularPrice && regularPrice > salePrice ? regularPrice : null,
-        worth_score: data.worth_score || (data.is_lowest_price ? 92 : (discount >= 40 ? 86 : 75)),
-        worth_label: data.worth_label || (data.is_lowest_price ? 'All-Time Low' : (discount >= 40 ? 'Steal Deal' : 'Good Offer')),
-        is_verified_deal: salePrice > 0,
-        is_lowest_price: Boolean(data.is_lowest_price),
+        worth_score: !inStock ? 60 : (data.worth_score || (data.is_lowest_price ? 92 : (discount >= 40 ? 86 : 75))),
+        worth_label: !inStock ? 'Out of Stock' : (data.worth_label || (data.is_lowest_price ? 'All-Time Low' : (discount >= 40 ? 'Steal Deal' : 'Good Offer'))),
+        is_verified_deal: inStock,
+        in_stock: inStock,
+        is_lowest_price: Boolean(data.is_lowest_price && inStock),
         lowest_price: data.lowest_price,
         history: data.history || [],
-        stock_text: data.stock_text,
-        savings: regularPrice && regularPrice > salePrice ? regularPrice - salePrice : (mrpPrice && mrpPrice > salePrice ? mrpPrice - salePrice : null),
-        verdict: data.verdict || (data.is_lowest_price
-          ? `🔥 All-Time Lowest Price: Current price of ₹${salePrice.toLocaleString('en-IN')} is the lowest recorded in 90 days (Usually sells for ₹${regularPrice?.toLocaleString('en-IN')}).`
-          : `Verified Price Drop: Current price of ₹${salePrice.toLocaleString('en-IN')} is ${discount}% lower than typical retail benchmarks.`),
+        stock_text: inStock ? data.stock_text : 'Currently unavailable on merchant store',
+        savings: inStock && regularPrice && regularPrice > salePrice ? regularPrice - salePrice : (inStock && mrpPrice && mrpPrice > salePrice ? mrpPrice - salePrice : null),
+        verdict: !inStock
+          ? `⚠️ Currently Unavailable: This item is out of stock or unavailable from the primary seller on ${storeName}. 90-day price history is preserved above for your reference.`
+          : (data.verdict || (data.is_lowest_price
+            ? `🔥 All-Time Lowest Price: Current price of ₹${salePrice.toLocaleString('en-IN')} is the lowest recorded in 90 days (Usually sells for ₹${regularPrice?.toLocaleString('en-IN')}).`
+            : `Verified Price Drop: Current price of ₹${salePrice.toLocaleString('en-IN')} is ${discount}% lower than typical retail benchmarks.`)),
       });
 
-      if (discount >= 35 || salePrice > 0) {
+      if (inStock && (discount >= 35 || salePrice > 0)) {
         try {
           confetti({
             particleCount: 38,
@@ -148,8 +152,9 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
     if (!history || history.length < 2) return null;
     const sorted = [...history].sort((a, b) => a[0] - b[0]);
     const prices = sorted.map((p) => p[1]);
-    const minP = Math.min(...prices, currentPrice);
-    const maxP = Math.max(...prices, currentPrice);
+    const validCurrent = currentPrice && currentPrice > 0 ? [currentPrice] : [];
+    const minP = Math.min(...prices, ...validCurrent);
+    const maxP = Math.max(...prices, ...validCurrent);
     const range = maxP - minP || 1;
 
     const width = 460;
@@ -367,29 +372,48 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
                 </h3>
 
                 {/* Price Row with High-Impact Typography */}
-                <div className="flex items-baseline gap-3 flex-wrap mb-3">
-                  <span className="text-3xl sm:text-4xl font-price font-black text-emerald-400 tracking-tight">
-                    ₹{result.price.toLocaleString('en-IN')}
-                  </span>
-
-                  {result.usually_price && result.usually_price > result.price && (
-                    <span className="text-xs text-slate-400">
-                      Regular: <strong className="text-slate-300 line-through font-mono">₹{result.usually_price.toLocaleString('en-IN')}</strong>
+                {!result.in_stock || !result.price ? (
+                  <div className="flex items-center gap-3 flex-wrap mb-3">
+                    <span className="px-3.5 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 font-bold text-sm border border-rose-500/30 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
+                      Currently Unavailable
                     </span>
-                  )}
-
-                  {result.mrp && result.mrp > result.price && (
-                    <span className="text-xs text-slate-500 line-through font-mono">
-                      MRP ₹{result.mrp.toLocaleString('en-IN')}
+                    {(result.regular_price || result.usually_price) && (
+                      <span className="text-xs text-slate-400">
+                        Typical Price: <strong className="text-slate-300 font-mono">₹{(result.regular_price || result.usually_price)?.toLocaleString('en-IN')}</strong>
+                      </span>
+                    )}
+                    {result.lowest_price && (
+                      <span className="text-xs text-emerald-400/90 font-mono">
+                        90D Low: ₹{result.lowest_price.toLocaleString('en-IN')}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-baseline gap-3 flex-wrap mb-3">
+                    <span className="text-3xl sm:text-4xl font-price font-black text-emerald-400 tracking-tight">
+                      ₹{result.price.toLocaleString('en-IN')}
                     </span>
-                  )}
 
-                  {result.discount_pct && (
-                    <span className="px-2.5 py-1 rounded-lg bg-orange-500/20 text-orange-400 font-black text-xs border border-orange-500/30">
-                      {result.discount_pct}% OFF
-                    </span>
-                  )}
-                </div>
+                    {result.usually_price && result.usually_price > result.price && (
+                      <span className="text-xs text-slate-400">
+                        Regular: <strong className="text-slate-300 line-through font-mono">₹{result.usually_price.toLocaleString('en-IN')}</strong>
+                      </span>
+                    )}
+
+                    {result.mrp && result.mrp > result.price && (
+                      <span className="text-xs text-slate-500 line-through font-mono">
+                        MRP ₹{result.mrp.toLocaleString('en-IN')}
+                      </span>
+                    )}
+
+                    {result.discount_pct && (
+                      <span className="px-2.5 py-1 rounded-lg bg-orange-500/20 text-orange-400 font-black text-xs border border-orange-500/30">
+                        {result.discount_pct}% OFF
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 {/* All-time lowest badge */}
                 {result.is_lowest_price && (
@@ -435,7 +459,9 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
                     </div>
                     <div className="flex justify-between items-center text-[10px] text-slate-500 font-mono mt-1 px-1">
                       <span>90 days ago</span>
-                      <span className="text-emerald-400 font-bold">Today: ₹{result.price.toLocaleString('en-IN')}</span>
+                      <span className={result.in_stock && result.price ? "text-emerald-400 font-bold" : "text-amber-400 font-bold"}>
+                        {result.in_stock && result.price ? `Today: ₹${result.price.toLocaleString('en-IN')}` : 'Status: Out of Stock'}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -445,18 +471,31 @@ export const DealLookupModal: React.FC<DealLookupProps> = ({
                   {result.verdict}
                 </p>
 
-                {/* Grab Deal Button with Animated Beam Sweep */}
-                <a
-                  href={result.url}
-                  target="_blank"
-                  rel="noopener noreferrer sponsored"
-                  className="relative overflow-hidden w-full sm:w-auto min-h-[48px] px-7 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 text-slate-950 font-black text-sm tracking-tight flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all duration-200 active:scale-95 cursor-pointer focus-ring group"
-                  aria-label={`Grab verified deal on ${result.store} for ₹${result.price.toLocaleString('en-IN')}`}
-                >
-                  <div className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/35 to-transparent skew-x-12 animate-beam-sweep pointer-events-none" />
-                  <ExternalLink className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" aria-hidden="true" />
-                  <span>Grab Deal on {result.store}</span>
-                </a>
+                {/* Grab Deal or Check Alternate Sellers Button */}
+                {!result.in_stock || !result.price ? (
+                  <a
+                    href={result.url}
+                    target="_blank"
+                    rel="noopener noreferrer sponsored"
+                    className="w-full sm:w-auto min-h-[48px] px-6 py-3.5 rounded-2xl bg-slate-800/90 hover:bg-slate-700/90 border border-slate-700 text-slate-200 font-bold text-sm tracking-tight flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95 cursor-pointer focus-ring group"
+                    aria-label={`Check alternate sellers or restock for this item on ${result.store}`}
+                  >
+                    <ExternalLink className="w-4 h-4 shrink-0 text-slate-400 group-hover:text-white transition-transform group-hover:scale-110" aria-hidden="true" />
+                    <span>Check Alternate Sellers on {result.store}</span>
+                  </a>
+                ) : (
+                  <a
+                    href={result.url}
+                    target="_blank"
+                    rel="noopener noreferrer sponsored"
+                    className="relative overflow-hidden w-full sm:w-auto min-h-[48px] px-7 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 text-slate-950 font-black text-sm tracking-tight flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all duration-200 active:scale-95 cursor-pointer focus-ring group"
+                    aria-label={`Grab verified deal on ${result.store} for ₹${result.price.toLocaleString('en-IN')}`}
+                  >
+                    <div className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/35 to-transparent skew-x-12 animate-beam-sweep pointer-events-none" />
+                    <ExternalLink className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" aria-hidden="true" />
+                    <span>Grab Deal on {result.store}</span>
+                  </a>
+                )}
               </div>
             </div>
           </div>

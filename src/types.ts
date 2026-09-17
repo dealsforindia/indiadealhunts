@@ -101,6 +101,7 @@ export interface LookupResult {
   worth_score?: number;
   worth_label?: string;
   is_verified_deal: boolean;
+  in_stock?: boolean;
   is_lowest_price?: boolean;
   lowest_price?: number | null;
   history?: Array<[number, number]>;
