@@ -22,10 +22,13 @@ import { Sparkles, Zap, RefreshCw, AlertCircle, Clock, ShoppingBag, ChevronRight
 import { PriceAlertModal } from './components/PriceAlertModal';
 import { BountyEmptyState } from './components/BountyEmptyState';
 import { LootPulse } from './components/LootPulse';
+import { AuthProvider } from './context/AuthContext';
+import { AuthModal } from './components/AuthModal';
+import { UserMenuDrawer } from './components/UserMenuDrawer';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
 
-export const App: React.FC = () => {
+const AppContent: React.FC = () => {
   // Navigation Tab State
   const [activeTab, setActiveTab] = useState<NavTab>('home');
 
@@ -883,8 +886,20 @@ export const App: React.FC = () => {
         onCardsUpdated={setActiveCards}
       />
 
+      {/* 9. Passwordless Email Authentication Modal */}
+      <AuthModal />
+
+      {/* 10. User Profile & Live Alerts Slide-over Drawer */}
+      <UserMenuDrawer />
+
     </div>
   );
 };
+
+export const App: React.FC = () => (
+  <AuthProvider>
+    <AppContent />
+  </AuthProvider>
+);
 
 export default App;
