@@ -19,6 +19,8 @@ import { calculateWorthScore } from './utils/worthScore';
 import { MarqueeTicker } from './components/MarqueeTicker';
 import { CategoryStories } from './components/CategoryStories';
 import { Sparkles, Zap, RefreshCw, AlertCircle, Clock, ShoppingBag, ChevronRight, CheckCircle2, ShieldCheck, Flame } from 'lucide-react';
+import { PriceAlertModal } from './components/PriceAlertModal';
+import { BountyEmptyState } from './components/BountyEmptyState';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
 
@@ -56,6 +58,8 @@ export const App: React.FC = () => {
   const [isCardModalOpen, setIsCardModalOpen] = useState<boolean>(false);
   const [activeCards, setActiveCards] = useState<string[]>(() => getSavedCards());
   const [onlyConsensus, setOnlyConsensus] = useState<boolean>(false);
+  const [alertDeal, setAlertDeal] = useState<PublicDeal | null>(null);
+  const [isAlertOpen, setIsAlertOpen] = useState<boolean>(false);
 
   // Fetch Deals from Backend
   const fetchDeals = useCallback(
@@ -76,6 +80,7 @@ export const App: React.FC = () => {
         if (selectedStore !== 'all') params.append('store', selectedStore);
         if (selectedCategory !== 'all' && selectedCategory !== 'loot70') params.append('category', selectedCategory);
         if (searchQuery.trim()) params.append('search', searchQuery.trim());
+        params.append('sort', sortBy === 'worth' ? 'heat' : sortBy);
 
         const res = await fetch(`${API_BASE}/api/v1/deals/public?${params.toString()}`);
         if (!res.ok) {
@@ -234,11 +239,11 @@ export const App: React.FC = () => {
       result = result.filter((d) => Boolean(d.cluster_count && d.cluster_count >= 2));
     }
 
-    // Sorting Logic
+    // Sorting Logic: Standardized display_ts and dynamic Heat Score
     if (sortBy === 'worth') {
-      result.sort((a, b) => (b.worth_score || 0) - (a.worth_score || 0));
+      result.sort((a, b) => (b.heat_score || b.worth_score || 0) - (a.heat_score || a.worth_score || 0));
     } else if (sortBy === 'newest') {
-      result.sort((a, b) => (b.posted_at || 0) - (a.posted_at || 0));
+      result.sort((a, b) => (b.display_ts || b.posted_at || 0) - (a.display_ts || a.posted_at || 0));
     } else if (sortBy === 'discount') {
       result.sort((a, b) => (b.discount_pct || 0) - (a.discount_pct || 0));
     } else if (sortBy === 'price_low') {
@@ -444,23 +449,15 @@ export const App: React.FC = () => {
                   </button>
                 </div>
               ) : gridDeals.length === 0 ? (
-                <div className="py-20 text-center rounded-3xl border border-white/10 bg-[#0E1424] p-8 shadow-xl">
-                  <ShoppingBag className="w-12 h-12 text-slate-500 mx-auto mb-3" aria-hidden="true" />
-                  <h3 className="text-white font-bold text-lg mb-1 font-brand">No deals found</h3>
-                  <p className="text-xs text-slate-400 mb-4">
-                    Try adjusting your store or category filter to discover more drops.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setSelectedStore('all');
-                      setSelectedCategory('all');
-                      setSearchQuery('');
-                    }}
-                    className="min-h-[44px] px-5 py-2.5 rounded-xl bg-emerald-500 text-black font-bold text-xs focus-ring active:scale-95 transition-all"
-                  >
-                    Reset All Filters
-                  </button>
-                </div>
+                <BountyEmptyState
+                  searchTerm={searchQuery}
+                  onClearSearch={() => {
+                    setSelectedStore('all');
+                    setSelectedCategory('all');
+                    setSearchQuery('');
+                  }}
+                  onSelectTrending={(term) => setSearchQuery(term)}
+                />
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
                   {gridDeals.map((deal) => (
@@ -470,6 +467,10 @@ export const App: React.FC = () => {
                       onOpenImage={setLightboxDeal}
                       activeCards={activeCards}
                       onOpenCardModal={() => setIsCardModalOpen(true)}
+                      onOpenAlert={(d) => {
+                        setAlertDeal(d);
+                        setIsAlertOpen(true);
+                      }}
                     />
                   ))}
                 </div>
@@ -576,6 +577,10 @@ export const App: React.FC = () => {
                   isEndingSoonView={true}
                   activeCards={activeCards}
                   onOpenCardModal={() => setIsCardModalOpen(true)}
+                  onOpenAlert={(d) => {
+                    setAlertDeal(d);
+                    setIsAlertOpen(true);
+                  }}
                 />
               ))}
             </div>
@@ -743,6 +748,40 @@ export const App: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            {/* Dynamic Live Coupon & App Deals Feed */}
+            <div className="space-y-4 pt-6 border-t border-white/[0.08]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-emerald-400" />
+                    Live Verified Coupon Deals
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
+                    Deals currently active with stackable promo codes & high-discount drops.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+                {deals
+                  .filter((d) => Boolean(d.coupon || (d.discount_pct && d.discount_pct >= 60)))
+                  .slice(0, 12)
+                  .map((deal) => (
+                    <PublicDealCard
+                      key={deal.id}
+                      deal={deal}
+                      onOpenImage={setLightboxDeal}
+                      activeCards={activeCards}
+                      onOpenCardModal={() => setIsCardModalOpen(true)}
+                      onOpenAlert={(d) => {
+                        setAlertDeal(d);
+                        setIsAlertOpen(true);
+                      }}
+                    />
+                  ))}
+              </div>
+            </div>
           </div>
         )}
 
@@ -810,6 +849,16 @@ export const App: React.FC = () => {
       <LegalModal
         type={activeLegal}
         onClose={() => setActiveLegal(null)}
+      />
+
+      {/* 6. Continuous Price Drop Alert Modal */}
+      <PriceAlertModal
+        isOpen={isAlertOpen}
+        onClose={() => {
+          setIsAlertOpen(false);
+          setAlertDeal(null);
+        }}
+        deal={alertDeal}
       />
 
       {/* 7. Instant Deal Lookup & Sanity Checker Modal */}

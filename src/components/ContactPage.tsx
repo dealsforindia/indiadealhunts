@@ -14,15 +14,28 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome, onNaviga
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !message.trim()) return;
 
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await fetch('https://api.rudranil.me/api/v1/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name.trim() || 'Shopper',
+          email: email.trim(),
+          subject: subject || 'Website Inquiry',
+          message: message.trim(),
+        }),
+      });
       setSubmitted(true);
-    }, 700);
+    } catch (err) {
+      setSubmitted(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

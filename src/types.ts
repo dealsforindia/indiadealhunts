@@ -30,6 +30,14 @@ export interface PublicDeal {
   consensus_badge?: string;
   is_expired?: boolean;
   status?: string;
+  display_ts?: number;
+  heat_score?: number;
+  heat_badge?: {
+    tier: string;
+    label: string;
+    emoji: string;
+    color: string;
+  };
 }
 
 export interface CreditCardProfile {

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { ExternalLink, Copy, Check, MessageCircle, ZoomIn, Clock, Flame, ShieldCheck, Zap, CreditCard, AlertTriangle } from 'lucide-react';
+import { ExternalLink, Copy, Check, MessageCircle, ZoomIn, Clock, Flame, ShieldCheck, Zap, CreditCard, AlertTriangle, Bell } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { PublicDeal } from '../types';
 import { calculateWorthScore } from '../utils/worthScore';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { calculateBestCardSavings, getSavedCards } from '../utils/cardSavings';
+import { HeatScoreBadge } from './HeatScoreBadge';
 
 interface PublicDealCardProps {
   deal: PublicDeal;
@@ -13,6 +14,7 @@ interface PublicDealCardProps {
   isBestWorthView?: boolean;
   activeCards?: string[];
   onOpenCardModal?: () => void;
+  onOpenAlert?: (deal: PublicDeal) => void;
 }
 
 // Relative time formatter
@@ -77,13 +79,14 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   onOpenImage,
   activeCards,
   onOpenCardModal,
+  onOpenAlert,
 }) => {
   const [copied, setCopied] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
 
   const cleanImageUrl = getCleanImageUrl(deal.image);
-  const relativeTime = getRelativeTime(deal.posted_at);
+  const relativeTime = getRelativeTime(deal.display_ts || deal.posted_at);
   const worth = calculateWorthScore(deal);
   const savings = (deal.mrp && deal.mrp > (deal.price || 0)) ? deal.mrp - (deal.price || 0) : 0;
   const isExpired = Boolean(deal.is_expired || deal.status === 'expired' || deal.is_over);
@@ -136,26 +139,19 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             </span>
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             {isExpired ? (
               <span className="text-[10px] font-bold text-rose-300 bg-rose-500/20 border border-rose-500/30 px-1.5 py-0.5 rounded flex items-center gap-0.5">
                 <AlertTriangle className="w-2.5 h-2.5 text-rose-400" />
                 Sold Out
               </span>
-            ) : deal.cluster_count && deal.cluster_count >= 2 ? (
-              <span className="text-[10px] font-black text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded flex items-center gap-0.5 animate-pulse" title={`Verified by ${deal.cluster_count} independent channels`}>
-                <Flame className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
-                Spotted by {deal.cluster_count} channels
-              </span>
-            ) : deal.desidime_temperature && deal.desidime_temperature >= 100 ? (
-              <span className="text-[10px] font-bold text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                <Flame className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
-                {deal.desidime_temperature}°
-              </span>
             ) : (
-              <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
-                Verified
+              <HeatScoreBadge score={deal.heat_score || deal.worth_score} />
+            )}
+            {deal.cluster_count && deal.cluster_count >= 2 && !isExpired && (
+              <span className="text-[10px] font-black text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded flex items-center gap-0.5" title={`Verified across ${deal.cluster_count} channels`}>
+                <Flame className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+                {deal.cluster_count}x
               </span>
             )}
           </div>
@@ -304,6 +300,20 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             <span>{isExpired ? `Check Sellers on ${deal.store}` : `Claim on ${deal.store}`}</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
+
+          {/* Price Alert Bell Button */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenAlert?.(deal);
+            }}
+            className="w-8 h-8 rounded-lg bg-white/[0.04] hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-400 border border-white/[0.08] hover:border-emerald-500/30 flex items-center justify-center transition-colors shrink-0"
+            title="Set 5-Min Price Drop Alert"
+            aria-label="Set Price Alert"
+          >
+            <Bell className="w-3.5 h-3.5" />
+          </button>
 
           {/* Quick WhatsApp Share Button */}
           <button

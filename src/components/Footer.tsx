@@ -91,14 +91,12 @@ export const Footer: React.FC<FooterProps> = ({ onTabChange, onOpenLegal }) => {
                 >
                   Top Worth Deals
                 </button>
-                {/* Hidden purposely: mock/unverified active offers
                 <button
                   onClick={() => onTabChange && onTabChange('active_offers')}
                   className="text-sm text-slate-300 hover:text-emerald-400 transition-colors text-left focus-ring rounded"
                 >
                   Vouchers & Offers
                 </button>
-                */}
                 <button
                   onClick={() => onTabChange && onTabChange('lookup')}
                   className="text-sm text-slate-300 hover:text-emerald-400 transition-colors text-left focus-ring rounded"
@@ -126,7 +124,6 @@ export const Footer: React.FC<FooterProps> = ({ onTabChange, onOpenLegal }) => {
                 >
                   How We Verify Deals
                 </button>
-                {/* Hidden purposely: mock submit deal form
                 <button
                   onClick={() => onTabChange && onTabChange('submit_deal')}
                   className="text-sm text-amber-300 hover:text-amber-200 transition-colors text-left focus-ring rounded flex items-center gap-1 font-medium"
@@ -134,7 +131,6 @@ export const Footer: React.FC<FooterProps> = ({ onTabChange, onOpenLegal }) => {
                   <PlusCircle className="w-3.5 h-3.5" />
                   Submit a Deal
                 </button>
-                */}
                 <button
                   onClick={() => onTabChange && onTabChange('contact')}
                   className="text-sm text-slate-300 hover:text-emerald-400 transition-colors text-left focus-ring rounded"
