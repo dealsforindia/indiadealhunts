@@ -28,6 +28,7 @@ export interface PublicDeal {
   cluster_count?: number;
   cluster_channels?: string[];
   consensus_badge?: string;
+  deal_badges?: string[];
   is_expired?: boolean;
   status?: string;
   display_ts?: number;

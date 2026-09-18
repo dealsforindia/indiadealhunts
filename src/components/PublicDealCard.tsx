@@ -186,9 +186,9 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
               <HeatScoreBadge score={deal.heat_score || deal.worth_score} />
             )}
             {deal.cluster_count && deal.cluster_count >= 2 && !isExpired && (
-              <span className="text-[10px] font-black text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded flex items-center gap-0.5" title={`Verified across ${deal.cluster_count} channels`}>
+              <span className="text-[10px] font-black text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded flex items-center gap-0.5" title={`Verified by ${deal.cluster_count} curators across our sensor network`}>
                 <Flame className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
-                {deal.cluster_count}x
+                {deal.cluster_count}x Curators
               </span>
             )}
           </div>
@@ -230,6 +230,21 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           {deal.discount_pct && deal.discount_pct > 0 && !isExpired && (
             <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 font-mono text-[10px] font-black shadow-sm">
               {deal.discount_pct}% OFF
+            </span>
+          )}
+
+          {/* High-Alpha Anomaly & Breakout Badges */}
+          {deal.deal_badges?.some((b: string) => b.toLowerCase().includes('glitch')) && !isExpired && (
+            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-gradient-to-r from-rose-600 to-red-600 text-white font-mono text-[9px] font-black uppercase tracking-wider shadow-lg border border-rose-400/40 animate-pulse flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+              <span>🚨 GLITCH</span>
+            </span>
+          )}
+
+          {!deal.deal_badges?.some((b: string) => b.toLowerCase().includes('glitch')) &&
+            deal.deal_badges?.some((b: string) => b.toLowerCase().includes('breakout') || b.toLowerCase().includes('surge')) && !isExpired && (
+            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-600 text-white font-mono text-[9px] font-black uppercase tracking-wider shadow-lg border border-amber-300/40 animate-pulse flex items-center gap-1">
+              <span>⚡ SURGE</span>
             </span>
           )}
 
