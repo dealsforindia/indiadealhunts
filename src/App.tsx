@@ -21,6 +21,7 @@ import { CategoryStories } from './components/CategoryStories';
 import { Sparkles, Zap, RefreshCw, AlertCircle, Clock, ShoppingBag, ChevronRight, CheckCircle2, ShieldCheck, Flame } from 'lucide-react';
 import { PriceAlertModal } from './components/PriceAlertModal';
 import { BountyEmptyState } from './components/BountyEmptyState';
+import { LootPulse } from './components/LootPulse';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
 
@@ -816,6 +817,9 @@ export const App: React.FC = () => {
         )}
 
       </main>
+
+      {/* 2b. Real-time Shopper Activity Notification Toast */}
+      <LootPulse deals={deals} />
 
       {/* 3. Floating Quick Filter & Back to Top Dock */}
       <FloatingDock
