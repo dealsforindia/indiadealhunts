@@ -118,9 +118,21 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   const effectiveActiveCards = activeCards || getSavedCards();
   const cardSavings = calculateBestCardSavings(deal, effectiveActiveCards);
 
-  const displayTitle = deal.title
+  let displayTitle = deal.title
     ? deal.title.replace(/^[\s\u2700-\u27BF\uE000-\uF8FF\uD83C-\uDBFF\uDC00-\uDFFF\u2011-\u26FF\uFE0E-\uFE0F\u00A0-\u00BF👉⚡🔥✅🎁📦🚨📢🏷️💎⏰‼️💥]+\s*/gu, '').trim() || deal.title
     : 'Verified Retail Deal';
+
+  const tLower = displayTitle.toLowerCase().trim();
+  if (['products', 'product', 'item store online', 'store online', 'deal', 'loot', 'item'].includes(tLower) || displayTitle.length < 5) {
+    const slugMatch = deal.url?.match(/\/(?:flipkart\.com|shopsy\.in|fkrt\.cc)(?:\/dl)?\/([^/?#]+)\/p\/itm/i);
+    if (slugMatch && slugMatch[1]) {
+      displayTitle = slugMatch[1].replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    } else if (deal.category && deal.category !== 'Special Deal') {
+      displayTitle = `${deal.store} ${deal.category} Deal`;
+    } else {
+      displayTitle = `${deal.store} Verified Deal`;
+    }
+  }
 
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -154,17 +166,17 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
     }`}>
       
       <div>
-        {/* 1. Card Top Meta: Store 3D Badge + Relative Time + Heat / Consensus Badge */}
-        <div className="flex items-center justify-between gap-2 mb-2.5">
-          <div className="flex items-center gap-1.5 flex-wrap">
+        {/* 1. Card Top Meta: Store 3D Badge + Live Pulse Relative Time + Heat Badge */}
+        <div className="flex items-center justify-between gap-1.5 mb-2.5 min-w-0">
+          <div className="flex items-center gap-1.5 min-w-0">
             <Store3DBadge store={deal.store || 'Retail'} />
-            <span className="text-[10.5px] text-slate-400 flex items-center gap-1 font-mono">
-              <Clock className="w-3 h-3 text-slate-500" />
+            <span className="text-[10.5px] text-slate-400 flex items-center gap-1 font-mono shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               {relativeTime}
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1 shrink-0">
             {isExpired ? (
               <span className="text-[10px] font-bold text-rose-300 bg-rose-500/20 border border-rose-500/30 px-1.5 py-0.5 rounded flex items-center gap-0.5">
                 <AlertTriangle className="w-2.5 h-2.5 text-rose-400" />
@@ -310,10 +322,10 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             target="_blank"
             rel="noopener noreferrer sponsored"
             onClick={handleClaim}
-            className={`flex-1 py-2 px-3 rounded-lg font-bold text-xs flex items-center justify-center gap-1 border transition-all active:scale-[0.98] ${
+            className={`flex-1 py-2 px-3 rounded-xl font-extrabold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] shadow-sm ${
               isExpired
-                ? 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border-slate-700'
-                : 'bg-white/[0.06] hover:bg-emerald-500 hover:text-slate-950 text-white border-white/[0.08] hover:border-emerald-400'
+                ? 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-700'
+                : 'bg-emerald-500/15 hover:bg-emerald-500 text-emerald-300 hover:text-slate-950 border border-emerald-500/30 hover:border-emerald-400'
             }`}
             aria-label={isExpired ? `Check alternate sellers on ${deal.store}` : `Claim deal on ${deal.store}`}
           >

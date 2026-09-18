@@ -42,7 +42,7 @@ const AppContent: React.FC = () => {
   const [selectedStore, setSelectedStore] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [sortBy, setSortBy] = useState<SortOption>('worth');
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
 
   // Ending Soon Filter Pills
   const [hideOverEndingSoon, setHideOverEndingSoon] = useState<boolean>(false);
@@ -124,7 +124,7 @@ const AppContent: React.FC = () => {
         setLoadingMore(false);
       }
     },
-    [selectedStore, selectedCategory, searchQuery]
+    [selectedStore, selectedCategory, searchQuery, sortBy]
   );
 
   // Initial fetch and reload on filter changes
@@ -244,10 +244,10 @@ const AppContent: React.FC = () => {
     }
 
     // Sorting Logic: Standardized display_ts and dynamic Heat Score
-    if (sortBy === 'worth') {
-      result.sort((a, b) => (b.heat_score || b.worth_score || 0) - (a.heat_score || a.worth_score || 0));
-    } else if (sortBy === 'newest') {
+    if (sortBy === 'newest') {
       result.sort((a, b) => (b.display_ts || b.posted_at || 0) - (a.display_ts || a.posted_at || 0));
+    } else if (sortBy === 'worth') {
+      result.sort((a, b) => (b.heat_score || b.worth_score || 0) - (a.heat_score || a.worth_score || 0));
     } else if (sortBy === 'discount') {
       result.sort((a, b) => (b.discount_pct || 0) - (a.discount_pct || 0));
     } else if (sortBy === 'price_low') {
@@ -279,6 +279,13 @@ const AppContent: React.FC = () => {
             setIsLookupOpen(true);
           } else {
             setActiveTab(tab);
+            if (tab === 'home') {
+              setSortBy('newest');
+            } else if (tab === 'ending_soon') {
+              setSortBy('discount');
+            } else if (tab === 'best_worth') {
+              setSortBy('worth');
+            }
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }
         }}

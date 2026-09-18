@@ -111,20 +111,20 @@ export const Filters: React.FC<FiltersProps> = ({
               aria-label="Sort deals"
               className="bg-transparent text-white font-medium focus:outline-none cursor-pointer pr-1 text-xs"
             >
-              <option value="worth" className="bg-[#121522] text-white">
-                ✨ Best Worth Index
-              </option>
-              <option value="newest" className="bg-[#121522] text-white">
-                ⚡ Newest Drops
+              <option value="newest" className="bg-[#121522] text-white font-bold">
+                ⚡ Newest Deals First (Just Dropped)
               </option>
               <option value="discount" className="bg-[#121522] text-white">
-                🔥 Highest % Off
+                🔥 Biggest Discounts (% Off)
+              </option>
+              <option value="worth" className="bg-[#121522] text-white">
+                ⭐ Top Rated (Best Value)
               </option>
               <option value="price_low" className="bg-[#121522] text-white">
-                🏷️ Price: Low to High
+                🏷️ Cheapest Price First (Under ₹499)
               </option>
               <option value="price_high" className="bg-[#121522] text-white">
-                💎 Price: High to Low
+                💎 Highest Price First (Premium)
               </option>
             </select>
           </div>
