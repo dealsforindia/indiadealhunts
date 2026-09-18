@@ -21,7 +21,6 @@ import { CategoryStories } from './components/CategoryStories';
 import { Sparkles, Zap, RefreshCw, AlertCircle, Clock, ShoppingBag, ChevronRight, CheckCircle2, ShieldCheck, Flame } from 'lucide-react';
 import { PriceAlertModal } from './components/PriceAlertModal';
 import { BountyEmptyState } from './components/BountyEmptyState';
-import { LootPulse } from './components/LootPulse';
 import { AuthProvider } from './context/AuthContext';
 import { AuthModal } from './components/AuthModal';
 import { UserMenuDrawer } from './components/UserMenuDrawer';
@@ -647,121 +646,8 @@ const AppContent: React.FC = () => {
               </div>
             </div>
 
-            {/* Rich Image-Dominant Store Offer Banners */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Swiggy Instamart */}
-              <div className="rounded-3xl border border-white/10 bg-[#0E1424] overflow-hidden hover:border-orange-500/40 card-elevation transition flex flex-col justify-between group shadow-xl">
-                <div className="h-44 bg-gradient-to-br from-orange-600/30 via-slate-900 to-slate-950 p-6 flex flex-col justify-between relative">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-1 rounded-md bg-orange-500 text-black text-xs font-black">
-                      SWIGGY INSTAMART
-                    </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-emerald-400 text-xs font-bold backdrop-blur-sm">
-                      ⚡ Flat ₹10 Drop
-                    </span>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-black text-white group-hover:text-orange-300 transition-colors">
-                      Soda & Snacks Glitch
-                    </div>
-                    <div className="text-xs text-orange-200/80 mt-1">Instant delivery in 10 minutes</div>
-                  </div>
-                </div>
-                <div className="p-5 space-y-4">
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    Search in your Swiggy app for: <strong>"Noice"</strong>, <strong>"Farmley Masala"</strong>, <strong>"Let's Try"</strong>. Select products are price-crashed to ₹10 flat. Add up to 5 items to checkout.
-                  </p>
-                  <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between">
-                    <span className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Verified Live
-                    </span>
-                    <a
-                      href="https://www.swiggy.com/instamart"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-400 text-black font-bold text-xs transition active:scale-95"
-                    >
-                      Open Swiggy
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              {/* Flipkart Minutes */}
-              <div className="rounded-3xl border border-white/10 bg-[#0E1424] overflow-hidden hover:border-blue-500/40 card-elevation transition flex flex-col justify-between group shadow-xl">
-                <div className="h-44 bg-gradient-to-br from-blue-600/30 via-slate-900 to-slate-950 p-6 flex flex-col justify-between relative">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-1 rounded-md bg-blue-500 text-white text-xs font-black">
-                      FLIPKART MINUTES
-                    </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-blue-300 text-xs font-bold backdrop-blur-sm">
-                      Flat ₹9
-                    </span>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-black text-white group-hover:text-blue-300 transition-colors">
-                      Grocery & Essentials
-                    </div>
-                    <div className="text-xs text-blue-200/80 mt-1">Daily deals in select metro cities</div>
-                  </div>
-                </div>
-                <div className="p-5 space-y-4">
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    Open the Flipkart app and tap the "Minutes" top banner. Fresh milk, biscuits, chips, and personal care items appear for ₹9. Refreshes every hour.
-                  </p>
-                  <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between">
-                    <span className="text-[11px] text-slate-400 font-medium">Limited Pincodes</span>
-                    <a
-                      href="https://www.flipkart.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-400 text-white font-bold text-xs transition active:scale-95"
-                    >
-                      Open Flipkart
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              {/* Myntra Sports & Sneakers */}
-              <div className="rounded-3xl border border-white/10 bg-[#0E1424] overflow-hidden hover:border-pink-500/40 card-elevation transition flex flex-col justify-between group shadow-xl">
-                <div className="h-44 bg-gradient-to-br from-pink-600/30 via-slate-900 to-slate-950 p-6 flex flex-col justify-between relative">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-1 rounded-md bg-pink-500 text-white text-xs font-black">
-                      MYNTRA
-                    </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-pink-300 text-xs font-bold backdrop-blur-sm">
-                      Coupon: SPORTS10
-                    </span>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-black text-white group-hover:text-pink-300 transition-colors">
-                      Extra 10% on Sneakers
-                    </div>
-                    <div className="text-xs text-pink-200/80 mt-1">Puma, Nike, Converse & Vans</div>
-                  </div>
-                </div>
-                <div className="p-5 space-y-4">
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    Stack coupon code <strong className="font-mono text-emerald-400">SPORTS10</strong> on top of ongoing 50-60% sales for an extra instant 10% off at the payment page.
-                  </p>
-                  <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between">
-                    <span className="text-[11px] text-pink-400 font-semibold">Active Coupon</span>
-                    <a
-                      href="https://www.myntra.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2 rounded-xl bg-pink-500 hover:bg-pink-400 text-white font-bold text-xs transition active:scale-95"
-                    >
-                      Shop Myntra
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Dynamic Live Coupon & App Deals Feed */}
-            <div className="space-y-4 pt-6 border-t border-white/[0.08]">
+            <div className="space-y-4 pt-2">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
@@ -827,9 +713,6 @@ const AppContent: React.FC = () => {
         )}
 
       </main>
-
-      {/* 2b. Real-time Shopper Activity Notification Toast */}
-      <LootPulse deals={deals} />
 
       {/* 3. Floating Quick Filter & Back to Top Dock */}
       <FloatingDock
