@@ -3,6 +3,7 @@ import { Search, Sparkles, ExternalLink, Tag, CheckCircle2, X, Flame } from 'luc
 import { PublicDeal } from '../types';
 import { calculateWorthScore } from '../utils/worthScore';
 import { getCleanImageUrl } from '../utils/imageUrl';
+import { Store3DBadge, SavingsPill3D, Category3DPlaceholder } from './Iconscout3DAssets';
 
 interface HeroBannerProps {
   searchQuery: string;
@@ -185,11 +186,9 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                     key={deal.id || idx}
                     className="group relative rounded-2xl bg-[#121522] border border-white/[0.08] hover:border-emerald-500/40 p-3.5 flex flex-col justify-between transition-all duration-200 hover:shadow-lg hover:shadow-black/40 hover:-translate-y-0.5"
                   >
-                    {/* Top Meta: Store Badge + Rank Badge */}
+                    {/* Top Meta: Store 3D Badge + Rank Badge */}
                     <div className="flex items-center justify-between mb-2.5">
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.05] border border-white/[0.08] text-[11px] font-semibold text-slate-300">
-                        <span>🏷️</span> {deal.store}
-                      </span>
+                      <Store3DBadge store={deal.store || 'Retail'} />
                       <span className="text-[11px] font-bold text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded-md flex items-center gap-1">
                         <Flame className="w-3 h-3 fill-amber-400 text-amber-400" />
                         #{idx + 1} Spotlight
@@ -211,10 +210,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                           loading="lazy"
                         />
                       ) : (
-                        <div className="text-slate-500 text-xs flex items-center gap-1">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                          <span>Verified Retail Item</span>
-                        </div>
+                        <Category3DPlaceholder category={deal.category || deal.store || 'Shopping'} />
                       )}
 
                       {deal.discount_pct && deal.discount_pct > 0 && (
@@ -250,9 +246,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                         )}
                       </div>
                       {savings > 0 && (
-                        <span className="text-[10px] text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded font-medium">
-                          Save ₹{savings.toLocaleString('en-IN')}
-                        </span>
+                        <SavingsPill3D amount={savings} />
                       )}
                     </div>
 

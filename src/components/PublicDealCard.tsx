@@ -6,6 +6,7 @@ import { calculateWorthScore } from '../utils/worthScore';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { calculateBestCardSavings, getSavedCards } from '../utils/cardSavings';
 import { HeatScoreBadge } from './HeatScoreBadge';
+import { Store3DBadge, SavingsPill3D, Category3DPlaceholder } from './Iconscout3DAssets';
 
 interface PublicDealCardProps {
   deal: PublicDeal;
@@ -146,17 +147,17 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   };
 
   return (
-    <article className={`group relative flex flex-col justify-between rounded-2xl border transition-all duration-200 p-3 sm:p-3.5 hover:shadow-xl hover:shadow-black/50 hover:-translate-y-0.5 ${
+    <article className={`group relative flex flex-col justify-between rounded-2xl border transition-all duration-200 p-3 sm:p-3.5 hover:shadow-2xl hover:shadow-black/70 hover:-translate-y-1 transform-gpu ${
       isExpired
         ? 'bg-[#0E111C] border-rose-900/30 opacity-75'
-        : 'bg-[#121522] border-white/[0.08] hover:border-emerald-500/40'
+        : 'bg-[#121522] border-white/[0.08] hover:border-emerald-500/50'
     }`}>
       
       <div>
-        {/* 1. Card Top Meta: Store Logo + Relative Time + Verified Status / Consensus Badge */}
+        {/* 1. Card Top Meta: Store 3D Badge + Relative Time + Heat / Consensus Badge */}
         <div className="flex items-center justify-between gap-2 mb-2.5">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <StoreLogo store={deal.store || 'Retail'} />
+            <Store3DBadge store={deal.store || 'Retail'} />
             <span className="text-[10.5px] text-slate-400 flex items-center gap-1 font-mono">
               <Clock className="w-3 h-3 text-slate-500" />
               {relativeTime}
@@ -210,10 +211,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
               loading="lazy"
             />
           ) : (
-            <div className="text-slate-500 text-xs flex flex-col items-center gap-1 text-center">
-              <ShieldCheck className="w-5 h-5 text-emerald-400" />
-              <span>Verified {deal.store} Item</span>
-            </div>
+            <Category3DPlaceholder category={deal.category || deal.store || 'Shopping'} />
           )}
 
           {/* Discount Pill Overlay */}
@@ -270,9 +268,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           </div>
 
           {savings > 0 && !isExpired && (
-            <span className="text-[10px] font-medium text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded">
-              Save ₹{savings.toLocaleString('en-IN')}
-            </span>
+            <SavingsPill3D amount={savings} />
           )}
         </div>
 
