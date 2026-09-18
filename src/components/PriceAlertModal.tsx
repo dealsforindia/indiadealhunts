@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Bell, X, CheckCircle2, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Bell, X, CheckCircle2, ShieldCheck, ArrowRight, Sparkles, UserCheck } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { useAuth } from '../context/AuthContext';
 
 interface PriceAlertModalProps {
   isOpen: boolean;
@@ -15,17 +16,26 @@ interface PriceAlertModalProps {
   } | null;
 }
 
+const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
+
 export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({ isOpen, onClose, deal }) => {
+  const { user, token } = useAuth();
   if (!isOpen || !deal) return null;
 
   const currentPrice = Number(deal.price) || 0;
   const defaultTarget = currentPrice > 0 ? Math.round(currentPrice * 0.9) : 500;
 
   const [targetPrice, setTargetPrice] = useState<string>(String(defaultTarget));
-  const [contact, setContact] = useState<string>('');
+  const [contact, setContact] = useState<string>(user?.email || '');
   const [loading, setLoading] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+
+  useEffect(() => {
+    if (user?.email && !contact) {
+      setContact(user.email);
+    }
+  }, [user, contact]);
 
   const handlePreset = (pct: number) => {
     const discounted = Math.round(currentPrice * (1 - pct / 100));
@@ -47,9 +57,14 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({ isOpen, onClos
     setError('');
 
     try {
-      const res = await fetch('https://api.rudranil.me/api/v1/alerts', {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const res = await fetch(`${API_BASE}/api/v1/alerts`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           product_url: deal.url,
           target_price: Number(targetPrice),
@@ -57,6 +72,7 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({ isOpen, onClos
           product_title: deal.title,
           current_price: currentPrice,
           store: deal.store || 'Online Store',
+          user_email: user?.email || undefined,
         }),
       });
 
@@ -195,9 +211,17 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({ isOpen, onClos
 
               {/* Contact Information */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
-                  Send Instant Alert To
-                </label>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                    Send Instant Alert To
+                  </label>
+                  {user?.email && (
+                    <span className="text-[10.5px] text-emerald-400 font-semibold flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                      <UserCheck className="w-3 h-3 text-emerald-400" />
+                      Syncs to Account
+                    </span>
+                  )}
+                </div>
                 <input
                   type="text"
                   value={contact}
@@ -208,7 +232,11 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({ isOpen, onClos
                 />
                 <p className="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  Zero spam. We only notify you when your target price is verified in stock.
+                  {user ? (
+                    <span>Alert will be saved to your dashboard under <strong>My Price Drop Alerts</strong>.</span>
+                  ) : (
+                    <span>Zero spam. We only notify you when your target price is verified in stock.</span>
+                  )}
                 </p>
               </div>
 

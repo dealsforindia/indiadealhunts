@@ -67,6 +67,30 @@ const StoreLogo: React.FC<{ store: string }> = ({ store }) => {
       </span>
     );
   }
+  if (s.includes('zepto')) {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-600/20 border border-purple-500/40 text-purple-300 text-[10.5px] font-semibold">
+        <span className="font-bold text-[9px] text-purple-400">⚡</span>
+        Zepto
+      </span>
+    );
+  }
+  if (s.includes('blinkit')) {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-yellow-500/15 border border-yellow-500/30 text-yellow-300 text-[10.5px] font-semibold">
+        <span className="font-bold text-[9px] text-yellow-400">⚡</span>
+        Blinkit
+      </span>
+    );
+  }
+  if (s.includes('swiggy')) {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-orange-500/15 border border-orange-500/30 text-orange-300 text-[10.5px] font-semibold">
+        <span className="font-bold text-[9px] text-orange-400">🍲</span>
+        Swiggy
+      </span>
+    );
+  }
   return (
     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/60 text-slate-300 text-[10.5px] font-semibold">
       {store || 'Retail'}

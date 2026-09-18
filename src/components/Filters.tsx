@@ -20,6 +20,7 @@ const STORES = [
   { id: 'Flipkart', label: 'Flipkart' },
   { id: 'Myntra', label: 'Myntra' },
   { id: 'AJIO', label: 'AJIO' },
+  { id: 'Zepto', label: 'Zepto' },
   { id: 'Swiggy', label: 'Swiggy' },
   { id: 'Croma', label: 'Croma' },
   { id: 'Blinkit', label: 'Blinkit' },
