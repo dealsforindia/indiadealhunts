@@ -1,26 +1,61 @@
-import React, { useState, useRef } from 'react';
-import { Play, Volume2, VolumeX, X, ExternalLink, ChevronLeft, ChevronRight, Sparkles, CheckCircle2, Film } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import {
+  Play, Pause, Volume2, VolumeX, X, ExternalLink, ChevronLeft, ChevronRight,
+  ChevronUp, ChevronDown, Sparkles, Film, Heart, Share2, Flame
+} from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 
 interface ViralShortsSectionProps {
   deals: PublicDeal[];
   onOpenDeal?: (deal: PublicDeal) => void;
+  externalActiveDeal?: PublicDeal | null;
+  onCloseExternal?: () => void;
 }
 
-export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({ deals, onOpenDeal }) => {
+export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({
+  deals,
+  onOpenDeal,
+  externalActiveDeal,
+  onCloseExternal,
+}) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [activeVideoDeal, setActiveVideoDeal] = useState<PublicDeal | null>(null);
-  const [isMuted, setIsMuted] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Filter deals that have ready videos
-  const videoDeals = deals.filter(d => (d.has_video || d.video_url) && d.video_status !== 'failed');
+  const videoDeals = deals.filter(
+    (d) => (d.has_video || d.video_url) && d.video_status !== 'failed'
+  );
 
-  // If no deals have videos ready, gracefully don't render anything
-  if (!videoDeals || videoDeals.length === 0) {
-    return null;
-  }
+  const [currentIndex, setCurrentIndex] = useState<number>(-1);
+  const [isPlaying, setIsPlaying] = useState<boolean>(true);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [autoAdvance, setAutoAdvance] = useState<boolean>(true);
+  const [likes, setLikes] = useState<Record<string, number>>({});
+  const [hasLiked, setHasLiked] = useState<Record<string, boolean>>({});
+  const [showHeartAnim, setShowHeartAnim] = useState<boolean>(false);
+  const [touchStartY, setTouchStartY] = useState<number | null>(null);
 
+  // Sync externalActiveDeal from parent (e.g. clicking a deal card's short badge)
+  useEffect(() => {
+    if (externalActiveDeal) {
+      const idx = videoDeals.findIndex(
+        (d) => (d.id || (d as any).fp_hash) === (externalActiveDeal.id || (externalActiveDeal as any).fp_hash)
+      );
+      if (idx !== -1) {
+        setCurrentIndex(idx);
+      } else {
+        // Fallback to first video if match not found in list
+        setCurrentIndex(0);
+      }
+      setIsPlaying(true);
+    }
+  }, [externalActiveDeal, videoDeals]);
+
+  const activeDeal = currentIndex >= 0 && currentIndex < videoDeals.length ? videoDeals[currentIndex] : null;
+
+  // Carousel horizontal scroll
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
       const scrollAmount = direction === 'left' ? -320 : 320;
@@ -28,10 +63,137 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({ deals, o
     }
   };
 
-  const handleOpenShort = (deal: PublicDeal, e: React.MouseEvent) => {
+  const handleOpenShort = (deal: PublicDeal, index: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    setActiveVideoDeal(deal);
+    setCurrentIndex(index);
+    setIsPlaying(true);
   };
+
+  const handleClose = useCallback(() => {
+    setCurrentIndex(-1);
+    onCloseExternal?.();
+  }, [onCloseExternal]);
+
+  // Navigate next short
+  const handleNext = useCallback(() => {
+    if (videoDeals.length === 0) return;
+    setCurrentIndex((prev) => (prev + 1) % videoDeals.length);
+    setIsPlaying(true);
+  }, [videoDeals.length]);
+
+  // Navigate prev short
+  const handlePrev = useCallback(() => {
+    if (videoDeals.length === 0) return;
+    setCurrentIndex((prev) => (prev - 1 + videoDeals.length) % videoDeals.length);
+    setIsPlaying(true);
+  }, [videoDeals.length]);
+
+  // Toggle Play / Pause
+  const togglePlayPause = () => {
+    if (!videoRef.current) return;
+    if (videoRef.current.paused) {
+      videoRef.current.play();
+      setIsPlaying(true);
+    } else {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  // Trigger floating heart explosion on double tap or like button
+  const triggerLike = (dealId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setHasLiked((prev) => ({ ...prev, [dealId]: !prev[dealId] }));
+    setLikes((prev) => ({
+      ...prev,
+      [dealId]: (prev[dealId] || 42) + (hasLiked[dealId] ? -1 : 1),
+    }));
+
+    setShowHeartAnim(true);
+    setTimeout(() => setShowHeartAnim(false), 900);
+
+    // Confetti heart burst
+    confetti({
+      particleCount: 18,
+      spread: 60,
+      origin: { y: 0.65 },
+      colors: ['#f43f5e', '#ec4899', '#fb7185'],
+      shapes: ['circle'],
+    });
+  };
+
+  // Keyboard navigation for reels
+  useEffect(() => {
+    if (currentIndex === -1) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowDown' || e.key === 'KeyS') {
+        e.preventDefault();
+        handleNext();
+      } else if (e.key === 'ArrowUp' || e.key === 'KeyW') {
+        e.preventDefault();
+        handlePrev();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        handleClose();
+      } else if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        togglePlayPause();
+      } else if (e.key === 'm' || e.key === 'M') {
+        e.preventDefault();
+        setIsMuted((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentIndex, handleNext, handlePrev, handleClose]);
+
+  // Touch Swipe Gestures on Mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartY(e.touches[0].clientY);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartY === null) return;
+    const touchEndY = e.changedTouches[0].clientY;
+    const diff = touchStartY - touchEndY;
+
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        // Swiped Up -> Next Short
+        handleNext();
+      } else {
+        // Swiped Down -> Prev Short
+        handlePrev();
+      }
+    }
+    setTouchStartY(null);
+  };
+
+  // Share Short Link
+  const handleShare = async (deal: PublicDeal, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const shareUrl = `${window.location.origin}?short=${deal.id}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Loot Short: ${deal.title}`,
+          text: `Check out this 15s loot breakdown for ${deal.title} at ${deal.discount_pct}% OFF!`,
+          url: shareUrl,
+        });
+      } catch {
+        // cancelled
+      }
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+      alert('Link copied to clipboard!');
+    }
+  };
+
+  if (!videoDeals || videoDeals.length === 0) {
+    return null;
+  }
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-6">
@@ -79,14 +241,14 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({ deals, o
         className="flex gap-4 sm:gap-5 overflow-x-auto scrollbar-none pb-4 pt-1 snap-x snap-mandatory scroll-smooth"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {videoDeals.map((deal) => {
+        {videoDeals.map((deal, idx) => {
           const poster = deal.video_cover || getCleanImageUrl(deal.image);
           const disc = deal.discount_pct || 0;
 
           return (
             <div
-              key={`short-${deal.id}`}
-              onClick={(e) => handleOpenShort(deal, e)}
+              key={`short-${deal.id}-${idx}`}
+              onClick={(e) => handleOpenShort(deal, idx, e)}
               className="group relative w-56 sm:w-64 flex-shrink-0 aspect-[9/16] rounded-3xl overflow-hidden glass-card border border-white/10 hover:border-indigo-500/50 transition-all duration-300 snap-start cursor-pointer shadow-xl hover:shadow-2xl hover:shadow-indigo-500/20 flex flex-col bg-slate-950/80"
             >
               {/* Background Poster Image */}
@@ -102,6 +264,16 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({ deals, o
                   <div className="w-full h-full bg-gradient-to-br from-indigo-950 to-slate-950 flex items-center justify-center text-4xl">
                     🎬
                   </div>
+                )}
+
+                {/* 4s Animated WebP Hover Sticker Preview if available */}
+                {deal.video_preview && (
+                  <img
+                    src={deal.video_preview}
+                    alt="Preview"
+                    className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                    loading="lazy"
+                  />
                 )}
 
                 {/* Dark Vignette Overlay */}
@@ -164,94 +336,213 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({ deals, o
         })}
       </div>
 
-      {/* Fullscreen Vertical 9:16 Reel Player Modal */}
-      {activeVideoDeal && (
+      {/* Fullscreen Vertical 9:16 TikTok/Reels Player Modal */}
+      {activeDeal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/92 backdrop-blur-2xl animate-fade-in"
-          onClick={() => setActiveVideoDeal(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/94 backdrop-blur-2xl animate-fade-in"
+          onClick={handleClose}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
+          {/* Main Reel Viewport */}
           <div
-            className="relative max-h-[90vh] aspect-[9/16] w-full max-w-[420px] rounded-3xl overflow-hidden bg-black border border-white/20 shadow-2xl flex flex-col"
+            className="relative h-[92vh] max-h-[880px] aspect-[9/16] w-auto max-w-[440px] rounded-3xl overflow-hidden bg-black border border-white/20 shadow-2xl flex flex-col select-none"
             onClick={(e) => e.stopPropagation()}
+            onDoubleClick={(e) => triggerLike(activeDeal.id, e)}
           >
             {/* Modal Top Bar */}
-            <div className="absolute top-0 inset-x-0 z-20 p-4 bg-gradient-to-b from-black/85 via-black/40 to-transparent flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full bg-indigo-500 text-white text-[10px] font-black uppercase tracking-wider shadow-sm">
-                  9:16 Viral Short
+            <div className="absolute top-0 inset-x-0 z-30 p-4 bg-gradient-to-b from-black/90 via-black/50 to-transparent flex items-center justify-between">
+              <div className="flex items-center gap-2 max-w-[70%]">
+                <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
+                  <Film className="w-2.5 h-2.5 animate-pulse" />
+                  <span>Reel {currentIndex + 1}/{videoDeals.length}</span>
                 </span>
-                <span className="text-xs font-bold text-white truncate max-w-[200px]">
-                  {activeVideoDeal.title}
+                <span className="text-xs font-bold text-white truncate drop-shadow">
+                  {activeDeal.title}
                 </span>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
+                {/* Sound Visualizer & Toggle */}
                 <button
                   onClick={() => setIsMuted(!isMuted)}
-                  className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
-                  title={isMuted ? 'Unmute' : 'Mute'}
+                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center gap-1"
+                  title={isMuted ? 'Unmute (M)' : 'Mute (M)'}
                 >
-                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                  {isMuted ? (
+                    <VolumeX className="w-4 h-4 text-rose-400" />
+                  ) : (
+                    <>
+                      <Volume2 className="w-4 h-4 text-emerald-400" />
+                      {/* Bouncing Equalizer Bars */}
+                      <span className="flex items-end gap-0.5 h-3 ml-0.5">
+                        <span className="w-0.5 bg-emerald-400 rounded-full animate-[bounce_0.8s_infinite_100ms] h-2" />
+                        <span className="w-0.5 bg-emerald-400 rounded-full animate-[bounce_0.6s_infinite_200ms] h-3" />
+                        <span className="w-0.5 bg-emerald-400 rounded-full animate-[bounce_0.7s_infinite_300ms] h-1.5" />
+                      </span>
+                    </>
+                  )}
                 </button>
+
+                {/* Close Button */}
                 <button
-                  onClick={() => setActiveVideoDeal(null)}
-                  className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
-                  title="Close short"
+                  onClick={handleClose}
+                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                  title="Close short (Esc)"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* Video Player */}
-            <div className="flex-1 w-full h-full relative bg-black flex items-center justify-center">
-              {activeVideoDeal.video_url ? (
+            {/* Video Player Frame */}
+            <div
+              className="flex-1 w-full h-full relative bg-black flex items-center justify-center cursor-pointer"
+              onClick={togglePlayPause}
+            >
+              {activeDeal.video_url ? (
                 <video
-                  src={activeVideoDeal.video_url}
-                  poster={activeVideoDeal.video_cover || getCleanImageUrl(activeVideoDeal.image)}
-                  controls
+                  ref={videoRef}
+                  src={activeDeal.video_url}
+                  poster={activeDeal.video_cover || getCleanImageUrl(activeDeal.image)}
                   autoPlay
                   playsInline
-                  loop
+                  loop={!autoAdvance}
                   muted={isMuted}
+                  onEnded={() => {
+                    if (autoAdvance) handleNext();
+                  }}
                   className="w-full h-full object-contain"
                 />
               ) : (
                 <div className="text-center p-6 text-slate-400 text-xs">
-                  Video is processing or streaming link is unavailable.
+                  Video short is rendering or streaming link unavailable.
+                </div>
+              )}
+
+              {/* Centered Pause Overlay Icon */}
+              {!isPlaying && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/35 pointer-events-none">
+                  <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 shadow-2xl">
+                    <Play className="w-8 h-8 fill-white translate-x-1" />
+                  </div>
+                </div>
+              )}
+
+              {/* Floating Double-Tap Heart Animation */}
+              {showHeartAnim && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-40 animate-ping">
+                  <Heart className="w-24 h-24 fill-rose-500 text-rose-500 drop-shadow-2xl" />
                 </div>
               )}
             </div>
 
-            {/* Bottom Floating Bar */}
-            <div className="p-4 bg-slate-950/95 border-t border-white/10 flex items-center justify-between gap-3 z-20">
-              <div className="flex flex-col">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-base font-black text-emerald-400 font-mono">
-                    ₹{activeVideoDeal.price?.toLocaleString('en-IN')}
-                  </span>
-                  {activeVideoDeal.mrp && activeVideoDeal.mrp > (activeVideoDeal.price || 0) && (
-                    <span className="text-xs font-mono text-slate-500 line-through">
-                      ₹{activeVideoDeal.mrp?.toLocaleString('en-IN')}
-                    </span>
-                  )}
+            {/* Right TikTok-Style Action Dock */}
+            <div className="absolute right-3 bottom-24 z-30 flex flex-col items-center gap-4">
+              {/* Like / Heart Action */}
+              <button
+                onClick={(e) => triggerLike(activeDeal.id, e)}
+                className="flex flex-col items-center gap-1 group cursor-pointer"
+                title="Double-tap or click to like"
+              >
+                <div
+                  className={`w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-md border transition-all ${
+                    hasLiked[activeDeal.id]
+                      ? 'bg-rose-500 border-rose-400 text-white scale-110 shadow-lg shadow-rose-500/50'
+                      : 'bg-black/60 border-white/20 text-white group-hover:bg-rose-500/30'
+                  }`}
+                >
+                  <Heart
+                    className={`w-5 h-5 ${hasLiked[activeDeal.id] ? 'fill-white text-white' : 'text-white'}`}
+                  />
                 </div>
-                <span className="text-[10px] text-slate-400">
-                  {activeVideoDeal.store || 'Verified Store'}
+                <span className="text-[11px] font-mono font-bold text-white drop-shadow">
+                  {likes[activeDeal.id] || 42}
                 </span>
+              </button>
+
+              {/* Share Action */}
+              <button
+                onClick={(e) => handleShare(activeDeal, e)}
+                className="flex flex-col items-center gap-1 group cursor-pointer"
+                title="Share this short"
+              >
+                <div className="w-11 h-11 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white backdrop-blur-md group-hover:bg-white/20 transition-all">
+                  <Share2 className="w-5 h-5" />
+                </div>
+                <span className="text-[11px] font-mono font-bold text-white drop-shadow">Share</span>
+              </button>
+            </div>
+
+            {/* Bottom Deal Card Overlay */}
+            <div className="relative z-30 p-4 bg-gradient-to-t from-slate-950 via-slate-950/95 to-transparent border-t border-white/10 flex flex-col gap-2.5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 pr-10">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="px-2 py-0.5 rounded-md bg-white/15 text-[10.5px] font-bold text-white backdrop-blur-md">
+                      {activeDeal.store || 'Verified Store'}
+                    </span>
+                    {activeDeal.discount_pct && activeDeal.discount_pct > 0 && (
+                      <span className="px-2 py-0.5 rounded-md bg-rose-500/90 text-[10px] font-mono font-black text-white flex items-center gap-1">
+                        <Flame className="w-3 h-3 fill-white" />
+                        <span>{activeDeal.discount_pct}% OFF</span>
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 leading-snug drop-shadow-md">
+                    {activeDeal.title}
+                  </h3>
+                </div>
               </div>
 
-              <a
-                href={activeVideoDeal.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="py-2.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 text-xs font-black flex items-center gap-1.5 shadow-lg shadow-emerald-500/30 transition-all active:scale-95 cursor-pointer"
-              >
-                <Sparkles className="w-3.5 h-3.5 fill-slate-950" />
-                <span>Grab Loot Deal</span>
-                <ExternalLink className="w-3.5 h-3.5 ml-0.5" />
-              </a>
+              {/* Price Row & 1-Click Affiliate Checkout */}
+              <div className="flex items-center justify-between gap-3 pt-1 border-t border-white/10">
+                <div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-lg font-black text-emerald-400 font-mono drop-shadow">
+                      ₹{activeDeal.price?.toLocaleString('en-IN')}
+                    </span>
+                    {activeDeal.mrp && activeDeal.mrp > (activeDeal.price || 0) && (
+                      <span className="text-xs font-mono text-slate-400 line-through">
+                        ₹{activeDeal.mrp?.toLocaleString('en-IN')}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-emerald-300/90 font-medium">
+                    Verified Drop • Lowest in 30d
+                  </span>
+                </div>
+
+                <a
+                  href={activeDeal.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="py-2.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 text-xs font-black flex items-center gap-1.5 shadow-xl shadow-emerald-500/35 transition-all active:scale-95 cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 fill-slate-950" />
+                  <span>Grab Loot Deal</span>
+                  <ExternalLink className="w-3.5 h-3.5 ml-0.5" />
+                </a>
+              </div>
             </div>
+          </div>
+
+          {/* Desktop Floating Next / Prev Navigation Buttons */}
+          <div className="hidden sm:flex flex-col gap-3 ml-4 z-50">
+            <button
+              onClick={handlePrev}
+              className="p-3.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-white/15 shadow-xl transition-all hover:scale-110 active:scale-90 cursor-pointer"
+              title="Previous Reel (Up Arrow / W)"
+            >
+              <ChevronUp className="w-6 h-6" />
+            </button>
+            <button
+              onClick={handleNext}
+              className="p-3.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-white/15 shadow-xl transition-all hover:scale-110 active:scale-90 cursor-pointer"
+              title="Next Reel (Down Arrow / S)"
+            >
+              <ChevronDown className="w-6 h-6" />
+            </button>
           </div>
         </div>
       )}

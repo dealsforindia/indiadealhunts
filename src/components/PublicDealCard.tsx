@@ -12,6 +12,7 @@ import { Store3DBadge, SavingsPill3D, Category3DPlaceholder } from './Iconscout3
 interface PublicDealCardProps {
   deal: PublicDeal;
   onOpenImage: (deal: PublicDeal) => void;
+  onOpenVideo?: (deal: PublicDeal) => void;
   isEndingSoonView?: boolean;
   isBestWorthView?: boolean;
   activeCards?: string[];
@@ -64,8 +65,17 @@ const StoreLogo: React.FC<{ store: string }> = ({ store }) => {
   }
   if (s.includes('ajio')) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-500/15 border border-purple-500/30 text-purple-300 text-[10.5px] font-semibold">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-500/15 border border-teal-500/30 text-teal-300 text-[10.5px] font-semibold">
+        <span className="font-bold text-[9px] text-teal-400">A</span>
         AJIO
+      </span>
+    );
+  }
+  if (s.includes('swiggy') || s.includes('instamart')) {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-orange-500/15 border border-orange-500/30 text-orange-300 text-[10.5px] font-semibold">
+        <span className="font-bold text-[9px] text-orange-400">🛒</span>
+        Instamart
       </span>
     );
   }
@@ -94,8 +104,8 @@ const StoreLogo: React.FC<{ store: string }> = ({ store }) => {
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/60 text-slate-300 text-[10.5px] font-semibold">
-      {store || 'Retail'}
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-800 border border-white/10 text-slate-300 text-[10.5px] font-semibold">
+      {store || 'Store'}
     </span>
   );
 };
@@ -103,6 +113,7 @@ const StoreLogo: React.FC<{ store: string }> = ({ store }) => {
 export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   deal,
   onOpenImage,
+  onOpenVideo,
   activeCards,
   onOpenCardModal,
   onOpenAlert,
@@ -227,16 +238,26 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             <Category3DPlaceholder category={deal.category || deal.store || 'Shopping'} />
           )}
 
+          {/* 4s Animated WebP Hover Preview if video is ready */}
+          {deal.video_preview && !isExpired && (
+            <img
+              src={deal.video_preview}
+              alt="Video Preview"
+              className="absolute inset-0 w-full h-full object-contain opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl bg-black/40 backdrop-blur-[2px] z-5"
+              loading="lazy"
+            />
+          )}
+
           {/* Discount Pill Overlay */}
           {deal.discount_pct && deal.discount_pct > 0 && !isExpired && (
-            <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 font-mono text-[10px] font-black shadow-sm">
+            <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 font-mono text-[10px] font-black shadow-sm z-10">
               {deal.discount_pct}% OFF
             </span>
           )}
 
           {/* High-Alpha Anomaly & Breakout Badges */}
           {deal.deal_badges?.some((b: string) => b.toLowerCase().includes('glitch')) && !isExpired && (
-            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-gradient-to-r from-rose-600 to-red-600 text-white font-mono text-[9px] font-black uppercase tracking-wider shadow-lg border border-rose-400/40 animate-pulse flex items-center gap-1">
+            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-gradient-to-r from-rose-600 to-red-600 text-white font-mono text-[9px] font-black uppercase tracking-wider shadow-lg border border-rose-400/40 animate-pulse flex items-center gap-1 z-10">
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
               <span>🚨 GLITCH</span>
             </span>
@@ -244,35 +265,52 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
 
           {!deal.deal_badges?.some((b: string) => b.toLowerCase().includes('glitch')) &&
             deal.deal_badges?.some((b: string) => b.toLowerCase().includes('breakout') || b.toLowerCase().includes('surge')) && !isExpired && (
-            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-600 text-white font-mono text-[9px] font-black uppercase tracking-wider shadow-lg border border-amber-300/40 animate-pulse flex items-center gap-1">
+            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-600 text-white font-mono text-[9px] font-black uppercase tracking-wider shadow-lg border border-amber-300/40 animate-pulse flex items-center gap-1 z-10">
               <span>⚡ SURGE</span>
             </span>
           )}
 
-          {/* 15s Short Video Available Badge */}
+          {/* 15s Short Video Available Interactive Badge */}
           {(deal.has_video || deal.video_url) && !isExpired && (
-            <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded-lg bg-indigo-500/90 text-white font-mono text-[9px] font-black uppercase tracking-wider shadow-md backdrop-blur-md flex items-center gap-1 border border-indigo-300/40 z-10">
-              <Film className="w-2.5 h-2.5 animate-pulse text-indigo-200" />
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onOpenVideo) {
+                  onOpenVideo(deal);
+                } else {
+                  onOpenImage(deal);
+                }
+              }}
+              className="absolute bottom-2 right-2 px-2.5 py-1 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-mono text-[9.5px] font-black uppercase tracking-wider shadow-lg shadow-indigo-500/30 backdrop-blur-md flex items-center gap-1.5 border border-indigo-300/40 z-20 hover:scale-105 active:scale-95 transition-all cursor-pointer group/btn"
+              title="Watch 15s Short"
+            >
+              <Film className="w-3 h-3 animate-pulse text-indigo-200 group-hover/btn:rotate-12 transition-transform" />
               <span>15s Short</span>
-            </span>
+            </button>
           )}
-
 
           {/* Sold out watermark overlay */}
           {isExpired && (
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none z-20">
               <span className="px-3 py-1 rounded-xl bg-rose-500/80 text-white text-xs font-black tracking-wider uppercase shadow-lg backdrop-blur-sm border border-rose-400/40">
                 Out of Stock
               </span>
             </div>
           )}
 
-          {/* Zoom Hover Hint */}
+          {/* Zoom or Watch Video Hover Hint */}
           {!isExpired && (
-            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <span className="px-2.5 py-1 rounded-full bg-black/75 text-white text-[11px] font-medium flex items-center gap-1 backdrop-blur-sm border border-white/10">
-                <ZoomIn className="w-3 h-3" /> View
-              </span>
+            <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 pointer-events-none z-10">
+              {(deal.has_video || deal.video_url) && onOpenVideo ? (
+                <span className="px-3 py-1.5 rounded-full bg-indigo-600/90 text-white text-[11px] font-bold flex items-center gap-1.5 backdrop-blur-sm border border-indigo-300/30 shadow-lg shadow-indigo-500/40">
+                  <Film className="w-3.5 h-3.5 fill-white text-indigo-600" /> Watch Short
+                </span>
+              ) : (
+                <span className="px-2.5 py-1 rounded-full bg-black/75 text-white text-[11px] font-medium flex items-center gap-1 backdrop-blur-sm border border-white/10">
+                  <ZoomIn className="w-3 h-3" /> View
+                </span>
+              )}
             </div>
           )}
         </div>

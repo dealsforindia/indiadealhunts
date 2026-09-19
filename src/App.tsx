@@ -93,6 +93,7 @@ const AppContent: React.FC = () => {
   const [onlyConsensus, setOnlyConsensus] = useState<boolean>(false);
   const [alertDeal, setAlertDeal] = useState<PublicDeal | null>(null);
   const [isAlertOpen, setIsAlertOpen] = useState<boolean>(false);
+  const [activeReelDeal, setActiveReelDeal] = useState<PublicDeal | null>(null);
 
   // Fetch Deals from Backend
   const fetchDeals = useCallback(
@@ -357,7 +358,11 @@ const AppContent: React.FC = () => {
             </div>
 
             {/* Automated Viral Shorts Section (9:16 Video Reels) */}
-            <ViralShortsSection deals={videoDeals.length > 0 ? videoDeals : deals} />
+            <ViralShortsSection
+              deals={videoDeals.length > 0 ? videoDeals : deals}
+              externalActiveDeal={activeReelDeal}
+              onCloseExternal={() => setActiveReelDeal(null)}
+            />
 
             {/* ShoppinGenie Feature: "Order Right Now" Horizontal 4-Card Carousel */}
             {orderRightNowDeals.length > 0 && !searchQuery && selectedStore === 'all' && selectedCategory === 'all' && (
@@ -392,6 +397,7 @@ const AppContent: React.FC = () => {
                       key={`orn-${deal.id}`}
                       deal={deal}
                       onOpenImage={setLightboxDeal}
+                      onOpenVideo={setActiveReelDeal}
                       activeCards={activeCards}
                       onOpenCardModal={() => setIsCardModalOpen(true)}
                     />
@@ -433,6 +439,7 @@ const AppContent: React.FC = () => {
                       key={`es-${deal.id}`}
                       deal={deal}
                       onOpenImage={setLightboxDeal}
+                      onOpenVideo={setActiveReelDeal}
                       isEndingSoonView={true}
                       activeCards={activeCards}
                       onOpenCardModal={() => setIsCardModalOpen(true)}
@@ -508,6 +515,7 @@ const AppContent: React.FC = () => {
                       key={deal.id}
                       deal={deal}
                       onOpenImage={setLightboxDeal}
+                      onOpenVideo={setActiveReelDeal}
                       activeCards={activeCards}
                       onOpenCardModal={() => setIsCardModalOpen(true)}
                       onOpenAlert={(d) => {
@@ -617,6 +625,7 @@ const AppContent: React.FC = () => {
                   key={deal.id}
                   deal={deal}
                   onOpenImage={setLightboxDeal}
+                  onOpenVideo={setActiveReelDeal}
                   isEndingSoonView={true}
                   activeCards={activeCards}
                   onOpenCardModal={() => setIsCardModalOpen(true)}
@@ -653,6 +662,7 @@ const AppContent: React.FC = () => {
                   key={deal.id}
                   deal={deal}
                   onOpenImage={setLightboxDeal}
+                  onOpenVideo={setActiveReelDeal}
                   isBestWorthView={true}
                   activeCards={activeCards}
                   onOpenCardModal={() => setIsCardModalOpen(true)}
@@ -702,6 +712,7 @@ const AppContent: React.FC = () => {
                       key={deal.id}
                       deal={deal}
                       onOpenImage={setLightboxDeal}
+                      onOpenVideo={setActiveReelDeal}
                       activeCards={activeCards}
                       onOpenCardModal={() => setIsCardModalOpen(true)}
                       onOpenAlert={(d) => {

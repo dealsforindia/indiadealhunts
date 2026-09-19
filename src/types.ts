@@ -42,6 +42,7 @@ export interface PublicDeal {
   has_video?: boolean;
   video_url?: string;
   video_cover?: string;
+  video_preview?: string;
   video_status?: string;
 }
 
