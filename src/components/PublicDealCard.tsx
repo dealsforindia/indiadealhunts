@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ExternalLink, Copy, Check, MessageCircle, ZoomIn, Clock, Flame, ShieldCheck, Zap, CreditCard, AlertTriangle, Bell } from 'lucide-react';
+import { ExternalLink, Copy, Check, MessageCircle, ZoomIn, Clock, Flame, ShieldCheck, Zap, CreditCard, AlertTriangle, Bell, Film } from 'lucide-react';
 import confetti from 'canvas-confetti';
+
 import { PublicDeal } from '../types';
 import { calculateWorthScore } from '../utils/worthScore';
 import { getCleanImageUrl } from '../utils/imageUrl';
@@ -247,6 +248,15 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
               <span>⚡ SURGE</span>
             </span>
           )}
+
+          {/* 15s Short Video Available Badge */}
+          {(deal.has_video || deal.video_url) && !isExpired && (
+            <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded-lg bg-indigo-500/90 text-white font-mono text-[9px] font-black uppercase tracking-wider shadow-md backdrop-blur-md flex items-center gap-1 border border-indigo-300/40 z-10">
+              <Film className="w-2.5 h-2.5 animate-pulse text-indigo-200" />
+              <span>15s Short</span>
+            </span>
+          )}
+
 
           {/* Sold out watermark overlay */}
           {isExpired && (
