@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Play, Pause, Volume2, VolumeX, X, ExternalLink, ChevronLeft, ChevronRight,
   ChevronUp, ChevronDown, Sparkles, Film, Heart, Share2, Flame
@@ -23,9 +24,9 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Filter deals that have ready videos
+  // Filter deals that have ready, playable video streams
   const videoDeals = deals.filter(
-    (d) => (d.has_video || d.video_url) && d.video_status !== 'failed'
+    (d) => Boolean(d.video_url && typeof d.video_url === 'string' && d.video_url.startsWith('http') && d.video_status !== 'failed')
   );
 
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
@@ -243,7 +244,10 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({
       >
         {videoDeals.map((deal, idx) => {
           const poster = deal.video_cover || getCleanImageUrl(deal.image);
-          const disc = deal.discount_pct || 0;
+          const rawDisc = deal.discount_pct || 0;
+          const disc = rawDisc >= 99 && (deal.mrp || 0) > 30000 && (deal.price || 0) < 3000
+            ? Math.round((1 - (deal.price || 0) / Math.max((deal.price || 0) * 3, 2000)) * 100)
+            : Math.min(95, rawDisc);
 
           return (
             <div
@@ -336,10 +340,10 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({
         })}
       </div>
 
-      {/* Fullscreen Vertical 9:16 TikTok/Reels Player Modal */}
-      {activeDeal && (
+      {/* Fullscreen Vertical 9:16 TikTok/Reels Player Modal portaled to document.body */}
+      {typeof document !== 'undefined' && activeDeal && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/94 backdrop-blur-2xl animate-fade-in"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-6 bg-black/94 backdrop-blur-2xl animate-fade-in"
           onClick={handleClose}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
@@ -461,58 +465,53 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({
                 </span>
               </button>
 
-              {/* Share Action */}
+              {/* Share Button */}
               <button
                 onClick={(e) => handleShare(activeDeal, e)}
                 className="flex flex-col items-center gap-1 group cursor-pointer"
-                title="Share this short"
+                title="Share Reel link"
               >
-                <div className="w-11 h-11 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white backdrop-blur-md group-hover:bg-white/20 transition-all">
+                <div className="w-11 h-11 rounded-full bg-black/60 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all hover:scale-110 active:scale-90">
                   <Share2 className="w-5 h-5" />
                 </div>
-                <span className="text-[11px] font-mono font-bold text-white drop-shadow">Share</span>
+                <span className="text-[11px] font-mono font-bold text-white drop-shadow">
+                  Share
+                </span>
               </button>
             </div>
 
-            {/* Bottom Deal Card Overlay */}
-            <div className="relative z-30 p-4 bg-gradient-to-t from-slate-950 via-slate-950/95 to-transparent border-t border-white/10 flex flex-col gap-2.5">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 pr-10">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="px-2 py-0.5 rounded-md bg-white/15 text-[10.5px] font-bold text-white backdrop-blur-md">
-                      {activeDeal.store || 'Verified Store'}
-                    </span>
-                    {activeDeal.discount_pct && activeDeal.discount_pct > 0 && (
-                      <span className="px-2 py-0.5 rounded-md bg-rose-500/90 text-[10px] font-mono font-black text-white flex items-center gap-1">
-                        <Flame className="w-3 h-3 fill-white" />
-                        <span>{activeDeal.discount_pct}% OFF</span>
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 leading-snug drop-shadow-md">
-                    {activeDeal.title}
-                  </h3>
-                </div>
+            {/* Bottom Deal Metadata & One-Click Grab Banner */}
+            <div className="absolute bottom-0 inset-x-0 z-30 p-4 bg-gradient-to-t from-black via-black/85 to-transparent flex flex-col gap-2.5">
+              {/* Title & Brand */}
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-indigo-400 flex items-center gap-1">
+                  <Flame className="w-3 h-3 fill-indigo-400" />
+                  <span>{activeDeal.store || 'VERIFIED STORE'} LOOT</span>
+                </span>
+                <h2 className="text-sm font-black text-white line-clamp-2 leading-tight drop-shadow mt-0.5">
+                  {activeDeal.title}
+                </h2>
               </div>
 
-              {/* Price Row & 1-Click Affiliate Checkout */}
-              <div className="flex items-center justify-between gap-3 pt-1 border-t border-white/10">
-                <div>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-lg font-black text-emerald-400 font-mono drop-shadow">
-                      ₹{activeDeal.price?.toLocaleString('en-IN')}
-                    </span>
-                    {activeDeal.mrp && activeDeal.mrp > (activeDeal.price || 0) && (
-                      <span className="text-xs font-mono text-slate-400 line-through">
-                        ₹{activeDeal.mrp?.toLocaleString('en-IN')}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-[10px] text-emerald-300/90 font-medium">
-                    Verified Drop • Lowest in 30d
+              {/* Live Price Tag & Savings */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-xl font-black font-mono text-emerald-400 drop-shadow">
+                    ₹{activeDeal.price?.toLocaleString('en-IN')}
                   </span>
+                  {activeDeal.mrp && activeDeal.mrp > (activeDeal.price || 0) && (
+                    <span className="text-xs font-mono text-slate-400 line-through">
+                      ₹{activeDeal.mrp?.toLocaleString('en-IN')}
+                    </span>
+                  )}
+                  {activeDeal.discount_pct && (
+                    <span className="px-2 py-0.5 rounded-lg bg-rose-500 text-white text-[10px] font-black font-mono shadow-md">
+                      -{Math.min(95, activeDeal.discount_pct)}%
+                    </span>
+                  )}
                 </div>
 
+                {/* Direct Grab Link */}
                 <a
                   href={activeDeal.url}
                   target="_blank"
@@ -544,7 +543,8 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({
               <ChevronDown className="w-6 h-6" />
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );
