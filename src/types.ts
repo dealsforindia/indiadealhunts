@@ -39,6 +39,10 @@ export interface PublicDeal {
     emoji: string;
     color: string;
   };
+  has_video?: boolean;
+  video_url?: string;
+  video_cover?: string;
+  video_status?: string;
 }
 
 export interface CreditCardProfile {

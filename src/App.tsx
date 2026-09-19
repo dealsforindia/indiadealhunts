@@ -18,6 +18,7 @@ import type { PublicDeal, PublicDealsResponse, SortOption, NavTab } from './type
 import { calculateWorthScore } from './utils/worthScore';
 import { MarqueeTicker } from './components/MarqueeTicker';
 import { CategoryStories } from './components/CategoryStories';
+import { ViralShortsSection } from './components/ViralShortsSection';
 import { Sparkles, Zap, RefreshCw, AlertCircle, Clock, ShoppingBag, ChevronRight, CheckCircle2, ShieldCheck, Flame } from 'lucide-react';
 import { PriceAlertModal } from './components/PriceAlertModal';
 import { BountyEmptyState } from './components/BountyEmptyState';
@@ -33,9 +34,38 @@ const AppContent: React.FC = () => {
 
   // Deals State
   const [deals, setDeals] = useState<PublicDeal[]>([]);
+  const [videoDeals, setVideoDeals] = useState<PublicDeal[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Dedicated fetch for video deals
+  useEffect(() => {
+    fetch(`${API_BASE}/api/v1/deals/videos`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && data.deals) {
+          const mapped: PublicDeal[] = data.deals.map((d: any) => ({
+            id: d.fp_hash || d.id,
+            title: d.prod_name || d.title || 'Curated Deal',
+            price: d.prices?.sale ?? 0,
+            mrp: d.prices?.mrp ?? 0,
+            discount_pct: d.prices?.discount_pct ?? 0,
+            store: (d.platforms || ['Amazon'])[0],
+            image: d.img_url || '',
+            url: d.aff_url || d.canonical_url || d.url || '',
+            category: d.category || 'Special Deal',
+            posted_at: d.processed_ts || d.ts || Date.now() / 1000,
+            has_video: true,
+            video_url: d.video_url,
+            video_cover: d.video_cover,
+            video_status: d.video_status || 'ready',
+          }));
+          setVideoDeals(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Filters & Search
   const [selectedStore, setSelectedStore] = useState<string>('all');
@@ -325,6 +355,9 @@ const AppContent: React.FC = () => {
                 }}
               />
             </div>
+
+            {/* Automated Viral Shorts Section (9:16 Video Reels) */}
+            <ViralShortsSection deals={videoDeals.length > 0 ? videoDeals : deals} />
 
             {/* ShoppinGenie Feature: "Order Right Now" Horizontal 4-Card Carousel */}
             {orderRightNowDeals.length > 0 && !searchQuery && selectedStore === 'all' && selectedCategory === 'all' && (
