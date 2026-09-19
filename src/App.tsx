@@ -45,23 +45,38 @@ const AppContent: React.FC = () => {
       .then(res => res.ok ? res.json() : null)
       .then(data => {
         if (data && data.deals) {
-          const mapped: PublicDeal[] = data.deals.map((d: any) => ({
-            id: d.fp_hash || d.id,
-            title: d.prod_name || d.title || 'Curated Deal',
-            price: d.prices?.sale ?? 0,
-            mrp: d.prices?.mrp ?? 0,
-            discount_pct: d.prices?.discount_pct ?? 0,
-            store: (d.platforms || ['Amazon'])[0],
-            image: d.img_url || '',
-            url: d.aff_url || d.canonical_url || d.url || '',
-            category: d.category || 'Special Deal',
-            posted_at: d.processed_ts || d.ts || Date.now() / 1000,
-            has_video: true,
-            video_url: d.video_url,
-            video_cover: d.video_cover,
-            video_status: d.video_status || 'ready',
-          }));
+          const mapped: PublicDeal[] = data.deals
+            .filter((d: any) => Boolean(d.video_url && typeof d.video_url === 'string' && d.video_url.startsWith('http')))
+            .map((d: any) => ({
+              id: d.fp_hash || d.id,
+              title: d.prod_name || d.title || 'Curated Deal',
+              price: d.prices?.sale ?? 0,
+              mrp: d.prices?.mrp ?? 0,
+              discount_pct: d.prices?.discount_pct ?? 0,
+              store: (d.platforms || ['Amazon'])[0],
+              image: d.img_url || '',
+              url: d.aff_url || d.canonical_url || d.url || '',
+              category: d.category || 'Special Deal',
+              posted_at: d.processed_ts || d.ts || Date.now() / 1000,
+              has_video: true,
+              video_url: d.video_url,
+              video_cover: d.video_cover,
+              video_preview: d.video_preview || d.preview_url,
+              video_status: d.video_status || 'ready',
+            }));
           setVideoDeals(mapped);
+
+          // Deep-link support: Auto-open reel if ?short=fp_hash is present in URL
+          try {
+            const params = new URLSearchParams(window.location.search);
+            const shortId = params.get('short');
+            if (shortId) {
+              const matched = mapped.find(d => d.id === shortId);
+              if (matched) {
+                setActiveReelDeal(matched);
+              }
+            }
+          } catch (_) {}
         }
       })
       .catch(() => {});
