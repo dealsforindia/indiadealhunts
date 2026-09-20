@@ -10,8 +10,20 @@ export interface WorthScoreResult {
 
 export function calculateWorthScore(deal: Partial<PublicDeal>): WorthScoreResult {
   const price = deal.price || 0;
-  const mrp = deal.mrp || (deal.discount_pct && price ? Math.round(price / (1 - deal.discount_pct / 100)) : price);
-  const discount = deal.discount_pct || (mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0);
+  let discount = deal.discount_pct || 0;
+  // Guard against fake 100% discount with non-zero price
+  if (discount >= 100 && price > 0) {
+    discount = (deal.mrp && deal.mrp > price) ? Math.round(((deal.mrp - price) / deal.mrp) * 100) : 0;
+  }
+  
+  const discountFactor = Math.max(0.05, 1 - Math.min(95, discount) / 100);
+  const mrp = deal.mrp && deal.mrp > price 
+    ? deal.mrp 
+    : (discount > 0 && price > 0 ? Math.round(price / discountFactor) : price);
+
+  if (!discount && mrp > price && price > 0) {
+    discount = Math.round(((mrp - price) / mrp) * 100);
+  }
   const savings = Math.max(0, mrp - price);
 
   // 100% Transparent Formula Based Purely On Verified Deal Metrics:

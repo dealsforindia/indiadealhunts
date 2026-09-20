@@ -130,13 +130,25 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   const effectiveActiveCards = activeCards || getSavedCards();
   const cardSavings = calculateBestCardSavings(deal, effectiveActiveCards);
 
+  // Sanitize and true-calculate discount percentage (guards against fake 100% discount)
+  const priceVal = deal.price || 0;
+  const mrpVal = (deal.mrp && deal.mrp > priceVal) ? deal.mrp : undefined;
+  const effectiveDiscount = (deal.discount_pct && deal.discount_pct >= 100 && priceVal > 0)
+    ? (mrpVal ? Math.round(((mrpVal - priceVal) / mrpVal) * 100) : 0)
+    : (deal.discount_pct || 0);
+
   let displayTitle = deal.title
     ? deal.title.replace(/^[\s\u2700-\u27BF\uE000-\uF8FF\uD83C-\uDBFF\uDC00-\uDFFF\u2011-\u26FF\uFE0E-\uFE0F\u00A0-\u00BF👉⚡🔥✅🎁📦🚨📢🏷️💎⏰‼️💥]+\s*/gu, '').trim() || deal.title
     : 'Verified Retail Deal';
 
   const tLower = displayTitle.toLowerCase().trim();
-  if (['products', 'product', 'item store online', 'store online', 'deal', 'loot', 'item'].includes(tLower) || displayTitle.length < 5) {
-    const slugMatch = deal.url?.match(/\/(?:flipkart\.com|shopsy\.in|fkrt\.cc)(?:\/dl)?\/([^/?#]+)\/p\/itm/i);
+  const channelHandles = ['smagnetdeals', 'lootdealsapp', 'technicalsheikh', 'glamhauldiaries', 'offerzone', 'dealztrendz', 'freekart', 'extrape', 'realearnkaro', 'desidime', 'bblbblp'];
+  const isChannelHandle = channelHandles.some((h) => tLower.includes(h)) ||
+    (tLower.startsWith('@') || ((tLower.endsWith('deals') || tLower.endsWith('dealsx') || tLower.endsWith('loot')) && !tLower.includes(' ')));
+
+  if (['products', 'product', 'item store online', 'store online', 'deal', 'loot', 'item'].includes(tLower) || isChannelHandle || displayTitle.length < 5) {
+    const slugMatch = deal.url?.match(/\/(?:flipkart\.com|shopsy\.in|fkrt\.cc)(?:\/dl)?\/([^/?#]+)\/p\/itm/i) ||
+      deal.url?.match(/amazon\.in\/([^/?#]+)\/dp\/[A-Z0-9]{10}/i);
     if (slugMatch && slugMatch[1]) {
       displayTitle = slugMatch[1].replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
     } else if (deal.category && deal.category !== 'Special Deal') {
@@ -155,7 +167,9 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
 
   const handleWhatsAppShare = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const text = `🔥 *${displayTitle}*\n\n💰 *Price:* ₹${deal.price || 0} ~₹${deal.mrp || 0}~ (${deal.discount_pct || 0}% OFF)\n🛒 *Store:* ${deal.store}\n\n👉 *Grab Deal Now:* ${deal.url}\n\n⚡ Verified via IndiaDealHunts`;
+    const discStr = effectiveDiscount > 0 ? ` (${effectiveDiscount}% OFF)` : '';
+    const mrpStr = mrpVal ? ` ~₹${mrpVal}~` : '';
+    const text = `🔥 *${displayTitle}*\n\n💰 *Price:* ₹${priceVal}${mrpStr}${discStr}\n🛒 *Store:* ${deal.store}\n\n👉 *Grab Deal Now:* ${deal.url}\n\n⚡ Verified via IndiaDealHunts`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -249,9 +263,9 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           )}
 
           {/* Discount Pill Overlay */}
-          {deal.discount_pct && deal.discount_pct > 0 && !isExpired && (
+          {effectiveDiscount > 0 && effectiveDiscount < 100 && !isExpired && (
             <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 font-mono text-[10px] font-black shadow-sm z-10">
-              {deal.discount_pct}% OFF
+              {effectiveDiscount}% OFF
             </span>
           )}
 
@@ -335,9 +349,9 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             <span className={`text-lg sm:text-xl font-bold font-mono ${isExpired ? 'text-slate-400 line-through' : 'text-emerald-400'}`}>
               ₹{Math.round(deal.price || 0).toLocaleString('en-IN')}
             </span>
-            {deal.mrp && deal.mrp > (deal.price || 0) && (
+            {mrpVal && (
               <span className="text-xs text-slate-500 line-through font-mono">
-                ₹{Math.round(deal.mrp).toLocaleString('en-IN')}
+                ₹{Math.round(mrpVal).toLocaleString('en-IN')}
               </span>
             )}
           </div>

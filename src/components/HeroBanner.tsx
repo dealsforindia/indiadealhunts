@@ -66,7 +66,13 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 
   const cleanTitle = (raw?: string) => {
     if (!raw) return 'Verified Retail Deal';
-    return raw.replace(/^[\s\u2700-\u27BF\uE000-\uF8FF\uD83C-\uDBFF\uDC00-\uDFFF\u2011-\u26FF\uFE0E-\uFE0F\u00A0-\u00BF👉⚡🔥✅🎁📦🚨📢🏷️💎⏰‼️💥]+\s*/gu, '').trim() || raw;
+    const cleaned = raw.replace(/^[\s\u2700-\u27BF\uE000-\uF8FF\uD83C-\uDBFF\uDC00-\uDFFF\u2011-\u26FF\uFE0E-\uFE0F\u00A0-\u00BF👉⚡🔥✅🎁📦🚨📢🏷️💎⏰‼️💥]+\s*/gu, '').trim() || raw;
+    const cLower = cleaned.toLowerCase().trim();
+    const channelHandles = ['smagnetdeals', 'lootdealsapp', 'technicalsheikh', 'glamhauldiaries', 'offerzone', 'dealztrendz', 'freekart', 'extrape', 'realearnkaro', 'desidime', 'bblbblp'];
+    if (channelHandles.some((h) => cLower.includes(h)) || (cLower.endsWith('deals') && !cLower.includes(' '))) {
+      return 'Verified Retail Deal';
+    }
+    return cleaned;
   };
 
   // Top 3 Showcase Deals (Fall back to spotlightDeal if showcaseDeals is empty)
@@ -213,7 +219,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                         <Category3DPlaceholder category={deal.category || deal.store || 'Shopping'} />
                       )}
 
-                      {deal.discount_pct && deal.discount_pct > 0 && (
+                      {deal.discount_pct && deal.discount_pct > 0 && deal.discount_pct < 100 && (
                         <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 font-mono text-[10px] font-black shadow-sm">
                           {deal.discount_pct}% OFF
                         </span>
