@@ -12,6 +12,7 @@
   "dependencies": {
     "canvas-confetti": "^1.9.4",
     "embla-carousel-react": "^8.6.0",
+    "html2canvas": "^1.4.1",
     "lucide-react": "^1.16.0",
     "motion": "^12.23.24",
     "react": "^19.0.0",

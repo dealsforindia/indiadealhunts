@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ExternalLink, Copy, Check, MessageCircle, AlertTriangle, Bell, Film, ChevronDown } from 'lucide-react';
+import { ExternalLink, Copy, Check, MessageCircle, AlertTriangle, Bell, Film, ChevronDown, Share2, Loader2 } from 'lucide-react';
+import html2canvas from 'html2canvas';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { Category3DPlaceholder } from './Iconscout3DAssets';
 import { MegaHaulCard } from './MegaHaulCard';
+import { BragCardTemplate } from './BragCardTemplate';
 
 interface PublicDealCardProps {
   deal: PublicDeal;
@@ -106,6 +108,8 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [isHaulExpanded, setIsHaulExpanded] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const templateRef = useRef<HTMLDivElement>(null);
 
   const cleanImageUrl = getCleanImageUrl(deal.image);
   const relativeTime = getRelativeTime(deal.display_ts || deal.posted_at);
@@ -153,6 +157,48 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
     const text = `🔥 *${displayTitle}*\n\n💰 *Price:* ₹${priceVal}${mrpStr}${discStr}\n🛒 *Store:* ${deal.store}\n\n👉 *Claim Deal:* ${deal.url}\n\n⚡ Verified via IndiaDealHunts`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
   };
+
+  const handleBragShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsGenerating(true);
+  };
+
+  useEffect(() => {
+    if (isGenerating && templateRef.current) {
+      setTimeout(async () => {
+        try {
+          const canvas = await html2canvas(templateRef.current!, {
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#070A11',
+            scale: 2 // High resolution
+          });
+          const imageBlob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
+          
+          if (imageBlob) {
+            const file = new File([imageBlob], `loot-brag-${deal.id}.png`, { type: 'image/png' });
+            if (navigator.share && navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                title: 'Massive Loot Secured!',
+                text: `I just found this crazy deal on IndiaDealHunts: ${deal.title}`,
+                files: [file]
+              });
+            } else {
+              // Fallback download
+              const link = document.createElement('a');
+              link.download = `loot-brag-${deal.id}.png`;
+              link.href = URL.createObjectURL(imageBlob);
+              link.click();
+            }
+          }
+        } catch (err) {
+          console.error('Brag card generation failed', err);
+        } finally {
+          setIsGenerating(false);
+        }
+      }, 500); // 500ms delay to ensure image loading inside offscreen DOM
+    }
+  }, [isGenerating, deal.id, deal.title]);
 
   return (
     <motion.article 
@@ -315,6 +361,18 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             <ExternalLink className="w-3 h-3 shrink-0" />
           </a>
 
+          {/* Generate Brag Card / Share Button */}
+          <button
+            type="button"
+            onClick={handleBragShare}
+            disabled={isGenerating}
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 hover:text-indigo-200 border border-indigo-500/20 flex items-center justify-center transition-colors shrink-0 cursor-pointer disabled:opacity-50"
+            title="Generate Brag Card to Share (Insta/X)"
+            aria-label="Generate Brag Card"
+          >
+            {isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Share2 className="w-3.5 h-3.5" />}
+          </button>
+
           {/* Quick WhatsApp Share Button */}
           <button
             type="button"
@@ -385,7 +443,9 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
               ))}
             </div>
           </div>
-        </div>
+        {/* Hidden Offscreen DOM for HTML2Canvas */}
+      {isGenerating && (
+        <BragCardTemplate ref={templateRef} deal={deal} />
       )}
 
     </motion.article>
