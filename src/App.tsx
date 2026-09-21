@@ -111,16 +111,19 @@ const AppContent: React.FC = () => {
   const [alertDeal, setAlertDeal] = useState<PublicDeal | null>(null);
   const [isAlertOpen, setIsAlertOpen] = useState<boolean>(false);
   const [activeReelDeal, setActiveReelDeal] = useState<PublicDeal | null>(null);
+  const [isAutoRefreshing, setIsAutoRefreshing] = useState<boolean>(false);
 
   // Fetch Deals from Backend
   const fetchDeals = useCallback(
-    async (currentSkip = 0, isAppend = false) => {
+    async (currentSkip = 0, isAppend = false, isSilent = false) => {
       if (isAppend) {
         setLoadingMore(true);
+      } else if (isSilent) {
+        setIsAutoRefreshing(true);
       } else {
         setLoading(true);
       }
-      setError(null);
+      if (!isSilent) setError(null);
 
       try {
         const params = new URLSearchParams({
@@ -137,6 +140,9 @@ const AppContent: React.FC = () => {
         }
         if (searchQuery.trim()) params.append('search', searchQuery.trim());
         params.append('sort', sortBy);
+        if (isSilent) {
+          params.append('_t', Date.now().toString());
+        }
 
         let res: Response;
         try {
@@ -168,6 +174,13 @@ const AppContent: React.FC = () => {
             const newDeals = enriched.filter((d) => !existingIds.has(d.id));
             return [...prev, ...newDeals];
           });
+        } else if (isSilent && currentSkip === 0) {
+          // Prepend new arrivals seamlessly without jolting the user
+          setDeals((prev) => {
+            const newIds = new Set(enriched.map((d) => d.id));
+            const unchangedOlder = prev.filter((d) => !newIds.has(d.id));
+            return [...enriched, ...unchangedOlder];
+          });
         } else {
           setDeals(enriched);
         }
@@ -177,10 +190,13 @@ const AppContent: React.FC = () => {
         setSkip(currentSkip);
       } catch (err: any) {
         console.error('Fetch error:', err);
-        setError(err.message || 'Unable to connect to DealFlow engine');
+        if (!isSilent) {
+          setError(err.message || 'Unable to connect to DealFlow engine');
+        }
       } finally {
         setLoading(false);
         setLoadingMore(false);
+        setIsAutoRefreshing(false);
       }
     },
     [selectedStore, selectedCategory, searchQuery, sortBy]
@@ -189,6 +205,78 @@ const AppContent: React.FC = () => {
   // Initial fetch and reload on filter changes
   useEffect(() => {
     fetchDeals(0, false);
+  }, [fetchDeals]);
+
+  // Real-Time Background Auto-Refresh (Every 25 seconds on Home tab)
+  useEffect(() => {
+    if (activeTab !== 'home' || searchQuery.trim() || skip > 0) return;
+
+    const interval = setInterval(() => {
+      fetchDeals(0, false, true);
+    }, 25000);
+
+    return () => clearInterval(interval);
+  }, [activeTab, searchQuery, skip, fetchDeals]);
+
+  // Tab Focus / Phone Unlock Visibility Change Auto-Refresh
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && activeTab === 'home' && !searchQuery.trim()) {
+        fetchDeals(0, false, true);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleVisibilityChange);
+    };
+  }, [activeTab, searchQuery, fetchDeals]);
+
+  // Live WebSocket Stream Listener for Instant Real-Time Drops
+  useEffect(() => {
+    let ws: WebSocket | null = null;
+    let reconnectTimer: any = null;
+
+    const connectWs = () => {
+      try {
+        const wsUrl = API_BASE.replace(/^https?:\/\//, (m) => m === 'https://' ? 'wss://' : 'ws://') + '/ws';
+        ws = new WebSocket(wsUrl);
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (
+              data.event === 'deals:new' ||
+              data.event === 'deal_approved' ||
+              data.type === 'new_deal' ||
+              data.event === 'deal_update'
+            ) {
+              fetchDeals(0, false, true);
+            }
+          } catch {}
+        };
+
+        ws.onerror = () => {
+          ws?.close();
+        };
+
+        ws.onclose = () => {
+          reconnectTimer = setTimeout(connectWs, 8000);
+        };
+      } catch {}
+    };
+
+    connectWs();
+
+    return () => {
+      clearTimeout(reconnectTimer);
+      if (ws) {
+        ws.onclose = null;
+        ws.close();
+      }
+    };
   }, [fetchDeals]);
 
   // Curated Top 3 Showcase Drops for Hero (Highest real savings on physical goods)
@@ -414,19 +502,34 @@ const AppContent: React.FC = () => {
             </div>
 
             {/* Live Feed Header */}
-            <div className="max-w-7xl mx-auto px-3 sm:px-6 mb-3 flex items-center justify-between">
+            <div className="max-w-7xl mx-auto px-2.5 sm:px-6 mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+                </span>
                 <h2 className="text-base sm:text-xl font-bold font-brand text-white tracking-tight">
                   Recent Verified Drops
                 </h2>
-                <span className="text-xs text-slate-400 hidden sm:inline">
-                  — Real-time price drops across Amazon, Flipkart & top brands
+                <span className="text-[11px] font-mono text-emerald-400/90 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 hidden sm:inline-flex items-center gap-1">
+                  ● Live Auto-Sync
                 </span>
               </div>
-              <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
-                {gridDeals.length} drops
-              </span>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <button
+                  onClick={() => fetchDeals(0, false, false)}
+                  disabled={loading}
+                  className="px-2 py-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/10 text-xs flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                  title="Refresh deals now"
+                  aria-label="Refresh deals"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 text-emerald-400 ${loading || isAutoRefreshing ? 'animate-spin' : ''}`} />
+                  <span className="hidden sm:inline">Refresh</span>
+                </button>
+                <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                  {gridDeals.length} drops
+                </span>
+              </div>
             </div>
 
             {/* Deals Grid */}
