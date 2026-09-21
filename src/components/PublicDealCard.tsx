@@ -1,13 +1,8 @@
 import React, { useState } from 'react';
-import { ExternalLink, Copy, Check, MessageCircle, ZoomIn, Clock, Flame, ShieldCheck, Zap, CreditCard, AlertTriangle, Bell, Film } from 'lucide-react';
-import confetti from 'canvas-confetti';
-
+import { ExternalLink, Copy, Check, MessageCircle, AlertTriangle, Bell, Film } from 'lucide-react';
 import { PublicDeal } from '../types';
-import { calculateWorthScore } from '../utils/worthScore';
 import { getCleanImageUrl } from '../utils/imageUrl';
-import { calculateBestCardSavings, getSavedCards } from '../utils/cardSavings';
-import { HeatScoreBadge } from './HeatScoreBadge';
-import { Store3DBadge, SavingsPill3D, Category3DPlaceholder } from './Iconscout3DAssets';
+import { Category3DPlaceholder } from './Iconscout3DAssets';
 
 interface PublicDealCardProps {
   deal: PublicDeal;
@@ -34,78 +29,68 @@ function getRelativeTime(timestamp?: number): string {
   return `${diffDays}d ago`;
 }
 
-// Clean Store Badge
-const StoreLogo: React.FC<{ store: string }> = ({ store }) => {
-  const s = (store || '').toLowerCase();
+// Compact, crisp store pill
+const CompactStoreBadge: React.FC<{ store?: string }> = ({ store = 'Retail' }) => {
+  const s = store.toLowerCase();
   if (s.includes('amazon')) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#232F3E] border border-amber-500/30 text-amber-300 text-[10.5px] font-semibold">
-        <svg className="w-2.5 h-2.5 fill-amber-400" viewBox="0 0 24 24">
-          <path d="M15.93 17.09c-2.83 2.08-6.95 3.19-10.49 1.57-1.44-.66-2.6-1.74-3.44-3.09-.23-.37.05-.83.47-.73 3.65.86 7.6.61 10.98-1.02.43-.21.9.21.62.61-.41.59-.83 1.14-1.32 1.66l3.18 1zm4.72-2.19c.14-.84.22-1.7.22-2.58 0-6.07-4.93-11-11-11S-.13 6.25-.13 12.32 4.8 23.32 10.87 23.32c3.55 0 6.72-1.68 8.76-4.31.25-.32.06-.79-.34-.84l-2.02-.27c-.22-.03-.43.08-.54.27-1.41 1.94-3.7 3.2-6.28 3.2-4.38 0-7.94-3.44-8.09-7.78 3.73 1.83 8.16 1.87 11.96.11l.07-.03c.53-.25.86-.79.82-1.38-.05-.81-.69-1.44-1.5-1.47-2.9-.11-5.74.88-8.08 2.59.34-3.37 3.18-5.99 6.64-5.99 3.69 0 6.68 3 6.68 6.68 0 .42-.04.83-.11 1.23-.05.3.16.58.46.61l2.45.24c.26.03.48-.15.52-.41z"/>
-        </svg>
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#232F3E]/90 border border-amber-500/30 text-amber-300 text-[10px] font-bold">
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
         Amazon
       </span>
     );
   }
   if (s.includes('flipkart')) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#2874F0]/20 border border-blue-500/30 text-blue-300 text-[10.5px] font-semibold">
-        <span className="w-2.5 h-2.5 rounded-full bg-[#FFE500] text-[#2874F0] font-black text-[8px] flex items-center justify-center leading-none">f</span>
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#2874F0]/20 border border-blue-500/30 text-blue-300 text-[10px] font-bold">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#FFE500]" />
         Flipkart
       </span>
     );
   }
   if (s.includes('myntra')) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-pink-500/15 border border-pink-500/30 text-pink-300 text-[10.5px] font-semibold">
-        <span className="font-bold text-[9px] text-pink-400">M</span>
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-pink-500/15 border border-pink-500/30 text-pink-300 text-[10px] font-bold">
+        <span className="w-1.5 h-1.5 rounded-full bg-pink-400" />
         Myntra
       </span>
     );
   }
   if (s.includes('ajio')) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-500/15 border border-teal-500/30 text-teal-300 text-[10.5px] font-semibold">
-        <span className="font-bold text-[9px] text-teal-400">A</span>
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-teal-500/15 border border-teal-500/30 text-teal-300 text-[10px] font-bold">
+        <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
         AJIO
       </span>
     );
   }
   if (s.includes('swiggy') || s.includes('instamart')) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-orange-500/15 border border-orange-500/30 text-orange-300 text-[10.5px] font-semibold">
-        <span className="font-bold text-[9px] text-orange-400">🛒</span>
-        Instamart
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-orange-500/15 border border-orange-500/30 text-orange-300 text-[10px] font-bold">
+        <span className="w-1.5 h-1.5 rounded-full bg-orange-400" />
+        Swiggy
       </span>
     );
   }
   if (s.includes('zepto')) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-600/20 border border-purple-500/40 text-purple-300 text-[10.5px] font-semibold">
-        <span className="font-bold text-[9px] text-purple-400">⚡</span>
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-purple-500/15 border border-purple-500/30 text-purple-300 text-[10px] font-bold">
+        <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
         Zepto
       </span>
     );
   }
   if (s.includes('blinkit')) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-yellow-500/15 border border-yellow-500/30 text-yellow-300 text-[10.5px] font-semibold">
-        <span className="font-bold text-[9px] text-yellow-400">⚡</span>
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-yellow-500/15 border border-yellow-500/30 text-yellow-300 text-[10px] font-bold">
+        <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
         Blinkit
       </span>
     );
   }
-  if (s.includes('swiggy')) {
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-orange-500/15 border border-orange-500/30 text-orange-300 text-[10.5px] font-semibold">
-        <span className="font-bold text-[9px] text-orange-400">🍲</span>
-        Swiggy
-      </span>
-    );
-  }
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-800 border border-white/10 text-slate-300 text-[10.5px] font-semibold">
-      {store || 'Store'}
+    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-white/[0.06] border border-white/10 text-slate-300 text-[10px] font-semibold">
+      {store}
     </span>
   );
 };
@@ -114,8 +99,6 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   deal,
   onOpenImage,
   onOpenVideo,
-  activeCards,
-  onOpenCardModal,
   onOpenAlert,
 }) => {
   const [copied, setCopied] = useState(false);
@@ -124,13 +107,9 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
 
   const cleanImageUrl = getCleanImageUrl(deal.image);
   const relativeTime = getRelativeTime(deal.display_ts || deal.posted_at);
-  const worth = calculateWorthScore(deal);
   const savings = (deal.mrp && deal.mrp > (deal.price || 0)) ? deal.mrp - (deal.price || 0) : 0;
   const isExpired = Boolean(deal.is_expired || deal.status === 'expired' || deal.is_over);
-  const effectiveActiveCards = activeCards || getSavedCards();
-  const cardSavings = calculateBestCardSavings(deal, effectiveActiveCards);
 
-  // Sanitize and true-calculate discount percentage (guards against fake 100% discount)
   const priceVal = deal.price || 0;
   const mrpVal = (deal.mrp && deal.mrp > priceVal) ? deal.mrp : undefined;
   const effectiveDiscount = (deal.discount_pct && deal.discount_pct >= 100 && priceVal > 0)
@@ -169,60 +148,30 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
     e.stopPropagation();
     const discStr = effectiveDiscount > 0 ? ` (${effectiveDiscount}% OFF)` : '';
     const mrpStr = mrpVal ? ` ~₹${mrpVal}~` : '';
-    const text = `🔥 *${displayTitle}*\n\n💰 *Price:* ₹${priceVal}${mrpStr}${discStr}\n🛒 *Store:* ${deal.store}\n\n👉 *Grab Deal Now:* ${deal.url}\n\n⚡ Verified via IndiaDealHunts`;
+    const text = `🔥 *${displayTitle}*\n\n💰 *Price:* ₹${priceVal}${mrpStr}${discStr}\n🛒 *Store:* ${deal.store}\n\n👉 *Claim Deal:* ${deal.url}\n\n⚡ Verified via IndiaDealHunts`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
   };
 
-  const handleClaim = () => {
-    if (!isExpired) {
-      confetti({
-        particleCount: 25,
-        spread: 50,
-        origin: { y: 0.8 },
-        colors: ['#10B981', '#34D399', '#6EE7B7'],
-      });
-    }
-  };
-
   return (
-    <article className={`group relative flex flex-col justify-between rounded-2xl border transition-all duration-200 p-3 sm:p-3.5 hover:shadow-2xl hover:shadow-black/70 hover:-translate-y-1 transform-gpu ${
+    <article className={`group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border transition-all duration-150 p-2.5 sm:p-3.5 select-none ${
       isExpired
-        ? 'bg-[#0E111C] border-rose-900/30 opacity-75'
-        : 'bg-[#121522] border-white/[0.08] hover:border-emerald-500/50'
+        ? 'bg-[#0E111C] border-rose-900/30 opacity-70'
+        : 'bg-[#111422] border-white/[0.08] hover:border-emerald-500/40 hover:bg-[#131828] active:scale-[0.98]'
     }`}>
       
       <div>
-        {/* 1. Card Top Meta: Store 3D Badge + Live Pulse Relative Time + Heat Badge */}
-        <div className="flex items-center justify-between gap-1.5 mb-2.5 min-w-0">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <Store3DBadge store={deal.store || 'Retail'} />
-            <span className="text-[10.5px] text-slate-400 flex items-center gap-1 font-mono shrink-0">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              {relativeTime}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1 shrink-0">
-            {isExpired ? (
-              <span className="text-[10px] font-bold text-rose-300 bg-rose-500/20 border border-rose-500/30 px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                <AlertTriangle className="w-2.5 h-2.5 text-rose-400" />
-                Sold Out
-              </span>
-            ) : (
-              <HeatScoreBadge score={deal.heat_score || deal.worth_score} />
-            )}
-            {deal.cluster_count && deal.cluster_count >= 2 && !isExpired && (
-              <span className="text-[10px] font-black text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded flex items-center gap-0.5" title={`Verified by ${deal.cluster_count} curators across our sensor network`}>
-                <Flame className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
-                {deal.cluster_count}x Curators
-              </span>
-            )}
-          </div>
+        {/* 1. Header: Store Badge + Relative Time */}
+        <div className="flex items-center justify-between gap-1 mb-2">
+          <CompactStoreBadge store={deal.store} />
+          <span className="text-[10px] sm:text-[11px] text-slate-400 font-mono flex items-center gap-1 shrink-0">
+            {!isExpired && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
+            {relativeTime}
+          </span>
         </div>
 
-        {/* 2. Product Image Stage: Dark Obsidian Stage (Luma Style) */}
+        {/* 2. Image Stage: Square on mobile, 4/3 on desktop */}
         <div
-          className="relative w-full aspect-[4/3] bg-[#141828] rounded-xl p-3 flex items-center justify-center overflow-hidden cursor-pointer border border-white/[0.05] group-hover:border-white/[0.12] transition-colors mb-2.5"
+          className="relative w-full aspect-square sm:aspect-[4/3] bg-[#151928] rounded-lg sm:rounded-xl p-2 sm:p-3 flex items-center justify-center overflow-hidden cursor-pointer border border-white/[0.04] mb-2"
           onClick={() => onOpenImage(deal)}
           role="button"
           tabIndex={0}
@@ -243,48 +192,30 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
                 setImgError(true);
                 setImageLoaded(true);
               }}
-              className={`max-h-full max-w-full object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform duration-300 ${
+              className={`max-h-full max-w-full object-contain filter drop-shadow-sm transition-opacity duration-200 ${
                 imageLoaded ? 'opacity-100' : 'opacity-0'
-              } ${isExpired ? 'grayscale-[50%]' : ''}`}
+              } ${isExpired ? 'grayscale' : ''}`}
               loading="lazy"
             />
           ) : (
             <Category3DPlaceholder category={deal.category || deal.store || 'Shopping'} />
           )}
 
-          {/* 4s Animated WebP Hover Preview if video is ready */}
-          {deal.video_preview && !isExpired && (
-            <img
-              src={deal.video_preview}
-              alt="Video Preview"
-              className="absolute inset-0 w-full h-full object-contain opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl bg-black/40 backdrop-blur-[2px] z-5"
-              loading="lazy"
-            />
-          )}
-
-          {/* Discount Pill Overlay */}
+          {/* Discount Pill */}
           {effectiveDiscount > 0 && effectiveDiscount < 100 && !isExpired && (
-            <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 font-mono text-[10px] font-black shadow-sm z-10">
+            <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded-md bg-amber-400 text-slate-950 font-mono text-[9.5px] sm:text-[10.5px] font-black shadow-xs z-10">
               {effectiveDiscount}% OFF
             </span>
           )}
 
-          {/* High-Alpha Anomaly & Breakout Badges */}
+          {/* Glitch Anomaly Badge */}
           {deal.deal_badges?.some((b: string) => b.toLowerCase().includes('glitch')) && !isExpired && (
-            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-gradient-to-r from-rose-600 to-red-600 text-white font-mono text-[9px] font-black uppercase tracking-wider shadow-lg border border-rose-400/40 animate-pulse flex items-center gap-1 z-10">
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-              <span>🚨 GLITCH</span>
+            <span className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-rose-600 text-white font-mono text-[9px] font-black uppercase tracking-wider shadow-sm z-10">
+              🚨 GLITCH
             </span>
           )}
 
-          {!deal.deal_badges?.some((b: string) => b.toLowerCase().includes('glitch')) &&
-            deal.deal_badges?.some((b: string) => b.toLowerCase().includes('breakout') || b.toLowerCase().includes('surge')) && !isExpired && (
-            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-600 text-white font-mono text-[9px] font-black uppercase tracking-wider shadow-lg border border-amber-300/40 animate-pulse flex items-center gap-1 z-10">
-              <span>⚡ SURGE</span>
-            </span>
-          )}
-
-          {/* 15s Short Video Available Interactive Badge */}
+          {/* 15s Video Short Badge */}
           {(deal.has_video || deal.video_url) && !isExpired && (
             <button
               type="button"
@@ -296,41 +227,26 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
                   onOpenImage(deal);
                 }
               }}
-              className="absolute bottom-2 right-2 px-2.5 py-1 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-mono text-[9.5px] font-black uppercase tracking-wider shadow-lg shadow-indigo-500/30 backdrop-blur-md flex items-center gap-1.5 border border-indigo-300/40 z-20 hover:scale-105 active:scale-95 transition-all cursor-pointer group/btn"
+              className="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded-md bg-indigo-600/90 hover:bg-indigo-500 text-white font-mono text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 z-10 cursor-pointer"
               title="Watch 15s Short"
             >
-              <Film className="w-3 h-3 animate-pulse text-indigo-200 group-hover/btn:rotate-12 transition-transform" />
-              <span>15s Short</span>
+              <Film className="w-2.5 h-2.5" />
+              <span>Short</span>
             </button>
           )}
 
-          {/* Sold out watermark overlay */}
+          {/* Sold out overlay */}
           {isExpired && (
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none z-20">
-              <span className="px-3 py-1 rounded-xl bg-rose-500/80 text-white text-xs font-black tracking-wider uppercase shadow-lg backdrop-blur-sm border border-rose-400/40">
-                Out of Stock
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center pointer-events-none z-10">
+              <span className="px-2 py-0.5 rounded-md bg-rose-500/90 text-white text-[10px] font-black tracking-wider uppercase">
+                Sold Out
               </span>
-            </div>
-          )}
-
-          {/* Zoom or Watch Video Hover Hint */}
-          {!isExpired && (
-            <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 pointer-events-none z-10">
-              {(deal.has_video || deal.video_url) && onOpenVideo ? (
-                <span className="px-3 py-1.5 rounded-full bg-indigo-600/90 text-white text-[11px] font-bold flex items-center gap-1.5 backdrop-blur-sm border border-indigo-300/30 shadow-lg shadow-indigo-500/40">
-                  <Film className="w-3.5 h-3.5 fill-white text-indigo-600" /> Watch Short
-                </span>
-              ) : (
-                <span className="px-2.5 py-1 rounded-full bg-black/75 text-white text-[11px] font-medium flex items-center gap-1 backdrop-blur-sm border border-white/10">
-                  <ZoomIn className="w-3 h-3" /> View
-                </span>
-              )}
             </div>
           )}
         </div>
 
-        {/* 3. Title */}
-        <h3 className="font-semibold text-xs sm:text-sm text-white line-clamp-2 mb-2 leading-snug group-hover:text-emerald-300 transition-colors">
+        {/* 3. Product Title */}
+        <h3 className="font-semibold text-xs sm:text-sm text-slate-100 line-clamp-2 mb-1.5 leading-snug group-hover:text-emerald-300 transition-colors">
           <a
             href={deal.url}
             target="_blank"
@@ -343,94 +259,49 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
       </div>
 
       <div>
-        {/* 4. Price & Savings Row */}
-        <div className="flex items-baseline justify-between gap-1 pt-2 border-t border-white/[0.06] mb-1.5">
+        {/* 4. Price & Savings Bar */}
+        <div className="flex items-baseline justify-between gap-1 pt-1.5 border-t border-white/[0.06] mb-2">
           <div className="flex items-baseline gap-1.5">
-            <span className={`text-lg sm:text-xl font-bold font-mono ${isExpired ? 'text-slate-400 line-through' : 'text-emerald-400'}`}>
+            <span className={`text-base sm:text-lg font-bold font-mono ${isExpired ? 'text-slate-400 line-through' : 'text-emerald-400'}`}>
               ₹{Math.round(deal.price || 0).toLocaleString('en-IN')}
             </span>
             {mrpVal && (
-              <span className="text-xs text-slate-500 line-through font-mono">
+              <span className="text-[11px] sm:text-xs text-slate-500 line-through font-mono">
                 ₹{Math.round(mrpVal).toLocaleString('en-IN')}
               </span>
             )}
           </div>
-
           {savings > 0 && !isExpired && (
-            <SavingsPill3D amount={savings} />
+            <span className="text-[9.5px] sm:text-[10px] font-mono font-medium text-emerald-300 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 truncate max-w-[80px] sm:max-w-none">
+              Save ₹{Math.round(savings).toLocaleString('en-IN')}
+            </span>
           )}
         </div>
 
-        {/* 4b. Personalized Credit Card Savings Pill (Feature #14) */}
-        {cardSavings && !isExpired && (
-          <div
-            onClick={onOpenCardModal}
-            className="flex items-center justify-between gap-1 text-[10.5px] bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-emerald-500/10 border border-white/[0.08] hover:border-amber-400/40 px-2 py-1 rounded-lg mb-2 transition-all cursor-pointer group/card"
-            title="Click to customize your credit cards in My Cards"
-          >
-            <span className="flex items-center gap-1 font-bold text-amber-300 truncate">
-              <CreditCard className="w-3 h-3 text-amber-400 shrink-0" />
-              <span>₹{cardSavings.effectivePrice.toLocaleString('en-IN')} with {cardSavings.cardName}</span>
-            </span>
-            <span className="text-[9.5px] font-black text-emerald-400 font-mono shrink-0">
-              Save ₹{cardSavings.cashbackAmount}
-            </span>
-          </div>
-        )}
-
-        {/* 5. Live Telemetry Status */}
-        <div className="flex items-center gap-1.5 text-[10.5px] text-slate-400 bg-white/[0.03] border border-white/[0.05] px-2 py-1 rounded-lg mb-2.5">
-          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isExpired ? 'bg-rose-400' : 'bg-emerald-400 animate-pulse'}`} />
-          <span className="truncate">
-            {isExpired ? (
-              <strong className="text-rose-300">Offer expired or sold out on {deal.store}</strong>
-            ) : deal.cluster_count && deal.cluster_count >= 2 ? (
-              <span><strong className="text-amber-300">Spotted across {deal.cluster_count} channels</strong> — Verified drop</span>
-            ) : (
-              <span><strong className="text-slate-200">Live Verified</strong> — Direct {deal.store} checkout</span>
-            )}
-          </span>
-        </div>
-
-        {/* 6. Clean Action Buttons */}
+        {/* 5. Mobile-Optimized Action Bar */}
         <div className="flex items-center gap-1.5">
           <a
             href={deal.url}
             target="_blank"
             rel="noopener noreferrer sponsored"
-            onClick={handleClaim}
-            className={`flex-1 py-2 px-3 rounded-xl font-extrabold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] shadow-sm ${
+            className={`flex-1 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg sm:rounded-xl font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1 transition-all active:scale-95 shadow-xs cursor-pointer ${
               isExpired
-                ? 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-700'
+                ? 'bg-slate-800 text-slate-400 border border-slate-700'
                 : 'bg-emerald-500/15 hover:bg-emerald-500 text-emerald-300 hover:text-slate-950 border border-emerald-500/30 hover:border-emerald-400'
             }`}
-            aria-label={isExpired ? `Check alternate sellers on ${deal.store}` : `Claim deal on ${deal.store}`}
+            aria-label={isExpired ? `Check ${deal.store}` : `Claim on ${deal.store}`}
           >
-            <span>{isExpired ? `Check Sellers on ${deal.store}` : `Claim on ${deal.store}`}</span>
-            <ExternalLink className="w-3.5 h-3.5" />
+            <span>{isExpired ? 'Check Stock' : 'Get Deal'}</span>
+            <ExternalLink className="w-3 h-3 shrink-0" />
           </a>
-
-          {/* Price Alert Bell Button */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpenAlert?.(deal);
-            }}
-            className="w-8 h-8 rounded-lg bg-white/[0.04] hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-400 border border-white/[0.08] hover:border-emerald-500/30 flex items-center justify-center transition-colors shrink-0"
-            title="Set 5-Min Price Drop Alert"
-            aria-label="Set Price Alert"
-          >
-            <Bell className="w-3.5 h-3.5" />
-          </button>
 
           {/* Quick WhatsApp Share Button */}
           <button
             type="button"
             onClick={handleWhatsAppShare}
-            className="w-8 h-8 rounded-lg bg-white/[0.04] hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-white/[0.08] flex items-center justify-center transition-colors shrink-0"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.04] hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-white/[0.08] flex items-center justify-center transition-colors shrink-0 cursor-pointer"
             title="Share deal on WhatsApp"
-            aria-label="Share deal on WhatsApp"
+            aria-label="Share on WhatsApp"
           >
             <MessageCircle className="w-3.5 h-3.5" />
           </button>
@@ -439,12 +310,28 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           <button
             type="button"
             onClick={handleCopy}
-            className="w-8 h-8 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/[0.08] flex items-center justify-center transition-colors shrink-0"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/[0.08] flex items-center justify-center transition-colors shrink-0 cursor-pointer"
             title="Copy deal link"
             aria-label="Copy deal link"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
           </button>
+
+          {/* Price Alert Bell */}
+          {onOpenAlert && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenAlert(deal);
+              }}
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.04] hover:bg-amber-500/20 text-slate-300 hover:text-amber-300 border border-white/[0.08] flex items-center justify-center transition-colors shrink-0 cursor-pointer hidden sm:flex"
+              title="Set Price Alert"
+              aria-label="Set Price Alert"
+            >
+              <Bell className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 

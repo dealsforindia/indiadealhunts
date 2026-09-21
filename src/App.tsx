@@ -398,93 +398,8 @@ const AppContent: React.FC = () => {
               onCloseExternal={() => setActiveReelDeal(null)}
             />
 
-            {/* ShoppinGenie Feature: "Order Right Now" Horizontal 4-Card Carousel */}
-            {orderRightNowDeals.length > 0 && !searchQuery && selectedStore === 'all' && selectedCategory === 'all' && (
-              <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="p-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      <Sparkles className="w-4 h-4" />
-                    </span>
-                    <h2 className="text-xl sm:text-2xl font-black font-brand text-white tracking-tight">
-                      Order Right Now
-                    </h2>
-                    <span className="text-xs text-slate-400 hidden md:inline">
-                      — Insane Worth Scores (80+) verified live
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setActiveTab('best_worth');
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1 group py-1 px-2.5 rounded-lg hover:bg-emerald-500/10 transition-colors"
-                  >
-                    <span>See all</span>
-                    <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-                  {orderRightNowDeals.map((deal) => (
-                    <PublicDealCard
-                      key={`orn-${deal.id}`}
-                      deal={deal}
-                      onOpenImage={setLightboxDeal}
-                      onOpenVideo={setActiveReelDeal}
-                      activeCards={activeCards}
-                      onOpenCardModal={() => setIsCardModalOpen(true)}
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* ShoppinGenie Feature: "Ending Soon" Horizontal 4-Card Carousel */}
-            {endingSoonCarouselDeals.length > 0 && !searchQuery && selectedStore === 'all' && selectedCategory === 'all' && (
-              <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="p-1 rounded-lg bg-orange-500/10 text-orange-400 border border-orange-500/20">
-                      <Clock className="w-4 h-4 animate-pulse" />
-                    </span>
-                    <h2 className="text-xl sm:text-2xl font-black font-brand text-white tracking-tight">
-                      Ending Soon
-                    </h2>
-                    <span className="text-xs text-slate-400 hidden md:inline">
-                      — Fast-selling drops near stock depletion
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setActiveTab('ending_soon');
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="text-xs font-bold text-orange-400 hover:text-orange-300 flex items-center gap-1 group py-1 px-2.5 rounded-lg hover:bg-orange-500/10 transition-colors"
-                  >
-                    <span>See all</span>
-                    <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-                  {endingSoonCarouselDeals.map((deal) => (
-                    <PublicDealCard
-                      key={`es-${deal.id}`}
-                      deal={deal}
-                      onOpenImage={setLightboxDeal}
-                      onOpenVideo={setActiveReelDeal}
-                      isEndingSoonView={true}
-                      activeCards={activeCards}
-                      onOpenCardModal={() => setIsCardModalOpen(true)}
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Filter & Sort Bar */}
-            <div className="mt-12">
+            {/* Store & Sort Filter Rail */}
+            <div className="mt-4 mb-2">
               <Filters
                 selectedStore={selectedStore}
                 onSelectStore={setSelectedStore}
@@ -498,21 +413,24 @@ const AppContent: React.FC = () => {
               />
             </div>
 
-            {/* Section Heading: "Verified Live Loot Hunts" */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4 flex items-center justify-between">
+            {/* Live Feed Header */}
+            <div className="max-w-7xl mx-auto px-3 sm:px-6 mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
-                <h2 className="text-xl sm:text-2xl font-bold font-brand text-white tracking-tight">
-                  Verified Live Loot Hunts
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
+                <h2 className="text-base sm:text-xl font-bold font-brand text-white tracking-tight">
+                  Recent Verified Drops
                 </h2>
                 <span className="text-xs text-slate-400 hidden sm:inline">
-                  — Verified at lowest price in 90 days across Indian stores
+                  — Real-time price drops across Amazon, Flipkart & top brands
                 </span>
               </div>
+              <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                {gridDeals.length} drops
+              </span>
             </div>
 
             {/* Deals Grid */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+            <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 mb-12">
               {loading && deals.length === 0 ? (
                 <div className="py-24 text-center">
                   <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
@@ -560,7 +478,7 @@ const AppContent: React.FC = () => {
                       </span>
                     </div>
                   )}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-5">
                   {gridDeals.map((deal) => (
                     <PublicDealCard
                       key={deal.id}
@@ -609,7 +527,7 @@ const AppContent: React.FC = () => {
 
         {/* Tab 2: ENDING SOON VIEW (With ShoppinGenie Filter Pills) */}
         {activeTab === 'ending_soon' && (
-          <div className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="py-6 sm:py-8 max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-white/[0.08]">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center">
@@ -671,7 +589,7 @@ const AppContent: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-5">
               {gridDeals.map((deal) => (
                 <PublicDealCard
                   key={deal.id}
@@ -693,7 +611,7 @@ const AppContent: React.FC = () => {
 
         {/* Tab 3: BEST WORTH DEALS VIEW (Large 3-Column Cards) */}
         {activeTab === 'best_worth' && (
-          <div className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="py-6 sm:py-8 max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
             <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/[0.08]">
               <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
                 <Sparkles className="w-5 h-5" aria-hidden="true" />
@@ -726,7 +644,7 @@ const AppContent: React.FC = () => {
 
         {/* Tab 4: ACTIVE OFFERS & VOUCHERS VIEW (Rich Image & Action Cards) */}
         {activeTab === 'active_offers' && (
-          <div className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="py-6 sm:py-8 max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
             <div className="flex items-center gap-3 pb-4 border-b border-white/[0.08]">
               <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
                 <Sparkles className="w-5 h-5" aria-hidden="true" />
@@ -755,7 +673,7 @@ const AppContent: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-5">
                 {deals
                   .filter((d) => Boolean(d.coupon || (d.discount_pct && d.discount_pct >= 60)))
                   .slice(0, 12)

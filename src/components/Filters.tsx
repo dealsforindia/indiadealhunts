@@ -48,7 +48,7 @@ export const Filters: React.FC<FiltersProps> = ({
   onToggleConsensus,
 }) => {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-6 space-y-3" role="region" aria-label="Deal Filters and Sorting">
+    <div className="max-w-7xl mx-auto px-2.5 sm:px-6 mb-4 space-y-2.5" role="region" aria-label="Deal Filters and Sorting">
       
       {/* Top Filter Bar: Store Pills + Sort Dropdown */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 pb-3 border-b border-white/[0.06]">
