@@ -5,6 +5,8 @@ import {
   ChevronUp, ChevronDown, Sparkles, Film, Heart, Share2, Flame
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import useEmblaCarousel from 'embla-carousel-react';
+import { motion } from 'motion/react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 
@@ -21,8 +23,20 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({
   externalActiveDeal,
   onCloseExternal,
 }) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: 'start',
+    containScroll: 'trimSnaps',
+    dragFree: true,
+  });
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const scrollLeft = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
+
+  const scrollRight = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
 
   // Filter deals that have ready, playable video streams
   const videoDeals = deals.filter(
@@ -220,14 +234,14 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({
         {/* Carousel Navigation Buttons */}
         <div className="flex items-center gap-2">
           <button
-            onClick={() => scroll('left')}
+            onClick={scrollLeft}
             className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-colors cursor-pointer active:scale-95"
             aria-label="Scroll left"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
-            onClick={() => scroll('right')}
+            onClick={scrollRight}
             className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-colors cursor-pointer active:scale-95"
             aria-label="Scroll right"
           >
@@ -237,24 +251,24 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({
       </div>
 
       {/* 9:16 Vertical Video Cards Carousel */}
-      <div
-        ref={scrollRef}
-        className="flex gap-4 sm:gap-5 overflow-x-auto scrollbar-none pb-4 pt-1 snap-x snap-mandatory scroll-smooth"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-      >
-        {videoDeals.map((deal, idx) => {
-          const poster = deal.video_cover || getCleanImageUrl(deal.image);
-          const rawDisc = deal.discount_pct || 0;
-          const disc = rawDisc >= 99 && (deal.mrp || 0) > 30000 && (deal.price || 0) < 3000
-            ? Math.round((1 - (deal.price || 0) / Math.max((deal.price || 0) * 3, 2000)) * 100)
-            : Math.min(95, rawDisc);
+      <div className="overflow-hidden pb-4 pt-1" ref={emblaRef}>
+        <div className="flex gap-4 sm:gap-5">
+          {videoDeals.map((deal, idx) => {
+            const poster = deal.video_cover || getCleanImageUrl(deal.image);
+            const rawDisc = deal.discount_pct || 0;
+            const disc = rawDisc >= 99 && (deal.mrp || 0) > 30000 && (deal.price || 0) < 3000
+              ? Math.round((1 - (deal.price || 0) / Math.max((deal.price || 0) * 3, 2000)) * 100)
+              : Math.min(95, rawDisc);
 
-          return (
-            <div
-              key={`short-${deal.id}-${idx}`}
-              onClick={(e) => handleOpenShort(deal, idx, e)}
-              className="group relative w-56 sm:w-64 flex-shrink-0 aspect-[9/16] rounded-3xl overflow-hidden glass-card border border-white/10 hover:border-indigo-500/50 transition-all duration-300 snap-start cursor-pointer shadow-xl hover:shadow-2xl hover:shadow-indigo-500/20 flex flex-col bg-slate-950/80"
-            >
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: idx * 0.05, type: 'spring' }}
+                key={`short-${deal.id}-${idx}`}
+                onClick={(e) => handleOpenShort(deal, idx, e)}
+                className="group relative w-56 sm:w-64 flex-shrink-0 aspect-[9/16] rounded-3xl overflow-hidden glass-card border border-white/10 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl hover:shadow-indigo-500/20 flex flex-col bg-slate-950/80"
+              >
               {/* Background Poster Image */}
               <div className="absolute inset-0 w-full h-full bg-slate-900 overflow-hidden">
                 {poster ? (
@@ -334,10 +348,11 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({
                   <span>Grab Loot Deal</span>
                   <ExternalLink className="w-3 h-3 ml-0.5 opacity-80" />
                 </a>
-              </div>
-            </div>
-          );
-        })}
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Fullscreen Vertical 9:16 TikTok/Reels Player Modal portaled to document.body */}

@@ -18,6 +18,7 @@ import type { PublicDeal, PublicDealsResponse, SortOption, NavTab } from './type
 import { calculateWorthScore } from './utils/worthScore';
 import { MarqueeTicker } from './components/MarqueeTicker';
 import { CategoryStories } from './components/CategoryStories';
+import { TopDealsCarousel } from './components/TopDealsCarousel';
 import { ViralShortsSection } from './components/ViralShortsSection';
 import { Sparkles, Zap, RefreshCw, AlertCircle, Clock, ShoppingBag, ChevronRight, CheckCircle2, ShieldCheck, Flame, Search } from 'lucide-react';
 import { searchDealsClient } from './utils/semanticSearch';
@@ -474,12 +475,19 @@ const AppContent: React.FC = () => {
               />
             </div>
 
-            {/* Automated Viral Shorts Section (9:16 Video Reels) */}
-            <ViralShortsSection
-              deals={videoDeals.length > 0 ? videoDeals : deals}
-              externalActiveDeal={activeReelDeal}
-              onCloseExternal={() => setActiveReelDeal(null)}
-            />
+            {/* Editor's Choice - Very Good Deals Carousel */}
+            {topShowcaseDeals.length > 0 && (
+              <TopDealsCarousel 
+                deals={topShowcaseDeals} 
+                onOpenDeal={(deal) => {
+                  if (deal.has_video) {
+                    setActiveReelDeal(deal);
+                  } else {
+                    setLightboxDeal(deal);
+                  }
+                }} 
+              />
+            )}
 
             {/* Store & Sort Filter Rail */}
             <div className="mt-4 mb-2">
@@ -598,6 +606,15 @@ const AppContent: React.FC = () => {
                 </div>
               </>
               )}
+
+              {/* Automated Viral Shorts Section (9:16 Video Reels) - Moved to bottom */}
+              <div className="mt-8 mb-4">
+                <ViralShortsSection
+                  deals={videoDeals.length > 0 ? videoDeals : deals}
+                  externalActiveDeal={activeReelDeal}
+                  onCloseExternal={() => setActiveReelDeal(null)}
+                />
+              </div>
 
               {/* Load More Button */}
               {hasMore && gridDeals.length > 0 && (

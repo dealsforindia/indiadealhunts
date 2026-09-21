@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import { ExternalLink, Copy, Check, MessageCircle, AlertTriangle, Bell, Film, ChevronDown } from 'lucide-react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
@@ -154,11 +155,17 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   };
 
   return (
-    <article className={`group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border transition-all duration-150 p-2.5 sm:p-3.5 select-none ${
-      isExpired
-        ? 'bg-[#0E111C] border-rose-900/30 opacity-70'
-        : 'bg-[#111422] border-white/[0.08] hover:border-emerald-500/40 hover:bg-[#131828] active:scale-[0.98]'
-    }`}>
+    <motion.article 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, type: 'spring' }}
+      whileHover={{ scale: 1.02, y: -4 }}
+      className={`group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border transition-all duration-300 p-2.5 sm:p-3.5 select-none ${
+        isExpired
+          ? 'bg-[#0E111C] border-rose-900/30 opacity-70'
+          : 'bg-[#111422] border-white/[0.08] hover:border-emerald-500/40 hover:bg-[#131828] hover:shadow-2xl hover:shadow-emerald-500/10'
+      }`}
+    >
       
       <div>
         {/* 1. Header: Store Badge + Cities + Relative Time */}
@@ -381,6 +388,6 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
         </div>
       )}
 
-    </article>
+    </motion.article>
   );
 };
