@@ -27,6 +27,7 @@ import { AuthModal } from './components/AuthModal';
 import { UserMenuDrawer } from './components/UserMenuDrawer';
 import { searchDealsClient } from './utils/semanticSearch';
 
+const EDGE_API = import.meta.env.VITE_EDGE_API_URL || 'https://dealflow-edge.pottemasshippo.workers.dev';
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
 
 const AppContent: React.FC = () => {
@@ -132,7 +133,14 @@ const AppContent: React.FC = () => {
         if (searchQuery.trim()) params.append('search', searchQuery.trim());
         params.append('sort', sortBy === 'worth' ? 'heat' : sortBy);
 
-        const res = await fetch(`${API_BASE}/api/v1/deals/public?${params.toString()}`);
+        let res: Response;
+        try {
+          res = await fetch(`${EDGE_API}/api/v1/deals/public?${params.toString()}`);
+          if (!res.ok) throw new Error(`Edge error: ${res.status}`);
+        } catch {
+          res = await fetch(`${API_BASE}/api/v1/deals/public?${params.toString()}`);
+        }
+
         if (!res.ok) {
           throw new Error(`Failed to fetch deals: ${res.status} ${res.statusText}`);
         }
