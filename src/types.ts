@@ -44,7 +44,27 @@ export interface PublicDeal {
   video_cover?: string;
   video_preview?: string;
   video_status?: string;
+  deal_type?: 'standard' | 'mega_haul' | string;
+  is_mega_haul?: boolean;
+  haul_store?: string;
+  pincodes?: string[];
+  total_items?: number;
+  items?: MegaHaulItem[];
 }
+
+export interface MegaHaulItem {
+  id: string;
+  title: string;
+  pincode?: string | null;
+  city?: string | null;
+  sale_price: number | null;
+  mrp: number | null;
+  discount_pct: number | null;
+  buy_url: string;
+  img_url?: string | null;
+  store?: string;
+}
+
 
 export interface CreditCardProfile {
   id: string;

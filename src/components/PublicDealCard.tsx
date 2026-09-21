@@ -3,6 +3,7 @@ import { ExternalLink, Copy, Check, MessageCircle, AlertTriangle, Bell, Film } f
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { Category3DPlaceholder } from './Iconscout3DAssets';
+import { MegaHaulCard } from './MegaHaulCard';
 
 interface PublicDealCardProps {
   deal: PublicDeal;
@@ -101,6 +102,14 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   onOpenVideo,
   onOpenAlert,
 }) => {
+  if (deal.is_mega_haul && deal.items && deal.items.length > 0) {
+    return (
+      <div className="col-span-2 sm:col-span-2 md:col-span-3 lg:col-span-4 w-full">
+        <MegaHaulCard deal={deal} />
+      </div>
+    );
+  }
+
   const [copied, setCopied] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
