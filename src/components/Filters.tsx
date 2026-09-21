@@ -1,12 +1,14 @@
 import React from 'react';
 import { SortOption } from '../types';
-import { Store, Layers, ArrowUpDown, Smartphone, Shirt, Home, Utensils, Apple, Sparkles, Flame } from 'lucide-react';
+import { Store, Layers, ArrowUpDown, Smartphone, Shirt, Home, Utensils, Apple, Sparkles, Flame, MapPin } from 'lucide-react';
 
 interface FiltersProps {
   selectedStore: string;
   onSelectStore: (store: string) => void;
   selectedCategory: string;
   onSelectCategory: (category: string) => void;
+  selectedLocation: string;
+  onSelectLocation: (location: string) => void;
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
   totalDeals: number;
@@ -41,6 +43,8 @@ export const Filters: React.FC<FiltersProps> = ({
   onSelectStore,
   selectedCategory,
   onSelectCategory,
+  selectedLocation,
+  onSelectLocation,
   sortBy,
   onSortChange,
   totalDeals,
@@ -103,8 +107,29 @@ export const Filters: React.FC<FiltersProps> = ({
             <span>{totalDeals} Drops</span>
           </span>
 
-          <div className="flex items-center gap-1.5 bg-[#121522] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white">
-            <ArrowUpDown className="w-3.5 h-3.5 text-emerald-400 shrink-0" aria-hidden="true" />
+          <div className="flex flex-wrap items-center gap-1.5 justify-end">
+            <div className="flex items-center gap-1.5 bg-[#121522] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              <MapPin className="w-3.5 h-3.5 text-indigo-400 shrink-0" aria-hidden="true" />
+              <select
+                value={selectedLocation}
+                onChange={(e) => onSelectLocation(e.target.value)}
+                aria-label="Filter by location"
+                className="bg-transparent text-white font-medium focus:outline-none cursor-pointer pr-1 text-xs"
+              >
+                <option value="all" className="bg-[#121522] text-white">📍 All Cities</option>
+                <option value="Kolkata" className="bg-[#121522] text-white">Kolkata</option>
+                <option value="Delhi" className="bg-[#121522] text-white">Delhi</option>
+                <option value="Mumbai" className="bg-[#121522] text-white">Mumbai</option>
+                <option value="Bangalore" className="bg-[#121522] text-white">Bangalore</option>
+                <option value="Pune" className="bg-[#121522] text-white">Pune</option>
+                <option value="Hyderabad" className="bg-[#121522] text-white">Hyderabad</option>
+                <option value="Chennai" className="bg-[#121522] text-white">Chennai</option>
+                <option value="Ahmedabad" className="bg-[#121522] text-white">Ahmedabad</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-1.5 bg-[#121522] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              <ArrowUpDown className="w-3.5 h-3.5 text-emerald-400 shrink-0" aria-hidden="true" />
             <select
               value={sortBy}
               onChange={(e) => onSortChange(e.target.value as SortOption)}
@@ -127,6 +152,7 @@ export const Filters: React.FC<FiltersProps> = ({
                 💎 Highest Price First (Premium)
               </option>
             </select>
+          </div>
           </div>
         </div>
 

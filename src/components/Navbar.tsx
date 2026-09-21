@@ -1,7 +1,6 @@
 import React from 'react';
 import { NavTab } from '../types';
 import { Sparkles, MessageCircle, Send, Zap, CheckCircle2, Search, PlusCircle, CreditCard, User } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
 
 interface NavbarProps {
   activeTab: NavTab;
@@ -21,7 +20,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenCardModal,
   activeCardCount,
 }) => {
-  const { user, openAuthModal, openUserDrawer } = useAuth();
   return (
     <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-[#0B0D13]/90 backdrop-blur-xl transition-all shadow-sm">
       <div className="max-w-7xl mx-auto px-3 sm:px-6">
@@ -128,39 +126,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </nav>
 
-          {/* Right Action: Clean Telegram & WhatsApp Channels & My Cards & Auth */}
+          {/* Right Action: Clean Telegram & WhatsApp Channels & My Cards */}
           <div className="flex items-center gap-2 shrink-0">
-            {/* User Auth Profile Trigger */}
-            {!user ? (
-              <button
-                onClick={openAuthModal}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-xs font-bold transition-all active:scale-95 shadow-xs cursor-pointer focus:ring-2 focus:ring-emerald-500"
-                title="Sign in with Email"
-                aria-label="Sign in"
-              >
-                <User className="w-3.5 h-3.5 text-emerald-400 shrink-0" aria-hidden="true" />
-                <span>Sign In</span>
-              </button>
-            ) : (
-              <button
-                onClick={openUserDrawer}
-                className="inline-flex items-center gap-2 pl-2 pr-3 py-1 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white text-xs font-semibold transition-all active:scale-95 cursor-pointer shadow-xs focus:ring-2 focus:ring-emerald-500"
-                title={`Logged in as ${user.email}`}
-                aria-label="Open User Profile"
-              >
-                <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 text-slate-950 font-black text-xs flex items-center justify-center">
-                  {user.email.charAt(0).toUpperCase()}
-                </div>
-                <span className="hidden sm:inline max-w-[100px] truncate text-slate-200">
-                  {user.email.split('@')[0]}
-                </span>
-                {typeof user.alerts_count === 'number' && user.alerts_count > 0 && (
-                  <span className="w-4 h-4 rounded-full bg-emerald-400 text-slate-950 text-[10px] font-black flex items-center justify-center font-mono">
-                    {user.alerts_count}
-                  </span>
-                )}
-              </button>
-            )}
 
             {onOpenCardModal && (
               <button

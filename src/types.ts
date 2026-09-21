@@ -48,6 +48,7 @@ export interface PublicDeal {
   is_mega_haul?: boolean;
   haul_store?: string;
   pincodes?: string[];
+  cities?: string[];
   total_items?: number;
   items?: MegaHaulItem[];
 }

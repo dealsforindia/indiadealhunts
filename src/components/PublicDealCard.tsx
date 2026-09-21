@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ExternalLink, Copy, Check, MessageCircle, AlertTriangle, Bell, Film } from 'lucide-react';
+import { ExternalLink, Copy, Check, MessageCircle, AlertTriangle, Bell, Film, ChevronDown } from 'lucide-react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { Category3DPlaceholder } from './Iconscout3DAssets';
@@ -13,7 +13,6 @@ interface PublicDealCardProps {
   isBestWorthView?: boolean;
   activeCards?: string[];
   onOpenCardModal?: () => void;
-  onOpenAlert?: (deal: PublicDeal) => void;
 }
 
 // Relative time formatter
@@ -100,19 +99,12 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   deal,
   onOpenImage,
   onOpenVideo,
-  onOpenAlert,
+  onOpenCardModal,
 }) => {
-  if (deal.is_mega_haul && deal.items && deal.items.length > 0) {
-    return (
-      <div className="col-span-2 sm:col-span-2 md:col-span-3 lg:col-span-4 w-full">
-        <MegaHaulCard deal={deal} />
-      </div>
-    );
-  }
-
   const [copied, setCopied] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [isHaulExpanded, setIsHaulExpanded] = useState(false);
 
   const cleanImageUrl = getCleanImageUrl(deal.image);
   const relativeTime = getRelativeTime(deal.display_ts || deal.posted_at);
@@ -169,9 +161,21 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
     }`}>
       
       <div>
-        {/* 1. Header: Store Badge + Relative Time */}
+        {/* 1. Header: Store Badge + Cities + Relative Time */}
         <div className="flex items-center justify-between gap-1 mb-2">
-          <CompactStoreBadge store={deal.store} />
+          <div className="flex flex-wrap items-center gap-1">
+            <CompactStoreBadge store={deal.store} />
+            {deal.cities && deal.cities.length > 0 && deal.cities.slice(0, 2).map((city, idx) => (
+              <span key={idx} className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[9px] sm:text-[10px] font-medium whitespace-nowrap">
+                📍 {city}
+              </span>
+            ))}
+            {deal.cities && deal.cities.length > 2 && (
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[9px] sm:text-[10px] font-medium whitespace-nowrap">
+                +{deal.cities.length - 2}
+              </span>
+            )}
+          </div>
           <span className="text-[10px] sm:text-[11px] text-slate-400 font-mono flex items-center gap-1 shrink-0">
             {!isExpired && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
             {relativeTime}
@@ -325,24 +329,57 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
           </button>
-
-          {/* Price Alert Bell */}
-          {onOpenAlert && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenAlert(deal);
-              }}
-              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.04] hover:bg-amber-500/20 text-slate-300 hover:text-amber-300 border border-white/[0.08] flex items-center justify-center transition-colors shrink-0 cursor-pointer hidden sm:flex"
-              title="Set Price Alert"
-              aria-label="Set Price Alert"
-            >
-              <Bell className="w-3.5 h-3.5" />
-            </button>
-          )}
         </div>
       </div>
+
+      {/* Mega Haul Accordion */}
+      {deal.is_mega_haul && deal.items && deal.items.length > 0 && (
+        <div className="mt-3 border-t border-white/[0.06] pt-2">
+          <button
+            type="button"
+            onClick={() => setIsHaulExpanded(!isHaulExpanded)}
+            className="w-full flex items-center justify-between text-[11px] sm:text-xs text-indigo-300 hover:text-indigo-200 font-medium py-1.5 transition-colors cursor-pointer"
+          >
+            <span>View {deal.items.length} more deals in this location...</span>
+            <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isHaulExpanded ? 'rotate-180' : ''}`} />
+          </button>
+          
+          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isHaulExpanded ? 'max-h-[500px] opacity-100 mt-2 overflow-y-auto' : 'max-h-0 opacity-0'}`}>
+            <div className="flex flex-col gap-2 pb-1">
+              {deal.items.map((item, idx) => (
+                <a
+                  key={idx}
+                  href={item.buy_url || deal.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-2 rounded-lg bg-black/20 border border-white/[0.04] hover:bg-white/[0.04] hover:border-indigo-500/30 transition-all group/item"
+                >
+                  <div className="flex flex-col flex-1 min-w-0 pr-2">
+                    <span className="text-[11px] sm:text-xs text-slate-200 font-medium truncate group-hover/item:text-indigo-300 transition-colors">
+                      {item.title}
+                    </span>
+                    {item.city && (
+                      <span className="text-[9px] text-slate-400 mt-0.5">
+                        📍 {item.city}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-col items-end shrink-0">
+                    <span className="text-xs font-bold text-emerald-400 font-mono">
+                      ₹{Math.round(item.sale_price || deal.price || 0).toLocaleString('en-IN')}
+                    </span>
+                    {(item.discount_pct && item.discount_pct > 0) ? (
+                      <span className="text-[9px] text-amber-400 font-black font-mono">
+                        {item.discount_pct}% OFF
+                      </span>
+                    ) : null}
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
     </article>
   );

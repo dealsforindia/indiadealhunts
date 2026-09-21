@@ -19,12 +19,7 @@ import { calculateWorthScore } from './utils/worthScore';
 import { MarqueeTicker } from './components/MarqueeTicker';
 import { CategoryStories } from './components/CategoryStories';
 import { ViralShortsSection } from './components/ViralShortsSection';
-import { Sparkles, Zap, RefreshCw, AlertCircle, Clock, ShoppingBag, ChevronRight, CheckCircle2, ShieldCheck, Flame } from 'lucide-react';
-import { PriceAlertModal } from './components/PriceAlertModal';
-import { BountyEmptyState } from './components/BountyEmptyState';
-import { AuthProvider } from './context/AuthContext';
-import { AuthModal } from './components/AuthModal';
-import { UserMenuDrawer } from './components/UserMenuDrawer';
+import { Sparkles, Zap, RefreshCw, AlertCircle, Clock, ShoppingBag, ChevronRight, CheckCircle2, ShieldCheck, Flame, Search } from 'lucide-react';
 import { searchDealsClient } from './utils/semanticSearch';
 
 const EDGE_API = import.meta.env.VITE_EDGE_API_URL || 'https://dealflow-edge.pottemasshippo.workers.dev';
@@ -87,6 +82,7 @@ const AppContent: React.FC = () => {
   // Filters & Search
   const [selectedStore, setSelectedStore] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedLocation, setSelectedLocation] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
 
@@ -108,8 +104,6 @@ const AppContent: React.FC = () => {
   const [isCardModalOpen, setIsCardModalOpen] = useState<boolean>(false);
   const [activeCards, setActiveCards] = useState<string[]>(() => getSavedCards());
   const [onlyConsensus, setOnlyConsensus] = useState<boolean>(false);
-  const [alertDeal, setAlertDeal] = useState<PublicDeal | null>(null);
-  const [isAlertOpen, setIsAlertOpen] = useState<boolean>(false);
   const [activeReelDeal, setActiveReelDeal] = useState<PublicDeal | null>(null);
   const [isAutoRefreshing, setIsAutoRefreshing] = useState<boolean>(false);
 
@@ -132,6 +126,7 @@ const AppContent: React.FC = () => {
         });
 
         if (selectedStore !== 'all') params.append('store', selectedStore);
+        if (selectedLocation !== 'all') params.append('location', selectedLocation);
         if (selectedCategory === 'loot70') {
           params.append('category', 'loot70');
           params.append('min_discount', '70');
@@ -493,11 +488,13 @@ const AppContent: React.FC = () => {
                 onSelectStore={setSelectedStore}
                 selectedCategory={selectedCategory}
                 onSelectCategory={setSelectedCategory}
+                selectedLocation={selectedLocation}
+                onSelectLocation={setSelectedLocation}
                 sortBy={sortBy}
                 onSortChange={setSortBy}
                 totalDeals={gridDeals.length}
                 onlyConsensus={onlyConsensus}
-                onToggleConsensus={() => setOnlyConsensus((prev) => !prev)}
+                onToggleConsensus={() => setOnlyConsensus(!onlyConsensus)}
               />
             </div>
 
@@ -554,15 +551,21 @@ const AppContent: React.FC = () => {
                   </button>
                 </div>
               ) : gridDeals.length === 0 ? (
-                <BountyEmptyState
-                  searchTerm={searchQuery}
-                  onClearSearch={() => {
-                    setSelectedStore('all');
-                    setSelectedCategory('all');
-                    setSearchQuery('');
-                  }}
-                  onSelectTrending={(term) => setSearchQuery(term)}
-                />
+                <div className="py-16 px-6 text-center max-w-md mx-auto rounded-3xl border border-white/10 bg-white/[0.02]">
+                  <Search className="w-10 h-10 text-slate-500 mx-auto mb-3" aria-hidden="true" />
+                  <h3 className="font-bold text-white mb-1">No deals found</h3>
+                  <p className="text-xs text-slate-400 mb-4">Try adjusting your filters or search terms.</p>
+                  <button
+                    onClick={() => {
+                      setSelectedStore('all');
+                      setSelectedCategory('all');
+                      setSearchQuery('');
+                    }}
+                    className="min-h-[44px] px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs transition-all"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
               ) : (
                 <>
                   {searchQuery && searchInsights.activeBadges.length > 0 && (
@@ -590,10 +593,6 @@ const AppContent: React.FC = () => {
                       onOpenVideo={setActiveReelDeal}
                       activeCards={activeCards}
                       onOpenCardModal={() => setIsCardModalOpen(true)}
-                      onOpenAlert={(d) => {
-                        setAlertDeal(d);
-                        setIsAlertOpen(true);
-                      }}
                     />
                   ))}
                 </div>
@@ -702,10 +701,6 @@ const AppContent: React.FC = () => {
                   isEndingSoonView={true}
                   activeCards={activeCards}
                   onOpenCardModal={() => setIsCardModalOpen(true)}
-                  onOpenAlert={(d) => {
-                    setAlertDeal(d);
-                    setIsAlertOpen(true);
-                  }}
                 />
               ))}
             </div>
@@ -788,10 +783,6 @@ const AppContent: React.FC = () => {
                       onOpenVideo={setActiveReelDeal}
                       activeCards={activeCards}
                       onOpenCardModal={() => setIsCardModalOpen(true)}
-                      onOpenAlert={(d) => {
-                        setAlertDeal(d);
-                        setIsAlertOpen(true);
-                      }}
                     />
                   ))}
               </div>
@@ -865,16 +856,6 @@ const AppContent: React.FC = () => {
         onClose={() => setActiveLegal(null)}
       />
 
-      {/* 6. Continuous Price Drop Alert Modal */}
-      <PriceAlertModal
-        isOpen={isAlertOpen}
-        onClose={() => {
-          setIsAlertOpen(false);
-          setAlertDeal(null);
-        }}
-        deal={alertDeal}
-      />
-
       {/* 7. Instant Deal Lookup & Sanity Checker Modal */}
       <DealLookupModal
         isOpen={isLookupOpen || activeTab === 'lookup'}
@@ -893,20 +874,12 @@ const AppContent: React.FC = () => {
         onCardsUpdated={setActiveCards}
       />
 
-      {/* 9. Passwordless Email Authentication Modal */}
-      <AuthModal />
-
-      {/* 10. User Profile & Live Alerts Slide-over Drawer */}
-      <UserMenuDrawer />
-
     </div>
   );
 };
 
 export const App: React.FC = () => (
-  <AuthProvider>
-    <AppContent />
-  </AuthProvider>
+  <AppContent />
 );
 
 export default App;
