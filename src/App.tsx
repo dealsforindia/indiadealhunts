@@ -25,6 +25,7 @@ import { BountyEmptyState } from './components/BountyEmptyState';
 import { AuthProvider } from './context/AuthContext';
 import { AuthModal } from './components/AuthModal';
 import { UserMenuDrawer } from './components/UserMenuDrawer';
+import { searchDealsClient } from './utils/semanticSearch';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
 
@@ -252,9 +253,14 @@ const AppContent: React.FC = () => {
       .slice(0, 4);
   }, [deals]);
 
+  // On-Device Semantic Vector Search & Natural Intent Filter
+  const { deals: semanticFilteredDeals, parsedQuery: searchInsights } = useMemo(() => {
+    return searchDealsClient(deals, searchQuery);
+  }, [deals, searchQuery]);
+
   // Exclusive Grid Deals
   const gridDeals = useMemo(() => {
-    let result = [...deals];
+    let result = [...semanticFilteredDeals];
 
     // Exclude showcase deals in home tab so they don't repeat
     if (activeTab === 'home' && topShowcaseDeals.length > 0) {
@@ -524,7 +530,24 @@ const AppContent: React.FC = () => {
                   onSelectTrending={(term) => setSearchQuery(term)}
                 />
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+                <>
+                  {searchQuery && searchInsights.activeBadges.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2 mb-4 p-2.5 sm:p-3 rounded-2xl bg-emerald-500/[0.08] border border-emerald-500/20 backdrop-blur-md">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
+                        <Sparkles className="w-3.5 h-3.5 animate-pulse text-emerald-400" />
+                        <span>AI Intent:</span>
+                      </span>
+                      {searchInsights.activeBadges.map((badge, idx) => (
+                        <span key={idx} className="px-2.5 py-0.5 rounded-full bg-emerald-400/15 text-emerald-300 text-xs font-mono font-bold border border-emerald-400/30 shadow-2xs">
+                          {badge}
+                        </span>
+                      ))}
+                      <span className="text-xs text-slate-400 ml-auto font-mono">
+                        {gridDeals.length} deals matched
+                      </span>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
                   {gridDeals.map((deal) => (
                     <PublicDealCard
                       key={deal.id}
@@ -540,6 +563,7 @@ const AppContent: React.FC = () => {
                     />
                   ))}
                 </div>
+              </>
               )}
 
               {/* Load More Button */}

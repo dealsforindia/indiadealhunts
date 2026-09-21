@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Sparkles, ExternalLink, Tag, CheckCircle2, X, Flame } from 'lucide-react';
 import { PublicDeal } from '../types';
 import { calculateWorthScore } from '../utils/worthScore';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { Store3DBadge, SavingsPill3D, Category3DPlaceholder } from './Iconscout3DAssets';
+import { parseNaturalQuery } from '../utils/semanticSearch';
 
 interface HeroBannerProps {
   searchQuery: string;
@@ -26,13 +27,13 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   onOpenLookup,
 }) => {
   const quickTags = [
+    'TWS Earbuds under 999',
+    'Sneakers 70% off',
+    'Smartwatches under 1500',
     'boAt Audio',
+    'Backpacks under 500',
     'Laptops',
-    'Sneakers',
-    'Smartwatches',
-    'Kitchenware',
     'Dinner Sets',
-    'Luggage Bags',
   ];
 
   const [inputVal, setInputVal] = useState(searchQuery);
@@ -40,6 +41,11 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   useEffect(() => {
     setInputVal(searchQuery);
   }, [searchQuery]);
+
+  const liveParsed = useMemo(() => {
+    if (!inputVal.trim()) return null;
+    return parseNaturalQuery(inputVal);
+  }, [inputVal]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,6 +148,29 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
               </button>
             </div>
           </form>
+
+          {/* Live AI Intent Preview */}
+          {liveParsed && liveParsed.activeBadges.length > 0 && (
+            <div className="flex flex-wrap items-center justify-center gap-1.5 mb-3 px-3 py-1.5 rounded-xl bg-emerald-500/[0.08] border border-emerald-500/20 max-w-xl mx-auto backdrop-blur-md animate-fadeIn">
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400">
+                <Sparkles className="w-3 h-3 text-emerald-400 animate-pulse" />
+                <span>AI Filter:</span>
+              </span>
+              {liveParsed.activeBadges.map((badge, idx) => (
+                <span
+                  key={idx}
+                  className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[11px] font-mono font-medium border border-emerald-500/30"
+                >
+                  {badge}
+                </span>
+              ))}
+              {liveParsed.cleanQuery && (
+                <span className="text-[11px] text-slate-400 font-mono">
+                  &ldquo;{liveParsed.cleanQuery}&rdquo;
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Popular Search Chips */}
           <div className="flex flex-wrap items-center justify-center gap-1.5 text-xs text-slate-400">
