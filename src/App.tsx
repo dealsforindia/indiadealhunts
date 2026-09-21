@@ -129,9 +129,14 @@ const AppContent: React.FC = () => {
         });
 
         if (selectedStore !== 'all') params.append('store', selectedStore);
-        if (selectedCategory !== 'all' && selectedCategory !== 'loot70') params.append('category', selectedCategory);
+        if (selectedCategory === 'loot70') {
+          params.append('category', 'loot70');
+          params.append('min_discount', '70');
+        } else if (selectedCategory !== 'all') {
+          params.append('category', selectedCategory);
+        }
         if (searchQuery.trim()) params.append('search', searchQuery.trim());
-        params.append('sort', sortBy === 'worth' ? 'heat' : sortBy);
+        params.append('sort', sortBy);
 
         let res: Response;
         try {
