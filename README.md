@@ -30,6 +30,11 @@ High-performance, mobile-first deal discovery portal built with **React 19**, **
 * **Instant Price Drop Alerts**: Register interest or email alerts for items tracked across Indian e-commerce platforms.
 * **Card Cashback Calculator**: Highlights personalized credit card discounts and net checkout prices.
 
+### 5. Multi-Item Mega-Hauls & Local Quick-Commerce Support
+* **Full-Width Interactive Card (`src/components/MegaHaulCard.tsx`)**: Dedicated presentation for clearance hauls and quick-commerce posts (Zepto, Instamart, Blinkit) containing 10–30 sub-items.
+* **Live Location & Pincode Filter**: City/pincode selection pills with per-city deal counts and 6-digit live pincode search.
+* **Independent Sub-Item Buy Decks**: Individual price tags, MRP strikethroughs, discount tags, and direct merchant checkout links for every product in the haul.
+
 ---
 
 ## 🛠️ Development & Build
