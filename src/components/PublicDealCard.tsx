@@ -443,7 +443,10 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
               ))}
             </div>
           </div>
-        {/* Hidden Offscreen DOM for HTML2Canvas */}
+        </div>
+      )}
+
+      {/* Hidden Offscreen DOM for HTML2Canvas */}
       {isGenerating && (
         <BragCardTemplate ref={templateRef} deal={deal} />
       )}

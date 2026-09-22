@@ -70,14 +70,6 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({
 
   const activeDeal = currentIndex >= 0 && currentIndex < videoDeals.length ? videoDeals[currentIndex] : null;
 
-  // Carousel horizontal scroll
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollRef.current) {
-      const scrollAmount = direction === 'left' ? -320 : 320;
-      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  };
-
   const handleOpenShort = (deal: PublicDeal, index: number, e: React.MouseEvent) => {
     e.stopPropagation();
     setCurrentIndex(index);

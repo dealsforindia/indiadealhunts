@@ -102,7 +102,7 @@ export const BragCardTemplate = forwardRef<HTMLDivElement, BragCardTemplateProps
             <span className="text-white font-black tracking-wide text-lg">IndiaDealHunts</span>
           </div>
           <p className="text-center text-slate-400 text-xs font-medium tracking-widest uppercase">
-            Verified Price Drop â€¢ AI Curated
+            Verified Price Drop • AI Curated
           </p>
         </div>
       </div>
