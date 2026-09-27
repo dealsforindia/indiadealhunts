@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { IconRefresh } from './components/Icons';
 import { Navbar } from './components/Navbar';
 import { HeroBanner } from './components/HeroBanner';
 import { Filters } from './components/Filters';
@@ -10,6 +10,8 @@ import { DealLookupModal } from './components/DealLookupModal';
 import { CardCalculatorModal } from './components/CardCalculatorModal';
 import { getSavedCards } from './utils/cardSavings';
 import { FloatingDock } from './components/FloatingDock';
+import { ThumbDeck, ActiveDeckTab } from './components/ThumbDeck';
+import { DealSkeletonGrid } from './components/DealSkeleton';
 import { Footer } from './components/Footer';
 import { SubmitDeal } from './components/SubmitDeal';
 import { AboutPage } from './components/AboutPage';
@@ -20,22 +22,6 @@ import { calculateWorthScore } from './utils/worthScore';
 import { MarqueeTicker } from './components/MarqueeTicker';
 import { ViralShortsSection } from './components/ViralShortsSection';
 import { searchDealsClient } from './utils/semanticSearch';
-
-// Skeleton Component for Deal Cards
-const SkeletonCard = () => (
-  <div style={{
-    backgroundColor: '#111111', border: '1px solid #1E1E1E', borderRadius: '4px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '12px'
-  }}>
-    <div className="skeleton" style={{ width: '100%', aspectRatio: '1', borderRadius: '2px' }} />
-    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-      <div className="skeleton" style={{ width: '60px', height: '16px' }} />
-      <div className="skeleton" style={{ width: '40px', height: '16px' }} />
-    </div>
-    <div className="skeleton" style={{ width: '100%', height: '18px' }} />
-    <div className="skeleton" style={{ width: '80%', height: '18px' }} />
-    <div className="skeleton" style={{ width: '60px', height: '24px', marginTop: '12px' }} />
-  </div>
-);
 
 const EDGE_API = import.meta.env.VITE_EDGE_API_URL || 'https://dealflow-edge.pottemasshippo.workers.dev';
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
@@ -120,6 +106,35 @@ const AppContent: React.FC = () => {
   const [onlyConsensus, setOnlyConsensus] = useState<boolean>(false);
   const [activeReelDeal, setActiveReelDeal] = useState<PublicDeal | null>(null);
   const [isAutoRefreshing, setIsAutoRefreshing] = useState<boolean>(false);
+  const [thumbTab, setThumbTab] = useState<ActiveDeckTab>('feed');
+
+  const handleThumbTabSelect = (tab: ActiveDeckTab) => {
+    setThumbTab(tab);
+    if (tab === 'feed') {
+      setActiveTab('home');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (tab === 'search') {
+      setActiveTab('home');
+      setTimeout(() => {
+        const input = document.querySelector('input[type="text"]') as HTMLInputElement | null;
+        if (input) {
+          input.focus();
+          input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 50);
+    } else if (tab === 'stores') {
+      setActiveTab('home');
+      setTimeout(() => {
+        const filters = document.querySelector('[role="region"][aria-label="Deal filters"]');
+        if (filters) {
+          filters.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 50);
+    } else if (tab === 'submit') {
+      setActiveTab('submit_deal');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   // Fetch Deals from Backend
   const fetchDeals = useCallback(
@@ -449,12 +464,11 @@ const AppContent: React.FC = () => {
           }
         }}
         totalDeals={totalDeals}
-        onOpenCardModal={() => setIsCardModalOpen(true)}
-        activeCardCount={activeCards.length}
+        onOpenLegal={() => setActiveLegal('terms')}
       />
 
       {/* 2. Main Content Area with Safe Bottom Padding */}
-      <main className="flex-1 pb-28 sm:pb-20">
+      <main className="flex-1 pb-safe">
 
         {/* Tab 1: HOME VIEW */}
         {activeTab === 'home' && (
@@ -494,20 +508,17 @@ const AppContent: React.FC = () => {
             {/* Live Feed Header */}
             <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 16px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span className="status-live" style={{ marginTop: '6px' }} />
-                <h2 style={{ fontSize: '18px', fontWeight: 700, fontFamily: 'var(--font-heading)', color: '#F5F5F5', margin: 0 }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '1px', backgroundColor: 'var(--accent)' }} />
+                <h2 style={{ fontSize: '16px', fontWeight: 600, fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', margin: 0 }}>
                   Recent Verified Drops
                 </h2>
-                <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#22C55E', backgroundColor: '#0F2018', border: '1px solid #166534', padding: '2px 8px', borderRadius: '2px', marginLeft: '8px', display: 'flex', alignItems: 'center' }}>
-                  Auto-Sync
-                </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <button
                   onClick={() => fetchDeals(0, false, false)}
                   disabled={loading}
                   style={{
-                    padding: '4px 10px', backgroundColor: 'transparent', border: '1px solid #262626', color: '#F5F5F5',
+                    padding: '4px 10px', backgroundColor: 'transparent', border: '1px solid var(--border-default)', color: 'var(--text-primary)',
                     fontSize: '12px', borderRadius: '2px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
                   }}
                   title="Refresh deals now"
@@ -517,26 +528,14 @@ const AppContent: React.FC = () => {
                   </svg>
                   Refresh
                 </button>
-                <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#D47A10', backgroundColor: '#1A1200', padding: '2px 8px', borderRadius: '2px', border: '1px solid #452A00' }}>
-                  {gridDeals.length} drops
-                </span>
               </div>
             </div>
 
             {/* Deals Grid */}
             <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 16px 48px' }}>
               {loading && deals.length === 0 ? (
-                <div style={{ padding: '64px 0', textAlign: 'center' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
-                     <SkeletonCard />
-                     <SkeletonCard />
-                     <SkeletonCard />
-                     <SkeletonCard />
-                     <SkeletonCard />
-                     <SkeletonCard />
-                     <SkeletonCard />
-                     <SkeletonCard />
-                  </div>
+                <div style={{ padding: '24px 0' }}>
+                  <DealSkeletonGrid count={8} />
                 </div>
               ) : error && deals.length === 0 ? (
                 <div style={{ padding: '64px 24px', textAlign: 'center', maxWidth: '400px', margin: '0 auto', borderRadius: '4px', border: '1px solid #450A0A', backgroundColor: '#1F0D0D' }}>
@@ -605,23 +604,34 @@ const AppContent: React.FC = () => {
 
               {/* Load More Button */}
               {hasMore && gridDeals.length > 0 && (
-                <div className="text-center mt-10">
+                <div style={{ textAlign: 'center', marginTop: '32px' }}>
                   <button
                     onClick={handleLoadMore}
                     disabled={loadingMore}
-                    className="min-h-[44px] px-8 py-3.5 rounded-2xl bg-white/[0.08] hover:bg-emerald-500 hover:text-black text-white font-bold text-sm tracking-tight border border-white/15 hover:border-emerald-400 transition-all duration-200 active:scale-95 shadow-lg flex items-center gap-2 mx-auto disabled:opacity-50 focus-ring"
+                    style={{
+                      minHeight: '44px',
+                      padding: '10px 24px',
+                      backgroundColor: 'var(--bg-raised)',
+                      border: '1px solid var(--border-strong)',
+                      color: 'var(--text-primary)',
+                      borderRadius: '2px',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      opacity: loadingMore ? 0.6 : 1,
+                    }}
                     aria-label="Load more deals"
                   >
                     {loadingMore ? (
                       <>
-                        <RefreshCw className="w-4 h-4 animate-spin shrink-0" aria-hidden="true" />
+                        <IconRefresh size={14} style={{ animation: 'spin 1s linear infinite' }} />
                         <span>Loading More Drops...</span>
                       </>
                     ) : (
-                      <>
-                        <span>Load More Deals</span>
-                        <span className="text-xs opacity-75 font-mono">({gridDeals.length} shown)</span>
-                      </>
+                      <span>Load More Deals</span>
                     )}
                   </button>
                 </div>
@@ -780,7 +790,13 @@ const AppContent: React.FC = () => {
 
       </main>
 
-      {/* 3. Floating Quick Filter & Back to Top Dock */}
+      {/* 3. Mobile Ergonomic Thumb Navigation Deck */}
+      <ThumbDeck
+        activeTab={thumbTab}
+        onSelectTab={handleThumbTabSelect}
+      />
+
+      {/* 4. Desktop Quick Filter & Back to Top Dock */}
       <FloatingDock
         selectedStore={selectedStore}
         onSelectStore={setSelectedStore}

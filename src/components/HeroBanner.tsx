@@ -69,25 +69,6 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
     >
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
 
-        {/* Live status line */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          marginBottom: '16px',
-        }}>
-          <span className="status-live" aria-hidden="true" />
-          <span style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '11px',
-            fontWeight: 500,
-            color: '#6B6B6B',
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-          }}>
-            {dealCount > 0 ? `${dealCount} deals live` : 'Live deal discovery'}
-          </span>
-        </div>
 
         {/* Headline */}
         <h1 style={{

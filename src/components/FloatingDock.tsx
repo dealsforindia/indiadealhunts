@@ -27,20 +27,19 @@ export const FloatingDock: React.FC<FloatingDockProps> = ({ selectedStore, onSel
 
   return (
     <div
+      className="hidden md:flex"
       style={{
         position: 'fixed',
         bottom: '24px',
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: 40,
-        display: 'flex',
         alignItems: 'center',
         gap: '4px',
         padding: '6px',
-        backgroundColor: '#111111',
-        border: '1px solid #262626',
-        borderRadius: '4px',
-        // No box-shadow, no backdrop blur, no glass
+        backgroundColor: 'var(--bg-surface)',
+        border: '1px solid var(--border-default)',
+        borderRadius: '2px',
       }}
       role="toolbar"
       aria-label="Quick store filter"

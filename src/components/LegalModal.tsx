@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X, ShieldCheck, CheckCircle2, AlertCircle, FileText, Lock, Award, ExternalLink } from 'lucide-react';
+import { IconClose, IconShieldCheck, IconCheck, IconDocument, IconInfo, IconExternalLink } from './Icons';
 
 export type LegalDocType = 'disclosure' | 'verify' | 'terms' | 'privacy' | null;
 
@@ -27,199 +27,233 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 60,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+      }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="legal-modal-title"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[85vh] bg-[#111111] border border-[#262626] rounded flex flex-col overflow-hidden text-left"
+        style={{
+          position: 'relative',
+          width: '100%',
+          maxWidth: '640px',
+          maxHeight: '85vh',
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-default)',
+          borderRadius: '2px',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          textAlign: 'left',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#1E1E1E] bg-[#161616]">
-          <div className="flex items-center gap-2.5">
-            {type === 'disclosure' && (
-              <>
-                <Award className="w-5 h-5 text-emerald-400 shrink-0" aria-hidden="true" />
-                <h2 id="legal-modal-title" className="text-lg font-bold font-brand text-white">Affiliate Disclosure</h2>
-              </>
-            )}
-            {type === 'verify' && (
-              <>
-                <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" aria-hidden="true" />
-                <h2 id="legal-modal-title" className="text-lg font-bold font-brand text-white">How We Verify Deals</h2>
-              </>
-            )}
-            {type === 'terms' && (
-              <>
-                <FileText className="w-5 h-5 text-emerald-400 shrink-0" aria-hidden="true" />
-                <h2 id="legal-modal-title" className="text-lg font-bold font-brand text-white">Terms of Service</h2>
-              </>
-            )}
-            {type === 'privacy' && (
-              <>
-                <Lock className="w-5 h-5 text-emerald-400 shrink-0" aria-hidden="true" />
-                <h2 id="legal-modal-title" className="text-lg font-bold font-brand text-white">Privacy Policy</h2>
-              </>
-            )}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '12px 16px',
+            borderBottom: '1px solid var(--border-default)',
+            backgroundColor: 'var(--bg-base)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <IconShieldCheck size={16} color="var(--accent)" />
+            <h2
+              id="legal-modal-title"
+              style={{
+                fontSize: '15px',
+                fontWeight: 600,
+                fontFamily: 'var(--font-heading)',
+                color: 'var(--text-primary)',
+                margin: 0,
+              }}
+            >
+              {type === 'disclosure' && 'Affiliate Disclosure'}
+              {type === 'verify' && 'How Deals Are Verified'}
+              {type === 'terms' && 'Terms of Service'}
+              {type === 'privacy' && 'Privacy Policy'}
+            </h2>
           </div>
           <button
             onClick={onClose}
-            className="touch-target min-h-[44px] min-w-[44px] p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-slate-300 hover:text-white transition focus-ring"
-            aria-label="Close legal modal (Escape)"
+            aria-label="Close modal"
+            style={{
+              padding: '6px',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: 'none',
+              background: 'none',
+            }}
           >
-            <X className="w-5 h-5" aria-hidden="true" />
+            <IconClose size={18} />
           </button>
         </div>
 
-        {/* Modal Scrollable Body */}
-        <div className="p-6 overflow-y-auto space-y-6 text-sm text-white/80 leading-relaxed scrollbar-thin">
-          {/* 1. AFFILIATE DISCLOSURE */}
+        {/* Modal Body */}
+        <div
+          style={{
+            padding: '20px',
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            fontSize: '13px',
+            lineHeight: 1.6,
+            color: 'var(--text-secondary)',
+          }}
+        >
+          {/* AFFILIATE DISCLOSURE */}
           {type === 'disclosure' && (
             <>
-              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-medium">
-                IndiaDealHunts is dedicated to 100% transparency. We believe our community deserves complete clarity regarding how our service is sustained.
+              <div
+                style={{
+                  padding: '12px',
+                  backgroundColor: 'var(--bg-raised)',
+                  border: '1px solid var(--border-default)',
+                  borderRadius: '2px',
+                  color: 'var(--text-primary)',
+                  fontSize: '12px',
+                }}
+              >
+                IndiaDealHunts operates on complete transparency. Our service is free to use and sustained through retail partner commissions.
               </div>
 
               <div>
-                <h4 className="font-bold text-white text-base mb-1.5 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Amazon Associates Program
+                <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                  Amazon Associates Program
                 </h4>
-                <p className="text-xs text-white/70">
-                  IndiaDealHunts participates in the Amazon Services LLC Associates Program and the Amazon India Associates Program. As an Amazon Associate, we earn from qualifying purchases. When you click on an Amazon link from our service and make a purchase, we may earn a small referral commission at <strong>zero additional cost to you</strong>. The product price remains identical.
+                <p>
+                  IndiaDealHunts is a participant in the Amazon Associates Program. As an Amazon Associate, we earn from qualifying purchases. When you click an Amazon link on our site and make a purchase, we may receive a commission at zero additional cost to you. The price you pay is completely unchanged.
                 </p>
               </div>
 
               <div>
-                <h4 className="font-bold text-white text-base mb-1.5 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Flipkart & EarnKaro Affiliate Programs
+                <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                  Flipkart and EarnKaro Affiliate Networks
                 </h4>
-                <p className="text-xs text-white/70">
-                  We participate in the Flipkart Affiliate Program and partner affiliate networks (including EarnKaro). When you click product links for Flipkart, Myntra, AJIO, Swiggy, Croma, or other partner stores, we may receive a commission on qualifying completed orders.
+                <p>
+                  We participate in the Flipkart Affiliate Program and partner networks including EarnKaro. When you purchase items on Flipkart, Myntra, Ajio, Swiggy, or Croma through our links, we may receive referral compensation.
                 </p>
               </div>
 
               <div>
-                <h4 className="font-bold text-white text-base mb-1.5 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Editorial Independence & Authenticity
+                <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                  Editorial Independence
                 </h4>
-                {/* Hidden purposely: 'fake discount' wording */}
-                <p className="text-xs text-white/70">
-                  Affiliate partnerships never dictate our editorial verdict. We will <strong>never</strong> promote an inflated MRP, an artificial discount, or a low-grade product simply to earn a commission. Our algorithms evaluate genuine price drops against historical regular selling prices.
+                <p>
+                  Commission rates never determine which deals are posted. Deals are surfaced based strictly on verified price drops and genuine merchant discounts.
                 </p>
               </div>
             </>
           )}
 
-          {/* 2. HOW WE VERIFY DEALS */}
+          {/* VERIFY METHODOLOGY */}
           {type === 'verify' && (
             <>
-              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-medium">
-                Unlike scrapers that dump hundreds of unverified links, every drop published on IndiaDealHunts passes through our 4-stage verification engine.
+              <div>
+                <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                  1. Multi-Channel Signal Verification
+                </h4>
+                <p>
+                  Incoming price drops are scanned across 27 monitored Indian shopping channels. Multi-source consensus verifies whether a price is genuine before promotion.
+                </p>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-xs shrink-0 mt-0.5">
-                    1
-                  </div>
-                  <div>
-                    <h5 className="font-bold text-white text-sm">Continuous Multi-Stream Ingestion</h5>
-                    <p className="text-xs text-white/60 mt-0.5">
-                      We monitor 27+ top deal feeds, telegram channels, and online communities simultaneously. Sibling posts of identical items are clustered to prevent spam.
-                    </p>
-                  </div>
-                </div>
+              <div>
+                <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                  2. Inflation Filter
+                </h4>
+                <p>
+                  Sellers often artificially inflate MRP before applying fake discounts. Our engine compares current prices against historical retail prices to calculate honest discount percentages.
+                </p>
+              </div>
 
-                <div className="flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-xs shrink-0 mt-0.5">
-                    2
-                  </div>
-                  <div>
-                    <h5 className="font-bold text-white text-sm">90-Day Usual Price Benchmark ("Usually: ₹X")</h5>
-                    {/* Hidden purposely: 'fake 80% discounts' wording */}
-                    <p className="text-xs text-white/60 mt-0.5">
-                      Sellers frequently inflate MRP to show artificial 80% discounts. We cross-reference the product against its actual regular selling price over the last 90 days. If a discount isn't genuine, it gets dropped.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-xs shrink-0 mt-0.5">
-                    3
-                  </div>
-                  <div>
-                    <h5 className="font-bold text-white text-sm">Anti-Dead Deal & Live Stock Checking</h5>
-                    <p className="text-xs text-white/60 mt-0.5">
-                      Shortlinks are resolved to canonical store URLs. Our pipeline checks that the product is in stock, not marked "Currently unavailable", and that the price matches what was claimed.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-xs shrink-0 mt-0.5">
-                    4
-                  </div>
-                  <div>
-                    <h5 className="font-bold text-white text-sm">Tricks vs Product Separation</h5>
-                    <p className="text-xs text-white/60 mt-0.5">
-                      App-specific promo loots (like Swiggy Instamart searches or grocery cashbacks) are separated from product drops and documented with step-by-step instructions.
-                    </p>
-                  </div>
-                </div>
+              <div>
+                <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                  3. Direct Merchant Landing
+                </h4>
+                <p>
+                  All redirect links are resolved directly to official merchant domains (amazon.in, flipkart.com, myntra.com). Third-party redirect chains are inspected for user safety.
+                </p>
               </div>
             </>
           )}
 
-          {/* 3. TERMS OF SERVICE */}
+          {/* TERMS OF SERVICE */}
           {type === 'terms' && (
             <>
               <div>
-                <h4 className="font-bold text-white text-base mb-1.5">Welcome to IndiaDealHunts</h4>
-                <p className="text-xs text-white/70">
-                  By accessing IndiaDealHunts (web or official WhatsApp/Telegram channels), you agree to these terms. Our mission is to discover and share verified price drops and promotional offers across Indian e-commerce platforms.
+                <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                  1. Service Nature
+                </h4>
+                <p>
+                  IndiaDealHunts is an automated deal aggregator and price comparison discovery tool. We do not sell products directly. All transactions occur on third-party merchant sites (Amazon, Flipkart, etc.).
                 </p>
               </div>
 
               <div>
-                <h4 className="font-bold text-white text-base mb-1.5">Price & Stock Volatility</h4>
-                <p className="text-xs text-white/70">
-                  Online retail prices, coupon validity, and product stock levels fluctuate rapidly. While we verify deals prior to publishing, merchants may update prices or terminate flash sales at their sole discretion. We recommend confirming final checkout pricing on the merchant website before completing payment.
+                <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                  2. Pricing and Stock Availability
+                </h4>
+                <p>
+                  Prices and stock availability fluctuate rapidly on retail marketplaces. While our automated engine scans deals continuously, prices displayed were accurate at the time of publication and may change without notice.
                 </p>
               </div>
 
               <div>
-                <h4 className="font-bold text-white text-base mb-1.5">Merchant Responsibility</h4>
-                <p className="text-xs text-white/70">
-                  IndiaDealHunts is a curation and deal discovery platform. All orders, deliveries, warranties, and returns are fulfilled directly by the respective merchants (Amazon, Flipkart, Myntra, Swiggy, etc.).
+                <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                  3. Limitation of Liability
+                </h4>
+                <p>
+                  IndiaDealHunts is not responsible for product warranties, fulfillment, shipping delays, or refund disputes. All customer support requests regarding orders must be directed to the respective retail merchant.
                 </p>
               </div>
             </>
           )}
 
-          {/* 4. PRIVACY POLICY */}
+          {/* PRIVACY POLICY */}
           {type === 'privacy' && (
             <>
               <div>
-                <h4 className="font-bold text-white text-base mb-1.5">Zero Invasive Tracking</h4>
-                <p className="text-xs text-white/70">
-                  IndiaDealHunts does not require user registration or personal identification to browse deals. We do not sell your personal information or run invasive third-party ad trackers.
+                <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                  1. Zero Personal Data Harvesting
+                </h4>
+                <p>
+                  IndiaDealHunts does not require user accounts, passwords, or personal identity information to browse or search deals.
                 </p>
               </div>
 
               <div>
-                <h4 className="font-bold text-white text-base mb-1.5">Affiliate Cookies</h4>
-                <p className="text-xs text-white/70">
-                  When you click a merchant link, standard affiliate cookies may be set by the merchant platform (e.g. Amazon.in, Flipkart.com) to credit referral traffic. These cookies are governed by the respective merchant's privacy policy.
+                <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                  2. Local Storage and Preferences
+                </h4>
+                <p>
+                  We store UI state preferences (such as selected store filters and theme configurations) locally in your browser storage. This data never leaves your device.
                 </p>
               </div>
 
               <div>
-                <h4 className="font-bold text-white text-base mb-1.5">Contact Us</h4>
-                <p className="text-xs text-white/70">
-                  For feedback, deal tip-offs, or inquiries, reach out to our team at <a href="mailto:hello@rudranil.me" className="text-emerald-400 underline">hello@rudranil.me</a>.
+                <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                  3. Outbound Links and Third-Party Cookies
+                </h4>
+                <p>
+                  When navigating to external retailer websites via deal links, third-party affiliate networks may set tracking cookies according to their respective privacy policies to credit referral commissions.
                 </p>
               </div>
             </>
@@ -227,12 +261,28 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-4 border-t border-white/10 bg-[#1E293B] flex items-center justify-between">
-          <span className="text-xs text-slate-400 font-medium">IndiaDealHunts • Follow, Share, Support</span>
+        <div
+          style={{
+            padding: '12px 16px',
+            borderTop: '1px solid var(--border-default)',
+            backgroundColor: 'var(--bg-base)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          }}
+        >
           <button
             onClick={onClose}
-            className="min-h-[44px] px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition active:scale-95 focus-ring"
-            aria-label="Close modal dialog"
+            style={{
+              padding: '6px 14px',
+              fontSize: '12px',
+              fontWeight: 500,
+              color: 'var(--text-primary)',
+              backgroundColor: 'var(--bg-raised)',
+              border: '1px solid var(--border-strong)',
+              borderRadius: '2px',
+              cursor: 'pointer',
+            }}
           >
             Close
           </button>

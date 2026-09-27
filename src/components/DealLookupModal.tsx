@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { IconClose, IconSearch, IconShieldCheck, IconExternalLink } from './Icons';
 
 interface DealLookupModalProps {
   initialUrl?: string;
@@ -34,9 +35,9 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
     try {
       const res = await fetch(`https://api.rudranil.me/api/v1/deals/analyze-url?url=${encodeURIComponent(targetUrl)}`);
       const data = await res.json();
-      
+
       if (!res.ok || data.status === 'error') {
-        throw new Error(data.message || 'Verification failed. This might not be a supported product link.');
+        throw new Error(data.message || 'Verification failed. Please verify the product link is accessible.');
       }
       setResult(data);
     } catch (err: unknown) {
@@ -49,80 +50,252 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.8)'
-    }} onClick={onClose}>
-      <div 
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 50,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+      }}
+      onClick={onClose}
+    >
+      <div
         style={{
-          width: '100%', maxWidth: '640px', backgroundColor: '#111111', border: '1px solid #262626',
-          borderRadius: '4px', overflow: 'hidden', display: 'flex', flexDirection: 'column'
+          width: '100%',
+          maxWidth: '600px',
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-default)',
+          borderRadius: '2px',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
         }}
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', borderBottom: '1px solid #1E1E1E', backgroundColor: '#161616' }}>
-          <h2 style={{ margin: 0, fontSize: '16px', fontFamily: 'var(--font-heading)', color: '#F5F5F5' }}>Link Lookup</h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#6B6B6B', cursor: 'pointer' }}>Close</button>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '12px 16px',
+            borderBottom: '1px solid var(--border-default)',
+            backgroundColor: 'var(--bg-base)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <IconSearch size={16} color="var(--accent)" />
+            <h2
+              style={{
+                margin: 0,
+                fontSize: '14px',
+                fontWeight: 600,
+                fontFamily: 'var(--font-heading)',
+                color: 'var(--text-primary)',
+              }}
+            >
+              Price Drop &amp; Deal Analyzer
+            </h2>
+          </div>
+          {onClose && (
+            <button
+              onClick={onClose}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <IconClose size={18} />
+            </button>
+          )}
         </div>
 
-        <div style={{ padding: '24px' }}>
-          <form 
-            onSubmit={(e) => { e.preventDefault(); handleLookup(url); }}
-            style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}
+        <div style={{ padding: '20px' }}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleLookup(url);
+            }}
+            style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}
           >
             <input
               type="url"
               value={url}
-              onChange={e => setUrl(e.target.value)}
-              placeholder="Paste Amazon/Flipkart URL..."
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="Paste Amazon, Flipkart, or Myntra link..."
               required
               style={{
-                flex: 1, padding: '10px 12px', backgroundColor: '#0A0A0A', border: '1px solid #262626',
-                color: '#F5F5F5', fontSize: '14px', fontFamily: 'var(--font-body)', outline: 'none'
+                flex: 1,
+                padding: '10px 12px',
+                backgroundColor: 'var(--bg-base)',
+                border: '1px solid var(--border-default)',
+                color: 'var(--text-primary)',
+                fontSize: '13px',
+                fontFamily: 'var(--font-body)',
+                outline: 'none',
+                borderRadius: '2px',
               }}
             />
             <button
               type="submit"
               disabled={loading}
               style={{
-                padding: '0 20px', backgroundColor: '#D47A10', border: 'none', color: '#0A0A0A',
-                fontWeight: 600, fontSize: '13px', cursor: 'pointer', opacity: loading ? 0.5 : 1
+                padding: '0 16px',
+                backgroundColor: 'var(--accent)',
+                border: 'none',
+                color: 'var(--text-inverse)',
+                fontWeight: 600,
+                fontSize: '13px',
+                cursor: 'pointer',
+                opacity: loading ? 0.5 : 1,
+                borderRadius: '2px',
+                whiteSpace: 'nowrap',
               }}
             >
-              {loading ? 'Analyzing...' : 'Analyze'}
+              {loading ? 'Analyzing...' : 'Verify Deal'}
             </button>
           </form>
 
           {error && (
-            <div style={{ padding: '16px', backgroundColor: '#1F0D0D', border: '1px solid #450A0A', color: '#EF4444', fontSize: '13px' }}>
+            <div
+              style={{
+                padding: '12px',
+                backgroundColor: 'var(--red-subtle)',
+                border: '1px solid var(--red)',
+                color: 'var(--red)',
+                fontSize: '13px',
+                borderRadius: '2px',
+              }}
+            >
               {error}
             </div>
           )}
 
-          {loading && (
-            <div className="skeleton" style={{ height: '200px', width: '100%' }} />
-          )}
-
-          {result && !loading && (
-            <div>
-              <h3 style={{ margin: '0 0 16px', fontSize: '16px', color: '#F5F5F5', fontFamily: 'var(--font-heading)' }}>
-                {result.product_name}
-              </h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-                <div style={{ flex: 1, padding: '16px', backgroundColor: '#161616', border: '1px solid #262626' }}>
-                  <span style={{ display: 'block', fontSize: '11px', color: '#6B6B6B', marginBottom: '4px' }}>Current Price</span>
-                  <span className="price-num" style={{ fontSize: '24px', fontWeight: 600, color: '#F5F5F5' }}>
-                    {'\u20B9'}{typeof result.price === 'number' ? result.price.toLocaleString('en-IN') : result.price}
-                  </span>
-                </div>
-                <div style={{ flex: 1, padding: '16px', backgroundColor: '#161616', border: '1px solid #262626' }}>
-                  <span style={{ display: 'block', fontSize: '11px', color: '#6B6B6B', marginBottom: '4px' }}>Verdict</span>
-                  <span style={{ fontSize: '16px', fontWeight: 600, color: result.is_deal ? '#22C55E' : '#EF4444' }}>
-                    {result.is_deal ? 'Good Deal' : 'Wait for Drop'}
-                  </span>
-                </div>
+          {result && (
+            <div
+              style={{
+                backgroundColor: 'var(--bg-raised)',
+                border: '1px solid var(--border-default)',
+                borderRadius: '2px',
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span
+                  style={{
+                    fontSize: '11px',
+                    fontFamily: 'var(--font-mono)',
+                    fontWeight: 600,
+                    color: 'var(--accent)',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {result.store || 'Verified Store'}
+                </span>
+                <span
+                  style={{
+                    fontSize: '11px',
+                    fontFamily: 'var(--font-mono)',
+                    color: 'var(--green)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <IconShieldCheck size={14} />
+                  Safe Link
+                </span>
               </div>
+
+              <h4
+                style={{
+                  margin: 0,
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  lineHeight: 1.4,
+                }}
+              >
+                {result.title || 'Product Analysis Complete'}
+              </h4>
+
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                {result.price && (
+                  <span
+                    style={{
+                      fontSize: '18px',
+                      fontWeight: 700,
+                      fontFamily: 'var(--font-heading)',
+                      color: 'var(--text-primary)',
+                    }}
+                  >
+                    {'\u20B9'}{Number(result.price).toLocaleString('en-IN')}
+                  </span>
+                )}
+                {result.mrp && result.mrp > result.price && (
+                  <span
+                    style={{
+                      fontSize: '13px',
+                      color: 'var(--text-muted)',
+                      textDecoration: 'line-through',
+                    }}
+                  >
+                    {'\u20B9'}{Number(result.mrp).toLocaleString('en-IN')}
+                  </span>
+                )}
+                {result.discount_pct && (
+                  <span
+                    style={{
+                      padding: '2px 6px',
+                      backgroundColor: 'var(--badge-disc-bg)',
+                      border: '1px solid var(--badge-disc-bdr)',
+                      color: 'var(--badge-disc-fg)',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      borderRadius: '2px',
+                    }}
+                  >
+                    {result.discount_pct}% OFF
+                  </span>
+                )}
+              </div>
+
+              {result.clean_url && (
+                <a
+                  href={result.clean_url}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  style={{
+                    marginTop: '8px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    padding: '8px 14px',
+                    backgroundColor: 'var(--bg-base)',
+                    border: '1px solid var(--border-default)',
+                    color: 'var(--text-primary)',
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    borderRadius: '2px',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <span>Open Clean Merchant Link</span>
+                  <IconExternalLink size={14} />
+                </a>
+              )}
             </div>
           )}
         </div>

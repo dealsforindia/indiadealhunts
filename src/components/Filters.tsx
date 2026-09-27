@@ -1,5 +1,6 @@
 import React from 'react';
 import { SortOption } from '../types';
+import { IconChevronDown } from './Icons';
 
 interface FiltersProps {
   selectedStore: string;
@@ -8,7 +9,7 @@ interface FiltersProps {
   onSelectCategory: (category: string) => void;
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
-  totalDeals: number;
+  totalDeals?: number;
   onlyConsensus?: boolean;
   onToggleConsensus?: () => void;
 }
@@ -19,9 +20,9 @@ const STORES = [
   { id: 'Flipkart', label: 'Flipkart'   },
   { id: 'Myntra',   label: 'Myntra'     },
   { id: 'AJIO',     label: 'AJIO'       },
+  { id: 'DesiDime', label: 'DesiDime'   },
   { id: 'Zepto',    label: 'Zepto'      },
   { id: 'Swiggy',   label: 'Swiggy'     },
-  { id: 'Croma',    label: 'Croma'      },
   { id: 'Blinkit',  label: 'Blinkit'    },
 ];
 
@@ -36,50 +37,12 @@ const CATEGORIES = [
 ];
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: 'newest',     label: 'Newest first'     },
-  { value: 'discount',   label: 'Biggest discount'  },
-  { value: 'worth',      label: 'Best value'        },
-  { value: 'price_low',  label: 'Price: low to high' },
-  { value: 'price_high', label: 'Price: high to low' },
+  { value: 'newest',     label: 'Newest First'     },
+  { value: 'discount',   label: 'Highest Discount' },
+  { value: 'worth',      label: 'Top Value'        },
+  { value: 'price_low',  label: 'Price: Low to High' },
+  { value: 'price_high', label: 'Price: High to Low' },
 ];
-
-const pillBase: React.CSSProperties = {
-  padding: '5px 12px',
-  fontSize: '12px',
-  fontFamily: 'var(--font-body)',
-  fontWeight: 400,
-  border: '1px solid #262626',
-  borderRadius: '2px',
-  cursor: 'pointer',
-  backgroundColor: 'transparent',
-  whiteSpace: 'nowrap',
-  lineHeight: '18px',
-  color: '#6B6B6B',
-  transition: 'color 120ms ease, border-color 120ms ease, background-color 120ms ease',
-};
-
-const pillActive: React.CSSProperties = {
-  ...pillBase,
-  color: '#F5F5F5',
-  backgroundColor: '#1A1A1A',
-  borderColor: '#404040',
-  fontWeight: 500,
-};
-
-const selectStyle: React.CSSProperties = {
-  padding: '5px 8px',
-  fontSize: '12px',
-  fontFamily: 'var(--font-body)',
-  color: '#A3A3A3',
-  backgroundColor: '#111111',
-  border: '1px solid #262626',
-  borderRadius: '2px',
-  cursor: 'pointer',
-  outline: 'none',
-  appearance: 'none' as const,
-  WebkitAppearance: 'none' as const,
-  paddingRight: '22px',
-};
 
 export const Filters: React.FC<FiltersProps> = ({
   selectedStore,
@@ -88,24 +51,43 @@ export const Filters: React.FC<FiltersProps> = ({
   onSelectCategory,
   sortBy,
   onSortChange,
-  totalDeals,
   onlyConsensus = false,
   onToggleConsensus,
 }) => {
   return (
     <div
-      style={{ maxWidth: '1280px', margin: '0 auto', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '10px' }}
+      style={{
+        maxWidth: '1280px',
+        margin: '0 auto',
+        padding: '12px 16px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+      }}
       role="region"
       aria-label="Deal filters"
     >
-      {/* Row 1: Store pills + right controls */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
-
-        {/* Store pills */}
+      {/* Row 1: Store pills and Sort */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '8px',
+          flexWrap: 'wrap',
+        }}
+      >
+        {/* Store pills (horizontal scrollable) */}
         <div
           role="group"
           aria-label="Filter by store"
-          style={{ display: 'flex', alignItems: 'center', gap: '4px', overflowX: 'auto', paddingBottom: '2px', msOverflowStyle: 'none', scrollbarWidth: 'none' }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            overflowX: 'auto',
+            paddingBottom: '2px',
+          }}
           className="scrollbar-none"
         >
           {STORES.map((s) => {
@@ -115,66 +97,89 @@ export const Filters: React.FC<FiltersProps> = ({
                 key={s.id}
                 onClick={() => onSelectStore(s.id)}
                 aria-pressed={isActive}
-                style={isActive ? pillActive : pillBase}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    (e.currentTarget as HTMLButtonElement).style.color = '#F5F5F5';
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = '#404040';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    (e.currentTarget as HTMLButtonElement).style.color = '#6B6B6B';
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = '#262626';
-                  }
+                style={{
+                  padding: '5px 10px',
+                  fontSize: '12px',
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: isActive ? 600 : 400,
+                  border: `1px solid ${isActive ? 'var(--border-strong)' : 'var(--border-default)'}`,
+                  borderRadius: '2px',
+                  cursor: 'pointer',
+                  backgroundColor: isActive ? 'var(--bg-raised)' : 'var(--bg-surface)',
+                  color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  whiteSpace: 'nowrap',
+                  lineHeight: '18px',
+                  transition: 'background-color 100ms linear, color 100ms linear',
                 }}
               >
                 {s.label}
               </button>
             );
           })}
+
           {onToggleConsensus && (
             <button
               onClick={onToggleConsensus}
               aria-pressed={onlyConsensus}
-              title="Deals confirmed by 2 or more independent Telegram channels"
-              style={onlyConsensus ? { ...pillActive, color: '#F59E0B', borderColor: '#854D0E' } : pillBase}
+              title="Verified by multiple sources"
+              style={{
+                padding: '5px 10px',
+                fontSize: '12px',
+                fontFamily: 'var(--font-body)',
+                fontWeight: onlyConsensus ? 600 : 400,
+                border: `1px solid ${onlyConsensus ? 'var(--accent)' : 'var(--border-default)'}`,
+                borderRadius: '2px',
+                cursor: 'pointer',
+                backgroundColor: onlyConsensus ? 'var(--accent-subtle)' : 'var(--bg-surface)',
+                color: onlyConsensus ? 'var(--accent)' : 'var(--text-secondary)',
+                whiteSpace: 'nowrap',
+                lineHeight: '18px',
+              }}
             >
-              Consensus
+              Multi-Source
             </button>
           )}
         </div>
 
-        {/* Right: deal count + location + sort */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, flexWrap: 'wrap' }}>
-          <span style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '11px',
-            color: '#6B6B6B',
-            whiteSpace: 'nowrap',
-          }}>
-            {totalDeals} deals
-          </span>
-
-          <div style={{ position: 'relative' }}>
-            <select
-              value={sortBy}
-              onChange={(e) => onSortChange(e.target.value as SortOption)}
-              aria-label="Sort deals"
-              style={selectStyle}
-            >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value} style={{ backgroundColor: '#111111', color: '#F5F5F5' }}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-            <svg
-              width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"
-              style={{ position: 'absolute', right: '6px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#6B6B6B' }}
-            >
-              <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+        {/* Sort Selector */}
+        <div style={{ position: 'relative', flexShrink: 0 }}>
+          <select
+            value={sortBy}
+            onChange={(e) => onSortChange(e.target.value as SortOption)}
+            aria-label="Sort deals"
+            style={{
+              padding: '5px 24px 5px 8px',
+              fontSize: '12px',
+              fontFamily: 'var(--font-body)',
+              color: 'var(--text-secondary)',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-default)',
+              borderRadius: '2px',
+              cursor: 'pointer',
+              outline: 'none',
+              appearance: 'none',
+              WebkitAppearance: 'none',
+            }}
+          >
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value} style={{ backgroundColor: 'var(--bg-surface)', color: 'var(--text-primary)' }}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+          <div
+            style={{
+              position: 'absolute',
+              right: '6px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              pointerEvents: 'none',
+              color: 'var(--text-muted)',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <IconChevronDown size={10} />
           </div>
         </div>
       </div>
@@ -183,17 +188,25 @@ export const Filters: React.FC<FiltersProps> = ({
       <div
         role="group"
         aria-label="Filter by category"
-        style={{ display: 'flex', alignItems: 'center', gap: '4px', overflowX: 'auto', paddingBottom: '2px' }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          overflowX: 'auto',
+          paddingBottom: '2px',
+        }}
         className="scrollbar-none"
       >
-        <span style={{
-          fontSize: '11px',
-          color: '#6B6B6B',
-          fontFamily: 'var(--font-mono)',
-          flexShrink: 0,
-          marginRight: '4px',
-          whiteSpace: 'nowrap',
-        }}>
+        <span
+          style={{
+            fontSize: '11px',
+            color: 'var(--text-muted)',
+            fontFamily: 'var(--font-mono)',
+            flexShrink: 0,
+            textTransform: 'uppercase',
+            letterSpacing: '0.04em',
+          }}
+        >
           Category:
         </span>
         {CATEGORIES.map((c) => {
@@ -203,18 +216,19 @@ export const Filters: React.FC<FiltersProps> = ({
               key={c.id}
               onClick={() => onSelectCategory(c.id)}
               aria-pressed={isActive}
-              style={isActive ? pillActive : pillBase}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  (e.currentTarget as HTMLButtonElement).style.color = '#F5F5F5';
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = '#404040';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  (e.currentTarget as HTMLButtonElement).style.color = '#6B6B6B';
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = '#262626';
-                }
+              style={{
+                padding: '4px 8px',
+                fontSize: '11px',
+                fontFamily: 'var(--font-body)',
+                fontWeight: isActive ? 600 : 400,
+                border: `1px solid ${isActive ? 'var(--border-strong)' : 'transparent'}`,
+                borderRadius: '2px',
+                cursor: 'pointer',
+                backgroundColor: isActive ? 'var(--bg-raised)' : 'transparent',
+                color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
+                whiteSpace: 'nowrap',
+                lineHeight: '16px',
+                transition: 'background-color 100ms linear, color 100ms linear',
               }}
             >
               {c.label}
