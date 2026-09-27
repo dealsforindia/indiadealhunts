@@ -4,7 +4,7 @@ export interface PublicDeal {
   price: number | null;
   mrp: number | null;
   discount_pct: number | null;
-  store: 'Amazon' | 'Flipkart' | 'Myntra' | 'AJIO' | 'Swiggy Instamart' | 'Zepto' | 'Blinkit' | 'Croma' | string;
+  store: string;
   image: string | null;
   url: string;
   category: string;
@@ -44,7 +44,7 @@ export interface PublicDeal {
   video_cover?: string;
   video_preview?: string;
   video_status?: string;
-  deal_type?: 'standard' | 'mega_haul' | string;
+  deal_type?: string;
   is_mega_haul?: boolean;
   haul_store?: string;
   pincodes?: string[];

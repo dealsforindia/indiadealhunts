@@ -12,6 +12,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome, onNaviga
   const [subject, setSubject] = useState('Feedback');
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,8 +20,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome, onNaviga
     if (!email.trim() || !message.trim()) return;
 
     setLoading(true);
+    setSubmitError(null);
     try {
-      await fetch('https://api.rudranil.me/api/v1/feedback', {
+      const res = await fetch('https://api.rudranil.me/api/v1/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -30,9 +32,12 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome, onNaviga
           message: message.trim(),
         }),
       });
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
       setSubmitted(true);
-    } catch (err) {
-      setSubmitted(true);
+    } catch (err: unknown) {
+      setSubmitError(
+        err instanceof Error ? err.message : 'Failed to send. Please email us directly at hello@rudranil.me'
+      );
     } finally {
       setLoading(false);
     }
@@ -196,6 +201,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome, onNaviga
                     </>
                   )}
                 </button>
+                {submitError && (
+                  <p className="text-xs text-red-400 text-center mt-2">{submitError}</p>
+                )}
               </form>
             )}
           </div>

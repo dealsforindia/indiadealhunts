@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavTab } from '../types';
-import { Sparkles, MessageCircle, Send, Zap, CheckCircle2, Search, PlusCircle, CreditCard, User } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: NavTab;
@@ -10,8 +9,16 @@ interface NavbarProps {
   activeCardCount?: number;
 }
 
-const WHATSAPP_CHANNEL_URL = 'https://whatsapp.com/channel/0029VaHCuZs2v1IkBRgH9w3z';
-const TELEGRAM_CHANNEL_URL = 'https://t.me/dealsforindiachannel';
+const WHATSAPP_URL = 'https://whatsapp.com/channel/0029VaHCuZs2v1IkBRgH9w3z';
+const TELEGRAM_URL = 'https://t.me/dealsforindiachannel';
+
+const NAV_TABS: { id: NavTab; label: string }[] = [
+  { id: 'home',         label: 'Latest'      },
+  { id: 'ending_soon',  label: 'Popular'     },
+  { id: 'best_worth',   label: 'Top Rated'   },
+  { id: 'lookup',       label: 'Link Lookup' },
+  { id: 'submit_deal',  label: 'Submit Deal' },
+];
 
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
@@ -20,125 +27,138 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenCardModal,
   activeCardCount,
 }) => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
-    <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-[#0B0D13]/90 backdrop-blur-xl transition-all shadow-sm">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6">
-        
-        {/* Top Navbar Row */}
-        <div className="flex items-center justify-between h-16 sm:h-18 gap-4">
-          
-          {/* Brand Logo & Title */}
-          <div className="flex items-center gap-3 shrink-0">
-            <button
-              onClick={() => onTabChange('home')}
-              className="flex items-center gap-2.5 text-left group focus:outline-none rounded-xl"
-              aria-label="Go to IndiaDealHunts Home"
-            >
-              <div className="relative w-9 h-9 rounded-xl overflow-hidden border border-emerald-500/30 bg-[#121522] flex items-center justify-center group-hover:border-emerald-400 transition-all shadow-sm">
-                <span className="text-base font-black text-transparent bg-clip-text bg-gradient-to-br from-emerald-400 to-teal-300 font-mono">
-                  ID
-                </span>
-              </div>
+    <header
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+        backgroundColor: '#0A0A0A',
+        borderBottom: '1px solid #262626',
+      }}
+    >
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 16px' }}>
+        {/* Main bar */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '56px', gap: '16px' }}>
 
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-base sm:text-lg tracking-tight text-white group-hover:text-emerald-400 transition-colors">
-                    IndiaDealHunts
-                  </span>
-                  <span className="p-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                    <CheckCircle2 className="w-3 h-3" aria-hidden="true" />
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 -mt-0.5">
-                  <span className="text-[10.5px] text-slate-400 font-medium hidden sm:block">
-                    Verified Deal Discovery
-                  </span>
-                  <span className="hidden sm:inline text-slate-700 text-[10px]">•</span>
-                  <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400 font-mono font-medium">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    {totalDeals > 0 ? `${totalDeals} drops live` : '27 streams active'}
-                  </span>
-                </div>
-              </div>
-            </button>
-          </div>
+          {/* Brand */}
+          <button
+            onClick={() => { onTabChange('home'); setMobileOpen(false); }}
+            aria-label="IndiaDealHunts home"
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          >
+            <span style={{
+              fontFamily: 'var(--font-heading)',
+              fontWeight: 700,
+              fontSize: '15px',
+              color: '#F5F5F5',
+              letterSpacing: '-0.02em',
+              lineHeight: 1,
+            }}>
+              IndiaDealHunts
+            </span>
+            {totalDeals > 0 && (
+              <span style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '11px',
+                fontWeight: 500,
+                color: '#6B6B6B',
+                letterSpacing: '0',
+              }}>
+                {totalDeals} live
+              </span>
+            )}
+          </button>
 
-          {/* Center Navigation: Luma / Mobbin Style Segmented Controller */}
-          <nav className="hidden md:flex items-center gap-1 p-1 rounded-xl bg-white/[0.03] border border-white/[0.06] backdrop-blur-md" aria-label="Main Navigation">
-            <button
-              onClick={() => onTabChange('home')}
-              className={`relative px-3.5 py-1.5 text-xs font-semibold transition-all duration-150 whitespace-nowrap rounded-lg flex items-center gap-1.5 ${
-                activeTab === 'home'
-                  ? 'bg-white/10 text-white shadow-sm border border-white/10 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
-              }`}
-              aria-current={activeTab === 'home' ? 'page' : undefined}
-            >
-              Latest
-            </button>
-            <button
-              onClick={() => onTabChange('ending_soon')}
-              className={`relative px-3.5 py-1.5 text-xs font-semibold transition-all duration-150 whitespace-nowrap rounded-lg flex items-center gap-1.5 ${
-                activeTab === 'ending_soon'
-                  ? 'bg-amber-500/15 text-amber-300 shadow-sm border border-amber-500/30 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
-              }`}
-              aria-current={activeTab === 'ending_soon' ? 'page' : undefined}
-            >
-              <Zap className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
-              <span>Most Popular</span>
-            </button>
-            <button
-              onClick={() => onTabChange('best_worth')}
-              className={`relative px-3.5 py-1.5 text-xs font-semibold transition-all duration-150 whitespace-nowrap rounded-lg flex items-center gap-1.5 ${
-                activeTab === 'best_worth'
-                  ? 'bg-emerald-500/15 text-emerald-300 shadow-sm border border-emerald-500/30 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
-              }`}
-              aria-current={activeTab === 'best_worth' ? 'page' : undefined}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
-              <span>Top Rated</span>
-            </button>
-            <button
-              onClick={() => onTabChange('lookup')}
-              className={`relative px-3.5 py-1.5 text-xs font-semibold transition-all duration-150 whitespace-nowrap rounded-lg flex items-center gap-1.5 ${
-                activeTab === 'lookup'
-                  ? 'bg-white/10 text-white shadow-sm border border-white/10 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
-              }`}
-              aria-current={activeTab === 'lookup' ? 'page' : undefined}
-            >
-              <Search className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
-              <span>Link Lookup</span>
-            </button>
-            <button
-              onClick={() => onTabChange('submit_deal')}
-              className={`relative px-3.5 py-1.5 text-xs font-semibold transition-all duration-150 whitespace-nowrap rounded-lg flex items-center gap-1.5 ${
-                activeTab === 'submit_deal'
-                  ? 'bg-emerald-500/20 text-emerald-300 shadow-sm border border-emerald-500/30 font-bold'
-                  : 'text-slate-400 hover:text-emerald-300 hover:bg-emerald-500/10'
-              }`}
-              aria-current={activeTab === 'submit_deal' ? 'page' : undefined}
-            >
-              <PlusCircle className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
-              <span>Submit Deal</span>
-            </button>
+          {/* Desktop nav */}
+          <nav
+            aria-label="Main navigation"
+            style={{ display: 'flex', alignItems: 'center', gap: '2px' }}
+            className="hidden md:flex"
+          >
+            {NAV_TABS.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => onTabChange(tab.id)}
+                  aria-current={isActive ? 'page' : undefined}
+                  style={{
+                    padding: '6px 12px',
+                    fontSize: '13px',
+                    fontWeight: isActive ? 600 : 400,
+                    fontFamily: 'var(--font-body)',
+                    color: isActive ? '#F5F5F5' : '#6B6B6B',
+                    backgroundColor: isActive ? '#1A1A1A' : 'transparent',
+                    border: isActive ? '1px solid #262626' : '1px solid transparent',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    lineHeight: '20px',
+                    transition: 'color 150ms ease, background-color 150ms ease',
+                    whiteSpace: 'nowrap',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = '#F5F5F5';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = '#6B6B6B';
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
           </nav>
 
-          {/* Right Action: Clean Telegram & WhatsApp Channels & My Cards */}
-          <div className="flex items-center gap-2 shrink-0">
-
+          {/* Right actions */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             {onOpenCardModal && (
               <button
                 onClick={onOpenCardModal}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-bold transition-all active:scale-95 shadow-xs cursor-pointer"
-                title="Personalize cashback discounts for your credit cards"
+                aria-label="Manage my credit cards"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 12px',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  fontFamily: 'var(--font-body)',
+                  color: '#A3A3A3',
+                  backgroundColor: 'transparent',
+                  border: '1px solid #262626',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  lineHeight: '20px',
+                  whiteSpace: 'nowrap',
+                  transition: 'color 150ms ease, border-color 150ms ease',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.color = '#F5F5F5';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = '#404040';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.color = '#A3A3A3';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = '#262626';
+                }}
               >
-                <CreditCard className="w-3.5 h-3.5 text-amber-400 shrink-0" aria-hidden="true" />
-                <span className="hidden sm:inline">My Cards</span>
+                My Cards
                 {typeof activeCardCount === 'number' && activeCardCount > 0 && (
-                  <span className="w-4 h-4 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black flex items-center justify-center font-mono">
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '50%',
+                    backgroundColor: '#D47A10',
+                    color: '#0A0A0A',
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    fontFamily: 'var(--font-mono)',
+                  }}>
                     {activeCardCount}
                   </span>
                 )}
@@ -146,97 +166,159 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
 
             <a
-              href={TELEGRAM_CHANNEL_URL}
+              href={TELEGRAM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-sky-500/20 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 text-xs font-semibold transition-all active:scale-95 shadow-xs"
               aria-label="Join Telegram channel"
+              className="hidden lg:flex"
+              style={{
+                alignItems: 'center',
+                padding: '6px 12px',
+                fontSize: '12px',
+                fontWeight: 500,
+                fontFamily: 'var(--font-body)',
+                color: '#A3A3A3',
+                border: '1px solid #262626',
+                borderRadius: '4px',
+                lineHeight: '20px',
+                whiteSpace: 'nowrap',
+                transition: 'color 150ms ease, border-color 150ms ease',
+                textDecoration: 'none',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.color = '#F5F5F5';
+                (e.currentTarget as HTMLAnchorElement).style.borderColor = '#404040';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.color = '#A3A3A3';
+                (e.currentTarget as HTMLAnchorElement).style.borderColor = '#262626';
+              }}
             >
-              <Send className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-              <span>Telegram</span>
+              Telegram
             </a>
 
             <a
-              href={WHATSAPP_CHANNEL_URL}
+              href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 text-xs font-bold shadow-sm transition-all active:scale-95"
-              title="Join official IndiaDealHunts WhatsApp Channel"
-              aria-label="Join official WhatsApp Channel"
+              aria-label="Join WhatsApp alerts channel"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 14px',
+                fontSize: '12px',
+                fontWeight: 600,
+                fontFamily: 'var(--font-body)',
+                color: '#0A0A0A',
+                backgroundColor: '#22C55E',
+                border: '1px solid #22C55E',
+                borderRadius: '4px',
+                lineHeight: '20px',
+                whiteSpace: 'nowrap',
+                transition: 'background-color 150ms ease',
+                textDecoration: 'none',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#16A34A';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#22C55E';
+              }}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <MessageCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-              <span className="hidden sm:inline">WhatsApp Channel</span>
-              <span className="sm:hidden">WhatsApp</span>
+              Alerts
             </a>
+
+            {/* Mobile menu toggle */}
+            <button
+              className="flex md:hidden"
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileOpen}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px',
+                backgroundColor: 'transparent',
+                border: '1px solid #262626',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                color: '#A3A3A3',
+              }}
+            >
+              {mobileOpen ? (
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M1 3h12M1 7h12M1 11h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              )}
+            </button>
           </div>
         </div>
 
-        {/* Mobile Segmented Navigation Bar */}
-        <nav 
-          className="flex md:hidden items-center justify-between gap-1 overflow-x-auto scrollbar-none pb-2 pt-1 border-t border-white/[0.06]"
-          aria-label="Mobile Navigation"
-        >
-          <button
-            onClick={() => onTabChange('home')}
-            className={`min-h-[38px] px-3 py-1.5 text-xs font-semibold whitespace-nowrap rounded-lg flex items-center justify-center transition-colors ${
-              activeTab === 'home' ? 'bg-white/10 text-white font-bold border border-white/10' : 'text-slate-400 hover:text-white'
-            }`}
-            aria-current={activeTab === 'home' ? 'page' : undefined}
+        {/* Mobile nav drawer */}
+        {mobileOpen && (
+          <nav
+            aria-label="Mobile navigation"
+            style={{
+              borderTop: '1px solid #1E1E1E',
+              padding: '8px 0 12px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '2px',
+            }}
           >
-            Latest
-          </button>
-          <button
-            onClick={() => onTabChange('ending_soon')}
-            className={`min-h-[38px] px-3 py-1.5 text-xs font-semibold whitespace-nowrap rounded-lg flex items-center justify-center gap-1 transition-colors ${
-              activeTab === 'ending_soon' ? 'bg-amber-500/15 text-amber-300 font-bold border border-amber-500/30' : 'text-slate-400 hover:text-white'
-            }`}
-            aria-current={activeTab === 'ending_soon' ? 'page' : undefined}
-          >
-            <Zap className="w-3 h-3 text-amber-400 shrink-0" aria-hidden="true" />
-            <span>Popular</span>
-          </button>
-          <button
-            onClick={() => onTabChange('best_worth')}
-            className={`min-h-[38px] px-3 py-1.5 text-xs font-semibold whitespace-nowrap rounded-lg flex items-center justify-center gap-1 transition-colors ${
-              activeTab === 'best_worth' ? 'bg-emerald-500/15 text-emerald-300 font-bold border border-emerald-500/30' : 'text-slate-400 hover:text-white'
-            }`}
-            aria-current={activeTab === 'best_worth' ? 'page' : undefined}
-          >
-            <Sparkles className="w-3 h-3 text-emerald-400 shrink-0" aria-hidden="true" />
-            <span>Top Rated</span>
-          </button>
-          <button
-            onClick={() => onTabChange('lookup')}
-            className={`min-h-[38px] px-3 py-1.5 text-xs font-semibold whitespace-nowrap rounded-lg flex items-center justify-center gap-1 transition-colors ${
-              activeTab === 'lookup' ? 'bg-white/10 text-white font-bold border border-white/10' : 'text-slate-400 hover:text-white'
-            }`}
-            aria-current={activeTab === 'lookup' ? 'page' : undefined}
-          >
-            <Search className="w-3 h-3 text-emerald-400 shrink-0" aria-hidden="true" />
-            <span>Lookup</span>
-          </button>
-          {onOpenCardModal && (
-            <button
-              onClick={onOpenCardModal}
-              className="min-h-[38px] px-3 py-1.5 text-xs font-bold whitespace-nowrap rounded-lg flex items-center justify-center gap-1 text-amber-300 bg-amber-500/15 border border-amber-500/30 transition-colors"
+            {NAV_TABS.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => { onTabChange(tab.id); setMobileOpen(false); }}
+                  aria-current={isActive ? 'page' : undefined}
+                  style={{
+                    width: '100%',
+                    textAlign: 'left',
+                    padding: '10px 12px',
+                    fontSize: '14px',
+                    fontWeight: isActive ? 600 : 400,
+                    fontFamily: 'var(--font-body)',
+                    color: isActive ? '#F5F5F5' : '#A3A3A3',
+                    backgroundColor: isActive ? '#1A1A1A' : 'transparent',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+            <div style={{ height: '1px', backgroundColor: '#1E1E1E', margin: '6px 0' }} />
+            <a
+              href={TELEGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ padding: '10px 12px', fontSize: '14px', color: '#A3A3A3', fontFamily: 'var(--font-body)' }}
+              onClick={() => setMobileOpen(false)}
             >
-              <CreditCard className="w-3 h-3 text-amber-400 shrink-0" aria-hidden="true" />
-              <span>Cards</span>
-            </button>
-          )}
-          <button
-            onClick={() => onTabChange('submit_deal')}
-            className={`min-h-[38px] px-3 py-1.5 text-xs font-semibold whitespace-nowrap rounded-lg flex items-center justify-center gap-1 transition-colors ${
-              activeTab === 'submit_deal' ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30' : 'text-slate-400 hover:text-emerald-300'
-            }`}
-            aria-current={activeTab === 'submit_deal' ? 'page' : undefined}
-          >
-            <PlusCircle className="w-3 h-3 text-emerald-400 shrink-0" aria-hidden="true" />
-            <span>Submit</span>
-          </button>
-        </nav>
-
+              Telegram Channel
+            </a>
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ padding: '10px 12px', fontSize: '14px', color: '#A3A3A3', fontFamily: 'var(--font-body)' }}
+              onClick={() => setMobileOpen(false)}
+            >
+              WhatsApp Alerts
+            </a>
+          </nav>
+        )}
       </div>
     </header>
   );

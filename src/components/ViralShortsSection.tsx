@@ -1,12 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import {
-  Play, Pause, Volume2, VolumeX, X, ExternalLink, ChevronLeft, ChevronRight,
-  ChevronUp, ChevronDown, Sparkles, Film, Heart, Share2, Flame
-} from 'lucide-react';
-import confetti from 'canvas-confetti';
 import useEmblaCarousel from 'embla-carousel-react';
-import { motion } from 'motion/react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 
@@ -19,7 +13,6 @@ interface ViralShortsSectionProps {
 
 export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({
   deals,
-  onOpenDeal,
   externalActiveDeal,
   onCloseExternal,
 }) => {
@@ -38,39 +31,29 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({
     if (emblaApi) emblaApi.scrollNext();
   }, [emblaApi]);
 
-  // Filter deals that have ready, playable video streams
   const videoDeals = deals.filter(
     (d) => Boolean(d.video_url && typeof d.video_url === 'string' && d.video_url.startsWith('http') && d.video_status !== 'failed')
   );
 
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
-  const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [autoAdvance, setAutoAdvance] = useState<boolean>(true);
-  const [likes, setLikes] = useState<Record<string, number>>({});
-  const [hasLiked, setHasLiked] = useState<Record<string, boolean>>({});
-  const [showHeartAnim, setShowHeartAnim] = useState<boolean>(false);
-  const [touchStartY, setTouchStartY] = useState<number | null>(null);
+  const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [autoAdvance] = useState<boolean>(true);
+  const [showCopied, setShowCopied] = useState<boolean>(false);
 
-  // Sync externalActiveDeal from parent (e.g. clicking a deal card's short badge)
   useEffect(() => {
     if (externalActiveDeal) {
       const idx = videoDeals.findIndex(
         (d) => (d.id || (d as any).fp_hash) === (externalActiveDeal.id || (externalActiveDeal as any).fp_hash)
       );
-      if (idx !== -1) {
-        setCurrentIndex(idx);
-      } else {
-        // Fallback to first video if match not found in list
-        setCurrentIndex(0);
-      }
+      setCurrentIndex(idx !== -1 ? idx : 0);
       setIsPlaying(true);
     }
   }, [externalActiveDeal, videoDeals]);
 
   const activeDeal = currentIndex >= 0 && currentIndex < videoDeals.length ? videoDeals[currentIndex] : null;
 
-  const handleOpenShort = (deal: PublicDeal, index: number, e: React.MouseEvent) => {
+  const handleOpenShort = (index: number, e: React.MouseEvent) => {
     e.stopPropagation();
     setCurrentIndex(index);
     setIsPlaying(true);
@@ -81,21 +64,18 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({
     onCloseExternal?.();
   }, [onCloseExternal]);
 
-  // Navigate next short
   const handleNext = useCallback(() => {
     if (videoDeals.length === 0) return;
     setCurrentIndex((prev) => (prev + 1) % videoDeals.length);
     setIsPlaying(true);
   }, [videoDeals.length]);
 
-  // Navigate prev short
   const handlePrev = useCallback(() => {
     if (videoDeals.length === 0) return;
     setCurrentIndex((prev) => (prev - 1 + videoDeals.length) % videoDeals.length);
     setIsPlaying(true);
   }, [videoDeals.length]);
 
-  // Toggle Play / Pause
   const togglePlayPause = () => {
     if (!videoRef.current) return;
     if (videoRef.current.paused) {
@@ -107,311 +87,132 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({
     }
   };
 
-  // Trigger floating heart explosion on double tap or like button
-  const triggerLike = (dealId: string, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    setHasLiked((prev) => ({ ...prev, [dealId]: !prev[dealId] }));
-    setLikes((prev) => ({
-      ...prev,
-      [dealId]: (prev[dealId] || 42) + (hasLiked[dealId] ? -1 : 1),
-    }));
-
-    setShowHeartAnim(true);
-    setTimeout(() => setShowHeartAnim(false), 900);
-
-    // Confetti heart burst
-    confetti({
-      particleCount: 18,
-      spread: 60,
-      origin: { y: 0.65 },
-      colors: ['#f43f5e', '#ec4899', '#fb7185'],
-      shapes: ['circle'],
-    });
-  };
-
-  // Keyboard navigation for reels
   useEffect(() => {
     if (currentIndex === -1) return;
-
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowDown' || e.key === 'KeyS') {
-        e.preventDefault();
-        handleNext();
-      } else if (e.key === 'ArrowUp' || e.key === 'KeyW') {
-        e.preventDefault();
-        handlePrev();
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
-        handleClose();
-      } else if (e.key === ' ' || e.code === 'Space') {
-        e.preventDefault();
-        togglePlayPause();
-      } else if (e.key === 'm' || e.key === 'M') {
-        e.preventDefault();
-        setIsMuted((prev) => !prev);
-      }
+      if (e.key === 'ArrowDown' || e.key === 'KeyS') { e.preventDefault(); handleNext(); }
+      else if (e.key === 'ArrowUp' || e.key === 'KeyW') { e.preventDefault(); handlePrev(); }
+      else if (e.key === 'Escape') { e.preventDefault(); handleClose(); }
+      else if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); togglePlayPause(); }
+      else if (e.key === 'm' || e.key === 'M') { e.preventDefault(); setIsMuted((p) => !p); }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex, handleNext, handlePrev, handleClose]);
 
-  // Touch Swipe Gestures on Mobile
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStartY(e.touches[0].clientY);
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartY === null) return;
-    const touchEndY = e.changedTouches[0].clientY;
-    const diff = touchStartY - touchEndY;
-
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) {
-        // Swiped Up -> Next Short
-        handleNext();
-      } else {
-        // Swiped Down -> Prev Short
-        handlePrev();
-      }
-    }
-    setTouchStartY(null);
-  };
-
-  // Share Short Link
   const handleShare = async (deal: PublicDeal, e: React.MouseEvent) => {
     e.stopPropagation();
     const shareUrl = `${window.location.origin}?short=${deal.id}`;
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Loot Short: ${deal.title}`,
-          text: `Check out this 15s loot breakdown for ${deal.title} at ${deal.discount_pct}% OFF!`,
+          title: `Deal Video: ${deal.title}`,
           url: shareUrl,
         });
-      } catch {
-        // cancelled
-      }
+      } catch { /* ignore */ }
     } else {
-      navigator.clipboard.writeText(shareUrl);
-      alert('Link copied to clipboard!');
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        setShowCopied(true);
+        setTimeout(() => setShowCopied(false), 2000);
+      });
     }
   };
 
-  if (!videoDeals || videoDeals.length === 0) {
-    return null;
-  }
+  if (!videoDeals || videoDeals.length === 0) return null;
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-6">
-      {/* Section Header */}
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-2.5">
-          <span className="p-1.5 rounded-xl bg-gradient-to-tr from-indigo-500/20 via-purple-500/20 to-pink-500/20 text-indigo-400 border border-indigo-500/30 shadow-lg shadow-indigo-500/10 flex items-center justify-center">
-            <Film className="w-4 h-4 text-indigo-400 animate-pulse" />
-          </span>
-          <div>
-            <h2 className="text-xl sm:text-2xl font-black font-brand text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-100 to-indigo-300 tracking-tight flex items-center gap-2">
-              <span>Automated Viral Shorts</span>
-              <span className="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 hidden sm:inline">
-                9:16 Video Reels
-              </span>
-            </h2>
-          </div>
-          <span className="text-xs text-slate-400 hidden md:inline ml-1">
-            — 15s kinetic breakdowns with live verified prices
-          </span>
+    <section style={{ maxWidth: '1280px', margin: '0 auto', padding: '48px 16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+        <div>
+          <h2 style={{ fontSize: '20px', fontFamily: 'var(--font-heading)', color: '#F5F5F5', fontWeight: 600, letterSpacing: '-0.02em', margin: '0 0 4px' }}>
+            Video Shorts
+          </h2>
+          <p style={{ fontSize: '13px', color: '#6B6B6B', margin: 0, fontFamily: 'var(--font-body)' }}>
+            15-second deal breakdowns.
+          </p>
         </div>
-
-        {/* Carousel Navigation Buttons */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={scrollLeft}
-            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-colors cursor-pointer active:scale-95"
-            aria-label="Scroll left"
-          >
-            <ChevronLeft className="w-4 h-4" />
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button onClick={scrollLeft} aria-label="Previous" style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111', border: '1px solid #262626', color: '#A3A3A3', cursor: 'pointer' }}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </button>
-          <button
-            onClick={scrollRight}
-            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-colors cursor-pointer active:scale-95"
-            aria-label="Scroll right"
-          >
-            <ChevronRight className="w-4 h-4" />
+          <button onClick={scrollRight} aria-label="Next" style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111', border: '1px solid #262626', color: '#A3A3A3', cursor: 'pointer' }}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 12l5-5-5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </button>
         </div>
       </div>
 
-      {/* 9:16 Vertical Video Cards Carousel */}
-      <div className="overflow-hidden pb-4 pt-1" ref={emblaRef}>
-        <div className="flex gap-4 sm:gap-5">
+      <div ref={emblaRef} style={{ overflow: 'hidden' }}>
+        <div style={{ display: 'flex', gap: '16px' }}>
           {videoDeals.map((deal, idx) => {
             const poster = deal.video_cover || getCleanImageUrl(deal.image);
-            const rawDisc = deal.discount_pct || 0;
-            const disc = rawDisc >= 99 && (deal.mrp || 0) > 30000 && (deal.price || 0) < 3000
-              ? Math.round((1 - (deal.price || 0) / Math.max((deal.price || 0) * 3, 2000)) * 100)
-              : Math.min(95, rawDisc);
-
+            const disc = deal.discount_pct || 0;
             return (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: idx * 0.05, type: 'spring' }}
-                key={`short-${deal.id}-${idx}`}
-                onClick={(e) => handleOpenShort(deal, idx, e)}
-                className="group relative w-56 sm:w-64 flex-shrink-0 aspect-[9/16] rounded-3xl overflow-hidden glass-card border border-white/10 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl hover:shadow-indigo-500/20 flex flex-col bg-slate-950/80"
+              <div
+                key={deal.id}
+                onClick={(e) => handleOpenShort(idx, e)}
+                style={{
+                  position: 'relative', width: '200px', flexShrink: 0, aspectRatio: '9/16',
+                  backgroundColor: '#111', border: '1px solid #262626', borderRadius: '4px',
+                  overflow: 'hidden', cursor: 'pointer'
+                }}
               >
-              {/* Background Poster Image */}
-              <div className="absolute inset-0 w-full h-full bg-slate-900 overflow-hidden">
                 {poster ? (
-                  <img
-                    src={poster}
-                    alt={deal.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
+                  <img src={poster} alt={deal.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-indigo-950 to-slate-950 flex items-center justify-center text-4xl">
-                    🎬
-                  </div>
+                  <div style={{ width: '100%', height: '100%', background: '#1A1A1A' }} />
                 )}
 
-                {/* 4s Animated WebP Hover Sticker Preview if available */}
-                {deal.video_preview && (
-                  <img
-                    src={deal.video_preview}
-                    alt="Preview"
-                    className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                    loading="lazy"
-                  />
-                )}
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, #0A0A0A 0%, transparent 60%)' }} />
 
-                {/* Dark Vignette Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-black/60 pointer-events-none" />
-              </div>
-
-              {/* Top Bar: Store & Discount Pill */}
-              <div className="relative z-10 p-3.5 flex items-center justify-between pointer-events-none">
-                <span className="px-2.5 py-1 rounded-xl bg-black/60 backdrop-blur-md text-[11px] font-bold text-white border border-white/15 shadow-sm">
-                  {deal.store || 'Verified Store'}
-                </span>
-
-                {disc > 0 && (
-                  <span className="px-2 py-0.5 rounded-lg bg-rose-500/90 text-white text-[10px] font-black font-mono shadow-md backdrop-blur-md">
-                    -{disc}% OFF
+                <div style={{ position: 'absolute', top: '12px', left: '12px', right: '12px', display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ padding: '2px 6px', background: '#0A0A0A', border: '1px solid #262626', color: '#F5F5F5', fontSize: '10px', fontFamily: 'var(--font-mono)' }}>
+                    {deal.store || 'VERIFIED'}
                   </span>
-                )}
-              </div>
-
-              {/* Center Play Pill */}
-              <div className="relative z-10 flex-1 flex items-center justify-center pointer-events-none">
-                <div className="w-13 h-13 rounded-full bg-indigo-500/85 group-hover:bg-indigo-500 text-white flex items-center justify-center shadow-xl shadow-indigo-500/40 group-hover:scale-110 active:scale-95 transition-all duration-300">
-                  <Play className="w-6 h-6 fill-white translate-x-0.5" />
-                </div>
-              </div>
-
-              {/* Bottom Card Overlay: Price & CTA */}
-              <div className="relative z-10 p-3.5 pt-0 flex flex-col gap-2">
-                <div>
-                  <h3 className="text-xs font-bold text-white line-clamp-2 leading-snug drop-shadow-md">
-                    {deal.title}
-                  </h3>
-                  <div className="flex items-baseline gap-2 mt-1.5">
-                    <span className="text-base font-black font-mono text-emerald-400 drop-shadow">
-                      ₹{deal.price?.toLocaleString('en-IN')}
+                  {disc > 0 && (
+                    <span style={{ padding: '2px 6px', background: '#1A1200', border: '1px solid #452A00', color: '#F59E0B', fontSize: '10px', fontFamily: 'var(--font-mono)' }}>
+                      -{disc}%
                     </span>
-                    {deal.mrp && deal.mrp > (deal.price || 0) && (
-                      <span className="text-[11px] font-mono text-slate-400 line-through">
-                        ₹{deal.mrp?.toLocaleString('en-IN')}
-                      </span>
-                    )}
-                  </div>
+                  )}
                 </div>
 
-                {/* Direct Grab Deal Affiliate Link */}
-                <a
-                  href={deal.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 text-xs font-black flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/25 transition-all active:scale-95 cursor-pointer"
-                >
-                  <Sparkles className="w-3.5 h-3.5 fill-slate-950" />
-                  <span>Grab Loot Deal</span>
-                  <ExternalLink className="w-3 h-3 ml-0.5 opacity-80" />
-                </a>
+                <div style={{ position: 'absolute', bottom: '12px', left: '12px', right: '12px' }}>
+                  <span className="price-num" style={{ display: 'block', fontSize: '16px', fontWeight: 600, color: '#F5F5F5', marginBottom: '4px' }}>
+                    {'\u20B9'}{deal.price?.toLocaleString('en-IN')}
+                  </span>
+                  <p style={{ margin: 0, fontSize: '12px', color: '#A3A3A3', fontFamily: 'var(--font-body)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    {deal.title}
+                  </p>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
       </div>
 
-      {/* Fullscreen Vertical 9:16 TikTok/Reels Player Modal portaled to document.body */}
       {typeof document !== 'undefined' && activeDeal && createPortal(
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-6 bg-black/94 backdrop-blur-2xl animate-fade-in"
-          onClick={handleClose}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-        >
-          {/* Main Reel Viewport */}
-          <div
-            className="relative h-[92vh] max-h-[880px] aspect-[9/16] w-auto max-w-[440px] rounded-3xl overflow-hidden bg-black border border-white/20 shadow-2xl flex flex-col select-none"
-            onClick={(e) => e.stopPropagation()}
-            onDoubleClick={(e) => triggerLike(activeDeal.id, e)}
-          >
-            {/* Modal Top Bar */}
-            <div className="absolute top-0 inset-x-0 z-30 p-4 bg-gradient-to-b from-black/90 via-black/50 to-transparent flex items-center justify-between">
-              <div className="flex items-center gap-2 max-w-[70%]">
-                <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
-                  <Film className="w-2.5 h-2.5 animate-pulse" />
-                  <span>Reel {currentIndex + 1}/{videoDeals.length}</span>
-                </span>
-                <span className="text-xs font-bold text-white truncate drop-shadow">
-                  {activeDeal.title}
-                </span>
-              </div>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, backgroundColor: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          
+          {showCopied && (
+            <div style={{ position: 'fixed', top: '24px', left: '50%', transform: 'translateX(-50%)', zIndex: 10000, padding: '8px 16px', background: '#111', border: '1px solid #262626', color: '#F5F5F5', fontSize: '12px', fontFamily: 'var(--font-mono)' }}>
+              Link copied
+            </div>
+          )}
 
-              <div className="flex items-center gap-1.5">
-                {/* Sound Visualizer & Toggle */}
-                <button
-                  onClick={() => setIsMuted(!isMuted)}
-                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center gap-1"
-                  title={isMuted ? 'Unmute (M)' : 'Mute (M)'}
-                >
-                  {isMuted ? (
-                    <VolumeX className="w-4 h-4 text-rose-400" />
-                  ) : (
-                    <>
-                      <Volume2 className="w-4 h-4 text-emerald-400" />
-                      {/* Bouncing Equalizer Bars */}
-                      <span className="flex items-end gap-0.5 h-3 ml-0.5">
-                        <span className="w-0.5 bg-emerald-400 rounded-full animate-[bounce_0.8s_infinite_100ms] h-2" />
-                        <span className="w-0.5 bg-emerald-400 rounded-full animate-[bounce_0.6s_infinite_200ms] h-3" />
-                        <span className="w-0.5 bg-emerald-400 rounded-full animate-[bounce_0.7s_infinite_300ms] h-1.5" />
-                      </span>
-                    </>
-                  )}
+          <div style={{ position: 'relative', height: '100%', maxHeight: '92vh', aspectRatio: '9/16', backgroundColor: '#0A0A0A', border: '1px solid #262626', borderRadius: '4px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 30, padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(to bottom, rgba(0,0,0,0.8), transparent)' }}>
+              <span style={{ color: '#F5F5F5', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
+                {currentIndex + 1} / {videoDeals.length}
+              </span>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button onClick={() => setIsMuted(!isMuted)} style={{ background: 'none', border: 'none', color: '#F5F5F5', cursor: 'pointer' }}>
+                  {isMuted ? 'Unmute' : 'Mute'}
                 </button>
-
-                {/* Close Button */}
-                <button
-                  onClick={handleClose}
-                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
-                  title="Close short (Esc)"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                <button onClick={handleClose} style={{ background: 'none', border: 'none', color: '#F5F5F5', cursor: 'pointer' }}>Close</button>
               </div>
             </div>
 
-            {/* Video Player Frame */}
-            <div
-              className="flex-1 w-full h-full relative bg-black flex items-center justify-center cursor-pointer"
-              onClick={togglePlayPause}
-            >
-              {activeDeal.video_url ? (
+            <div style={{ flex: 1, backgroundColor: '#000', position: 'relative' }} onClick={togglePlayPause}>
+              {activeDeal.video_url && (
                 <video
                   ref={videoRef}
                   src={activeDeal.video_url}
@@ -420,120 +221,39 @@ export const ViralShortsSection: React.FC<ViralShortsSectionProps> = ({
                   playsInline
                   loop={!autoAdvance}
                   muted={isMuted}
-                  onEnded={() => {
-                    if (autoAdvance) handleNext();
-                  }}
-                  className="w-full h-full object-contain"
+                  onEnded={() => { if (autoAdvance) handleNext(); }}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 />
-              ) : (
-                <div className="text-center p-6 text-slate-400 text-xs">
-                  Video short is rendering or streaming link unavailable.
-                </div>
               )}
-
-              {/* Centered Pause Overlay Icon */}
               {!isPlaying && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/35 pointer-events-none">
-                  <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 shadow-2xl">
-                    <Play className="w-8 h-8 fill-white translate-x-1" />
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+                  <div style={{ width: '64px', height: '64px', background: 'rgba(0,0,0,0.5)', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg width="24" height="24" fill="#F5F5F5"><path d="M8 5v14l11-7z"/></svg>
                   </div>
                 </div>
               )}
-
-              {/* Floating Double-Tap Heart Animation */}
-              {showHeartAnim && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-40 animate-ping">
-                  <Heart className="w-24 h-24 fill-rose-500 text-rose-500 drop-shadow-2xl" />
-                </div>
-              )}
             </div>
 
-            {/* Right TikTok-Style Action Dock */}
-            <div className="absolute right-3 bottom-24 z-30 flex flex-col items-center gap-4">
-              {/* Like / Heart Action */}
-              <button
-                onClick={(e) => triggerLike(activeDeal.id, e)}
-                className="flex flex-col items-center gap-1 group cursor-pointer"
-                title="Double-tap or click to like"
-              >
-                <div
-                  className={`w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-md border transition-all ${
-                    hasLiked[activeDeal.id]
-                      ? 'bg-rose-500 border-rose-400 text-white scale-110 shadow-lg shadow-rose-500/50'
-                      : 'bg-black/60 border-white/20 text-white group-hover:bg-rose-500/30'
-                  }`}
-                >
-                  <Heart
-                    className={`w-5 h-5 ${hasLiked[activeDeal.id] ? 'fill-white text-white' : 'text-white'}`}
-                  />
-                </div>
-                <span className="text-[11px] font-mono font-bold text-white drop-shadow">
-                  {likes[activeDeal.id] || 42}
-                </span>
-              </button>
-
-              {/* Share Button */}
-              <button
-                onClick={(e) => handleShare(activeDeal, e)}
-                className="flex flex-col items-center gap-1 group cursor-pointer"
-                title="Share Reel link"
-              >
-                <div className="w-11 h-11 rounded-full bg-black/60 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all hover:scale-110 active:scale-90">
-                  <Share2 className="w-5 h-5" />
-                </div>
-                <span className="text-[11px] font-mono font-bold text-white drop-shadow">
-                  Share
-                </span>
+            <div style={{ position: 'absolute', bottom: '80px', right: '16px', zIndex: 30, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <button onClick={(e) => handleShare(activeDeal, e)} style={{ width: '40px', height: '40px', background: '#111', border: '1px solid #262626', color: '#F5F5F5', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 12v8h16v-8M12 4v12M8 8l4-4 4 4"/></svg>
               </button>
             </div>
 
-            {/* Bottom Deal Metadata & One-Click Grab Banner */}
-            <div className="absolute bottom-0 inset-x-0 z-30 p-3 sm:p-4 bg-gradient-to-t from-black via-black/85 to-transparent flex items-center justify-between gap-3 border-t border-white/10 backdrop-blur-sm">
-              <div className="flex-1 min-w-0 pr-2">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span className="px-2 py-0.5 rounded-md bg-white/15 text-[10px] font-black uppercase tracking-wider text-indigo-300">
-                    {activeDeal.store || 'VERIFIED'}
-                  </span>
-                  {activeDeal.discount_pct && (
-                    <span className="px-1.5 py-0.5 rounded-md bg-rose-500 text-white text-[10px] font-black font-mono">
-                      -{Math.min(95, activeDeal.discount_pct)}%
-                    </span>
-                  )}
-                </div>
-                <h3 className="text-xs font-bold text-white truncate drop-shadow">
-                  {activeDeal.title}
-                </h3>
-              </div>
-
-              {/* Direct Grab Link */}
-              <a
-                href={activeDeal.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="shrink-0 py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 text-xs font-black flex items-center gap-1.5 shadow-lg shadow-emerald-500/30 transition-all active:scale-95 cursor-pointer"
-              >
-                <Sparkles className="w-3.5 h-3.5 fill-slate-950" />
-                <span>Claim ₹{activeDeal.price?.toLocaleString('en-IN')}</span>
-                <ExternalLink className="w-3 h-3 ml-0.5" />
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '16px', zIndex: 30, background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }}>
+              <h3 style={{ fontSize: '13px', color: '#F5F5F5', margin: '0 0 8px', fontFamily: 'var(--font-body)' }}>{activeDeal.title}</h3>
+              <a href={activeDeal.url} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', padding: '12px', background: '#F5F5F5', color: '#0A0A0A', textDecoration: 'none', fontSize: '13px', fontWeight: 600, fontFamily: 'var(--font-body)' }}>
+                Claim {'\u20B9'}{activeDeal.price?.toLocaleString('en-IN')}
               </a>
             </div>
           </div>
-
-          {/* Desktop Floating Next / Prev Navigation Buttons */}
-          <div className="hidden sm:flex flex-col gap-3 ml-4 z-50">
-            <button
-              onClick={handlePrev}
-              className="p-3.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-white/15 shadow-xl transition-all hover:scale-110 active:scale-90 cursor-pointer"
-              title="Previous Reel (Up Arrow / W)"
-            >
-              <ChevronUp className="w-6 h-6" />
+          
+          <div style={{ position: 'absolute', right: '40px', flexDirection: 'column', gap: '16px', display: window.innerWidth > 768 ? 'flex' : 'none' }}>
+            <button onClick={handlePrev} style={{ width: '48px', height: '48px', background: '#111', border: '1px solid #262626', color: '#F5F5F5', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ↑
             </button>
-            <button
-              onClick={handleNext}
-              className="p-3.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-white/15 shadow-xl transition-all hover:scale-110 active:scale-90 cursor-pointer"
-              title="Next Reel (Down Arrow / S)"
-            >
-              <ChevronDown className="w-6 h-6" />
+            <button onClick={handleNext} style={{ width: '48px', height: '48px', background: '#111', border: '1px solid #262626', color: '#F5F5F5', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ↓
             </button>
           </div>
         </div>,

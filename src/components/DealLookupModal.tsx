@@ -1,665 +1,132 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, ArrowRight, ExternalLink, ShieldCheck, RefreshCw, X, Link as LinkIcon, AlertTriangle, TrendingDown } from 'lucide-react';
-import confetti from 'canvas-confetti';
-import { LookupResult } from '../types';
-import { getCleanImageUrl } from '../utils/imageUrl';
 
-interface DealLookupProps {
-  isOpen?: boolean;
+interface DealLookupModalProps {
   initialUrl?: string;
+  isOpen?: boolean;
   onClose?: () => void;
   isModal?: boolean;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
-
-export const DealLookupModal: React.FC<DealLookupProps> = ({
-  isOpen = true,
+export const DealLookupModal: React.FC<DealLookupModalProps> = ({
   initialUrl = '',
+  isOpen = true,
   onClose,
-  isModal = true,
 }) => {
   const [url, setUrl] = useState(initialUrl);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<LookupResult | null>(null);
-  const [resultImgError, setResultImgError] = useState(false);
+  const [result, setResult] = useState<any | null>(null);
 
   useEffect(() => {
     if (initialUrl) {
-      setUrl(initialUrl);
       handleLookup(initialUrl);
     }
   }, [initialUrl]);
 
-  // Handle Escape key to close modal
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && onClose) {
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
-
-  if (isOpen === false) return null;
-
-  const sampleUrls = [
-    { label: 'Cricket Helmet (₹206)', url: 'https://www.amazon.in/dp/B09NQ5ZV2K' },
-    { label: 'Maybelline Lip Tint (₹372)', url: 'https://www.amazon.in/dp/B0D9WCCRMF' },
-    { label: 'SARIYA Midi Dress (₹569)', url: 'https://www.amazon.in/dp/B0DGX9N4LX' },
-    { label: 'Rosegold Spoon Set (₹499)', url: 'https://www.amazon.in/dp/B0CYH7F974' },
-  ];
-
   const handleLookup = async (inputUrl: string) => {
     const targetUrl = (inputUrl || url).trim();
-    if (!targetUrl) {
-      setError('Please paste a product URL from Amazon, Flipkart, Myntra, Swiggy or Ajio.');
-      return;
-    }
-    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
-      setError('Please enter a valid link starting with https://');
-      return;
-    }
+    if (!targetUrl) return;
 
     setLoading(true);
     setError(null);
     setResult(null);
-    setResultImgError(false);
 
     try {
-      const res = await fetch(`${API_BASE}/api/v1/deals/lookup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: targetUrl }),
-      });
-
-      if (!res.ok) {
-        throw new Error('Could not parse product details. Please check the URL and try again.');
-      }
-
+      const res = await fetch(`https://api.rudranil.me/api/v1/deals/analyze-url?url=${encodeURIComponent(targetUrl)}`);
       const data = await res.json();
-      if (!data.success) {
-        throw new Error(data.error || 'Product lookup service temporarily unavailable.');
+      
+      if (!res.ok || data.status === 'error') {
+        throw new Error(data.message || 'Verification failed. This might not be a supported product link.');
       }
-
-      const salePrice = data.price || 0;
-      const regularPrice = data.regular_price || data.displayRegularPrice || null;
-      const mrpPrice = data.mrp || null;
-      const discount = data.discount_pct || 0;
-
-      const storeName = data.store || (() => {
-        const u = targetUrl.toLowerCase();
-        if (u.includes('amazon')) return 'Amazon India';
-        if (u.includes('flipkart') || u.includes('fkrt')) return 'Flipkart';
-        if (u.includes('myntra') || u.includes('myntr')) return 'Myntra';
-        if (u.includes('ajio')) return 'AJIO';
-        if (u.includes('swiggy')) return 'Swiggy Instamart';
-        return 'Online Store';
-      })();
-
-      const cleanImg = getCleanImageUrl(data.image || data.store_img_url || data.img_url || '');
-      const inStock = data.in_stock !== false && Boolean(salePrice && salePrice > 0);
-
-      setResult({
-        title: data.title || 'Verified Product Drop',
-        price: salePrice,
-        regular_price: regularPrice,
-        mrp: mrpPrice,
-        discount_pct: discount > 0 ? discount : null,
-        image: cleanImg,
-        url: data.aff_url || data.url || targetUrl,
-        store: storeName,
-        usually_price: regularPrice && regularPrice > salePrice ? regularPrice : null,
-        worth_score: !inStock ? 60 : (data.worth_score || (data.is_lowest_price ? 92 : (discount >= 40 ? 86 : 75))),
-        worth_label: !inStock ? 'Out of Stock' : (data.worth_label || (data.is_lowest_price ? 'All-Time Low' : (discount >= 40 ? 'Steal Deal' : 'Good Offer'))),
-        is_verified_deal: inStock,
-        in_stock: inStock,
-        is_lowest_price: Boolean(data.is_lowest_price && inStock),
-        lowest_price: data.lowest_price,
-        history: data.history || [],
-        stock_text: inStock ? data.stock_text : 'Currently unavailable on merchant store',
-        savings: inStock && regularPrice && regularPrice > salePrice ? regularPrice - salePrice : (inStock && mrpPrice && mrpPrice > salePrice ? mrpPrice - salePrice : null),
-        verdict: !inStock
-          ? `⚠️ Currently Unavailable: This item is out of stock or unavailable from the primary seller on ${storeName}. 90-day price history is preserved above for your reference.`
-          : (data.verdict || (data.is_lowest_price
-            ? `🔥 All-Time Lowest Price: Current price of ₹${salePrice.toLocaleString('en-IN')} is the lowest recorded in 90 days (Usually sells for ₹${regularPrice?.toLocaleString('en-IN')}).`
-            : `Verified Price Drop: Current price of ₹${salePrice.toLocaleString('en-IN')} is ${discount}% lower than typical retail benchmarks.`)),
-      });
-
-      if (inStock && (discount >= 35 || salePrice > 0)) {
-        try {
-          confetti({
-            particleCount: 38,
-            spread: 60,
-            origin: { y: 0.55 },
-            colors: ['#10B981', '#F59E0B', '#34D399', '#38BDF8', '#FBBF24'],
-            disableForReducedMotion: true,
-            zIndex: 99999,
-          });
-        } catch {}
-      }
-    } catch (err: any) {
-      console.error('Lookup error:', err);
-      setError(err.message || 'Product lookup service temporarily unavailable.');
+      setResult(data);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Analysis failed.');
     } finally {
       setLoading(false);
     }
   };
 
-  const getDisplayHistory = (res: LookupResult): Array<[number, number]> => {
-    if (res.history && res.history.length > 1) {
-      return res.history;
-    }
-    return [];
-  };
-
-  const renderPriceHistoryChart = (history: Array<[number, number]>, currentPrice: number) => {
-    if (!history || history.length < 2) return null;
-    const sorted = [...history].sort((a, b) => a[0] - b[0]);
-    const prices = sorted.map((p) => p[1]);
-    const validCurrent = currentPrice && currentPrice > 0 ? [currentPrice] : [];
-    const minP = Math.min(...prices, ...validCurrent);
-    const maxP = Math.max(...prices, ...validCurrent);
-    const range = maxP - minP || 1;
-
-    const width = 460;
-    const height = 90;
-    const padX = 14;
-    const padY = 12;
-    const chartW = width - padX * 2;
-    const chartH = height - padY * 2;
-
-    const points = sorted.map((p, i) => {
-      const x = padX + (i / (sorted.length - 1)) * chartW;
-      const y = padY + chartH - ((p[1] - minP) / range) * chartH;
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    });
-
-    const pathD = `M ${points.join(' L ')}`;
-    const areaD = `${pathD} L ${width - padX},${height - 4} L ${padX},${height - 4} Z`;
-
-    const lastPoint = points[points.length - 1].split(',');
-    const lastX = Number(lastPoint[0]);
-    const lastY = Number(lastPoint[1]);
-
-    const startDate = new Date(sorted[0][0] > 1e11 ? sorted[0][0] : sorted[0][0] * 1000);
-    const endDate = new Date(sorted[sorted.length - 1][0] > 1e11 ? sorted[sorted.length - 1][0] : sorted[sorted.length - 1][0] * 1000);
-    const formatDate = (d: Date) => {
-      if (isNaN(d.getTime())) return '';
-      return d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
-    };
-
-    return (
-      <div className="w-full">
-        <div className="flex justify-between items-center text-[10.5px] text-slate-400 font-mono mb-1.5 px-0.5">
-          <span className="text-slate-400">Peak: <strong className="text-slate-200">₹{maxP.toLocaleString('en-IN')}</strong></span>
-          <span className="text-emerald-400">All-Time Low: <strong className="text-emerald-300">₹{minP.toLocaleString('en-IN')}</strong></span>
-        </div>
-        <div className="w-full h-22 relative">
-          <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full overflow-visible">
-            <defs>
-              <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#10B981" stopOpacity="0.35" />
-                <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
-              </linearGradient>
-            </defs>
-            <line x1={padX} y1={padY} x2={width - padX} y2={padY} stroke="rgba(255,255,255,0.08)" strokeDasharray="3 3" />
-            <line x1={padX} y1={height - padY} x2={width - padX} y2={height - padY} stroke="rgba(16,185,129,0.2)" strokeDasharray="3 3" />
-            <path d={areaD} fill="url(#priceGradient)" />
-            <path d={pathD} fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-            <circle cx={lastX} cy={lastY} r="6" fill="#10B981" opacity="0.3" className="animate-ping" />
-            <circle cx={lastX} cy={lastY} r="3.5" fill="#34D399" stroke="#0E1424" strokeWidth="1.5" />
-          </svg>
-        </div>
-        <div className="flex justify-between items-center text-[10px] text-slate-400 font-mono mt-1 px-1">
-          <span>{formatDate(startDate) || '90 days ago'}</span>
-          <span className="text-emerald-400/90 font-medium flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-            100% Authentic Marketplace Crawl Log
-          </span>
-          <span>{formatDate(endDate) || 'Today'}</span>
-        </div>
-      </div>
-    );
-  };
-
-  const content = (
-    <div className="w-full max-w-3xl mx-auto">
-      {/* Header Banner */}
-      <div className="text-center mb-6 sm:mb-8">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-xs font-bold text-emerald-400 mb-3">
-          <Sparkles className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-          <span>DealFlow Price Sanity Checker</span>
-        </div>
-        <h2 id="lookup-modal-title" className="text-2xl sm:text-4xl font-bold font-brand text-white tracking-tight mb-2">
-          Paste Any Product Link
-        </h2>
-        <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto leading-relaxed">
-          Instantly verify whether an Amazon, Flipkart, or Myntra discount is genuine, or if the retailer marked up the MRP to artificially boost the discount percentage.
-        </p>
-      </div>
-
-      {/* Input Box */}
-      <form onSubmit={(e) => { e.preventDefault(); handleLookup(url); }} className="relative mb-4" role="search">
-        <div className="flex items-center rounded-2xl bg-[#111827] border border-white/15 focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/30 p-1.5 shadow-2xl transition-all">
-          <div className="pl-3.5 text-slate-400">
-            <LinkIcon className="w-5 h-5 shrink-0" aria-hidden="true" />
-          </div>
-          <input
-            type="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="Paste product link (e.g. https://www.amazon.in/dp/...)"
-            className="w-full bg-transparent px-3 py-3 text-sm text-white placeholder-slate-400 focus:outline-none"
-            aria-label="Product URL to check"
-            autoFocus
-          />
-          <button
-            type="submit"
-            disabled={loading || !url.trim()}
-            className="min-h-[44px] px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black font-bold text-xs sm:text-sm tracking-tight flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shrink-0 cursor-pointer focus-ring"
-            aria-label="Submit URL to check price"
-          >
-            {loading ? (
-              <>
-                <RefreshCw className="w-4 h-4 animate-spin shrink-0" aria-hidden="true" />
-                <span>Checking...</span>
-              </>
-            ) : (
-              <>
-                <span>Check Price</span>
-                <ArrowRight className="w-4 h-4 shrink-0" aria-hidden="true" />
-              </>
-            )}
-          </button>
-        </div>
-      </form>
-
-      {/* Quick Example Chips */}
-      <div className="flex items-center gap-2 flex-wrap justify-center mb-8 text-xs text-slate-400">
-        <span>Try an example:</span>
-        {sampleUrls.map((s) => (
-          <button
-            key={s.label}
-            type="button"
-            onClick={() => {
-              setUrl(s.url);
-              handleLookup(s.url);
-            }}
-            className="min-h-[32px] px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 hover:border-emerald-500/40 transition-colors cursor-pointer text-xs focus-ring"
-          >
-            {s.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Error Notice */}
-      {error && (
-        <div className="p-4 rounded-2xl border border-red-500/30 bg-red-950/30 text-red-300 text-xs flex items-center gap-3 mb-6" role="alert">
-          <AlertTriangle className="w-5 h-5 shrink-0 text-red-400" aria-hidden="true" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {/* Loading Cyberpunk Laser Scanner State (Zero Layout Shift) */}
-      {loading && (
-        <div 
-          className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-[#0E1424] p-6 sm:p-7 shadow-2xl shadow-emerald-500/10 space-y-5" 
-          aria-busy="true"
-        >
-          {/* Animated Neon Laser Scan Beam */}
-          <div 
-            className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_18px_#10B981] animate-laser z-20 pointer-events-none" 
-            aria-hidden="true"
-          />
-
-          <div className="flex justify-between items-center pb-3 border-b border-white/10">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="radar-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
-              </span>
-              <span className="text-xs font-mono font-bold text-emerald-400 tracking-wider">
-                DEALFLOW AUDIT SCANNER RUNNING...
-              </span>
-            </div>
-            <span className="text-[11px] font-mono text-slate-400">Step 2/3: Price Graph</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-            <div className="md:col-span-4 aspect-square bg-[#151E34] rounded-2xl flex flex-col items-center justify-center p-4 border border-white/5 relative overflow-hidden">
-              <RefreshCw className="w-8 h-8 text-emerald-400 animate-spin mb-2" />
-              <span className="text-[11px] font-mono text-slate-400 text-center">Unshortening URL & scraping OpenGraph...</span>
-            </div>
-            <div className="md:col-span-8 space-y-3.5">
-              <div className="h-5 w-3/4 bg-slate-700/60 rounded-lg animate-pulse" />
-              <div className="h-9 w-1/3 bg-slate-700/60 rounded-xl animate-pulse" />
-              <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-xs font-mono text-emerald-300/80 space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-emerald-400">✓</span> Checking merchant inflated MRP vs 90-day retail average
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-emerald-400">✓</span> Verifying instant affiliate coupon applicability
-                </div>
-              </div>
-              <div className="h-11 w-52 bg-slate-700/60 rounded-xl animate-pulse" />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Result Card with Holographic Ambient Border */}
-      {result && (
-        <div className="relative p-[1.5px] rounded-3xl holographic-border shadow-2xl shadow-emerald-500/20 transition-all">
-          <div className="rounded-[23px] bg-[#0E1424] p-5 sm:p-7">
-            
-            {/* Header Badge */}
-            <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <span className="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-black">
-                  {result.store}
-                </span>
-                <span className="text-xs text-slate-400 font-medium hidden sm:inline">
-                  Live Engine Verification
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-black border border-emerald-500/30 shadow-xs">
-                <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" aria-hidden="true" />
-                <span>{result.worth_label} ({result.worth_score}/100)</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-              
-              {/* Product Photo with Aspect Ratio Lock */}
-              {result.image && !resultImgError ? (
-                <div className="md:col-span-4 aspect-square rounded-2xl bg-white p-4 flex items-center justify-center overflow-hidden shadow-inner group relative">
-                  <img
-                    src={result.image}
-                    alt={result.title}
-                    onError={() => setResultImgError(true)}
-                    className="max-h-full max-w-full object-contain filter drop-shadow transition-transform duration-300 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  {result.discount_pct && result.discount_pct >= 50 && (
-                    <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-amber-500 text-black text-[10px] font-black uppercase tracking-tight shadow-md">
-                      🔥 Steal Deal
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="md:col-span-4 aspect-square rounded-2xl bg-slate-900 border border-slate-800 p-4 flex flex-col items-center justify-center gap-2 text-center shadow-inner">
-                  <ShieldCheck className="w-12 h-12 text-emerald-400" aria-hidden="true" />
-                  <span className="text-xs font-bold text-slate-300">Verified {result.store} Item</span>
-                </div>
-              )}
-
-              {/* Product Pricing & Analysis */}
-              <div className={result.image ? 'md:col-span-8 flex flex-col justify-between' : 'md:col-span-12'}>
-                <h3 className="font-bold text-white text-base sm:text-lg line-clamp-2 mb-3 leading-snug font-brand">
-                  {result.title}
-                </h3>
-
-                {/* Price Row with High-Impact Typography */}
-                {!result.in_stock || !result.price ? (
-                  <div className="flex items-center gap-3 flex-wrap mb-3">
-                    <span className="px-3.5 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 font-bold text-sm border border-rose-500/30 flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
-                      Currently Unavailable
-                    </span>
-                    {(result.regular_price || result.usually_price) && (
-                      <span className="text-xs text-slate-400">
-                        Typical Price: <strong className="text-slate-300 font-mono">₹{(result.regular_price || result.usually_price)?.toLocaleString('en-IN')}</strong>
-                      </span>
-                    )}
-                    {result.lowest_price && (
-                      <span className="text-xs text-emerald-400/90 font-mono">
-                        90D Low: ₹{result.lowest_price.toLocaleString('en-IN')}
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex items-baseline gap-3 flex-wrap mb-3">
-                    <span className="text-3xl sm:text-4xl font-price font-black text-emerald-400 tracking-tight">
-                      ₹{result.price.toLocaleString('en-IN')}
-                    </span>
-
-                    {result.usually_price && result.usually_price > result.price && (
-                      <span className="text-xs text-slate-400">
-                        Regular: <strong className="text-slate-300 line-through font-mono">₹{result.usually_price.toLocaleString('en-IN')}</strong>
-                      </span>
-                    )}
-
-                    {result.mrp && result.mrp > result.price && (
-                      <span className="text-xs text-slate-500 line-through font-mono">
-                        MRP ₹{result.mrp.toLocaleString('en-IN')}
-                      </span>
-                    )}
-
-                    {result.discount_pct && (
-                      <span className="px-2.5 py-1 rounded-lg bg-orange-500/20 text-orange-400 font-black text-xs border border-orange-500/30">
-                        {result.discount_pct}% OFF
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                {/* All-time lowest badge */}
-                {result.is_lowest_price && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gradient-to-r from-rose-500/25 to-amber-500/25 border border-rose-500/40 text-amber-300 text-xs font-black shadow-lg shadow-rose-500/10 mb-2 w-fit">
-                    <span className="animate-pulse">🔥</span>
-                    <span>ALL-TIME LOWEST PRICE IN 90 DAYS</span>
-                  </div>
-                )}
-
-                {/* Instant Savings Badge & Stock Indicator */}
-                <div className="flex items-center gap-2 flex-wrap mb-3">
-                  {result.savings && result.savings > 0 && (
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-black">
-                      <span>💰 Instant Savings: ₹{result.savings.toLocaleString('en-IN')}</span>
-                    </div>
-                  )}
-                  {result.stock_text && (
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-semibold">
-                      <span>📦 {result.stock_text}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* 90-Day Real Price History Chart or Authentic Spot Price Intelligence */}
-                {(() => {
-                  const hist = getDisplayHistory(result);
-                  if (hist.length >= 2) {
-                    const lowestP = result.lowest_price || Math.min(...hist.map((h) => h[1]), result.price);
-                    const regP = result.regular_price || result.usually_price;
-                    return (
-                      <div className="mb-4 p-3.5 rounded-2xl bg-black/40 border border-white/10 backdrop-blur-md">
-                        <div className="flex items-center justify-between text-xs mb-2">
-                          <span className="font-bold text-slate-200 flex items-center gap-1.5">
-                            <TrendingDown className="w-3.5 h-3.5 text-emerald-400" />
-                            90-Day Real Price History
-                          </span>
-                          <div className="flex items-center gap-2.5 text-[11px] font-mono">
-                            {lowestP && (
-                              <span className="text-emerald-400 font-bold">Low: ₹{lowestP.toLocaleString('en-IN')}</span>
-                            )}
-                            {regP && (
-                              <span className="text-slate-400">Regular: ₹{regP.toLocaleString('en-IN')}</span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="w-full relative">
-                          {renderPriceHistoryChart(hist, result.price)}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  // Transparent, genuine spot price telemetry without fake sine-wave mockups
-                  return (
-                    <div className="mb-4 p-3.5 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-slate-900/60 to-teal-500/10 border border-emerald-500/20 backdrop-blur-md">
-                      <div className="flex items-center justify-between text-xs mb-2">
-                        <span className="font-bold text-emerald-300 flex items-center gap-1.5">
-                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                          Authentic Spot Price Intelligence
-                        </span>
-                        <span className="text-[10.5px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-                          Live Verified
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center font-mono">
-                        <div className="p-2 rounded-xl bg-white/[0.04] border border-white/5">
-                          <div className="text-[10px] text-slate-400">Live Checkout</div>
-                          <div className="text-sm font-bold text-emerald-400">₹{result.price.toLocaleString('en-IN')}</div>
-                        </div>
-                        <div className="p-2 rounded-xl bg-white/[0.04] border border-white/5">
-                          <div className="text-[10px] text-slate-400">Merchant List</div>
-                          <div className="text-sm font-bold text-slate-300">₹{(result.usually_price || result.mrp || Math.round(result.price * 1.25)).toLocaleString('en-IN')}</div>
-                        </div>
-                        <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 col-span-2 sm:col-span-1">
-                          <div className="text-[10px] text-emerald-300">Direct Savings</div>
-                          <div className="text-sm font-bold text-emerald-400">
-                            {result.discount_pct ? `${result.discount_pct}% OFF` : `₹${(result.savings || 0).toLocaleString('en-IN')}`}
-                          </div>
-                        </div>
-                      </div>
-                      <p className="text-[11px] text-slate-400 mt-2.5 flex items-center gap-1.5 font-sans">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                        <span>Continuous 24/7 price drop surveillance active across 27 deal channels.</span>
-                      </p>
-                    </div>
-                  );
-                })()}
-
-                {/* Verified Verdict */}
-                <p className="text-xs text-emerald-300 bg-emerald-500/10 p-3.5 rounded-2xl border border-emerald-500/20 mb-2 leading-relaxed">
-                  {result.verdict}
-                </p>
-              </div>
-            </div>
-
-            {/* Dedicated High-Impact "Check out on Store" Section */}
-            {(() => {
-              const s = (result.store || '').toLowerCase();
-              const isAmz = s.includes('amazon');
-              const isFk = s.includes('flipkart');
-              const isMyntra = s.includes('myntra');
-
-              const theme = isAmz ? {
-                name: 'Amazon',
-                icon: '📦',
-                sectionBg: 'from-amber-500/15 via-orange-500/10 to-amber-500/5 border-amber-500/30 shadow-amber-500/10',
-                avatarBg: 'bg-amber-500/20 border-amber-500/40 text-amber-300',
-                btnGrad: 'from-amber-400 via-orange-400 to-amber-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 shadow-amber-500/35 hover:shadow-amber-500/50',
-                actionTitle: 'Check out on Amazon',
-                btnLabel: 'Go to Amazon',
-              } : isFk ? {
-                name: 'Flipkart',
-                icon: '🛍️',
-                sectionBg: 'from-blue-500/15 via-sky-500/10 to-blue-500/5 border-blue-500/30 shadow-blue-500/10',
-                avatarBg: 'bg-blue-500/20 border-blue-500/40 text-blue-300',
-                btnGrad: 'from-blue-500 via-sky-500 to-blue-600 hover:from-blue-400 hover:to-sky-400 text-white shadow-blue-500/35 hover:shadow-blue-500/50',
-                actionTitle: 'Check out on Flipkart',
-                btnLabel: 'Go to Flipkart',
-              } : isMyntra ? {
-                name: 'Myntra',
-                icon: '👗',
-                sectionBg: 'from-pink-500/15 via-rose-500/10 to-pink-500/5 border-pink-500/30 shadow-pink-500/10',
-                avatarBg: 'bg-pink-500/20 border-pink-500/40 text-pink-300',
-                btnGrad: 'from-pink-500 via-rose-500 to-pink-600 hover:from-pink-400 hover:to-rose-400 text-white shadow-pink-500/35 hover:shadow-pink-500/50',
-                actionTitle: 'Check out on Myntra',
-                btnLabel: 'Go to Myntra',
-              } : {
-                name: result.store,
-                icon: '🏷️',
-                sectionBg: 'from-emerald-500/15 via-teal-500/10 to-emerald-500/5 border-emerald-500/30 shadow-emerald-500/10',
-                avatarBg: 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300',
-                btnGrad: 'from-emerald-400 via-teal-400 to-emerald-500 hover:from-emerald-300 hover:to-emerald-400 text-slate-950 shadow-emerald-500/35 hover:shadow-emerald-500/50',
-                actionTitle: `Check out on ${result.store}`,
-                btnLabel: `Go to ${result.store}`,
-              };
-
-              return (
-                <div className={`mt-5 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-r ${theme.sectionBg} p-4 sm:p-5 rounded-2xl border shadow-xl`}>
-                  <div className="flex items-center gap-3.5 w-full sm:w-auto">
-                    <div className={`w-12 h-12 rounded-2xl ${theme.avatarBg} border flex items-center justify-center shrink-0 text-xl shadow-inner`}>
-                      {theme.icon}
-                    </div>
-                    <div className="text-left">
-                      <div className="flex items-center gap-2">
-                        <span className="text-base sm:text-lg font-black text-white tracking-tight">{theme.actionTitle}</span>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${result.in_stock ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}`}>
-                          {result.in_stock ? 'In Stock' : 'Restock Check'}
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-400 flex items-center gap-2 flex-wrap mt-0.5">
-                        <span>Verified Store Price:</span>
-                        <span className="text-emerald-400 font-mono font-black text-sm">₹{result.price?.toLocaleString('en-IN')}</span>
-                        {result.usually_price && result.usually_price > (result.price || 0) && (
-                          <span className="text-slate-500 line-through font-mono text-xs">₹{result.usually_price?.toLocaleString('en-IN')}</span>
-                        )}
-                        {result.savings && result.savings > 0 && (
-                          <span className="text-amber-300 font-bold text-[11px] bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
-                            Save ₹{result.savings.toLocaleString('en-IN')}
-                          </span>
-                        )}
-                        <span className="text-slate-600 hidden sm:inline">•</span>
-                        <span className="text-slate-400 text-[11px] hidden sm:inline">Direct Merchant Checkout</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="w-full sm:w-auto flex items-center gap-2.5 shrink-0">
-                    <a
-                      href={result.url}
-                      target="_blank"
-                      rel="noopener noreferrer sponsored"
-                      className={`relative overflow-hidden w-full sm:w-auto min-h-[50px] px-8 py-3.5 rounded-2xl bg-gradient-to-r ${theme.btnGrad} font-black text-sm tracking-tight flex items-center justify-center gap-2.5 shadow-xl transition-all duration-200 active:scale-95 cursor-pointer focus-ring group shrink-0`}
-                      aria-label={`${theme.actionTitle} for ₹${result.price?.toLocaleString('en-IN')}`}
-                    >
-                      <div className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12 animate-beam-sweep pointer-events-none" />
-                      <span>{result.in_stock ? theme.btnLabel : `Check on ${theme.name}`}</span>
-                      <ArrowRight className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-1" aria-hidden="true" />
-                    </a>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
-  if (isModal) {
-    return (
-      <div 
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-200"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="lookup-modal-title"
-      >
-        <div className="relative w-full max-w-3xl rounded-3xl border border-white/10 bg-[#0B0F19] p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl">
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="touch-target min-h-[44px] min-w-[44px] absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer focus-ring"
-              aria-label="Close modal (Escape)"
-            >
-              <X className="w-5 h-5" aria-hidden="true" />
-            </button>
-          )}
-          {content}
-        </div>
-      </div>
-    );
-  }
+  if (!isOpen) return null;
 
   return (
-    <div className="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {content}
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.8)'
+    }} onClick={onClose}>
+      <div 
+        style={{
+          width: '100%', maxWidth: '640px', backgroundColor: '#111111', border: '1px solid #262626',
+          borderRadius: '4px', overflow: 'hidden', display: 'flex', flexDirection: 'column'
+        }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', borderBottom: '1px solid #1E1E1E', backgroundColor: '#161616' }}>
+          <h2 style={{ margin: 0, fontSize: '16px', fontFamily: 'var(--font-heading)', color: '#F5F5F5' }}>Link Lookup</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#6B6B6B', cursor: 'pointer' }}>Close</button>
+        </div>
+
+        <div style={{ padding: '24px' }}>
+          <form 
+            onSubmit={(e) => { e.preventDefault(); handleLookup(url); }}
+            style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}
+          >
+            <input
+              type="url"
+              value={url}
+              onChange={e => setUrl(e.target.value)}
+              placeholder="Paste Amazon/Flipkart URL..."
+              required
+              style={{
+                flex: 1, padding: '10px 12px', backgroundColor: '#0A0A0A', border: '1px solid #262626',
+                color: '#F5F5F5', fontSize: '14px', fontFamily: 'var(--font-body)', outline: 'none'
+              }}
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                padding: '0 20px', backgroundColor: '#D47A10', border: 'none', color: '#0A0A0A',
+                fontWeight: 600, fontSize: '13px', cursor: 'pointer', opacity: loading ? 0.5 : 1
+              }}
+            >
+              {loading ? 'Analyzing...' : 'Analyze'}
+            </button>
+          </form>
+
+          {error && (
+            <div style={{ padding: '16px', backgroundColor: '#1F0D0D', border: '1px solid #450A0A', color: '#EF4444', fontSize: '13px' }}>
+              {error}
+            </div>
+          )}
+
+          {loading && (
+            <div className="skeleton" style={{ height: '200px', width: '100%' }} />
+          )}
+
+          {result && !loading && (
+            <div>
+              <h3 style={{ margin: '0 0 16px', fontSize: '16px', color: '#F5F5F5', fontFamily: 'var(--font-heading)' }}>
+                {result.product_name}
+              </h3>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+                <div style={{ flex: 1, padding: '16px', backgroundColor: '#161616', border: '1px solid #262626' }}>
+                  <span style={{ display: 'block', fontSize: '11px', color: '#6B6B6B', marginBottom: '4px' }}>Current Price</span>
+                  <span className="price-num" style={{ fontSize: '24px', fontWeight: 600, color: '#F5F5F5' }}>
+                    {'\u20B9'}{typeof result.price === 'number' ? result.price.toLocaleString('en-IN') : result.price}
+                  </span>
+                </div>
+                <div style={{ flex: 1, padding: '16px', backgroundColor: '#161616', border: '1px solid #262626' }}>
+                  <span style={{ display: 'block', fontSize: '11px', color: '#6B6B6B', marginBottom: '4px' }}>Verdict</span>
+                  <span style={{ fontSize: '16px', fontWeight: 600, color: result.is_deal ? '#22C55E' : '#EF4444' }}>
+                    {result.is_deal ? 'Good Deal' : 'Wait for Drop'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

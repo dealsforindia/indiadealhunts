@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { RefreshCw } from 'lucide-react';
 import { Navbar } from './components/Navbar';
 import { HeroBanner } from './components/HeroBanner';
 import { Filters } from './components/Filters';
@@ -20,8 +21,23 @@ import { MarqueeTicker } from './components/MarqueeTicker';
 import { CategoryStories } from './components/CategoryStories';
 import { TopDealsCarousel } from './components/TopDealsCarousel';
 import { ViralShortsSection } from './components/ViralShortsSection';
-import { Sparkles, Zap, RefreshCw, AlertCircle, Clock, ShoppingBag, ChevronRight, CheckCircle2, ShieldCheck, Flame, Search } from 'lucide-react';
 import { searchDealsClient } from './utils/semanticSearch';
+
+// Skeleton Component for Deal Cards
+const SkeletonCard = () => (
+  <div style={{
+    backgroundColor: '#111111', border: '1px solid #1E1E1E', borderRadius: '4px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '12px'
+  }}>
+    <div className="skeleton" style={{ width: '100%', aspectRatio: '1', borderRadius: '2px' }} />
+    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div className="skeleton" style={{ width: '60px', height: '16px' }} />
+      <div className="skeleton" style={{ width: '40px', height: '16px' }} />
+    </div>
+    <div className="skeleton" style={{ width: '100%', height: '18px' }} />
+    <div className="skeleton" style={{ width: '80%', height: '18px' }} />
+    <div className="skeleton" style={{ width: '60px', height: '24px', marginTop: '12px' }} />
+  </div>
+);
 
 const EDGE_API = import.meta.env.VITE_EDGE_API_URL || 'https://dealflow-edge.pottemasshippo.workers.dev';
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
@@ -184,10 +200,10 @@ const AppContent: React.FC = () => {
         setTotalDeals(data.total || enriched.length);
         setHasMore(data.has_more ?? (currentSkip + enriched.length < data.total));
         setSkip(currentSkip);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Fetch error:', err);
         if (!isSilent) {
-          setError(err.message || 'Unable to connect to DealFlow engine');
+          setError(err instanceof Error ? err.message : 'Unable to connect to DealFlow engine');
         }
       } finally {
         setLoading(false);
@@ -195,7 +211,7 @@ const AppContent: React.FC = () => {
         setIsAutoRefreshing(false);
       }
     },
-    [selectedStore, selectedCategory, searchQuery, sortBy]
+    [selectedStore, selectedCategory, selectedLocation, searchQuery, sortBy]
   );
 
   // Initial fetch and reload on filter changes
@@ -507,69 +523,74 @@ const AppContent: React.FC = () => {
             </div>
 
             {/* Live Feed Header */}
-            <div className="max-w-7xl mx-auto px-2.5 sm:px-6 mb-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="relative flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
-                </span>
-                <h2 className="text-base sm:text-xl font-bold font-brand text-white tracking-tight">
+            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 16px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span className="status-live" style={{ marginTop: '6px' }} />
+                <h2 style={{ fontSize: '18px', fontWeight: 700, fontFamily: 'var(--font-heading)', color: '#F5F5F5', margin: 0 }}>
                   Recent Verified Drops
                 </h2>
-                <span className="text-[11px] font-mono text-emerald-400/90 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 hidden sm:inline-flex items-center gap-1">
-                  ● Live Auto-Sync
+                <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#22C55E', backgroundColor: '#0F2018', border: '1px solid #166534', padding: '2px 8px', borderRadius: '2px', marginLeft: '8px', display: 'flex', alignItems: 'center' }}>
+                  Auto-Sync
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 sm:gap-2">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <button
                   onClick={() => fetchDeals(0, false, false)}
                   disabled={loading}
-                  className="px-2 py-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/10 text-xs flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                  style={{
+                    padding: '4px 10px', backgroundColor: 'transparent', border: '1px solid #262626', color: '#F5F5F5',
+                    fontSize: '12px', borderRadius: '2px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
+                  }}
                   title="Refresh deals now"
-                  aria-label="Refresh deals"
                 >
-                  <RefreshCw className={`w-3.5 h-3.5 text-emerald-400 ${loading || isAutoRefreshing ? 'animate-spin' : ''}`} />
-                  <span className="hidden sm:inline">Refresh</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: loading || isAutoRefreshing ? 'spin 1s linear infinite' : 'none' }}>
+                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.22-10.27l-3.26-3.26"/>
+                  </svg>
+                  Refresh
                 </button>
-                <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#D47A10', backgroundColor: '#1A1200', padding: '2px 8px', borderRadius: '2px', border: '1px solid #452A00' }}>
                   {gridDeals.length} drops
                 </span>
               </div>
             </div>
 
             {/* Deals Grid */}
-            <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 mb-12">
+            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 16px 48px' }}>
               {loading && deals.length === 0 ? (
-                <div className="py-24 text-center">
-                  <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                  <p className="text-slate-300 text-sm font-medium">
-                    Loading verified drops from DealFlow engine...
-                  </p>
+                <div style={{ padding: '64px 0', textAlign: 'center' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
+                     <SkeletonCard />
+                     <SkeletonCard />
+                     <SkeletonCard />
+                     <SkeletonCard />
+                     <SkeletonCard />
+                     <SkeletonCard />
+                     <SkeletonCard />
+                     <SkeletonCard />
+                  </div>
                 </div>
               ) : error && deals.length === 0 ? (
-                <div className="py-16 px-6 text-center max-w-md mx-auto rounded-3xl border border-red-500/20 bg-red-950/20">
-                  <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" aria-hidden="true" />
-                  <h3 className="font-bold text-white mb-1">Could not connect to engine</h3>
-                  <p className="text-xs text-slate-300 mb-4">{error}</p>
+                <div style={{ padding: '64px 24px', textAlign: 'center', maxWidth: '400px', margin: '0 auto', borderRadius: '4px', border: '1px solid #450A0A', backgroundColor: '#1F0D0D' }}>
+                  <h3 style={{ fontWeight: 600, color: '#F5F5F5', marginBottom: '8px' }}>Could not connect to engine</h3>
+                  <p style={{ fontSize: '12px', color: '#EF4444', marginBottom: '16px' }}>{error}</p>
                   <button
                     onClick={() => fetchDeals(0, false)}
-                    className="min-h-[44px] px-5 py-2.5 rounded-xl bg-white text-black font-bold text-xs focus-ring active:scale-95 transition-all"
+                    style={{ minHeight: '44px', padding: '0 20px', backgroundColor: '#F5F5F5', color: '#0A0A0A', fontWeight: 600, fontSize: '12px', borderRadius: '2px', border: 'none', cursor: 'pointer' }}
                   >
                     Retry Connection
                   </button>
                 </div>
               ) : gridDeals.length === 0 ? (
-                <div className="py-16 px-6 text-center max-w-md mx-auto rounded-3xl border border-white/10 bg-white/[0.02]">
-                  <Search className="w-10 h-10 text-slate-500 mx-auto mb-3" aria-hidden="true" />
-                  <h3 className="font-bold text-white mb-1">No deals found</h3>
-                  <p className="text-xs text-slate-400 mb-4">Try adjusting your filters or search terms.</p>
+                <div style={{ padding: '64px 24px', textAlign: 'center', maxWidth: '400px', margin: '0 auto', borderRadius: '4px', border: '1px solid #262626', backgroundColor: '#111111' }}>
+                  <h3 style={{ fontWeight: 600, color: '#F5F5F5', marginBottom: '8px' }}>No deals found</h3>
+                  <p style={{ fontSize: '12px', color: '#A3A3A3', marginBottom: '16px' }}>Try adjusting your filters or search terms.</p>
                   <button
                     onClick={() => {
                       setSelectedStore('all');
                       setSelectedCategory('all');
                       setSearchQuery('');
                     }}
-                    className="min-h-[44px] px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs transition-all"
+                    style={{ minHeight: '44px', padding: '0 20px', backgroundColor: '#1A1A1A', color: '#F5F5F5', fontWeight: 600, fontSize: '12px', borderRadius: '2px', border: '1px solid #404040', cursor: 'pointer' }}
                   >
                     Clear Filters
                   </button>
@@ -577,22 +598,19 @@ const AppContent: React.FC = () => {
               ) : (
                 <>
                   {searchQuery && searchInsights.activeBadges.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-2 mb-4 p-2.5 sm:p-3 rounded-2xl bg-emerald-500/[0.08] border border-emerald-500/20 backdrop-blur-md">
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
-                        <Sparkles className="w-3.5 h-3.5 animate-pulse text-emerald-400" />
-                        <span>AI Intent:</span>
-                      </span>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginBottom: '16px', padding: '10px 12px', borderRadius: '4px', backgroundColor: '#0A1A0F', border: '1px solid #166534' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 600, color: '#22C55E' }}>AI Intent:</span>
                       {searchInsights.activeBadges.map((badge, idx) => (
-                        <span key={idx} className="px-2.5 py-0.5 rounded-full bg-emerald-400/15 text-emerald-300 text-xs font-mono font-bold border border-emerald-400/30 shadow-2xs">
+                        <span key={idx} style={{ padding: '2px 8px', borderRadius: '2px', backgroundColor: '#166534', color: '#F5F5F5', fontSize: '11px', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
                           {badge}
                         </span>
                       ))}
-                      <span className="text-xs text-slate-400 ml-auto font-mono">
+                      <span style={{ fontSize: '11px', color: '#6B6B6B', marginLeft: 'auto', fontFamily: 'var(--font-mono)' }}>
                         {gridDeals.length} deals matched
                       </span>
                     </div>
                   )}
-                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-5">
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px' }}>
                   {gridDeals.map((deal) => (
                     <PublicDealCard
                       key={deal.id}
@@ -603,12 +621,12 @@ const AppContent: React.FC = () => {
                       onOpenCardModal={() => setIsCardModalOpen(true)}
                     />
                   ))}
-                </div>
-              </>
+                  </div>
+                </>
               )}
 
               {/* Automated Viral Shorts Section (9:16 Video Reels) - Moved to bottom */}
-              <div className="mt-8 mb-4">
+              <div style={{ marginTop: '32px', marginBottom: '16px', borderTop: '1px solid #1E1E1E' }}>
                 <ViralShortsSection
                   deals={videoDeals.length > 0 ? videoDeals : deals}
                   externalActiveDeal={activeReelDeal}
@@ -644,71 +662,50 @@ const AppContent: React.FC = () => {
           </>
         )}
 
-        {/* Tab 2: ENDING SOON VIEW (With ShoppinGenie Filter Pills) */}
+        {/* Tab 2: ENDING SOON VIEW */}
         {activeTab === 'ending_soon' && (
-          <div className="py-6 sm:py-8 max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-white/[0.08]">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center">
-                  <Clock className="w-5 h-5 animate-pulse" aria-hidden="true" />
-                </div>
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-black font-brand text-white tracking-tight">
-                    Ending Soon Price Drops
-                  </h1>
-                  <p className="text-xs sm:text-sm text-slate-300">
-                    Flash loots with stock depletion alerts. Once these sell out, prices return to regular retail.
-                  </p>
-                </div>
+          <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 16px 48px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid #1E1E1E' }}>
+              <div>
+                <h1 style={{ fontSize: '24px', fontWeight: 700, fontFamily: 'var(--font-heading)', color: '#F5F5F5', margin: '0 0 8px' }}>
+                  Popular / Ending Soon
+                </h1>
+                <p style={{ fontSize: '14px', color: '#A3A3A3', margin: 0, fontFamily: 'var(--font-body)', maxWidth: '480px' }}>
+                  Flash deals with stock depletion alerts. Once these sell out, prices return to regular retail.
+                </p>
               </div>
 
-              {/* ShoppinGenie Filter Pills */}
-              <div className="flex items-center gap-2 flex-wrap">
+              {/* Filter Pills */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <button
                   onClick={() => setEndingSoonStoreFilter('all')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                    endingSoonStoreFilter === 'all'
-                      ? 'bg-emerald-500 text-black font-bold'
-                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
-                  }`}
+                  style={{ padding: '6px 12px', borderRadius: '2px', fontSize: '13px', fontWeight: endingSoonStoreFilter === 'all' ? 600 : 400, color: endingSoonStoreFilter === 'all' ? '#0A0A0A' : '#A3A3A3', backgroundColor: endingSoonStoreFilter === 'all' ? '#D47A10' : 'transparent', border: endingSoonStoreFilter === 'all' ? '1px solid #D47A10' : '1px solid #262626', cursor: 'pointer' }}
                 >
                   All Stores
                 </button>
                 <button
                   onClick={() => setEndingSoonStoreFilter('amazon')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                    endingSoonStoreFilter === 'amazon'
-                      ? 'bg-amber-500 text-black font-bold'
-                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
-                  }`}
+                  style={{ padding: '6px 12px', borderRadius: '2px', fontSize: '13px', fontWeight: endingSoonStoreFilter === 'amazon' ? 600 : 400, color: endingSoonStoreFilter === 'amazon' ? '#0A0A0A' : '#A3A3A3', backgroundColor: endingSoonStoreFilter === 'amazon' ? '#D47A10' : 'transparent', border: endingSoonStoreFilter === 'amazon' ? '1px solid #D47A10' : '1px solid #262626', cursor: 'pointer' }}
                 >
                   Amazon
                 </button>
                 <button
                   onClick={() => setEndingSoonStoreFilter('flipkart')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                    endingSoonStoreFilter === 'flipkart'
-                      ? 'bg-blue-500 text-white font-bold'
-                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
-                  }`}
+                  style={{ padding: '6px 12px', borderRadius: '2px', fontSize: '13px', fontWeight: endingSoonStoreFilter === 'flipkart' ? 600 : 400, color: endingSoonStoreFilter === 'flipkart' ? '#0A0A0A' : '#A3A3A3', backgroundColor: endingSoonStoreFilter === 'flipkart' ? '#D47A10' : 'transparent', border: endingSoonStoreFilter === 'flipkart' ? '1px solid #D47A10' : '1px solid #262626', cursor: 'pointer' }}
                 >
                   Flipkart
                 </button>
                 <button
                   onClick={() => setHideOverEndingSoon(!hideOverEndingSoon)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors flex items-center gap-1.5 ${
-                    hideOverEndingSoon
-                      ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
-                  }`}
+                  style={{ padding: '6px 12px', borderRadius: '2px', fontSize: '13px', fontWeight: hideOverEndingSoon ? 600 : 400, color: hideOverEndingSoon ? '#EF4444' : '#A3A3A3', backgroundColor: hideOverEndingSoon ? '#1F0D0D' : 'transparent', border: hideOverEndingSoon ? '1px solid #450A0A' : '1px solid #262626', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
                 >
-                  <span className={`w-2 h-2 rounded-full ${hideOverEndingSoon ? 'bg-rose-400' : 'bg-slate-600'}`} />
-                  Hide OVER
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: hideOverEndingSoon ? '#EF4444' : '#6B6B6B' }} />
+                  Hide Expired
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-5">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px' }}>
               {gridDeals.map((deal) => (
                 <PublicDealCard
                   key={deal.id}
@@ -724,24 +721,19 @@ const AppContent: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 3: BEST WORTH DEALS VIEW (Large 3-Column Cards) */}
+        {/* Tab 3: BEST WORTH DEALS VIEW */}
         {activeTab === 'best_worth' && (
-          <div className="py-6 sm:py-8 max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/[0.08]">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                <Sparkles className="w-5 h-5" aria-hidden="true" />
-              </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-black font-brand text-white tracking-tight">
-                  Best Worth Deals
-                </h1>
-                <p className="text-xs sm:text-sm text-slate-300">
-                  Ranked by DealFlow Worth Index (78+ rating) with verified 90-day regular price comparison.
-                </p>
-              </div>
+          <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 16px 48px' }}>
+            <div style={{ marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid #1E1E1E' }}>
+              <h1 style={{ fontSize: '24px', fontWeight: 700, fontFamily: 'var(--font-heading)', color: '#F5F5F5', margin: '0 0 8px' }}>
+                Top Rated Deals
+              </h1>
+              <p style={{ fontSize: '14px', color: '#A3A3A3', margin: 0, fontFamily: 'var(--font-body)', maxWidth: '480px' }}>
+                Algorithmic curation of deals with high historical value, consensus drops, and brand tier discounts.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px' }}>
               {gridDeals.map((deal) => (
                 <PublicDealCard
                   key={deal.id}
@@ -757,52 +749,32 @@ const AppContent: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 4: ACTIVE OFFERS & VOUCHERS VIEW (Rich Image & Action Cards) */}
+        {/* Tab 4: ACTIVE OFFERS & VOUCHERS VIEW */}
         {activeTab === 'active_offers' && (
-          <div className="py-6 sm:py-8 max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
-            <div className="flex items-center gap-3 pb-4 border-b border-white/[0.08]">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                <Sparkles className="w-5 h-5" aria-hidden="true" />
-              </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-black font-brand text-white tracking-tight">
-                  Verified Loot Hacks & Active Offers
-                </h1>
-                <p className="text-xs sm:text-sm text-slate-300">
-                  Curated step-by-step loot tricks, grocery coupon stacks, and instant savings verified across leading Indian apps.
-                </p>
-              </div>
+          <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 16px 48px' }}>
+            <div style={{ marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid #1E1E1E' }}>
+              <h1 style={{ fontSize: '24px', fontWeight: 700, fontFamily: 'var(--font-heading)', color: '#F5F5F5', margin: '0 0 8px' }}>
+                Verified Hacks & Offers
+              </h1>
+              <p style={{ fontSize: '14px', color: '#A3A3A3', margin: 0, fontFamily: 'var(--font-body)', maxWidth: '480px' }}>
+                Curated step-by-step loot tricks, grocery coupon stacks, and instant savings verified across leading Indian apps.
+              </p>
             </div>
 
-            {/* Dynamic Live Coupon & App Deals Feed */}
-            <div className="space-y-4 pt-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-emerald-400" />
-                    Live Verified Coupon Deals
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-                    Deals currently active with stackable promo codes & high-discount drops.
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-5">
-                {deals
-                  .filter((d) => Boolean(d.coupon || (d.discount_pct && d.discount_pct >= 60)))
-                  .slice(0, 12)
-                  .map((deal) => (
-                    <PublicDealCard
-                      key={deal.id}
-                      deal={deal}
-                      onOpenImage={setLightboxDeal}
-                      onOpenVideo={setActiveReelDeal}
-                      activeCards={activeCards}
-                      onOpenCardModal={() => setIsCardModalOpen(true)}
-                    />
-                  ))}
-              </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px' }}>
+              {deals
+                .filter((d) => Boolean(d.coupon || (d.discount_pct && d.discount_pct >= 60)))
+                .slice(0, 12)
+                .map((deal) => (
+                  <PublicDealCard
+                    key={deal.id}
+                    deal={deal}
+                    onOpenImage={setLightboxDeal}
+                    onOpenVideo={setActiveReelDeal}
+                    activeCards={activeCards}
+                    onOpenCardModal={() => setIsCardModalOpen(true)}
+                  />
+                ))}
             </div>
           </div>
         )}

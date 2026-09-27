@@ -18,7 +18,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
       window.addEventListener('keydown', handleKeyDown);
     }
     return () => {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = 'unset';
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [type, onClose]);
@@ -26,18 +26,19 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
   if (!type) return null;
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80"
       role="dialog"
       aria-modal="true"
       aria-labelledby="legal-modal-title"
+      onClick={onClose}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[85vh] bg-[#111827] border border-white/15 rounded-3xl shadow-2xl flex flex-col overflow-hidden text-left"
+        className="relative w-full max-w-2xl max-h-[85vh] bg-[#111111] border border-[#262626] rounded flex flex-col overflow-hidden text-left"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-white/10 bg-[#1E293B]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#1E1E1E] bg-[#161616]">
           <div className="flex items-center gap-2.5">
             {type === 'disclosure' && (
               <>
