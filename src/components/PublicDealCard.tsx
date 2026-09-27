@@ -318,19 +318,6 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             {deal.store || 'Store'}
           </span>
 
-          {/* City tags */}
-          {deal.cities && deal.cities.length > 0 && (
-            <span style={{
-              fontSize: '10px',
-              fontFamily: 'var(--font-mono)',
-              color: '#6B6B6B',
-              flexShrink: 0,
-            }}>
-              {deal.cities.slice(0, 2).join(', ')}
-              {deal.cities.length > 2 ? ` +${deal.cities.length - 2}` : ''}
-            </span>
-          )}
-
           <span style={{
             fontSize: '10px',
             fontFamily: 'var(--font-mono)',

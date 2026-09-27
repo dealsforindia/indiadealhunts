@@ -18,8 +18,6 @@ import { ContactPage } from './components/ContactPage';
 import type { PublicDeal, PublicDealsResponse, SortOption, NavTab } from './types';
 import { calculateWorthScore } from './utils/worthScore';
 import { MarqueeTicker } from './components/MarqueeTicker';
-import { CategoryStories } from './components/CategoryStories';
-import { TopDealsCarousel } from './components/TopDealsCarousel';
 import { ViralShortsSection } from './components/ViralShortsSection';
 import { searchDealsClient } from './utils/semanticSearch';
 
@@ -99,7 +97,6 @@ const AppContent: React.FC = () => {
   // Filters & Search
   const [selectedStore, setSelectedStore] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedLocation, setSelectedLocation] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
 
@@ -143,7 +140,6 @@ const AppContent: React.FC = () => {
         });
 
         if (selectedStore !== 'all') params.append('store', selectedStore);
-        if (selectedLocation !== 'all') params.append('location', selectedLocation);
         if (selectedCategory === 'loot70') {
           params.append('category', 'loot70');
           params.append('min_discount', '70');
@@ -211,7 +207,7 @@ const AppContent: React.FC = () => {
         setIsAutoRefreshing(false);
       }
     },
-    [selectedStore, selectedCategory, selectedLocation, searchQuery, sortBy]
+    [selectedStore, selectedCategory, searchQuery, sortBy]
   );
 
   // Initial fetch and reload on filter changes
@@ -375,10 +371,9 @@ const AppContent: React.FC = () => {
   const gridDeals = useMemo(() => {
     let result = [...semanticFilteredDeals];
 
-    // Exclude showcase deals in home tab so they don't repeat
-    if (activeTab === 'home' && topShowcaseDeals.length > 0) {
-      const showcaseIds = new Set(topShowcaseDeals.map((d) => d.id));
-      result = result.filter((d) => !showcaseIds.has(d.id));
+    // Exclude spotlight deal in home tab so it doesn't repeat immediately if featured in hero
+    if (activeTab === 'home' && spotlightDeal) {
+      result = result.filter((d) => d.id !== spotlightDeal.id);
     }
 
     // Filter for 'loot70' (70%+ off steal deals)
@@ -481,30 +476,6 @@ const AppContent: React.FC = () => {
               }}
             />
 
-            {/* Category Stories (Instagram/ShoppinGenie Style Quick Filter Bar) */}
-            <div className="mt-4 mb-2">
-              <CategoryStories
-                selectedCategory={selectedCategory}
-                onSelectCategory={(catId) => {
-                  setSelectedCategory(catId);
-                }}
-              />
-            </div>
-
-            {/* Editor's Choice - Very Good Deals Carousel */}
-            {topShowcaseDeals.length > 0 && (
-              <TopDealsCarousel 
-                deals={topShowcaseDeals} 
-                onOpenDeal={(deal) => {
-                  if (deal.has_video) {
-                    setActiveReelDeal(deal);
-                  } else {
-                    setLightboxDeal(deal);
-                  }
-                }} 
-              />
-            )}
-
             {/* Store & Sort Filter Rail */}
             <div className="mt-4 mb-2">
               <Filters
@@ -512,8 +483,6 @@ const AppContent: React.FC = () => {
                 onSelectStore={setSelectedStore}
                 selectedCategory={selectedCategory}
                 onSelectCategory={setSelectedCategory}
-                selectedLocation={selectedLocation}
-                onSelectLocation={setSelectedLocation}
                 sortBy={sortBy}
                 onSortChange={setSortBy}
                 totalDeals={gridDeals.length}

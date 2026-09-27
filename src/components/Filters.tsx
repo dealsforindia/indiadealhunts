@@ -6,8 +6,6 @@ interface FiltersProps {
   onSelectStore: (store: string) => void;
   selectedCategory: string;
   onSelectCategory: (category: string) => void;
-  selectedLocation: string;
-  onSelectLocation: (location: string) => void;
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
   totalDeals: number;
@@ -44,8 +42,6 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'price_low',  label: 'Price: low to high' },
   { value: 'price_high', label: 'Price: high to low' },
 ];
-
-const CITIES = ['all', 'Kolkata', 'Delhi', 'Mumbai', 'Bangalore', 'Pune', 'Hyderabad', 'Chennai', 'Ahmedabad'];
 
 const pillBase: React.CSSProperties = {
   padding: '5px 12px',
@@ -90,8 +86,6 @@ export const Filters: React.FC<FiltersProps> = ({
   onSelectStore,
   selectedCategory,
   onSelectCategory,
-  selectedLocation,
-  onSelectLocation,
   sortBy,
   onSortChange,
   totalDeals,
@@ -161,27 +155,6 @@ export const Filters: React.FC<FiltersProps> = ({
           }}>
             {totalDeals} deals
           </span>
-
-          <div style={{ position: 'relative' }}>
-            <select
-              value={selectedLocation}
-              onChange={(e) => onSelectLocation(e.target.value)}
-              aria-label="Filter by city"
-              style={selectStyle}
-            >
-              {CITIES.map((c) => (
-                <option key={c} value={c} style={{ backgroundColor: '#111111', color: '#F5F5F5' }}>
-                  {c === 'all' ? 'All cities' : c}
-                </option>
-              ))}
-            </select>
-            <svg
-              width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"
-              style={{ position: 'absolute', right: '6px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#6B6B6B' }}
-            >
-              <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
 
           <div style={{ position: 'relative' }}>
             <select
