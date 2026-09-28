@@ -59,8 +59,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
     <section
       style={{
         position: 'relative',
-        background: 'radial-gradient(circle at 75% 45%, rgba(217, 119, 6, 0.12), transparent 32%), #0D0E11',
-        borderBottom: '1px solid #23262F',
+        background: 'radial-gradient(circle at 75% 45%, rgba(217, 119, 6, 0.12), transparent 32%), var(--bg)',
+        borderBottom: '1px solid var(--border)',
         overflow: 'hidden',
       }}
     >
@@ -143,8 +143,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
               display: 'flex',
               alignItems: 'center',
               height: '52px',
-              backgroundColor: '#141820',
-              border: '1px solid #303845',
+              backgroundColor: 'var(--surface)',
+              border: '1px solid var(--border)',
               borderRadius: '6px',
               overflow: 'hidden',
               marginTop: '4px',
@@ -263,9 +263,9 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                   padding: '5px 11px',
                   fontSize: '12px',
                   fontFamily: 'var(--font-body)',
-                  color: '#9099A6',
-                  backgroundColor: '#141820',
-                  border: '1px solid #28313D',
+                  color: 'var(--muted)',
+                  backgroundColor: 'var(--surface)',
+                  border: '1px solid var(--border)',
                   borderRadius: '4px',
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
@@ -273,11 +273,11 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                 }}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLButtonElement).style.color = '#F5F7FA';
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = '#384454';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-strong)';
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.color = '#9099A6';
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = '#28313D';
+                  (e.currentTarget as HTMLButtonElement).style.color = 'var(--muted)';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
                 }}
               >
                 {term}
@@ -296,9 +296,9 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                   padding: '4px 10px',
                   fontSize: '11px',
                   fontFamily: 'var(--font-body)',
-                  color: '#9099A6',
-                  backgroundColor: '#141820',
-                  border: '1px solid #28313D',
+                  color: 'var(--muted)',
+                  backgroundColor: 'var(--surface)',
+                  border: '1px solid var(--border)',
                   borderRadius: '4px',
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',

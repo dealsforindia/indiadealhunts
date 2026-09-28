@@ -117,8 +117,8 @@ export const CategoryRail: React.FC<CategoryRailProps> = ({
       id="category-rail"
       aria-label="Category navigation rail"
       style={{
-        backgroundColor: '#0D0E11',
-        borderBottom: '1px solid #23262F',
+        backgroundColor: 'var(--bg)',
+        borderBottom: '1px solid var(--border)',
         position: 'sticky',
         top: '64px',
         zIndex: 40,

@@ -29,8 +29,8 @@ export const SignaturePriceGraph: React.FC<SignaturePriceGraphProps> = ({
   return (
     <div
       style={{
-        backgroundColor: '#141820',
-        border: '1px solid #28313D',
+        backgroundColor: 'var(--bg)',
+        border: '1px solid var(--border)',
         borderRadius: '6px',
         padding: '16px',
         marginTop: '12px',

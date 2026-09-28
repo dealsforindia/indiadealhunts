@@ -119,8 +119,8 @@ export const TrustStrip: React.FC = () => {
           <div
             key={idx}
             style={{
-              backgroundColor: '#141820',
-              border: '1px solid #28313D',
+              backgroundColor: 'var(--surface)',
+              border: '1px solid var(--border)',
               borderRadius: '6px',
               padding: '16px 20px',
               display: 'flex',
@@ -143,7 +143,7 @@ export const TrustStrip: React.FC = () => {
               style={{
                 fontFamily: 'var(--font-body)',
                 fontSize: '12px',
-                color: '#9099A6',
+                color: 'var(--muted)',
               }}
             >
               {metric.label}
@@ -155,8 +155,8 @@ export const TrustStrip: React.FC = () => {
       {/* ── Trust Pillars ── */}
       <div
         style={{
-          borderTop: '1px solid #23262F',
-          borderBottom: '1px solid #23262F',
+          borderTop: '1px solid var(--border)',
+          borderBottom: '1px solid var(--border)',
           padding: '24px 0',
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',

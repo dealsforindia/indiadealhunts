@@ -3,46 +3,54 @@
 
 @layer base {
   :root {
-    /* ── Exact Design Tokens ── */
-    --bg:             #0D0E11;
-    --surface:        #141820;
-    --surface-2:      #1B222C;
-    --border:         #28313D;
-    --text:           #F5F7FA;
-    --muted:          #9099A6;
-    --accent:         #F59E0B;
-    --accent-dark:    #D97706;
-    --green:          #22C55E;
-    --red:            #EF4444;
+    /* ── Exact Slate Design Tokens ── */
+    --bg: #212121;
+    /* Tailwind slate-900 */
+    --surface: #464d58;
+    /* Tailwind slate-800 */
+    --surface-2: #334155;
+    /* Tailwind slate-700 */
+    --border: #334155;
+    /* Tailwind slate-700 */
+    --text: #F8FAFC;
+    /* Tailwind slate-50 */
+    --muted: #94A3B8;
+    /* Tailwind slate-400 */
+    --accent: #F59E0B;
+    --accent-dark: #D97706;
+    --green: #22C55E;
+    --red: #EF4444;
 
-    /* ── Aliases for existing components ── */
-    --bg-base:        #0D0E11;
-    --bg-surface:     #141820;
-    --bg-raised:      #1B222C;
-    --bg-input:       #141820;
-    --border-default: #28313D;
-    --border-subtle:  #1B222C;
-    --border-strong:  #384454;
-    --text-primary:   #F5F7FA;
-    --text-secondary: #9099A6;
-    --text-muted:     #687482;
-    --text-inverse:   #090A0C;
-    --accent-hover:   #FFB126;
-    --accent-subtle:  rgba(245, 158, 11, 0.12);
-    --green-subtle:   #123322;
-    --red-subtle:     #3A1714;
+    /* ── Aliases for components ── */
+    --bg-base: #0F172A;
+    --bg-surface: #1E293B;
+    --bg-raised: #334155;
+    --bg-input: #1E293B;
+    --border-default: #334155;
+    --border-subtle: #1E293B;
+    --border-strong: #475569;
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    --text-inverse: #0F172A;
+    --accent-hover: #FFB126;
+    --accent-subtle: rgba(245, 158, 11, 0.14);
+    --green-subtle: rgba(34, 197, 94, 0.15);
+    --red-subtle: rgba(239, 68, 68, 0.15);
 
     /* ── Typography Tokens ── */
     --font-heading: 'Lexend', system-ui, -apple-system, sans-serif;
-    --font-body:    'Source Sans 3', system-ui, -apple-system, sans-serif;
-    --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+    --font-body: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
     /* ── Border Radius ── */
     --radius-sm: 4px;
     --radius-md: 6px;
   }
 
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -71,7 +79,12 @@
     color: #090A0C;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-heading);
     line-height: 1.25;
     letter-spacing: -0.02em;
@@ -101,19 +114,28 @@
   width: 5px;
   height: 5px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--bg);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #384454;
 }
 
-.scrollbar-none::-webkit-scrollbar { display: none; }
-.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 /* ── Accessible Focus Rings (WCAG 2.1 AA) ───────────────── */
 a:focus-visible,
@@ -127,9 +149,17 @@ textarea:focus-visible {
 }
 
 /* ── Typography Utilities ───────────────────────────────── */
-.font-heading { font-family: var(--font-heading); }
-.font-body    { font-family: var(--font-body); }
-.font-mono    { font-family: var(--font-mono); }
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
 
 /* ── Tabular Numerals for Pricing ────────────────────────── */
 .price-num {
@@ -140,8 +170,15 @@ textarea:focus-visible {
 
 /* ── Zero Layout-Shift Skeleton Loader (CLS = 0) ────────── */
 @keyframes skeleton-flat-pulse {
-  0%, 100% { opacity: 0.6; }
-  50%      { opacity: 0.3; }
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
 }
 
 .skeleton {
@@ -156,6 +193,7 @@ textarea:focus-visible {
     opacity: 0;
     transform: translateY(16px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -163,8 +201,13 @@ textarea:focus-visible {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .animate-modal {

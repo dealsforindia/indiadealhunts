@@ -195,8 +195,8 @@ export const App: React.FC = () => {
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: '#0D0E11',
-        color: '#F5F7FA',
+        backgroundColor: 'var(--bg)',
+        color: 'var(--text)',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -360,7 +360,7 @@ export const App: React.FC = () => {
                   margin: '0 auto',
                   borderRadius: '6px',
                   border: '1px solid #3A1714',
-                  backgroundColor: '#141820',
+                  backgroundColor: 'var(--surface)',
                 }}
               >
                 <h3 style={{ fontWeight: 700, color: '#F5F7FA', marginBottom: '8px' }}>
@@ -391,8 +391,8 @@ export const App: React.FC = () => {
                   maxWidth: '460px',
                   margin: '0 auto',
                   borderRadius: '6px',
-                  border: '1px solid #28313D',
-                  backgroundColor: '#141820',
+                  border: '1px solid var(--border)',
+                  backgroundColor: 'var(--surface)',
                 }}
               >
                 <h3 style={{ fontWeight: 700, color: '#F5F7FA', marginBottom: '8px' }}>
@@ -409,12 +409,12 @@ export const App: React.FC = () => {
                   }}
                   style={{
                     padding: '8px 20px',
-                    backgroundColor: '#1B222C',
+                    backgroundColor: 'var(--surface-2)',
                     color: '#F5F7FA',
                     fontWeight: 600,
                     fontSize: '13px',
                     borderRadius: '4px',
-                    border: '1px solid #384454',
+                    border: '1px solid var(--border-strong)',
                   }}
                 >
                   Clear Filters
@@ -446,9 +446,9 @@ export const App: React.FC = () => {
                       disabled={loadingMore}
                       style={{
                         padding: '10px 24px',
-                        backgroundColor: '#141820',
-                        border: '1px solid #28313D',
-                        color: '#F5F7FA',
+                        backgroundColor: 'var(--surface)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text)',
                         borderRadius: '4px',
                         fontSize: '13px',
                         fontWeight: 700,
@@ -463,7 +463,7 @@ export const App: React.FC = () => {
                         (e.currentTarget as HTMLButtonElement).style.borderColor = '#F59E0B';
                       }}
                       onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.borderColor = '#28313D';
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
                       }}
                     >
                       {loadingMore ? 'Loading More Drops...' : 'Load More Deals ↓'}

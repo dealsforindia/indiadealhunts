@@ -15,8 +15,8 @@ export const PriceLookupStrip: React.FC<PriceLookupStripProps> = ({ onOpenLookup
     >
       <div
         style={{
-          backgroundColor: '#141820',
-          border: '1px solid #28313D',
+          backgroundColor: 'var(--surface)',
+          border: '1px solid var(--border)',
           borderRadius: '6px',
           padding: '24px 28px',
           display: 'flex',

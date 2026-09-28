@@ -63,8 +63,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header
       style={{
         height: '64px',
-        borderBottom: '1px solid #23262F',
-        backgroundColor: '#0D0E11',
+        borderBottom: '1px solid var(--border)',
+        backgroundColor: 'var(--bg)',
         position: 'sticky',
         top: 0,
         zIndex: 50,
@@ -295,8 +295,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                   top: 'calc(100% + 8px)',
                   left: 0,
                   width: '180px',
-                  backgroundColor: '#141820',
-                  border: '1px solid #28313D',
+                  backgroundColor: 'var(--surface)',
+                  border: '1px solid var(--border)',
                   borderRadius: '4px',
                   padding: '6px',
                   boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
@@ -444,8 +444,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             top: '64px',
             left: 0,
             right: 0,
-            backgroundColor: '#0D0E11',
-            borderBottom: '1px solid #28313D',
+            backgroundColor: 'var(--bg)',
+            borderBottom: '1px solid var(--border)',
             padding: '16px 20px',
             display: 'flex',
             flexDirection: 'column',
@@ -524,10 +524,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                   style={{
                     padding: '5px 10px',
                     fontSize: '12px',
-                    backgroundColor: '#141820',
-                    border: '1px solid #28313D',
+                    backgroundColor: 'var(--surface)',
+                    border: '1px solid var(--border)',
                     borderRadius: '4px',
-                    color: '#9099A6',
+                    color: 'var(--muted)',
                   }}
                 >
                   {cat.label}

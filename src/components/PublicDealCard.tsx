@@ -94,8 +94,8 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
       layout="position"
       style={{
         minHeight: '440px',
-        backgroundColor: '#141820',
-        border: '1px solid #252C36',
+        backgroundColor: 'var(--surface)',
+        border: '1px solid var(--border)',
         borderRadius: '6px',
         display: 'flex',
         flexDirection: 'column',
@@ -105,10 +105,10 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
         transition: 'border-color 150ms ease',
       }}
       onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = '#384454';
+        (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-strong)';
       }}
       onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = '#252C36';
+        (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
       }}
     >
       {/* ── Top Bar: Discount Badge + Favorite Heart Button ── */}
@@ -205,7 +205,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
         style={{
           position: 'relative',
           aspectRatio: '4 / 3',
-          backgroundColor: '#0D1117',
+          backgroundColor: 'var(--bg)',
           padding: '16px',
           display: 'flex',
           alignItems: 'center',
