@@ -13,12 +13,12 @@ export const DealSkeleton: React.FC = () => {
         gap: '8px',
       }}
     >
-      {/* 1:1 Image placeholder */}
+      {/* 4:3 Image placeholder matching PublicDealCard */}
       <div
         className="skeleton"
         style={{
           width: '100%',
-          aspectRatio: '1 / 1',
+          aspectRatio: '4 / 3',
           borderRadius: '2px',
         }}
       />
@@ -53,8 +53,8 @@ export const DealSkeletonGrid: React.FC<{ count?: number }> = ({ count = 8 }) =>
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
-        gap: '12px',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+        gap: '16px',
         width: '100%',
       }}
     >
