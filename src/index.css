@@ -4,9 +4,9 @@
 @layer base {
   :root {
     /* ── Exact Slate Design Tokens ── */
-    --bg: #212121;
+    --bg: #0F172A;
     /* Tailwind slate-900 */
-    --surface: #464d58;
+    --surface: #1E293B;
     /* Tailwind slate-800 */
     --surface-2: #334155;
     /* Tailwind slate-700 */
