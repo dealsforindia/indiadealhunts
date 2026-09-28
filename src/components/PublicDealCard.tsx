@@ -382,20 +382,42 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             )}
           </div>
 
-          {/* Savings Callout */}
-          {savings > 0 && (
-            <div
-              style={{
-                fontSize: '13px',
-                fontFamily: 'var(--font-body)',
-                fontWeight: 600,
-                color: '#22C55E',
-                marginTop: '3px',
-              }}
-            >
-              Save ₹{savings.toLocaleString('en-IN')}
-            </div>
-          )}
+          {/* Savings Callout & Optional Tiny Price-Drop Signal */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px', flexWrap: 'wrap', marginTop: '3px' }}>
+            {savings > 0 ? (
+              <div
+                style={{
+                  fontSize: '12px',
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 600,
+                  color: '#22C55E',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Save ₹{savings.toLocaleString('en-IN')}
+              </div>
+            ) : <div />}
+
+            {discount >= 25 && (
+              <div
+                className="hidden sm:inline-flex"
+                style={{
+                  alignItems: 'center',
+                  gap: '3px',
+                  fontSize: '10px',
+                  fontFamily: 'var(--font-mono)',
+                  fontWeight: 600,
+                  color: '#38BDF8',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                  <path d="M1 3l4 4 2.5-2.5L11 8M11 8H7.5M11 8V4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <span>Price Drop</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Primary CTA Button: GET DEAL → */}

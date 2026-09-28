@@ -109,10 +109,12 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
   return (
     <>
       <div
+        className="px-3 md:px-5 w-full"
         style={{
           maxWidth: '1320px',
           margin: '0 auto',
-          padding: '16px 20px 12px',
+          paddingTop: '16px',
+          paddingBottom: '12px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',

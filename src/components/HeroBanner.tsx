@@ -65,16 +65,17 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
       }}
     >
       <div
+        className="px-3 md:px-5 w-full lg:grid-cols-[1.15fr_0.85fr]"
         style={{
-          maxWidth: '1320px',
+          maxWidth: '1280px',
           margin: '0 auto',
-          padding: '36px 20px 32px',
+          paddingTop: '32px',
+          paddingBottom: '28px',
           display: 'grid',
           gridTemplateColumns: '1fr',
-          gap: '32px',
+          gap: '24px',
           alignItems: 'center',
         }}
-        className="lg:grid-cols-[1.15fr_0.85fr]"
       >
         {/* ── Left Content: Eyebrow, Headline, Subheadline, Search, Popular Pills ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', maxWidth: '640px' }}>
@@ -90,7 +91,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                 textTransform: 'uppercase',
               }}
             >
-              VERIFIED · DEALS · REAL DISCOUNTS · NO SPAM
+              <span className="hidden sm:inline">VERIFIED · DEALS · REAL DISCOUNTS · NO SPAM</span>
+              <span className="sm:hidden">VERIFIED DEALS · NO SPAM</span>
             </span>
           </div>
 
@@ -148,6 +150,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
               borderRadius: '6px',
               overflow: 'hidden',
               marginTop: '4px',
+              width: '100%',
+              maxWidth: '100%',
             }}
           >
             {/* Search Icon with subtle 2px shift on focus */}
@@ -179,7 +183,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
               onKeyDown={(e) => {
                 if (e.key === 'Enter') submitSearch();
               }}
-              placeholder='Search for products, e.g. "TWS under 999", "iPhone 16", "laptop deals"'
+              placeholder="Search products or paste URL..."
               aria-label="Search deals or paste product URL"
               id="hero-search-input"
               style={{
@@ -310,150 +314,236 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
           </div>
         </div>
 
-        {/* ── Right Content: Visual Showcase (Desktop Artwork with Subtle 5s Float) ── */}
+        {/* ── Right Content: One Restrained Featured Visual (No 3D tilt, no infinite float) ── */}
         <div
           className="hidden lg:flex"
           style={{
             position: 'relative',
-            height: '290px',
             alignItems: 'center',
             justifyContent: 'center',
+            padding: '8px 0',
           }}
         >
           {/* Subtle Ambient Radial Glow */}
           <div
             style={{
               position: 'absolute',
-              width: '340px',
+              width: '320px',
               height: '240px',
-              background: 'radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, transparent 70%)',
-              filter: 'blur(36px)',
+              background: 'radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%)',
+              filter: 'blur(32px)',
               pointerEvents: 'none',
             }}
           />
 
-          {/* Laptop Mockup Box with subtle slow float */}
+          {/* Framed Featured Deal Spotlight Card */}
           <motion.div
-            animate={{ y: [0, -6, 0] }}
-            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: 'easeOut' }}
             style={{
               position: 'relative',
               width: '320px',
-              height: '195px',
-              backgroundColor: '#11141A',
-              border: '2px solid #2E3846',
-              borderRadius: '8px 8px 0 0',
+              backgroundColor: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: '6px',
               overflow: 'hidden',
-              boxShadow: '0 24px 48px rgba(0, 0, 0, 0.7)',
-              transform: 'perspective(900px) rotateY(-8deg) rotateX(4deg)',
+              boxShadow: '0 12px 28px rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
-            {/* Screen Wallpaper */}
+            {/* Spotlight Header Bar */}
             <div
               style={{
-                width: '100%',
-                height: '100%',
-                background: 'radial-gradient(ellipse at 70% 30%, #F59E0B 0%, #D97706 35%, #451A03 70%, #0D0E11 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '8px 12px',
+                borderBottom: '1px solid var(--border)',
+                backgroundColor: 'var(--surface-2)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '11px', color: '#F59E0B' }}>⚡</span>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    color: '#F59E0B',
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Featured Spotlight
+                </span>
+              </div>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '10px',
+                  fontWeight: 600,
+                  color: '#22C55E',
+                }}
+              >
+                <span>✓</span> Verified Drop
+              </span>
+            </div>
+
+            {/* Product Image Stage (4:3) */}
+            <div
+              style={{
+                position: 'relative',
+                height: '145px',
+                backgroundColor: 'var(--bg)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                position: 'relative',
+                padding: '12px',
               }}
             >
-              <div
+              <img
+                src="https://m.media-amazon.com/images/I/51HBom8xz7L._SL1500_.jpg"
+                alt="boAt Airdopes 141 Pro"
                 style={{
-                  width: '130px',
-                  height: '90px',
-                  background: 'radial-gradient(circle, rgba(251, 191, 36, 0.5) 0%, rgba(217, 119, 6, 0.2) 60%, transparent 100%)',
-                  filter: 'blur(14px)',
+                  maxHeight: '100%',
+                  maxWidth: '100%',
+                  objectFit: 'contain',
                 }}
               />
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '8px',
+                  left: '8px',
+                  padding: '2px 6px',
+                  borderRadius: '3px',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  backgroundColor: '#3A1714',
+                  color: '#FF6B5F',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                -64%
+              </span>
             </div>
-            {/* Screen border reflection */}
-            <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '1px',
-                background: 'rgba(255, 255, 255, 0.25)',
-              }}
-            />
-          </motion.div>
 
-          {/* Floating Pill: Top Deals / Up to 70% Off */}
-          <div
-            style={{
-              position: 'absolute',
-              top: '20px',
-              right: '20px',
-              padding: '6px 12px',
-              backgroundColor: '#161B22',
-              border: '1px solid #F59E0B',
-              borderRadius: '6px',
-              display: 'flex',
-              flexDirection: 'column',
-              boxShadow: '0 8px 24px rgba(245, 158, 11, 0.15)',
-              zIndex: 3,
-            }}
-          >
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: '11px', fontWeight: 800, color: '#F59E0B' }}>
-              Top Deals
-            </span>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#9099A6' }}>
-              Up to 70% Off →
-            </span>
-          </div>
+            {/* Product Details */}
+            <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    color: '#F59E0B',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Amazon India
+                </span>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '10px',
+                    color: '#687482',
+                  }}
+                >
+                  1h ago
+                </span>
+              </div>
 
-          {/* Floating TWS Earbuds Showcase */}
-          <motion.div
-            animate={{ y: [0, -4, 0] }}
-            transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-            style={{
-              position: 'absolute',
-              bottom: '10px',
-              right: '40px',
-              width: '135px',
-              height: '145px',
-              backgroundColor: '#161B22',
-              border: '1px solid #28313D',
-              borderRadius: '8px',
-              padding: '8px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 12px 28px rgba(0, 0, 0, 0.6)',
-              transform: 'translateY(10px)',
-              zIndex: 4,
-            }}
-          >
-            <img
-              src="https://m.media-amazon.com/images/I/51HBom8xz7L._SL1500_.jpg"
-              alt="boAt Airdopes"
-              style={{
-                width: '76px',
-                height: '76px',
-                objectFit: 'contain',
-                filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))',
-              }}
-            />
-            <span
-              style={{
-                marginTop: '6px',
-                padding: '2px 8px',
-                backgroundColor: 'rgba(245, 158, 11, 0.15)',
-                border: '1px solid rgba(245, 158, 11, 0.3)',
-                borderRadius: '4px',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '10px',
-                fontWeight: 700,
-                color: '#F59E0B',
-              }}
-            >
-              Up to 70% Off
-            </span>
+              <div
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: '#F5F7FA',
+                  lineHeight: 1.3,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                boAt Airdopes 141 Pro TWS Earbuds
+              </div>
+
+              {/* Price & Savings */}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '2px' }}>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '18px',
+                    fontWeight: 800,
+                    color: '#F5F7FA',
+                    lineHeight: 1,
+                  }}
+                >
+                  ₹899
+                </span>
+                <span
+                  style={{
+                    fontSize: '11px',
+                    color: '#687482',
+                    textDecoration: 'line-through',
+                    fontFamily: 'var(--font-mono)',
+                  }}
+                >
+                  ₹2,499
+                </span>
+                <span
+                  style={{
+                    fontSize: '11px',
+                    fontFamily: 'var(--font-body)',
+                    fontWeight: 600,
+                    color: '#22C55E',
+                    marginLeft: 'auto',
+                  }}
+                >
+                  Save ₹1,600
+                </span>
+              </div>
+
+              {/* Action Button */}
+              <a
+                href="https://www.amazon.in/dp/B09N3ZNHTY"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  height: '34px',
+                  backgroundColor: '#F59E0B',
+                  color: '#0B0D10',
+                  borderRadius: '4px',
+                  fontFamily: 'var(--font-heading)',
+                  fontWeight: 800,
+                  fontSize: '12px',
+                  letterSpacing: '0.02em',
+                  textTransform: 'uppercase',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  textDecoration: 'none',
+                  marginTop: '4px',
+                  transition: 'background-color 120ms ease',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#FFB126';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#F59E0B';
+                }}
+              >
+                <span>Get Deal</span>
+                <span>→</span>
+              </a>
+            </div>
           </motion.div>
         </div>
       </div>

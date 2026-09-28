@@ -195,6 +195,8 @@ export const App: React.FC = () => {
     <div
       style={{
         minHeight: '100vh',
+        maxWidth: '100vw',
+        overflowX: 'hidden',
         backgroundColor: 'var(--bg)',
         color: 'var(--text)',
         display: 'flex',
@@ -288,10 +290,12 @@ export const App: React.FC = () => {
 
           {/* ── 5. Deal Section: Latest Verified Deals ── */}
           <section
+            className="px-3 md:px-5 w-full"
             style={{
               maxWidth: '1320px',
               margin: '0 auto',
-              padding: '12px 20px 32px',
+              paddingTop: '12px',
+              paddingBottom: '32px',
             }}
           >
             {/* Section Header */}

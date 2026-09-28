@@ -116,19 +116,17 @@ export const CategoryRail: React.FC<CategoryRailProps> = ({
     <nav
       id="category-rail"
       aria-label="Category navigation rail"
+      className="sticky top-14 md:top-16 z-40"
       style={{
         backgroundColor: 'var(--bg)',
         borderBottom: '1px solid var(--border)',
-        position: 'sticky',
-        top: '64px',
-        zIndex: 40,
       }}
     >
       <div
+        className="scrollbar-none px-3 md:px-5 w-full"
         style={{
           maxWidth: '1320px',
           margin: '0 auto',
-          padding: '0 20px',
           display: 'flex',
           alignItems: 'center',
           overflowX: 'auto',
@@ -137,7 +135,6 @@ export const CategoryRail: React.FC<CategoryRailProps> = ({
           gap: '4px',
           height: '56px',
         }}
-        className="scrollbar-none"
       >
         {CATEGORIES.map((cat) => {
           const isSelected =

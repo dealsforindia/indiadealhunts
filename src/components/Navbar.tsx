@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { NavTab } from '../types';
 
 interface NavbarProps {
@@ -61,29 +62,21 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header
+      className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg)] h-14 md:h-16"
       style={{
-        height: '64px',
-        borderBottom: '1px solid var(--border)',
         backgroundColor: 'var(--bg)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 50,
+        borderBottom: '1px solid var(--border)',
       }}
     >
       <div
+        className="px-3 md:px-5 w-full flex items-center justify-between gap-2 md:gap-4 h-full"
         style={{
           maxWidth: '1320px',
           margin: '0 auto',
-          padding: '0 20px',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '16px',
         }}
       >
         {/* ── Left: Mobile Hamburger (on mobile) + Brand Logo ── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
           {/* Mobile Hamburger toggle */}
           <button
             className="flex md:hidden items-center justify-center"
@@ -162,78 +155,69 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </div>
 
-        {/* ── Center: Desktop Navigation Tabs ── */}
+        {/* ── Center: Desktop Navigation Tabs with tiny active bottom indicator ── */}
         <nav
           className="hidden md:flex items-center"
           aria-label="Primary navigation"
-          style={{ gap: '22px' }}
+          style={{ gap: '24px', height: '100%' }}
         >
-          <button
-            onClick={() => onTabChange('home')}
-            style={{
-              fontSize: '13px',
-              fontFamily: 'var(--font-body)',
-              fontWeight: activeTab === 'home' ? 600 : 500,
-              color: activeTab === 'home' ? '#F59E0B' : '#9099A6',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '6px 0',
-              transition: 'color 120ms ease',
-            }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#F5F7FA'; }}
-            onMouseLeave={(e) => {
-              if (activeTab !== 'home') (e.currentTarget as HTMLButtonElement).style.color = '#9099A6';
-            }}
-          >
-            Latest
-          </button>
-
-          <button
-            onClick={() => onTabChange('ending_soon')}
-            style={{
-              fontSize: '13px',
-              fontFamily: 'var(--font-body)',
-              fontWeight: activeTab === 'ending_soon' ? 600 : 500,
-              color: activeTab === 'ending_soon' ? '#F59E0B' : '#9099A6',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '6px 0',
-              transition: 'color 120ms ease',
-            }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#F5F7FA'; }}
-            onMouseLeave={(e) => {
-              if (activeTab !== 'ending_soon') (e.currentTarget as HTMLButtonElement).style.color = '#9099A6';
-            }}
-          >
-            Popular
-          </button>
-
-          <button
-            onClick={() => onTabChange('best_worth')}
-            style={{
-              fontSize: '13px',
-              fontFamily: 'var(--font-body)',
-              fontWeight: activeTab === 'best_worth' ? 600 : 500,
-              color: activeTab === 'best_worth' ? '#F59E0B' : '#9099A6',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '6px 0',
-              transition: 'color 120ms ease',
-            }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#F5F7FA'; }}
-            onMouseLeave={(e) => {
-              if (activeTab !== 'best_worth') (e.currentTarget as HTMLButtonElement).style.color = '#9099A6';
-            }}
-          >
-            Top Value
-          </button>
+          {[
+            { id: 'home', label: 'Latest' },
+            { id: 'ending_soon', label: 'Popular' },
+            { id: 'best_worth', label: 'Top Value' },
+          ].map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => onTabChange(tab.id as NavTab)}
+                style={{
+                  position: 'relative',
+                  height: '100%',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  fontSize: '13px',
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: isActive ? 600 : 500,
+                  color: isActive ? '#F59E0B' : '#9099A6',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '0 2px',
+                  transition: 'color 120ms ease',
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#F5F7FA'; }}
+                onMouseLeave={(e) => {
+                  if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = '#9099A6';
+                }}
+              >
+                <span>{tab.label}</span>
+                {isActive && (
+                  <motion.div
+                    layoutId="desktop-nav-indicator"
+                    transition={{ type: 'spring', stiffness: 500, damping: 40 }}
+                    style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: '2px',
+                      backgroundColor: '#F59E0B',
+                      borderRadius: '2px 2px 0 0',
+                    }}
+                  />
+                )}
+              </button>
+            );
+          })}
 
           <button
             onClick={onOpenLookup}
             style={{
+              position: 'relative',
+              height: '100%',
+              display: 'inline-flex',
+              alignItems: 'center',
               fontSize: '13px',
               fontFamily: 'var(--font-body)',
               fontWeight: 500,
@@ -241,7 +225,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              padding: '6px 0',
+              padding: '0 2px',
               transition: 'color 120ms ease',
             }}
             onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#F5F7FA'; }}
@@ -251,7 +235,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {/* Categories Popover dropdown */}
-          <div ref={categoriesRef} style={{ position: 'relative' }}>
+          <div ref={categoriesRef} style={{ position: 'relative', height: '100%', display: 'flex', alignItems: 'center' }}>
             <button
               onClick={() => setCategoriesOpen(!categoriesOpen)}
               style={{
@@ -265,7 +249,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                padding: '6px 0',
+                padding: '0 2px',
                 transition: 'color 120ms ease',
               }}
               onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#F5F7FA'; }}
@@ -292,7 +276,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div
                 style={{
                   position: 'absolute',
-                  top: 'calc(100% + 8px)',
+                  top: 'calc(100% + 4px)',
                   left: 0,
                   width: '180px',
                   backgroundColor: 'var(--surface)',
@@ -338,11 +322,11 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
 
         {/* ── Right: Search icon, Submit Deal, Telegram ── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {/* Quick Search Focus button */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+          {/* Quick Search Focus button (both Mobile and Desktop) */}
           {onFocusSearch && (
             <button
-              className="hidden md:flex items-center justify-center"
+              className="flex items-center justify-center"
               onClick={onFocusSearch}
               title="Search deals (/)"
               aria-label="Focus search"
@@ -372,13 +356,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           )}
 
-          {/* Submit Deal CTA */}
+          {/* Submit Deal CTA (Desktop only) */}
           <button
             className="hidden md:inline-flex items-center"
             onClick={onOpenSubmit}
             style={{
-              height: '40px',
-              padding: '0 16px',
+              height: '36px',
+              padding: '0 14px',
               backgroundColor: '#F59E0B',
               color: '#090A0C',
               borderRadius: '4px',
@@ -398,7 +382,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             Submit Deal
           </button>
 
-          {/* Telegram circular icon button */}
+          {/* Telegram circular icon button (both Mobile and Desktop) */}
           <a
             href={TELEGRAM_URL}
             target="_blank"
@@ -409,8 +393,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '40px',
-              height: '40px',
+              width: '36px',
+              height: '36px',
               backgroundColor: '#1E293B',
               color: '#38BDF8',
               borderRadius: '4px',
@@ -428,7 +412,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               (e.currentTarget as HTMLAnchorElement).style.color = '#38BDF8';
             }}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.63 3.73-.53.36-1.02.54-1.45.53-.48-.01-1.4-.27-2.09-.49-.84-.27-1.51-.42-1.45-.88.03-.24.37-.49 1.02-.75 4-1.74 6.68-2.88 8.03-3.44 3.82-1.59 4.62-1.87 5.14-1.88.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.16-.04.29z"/>
             </svg>
           </a>

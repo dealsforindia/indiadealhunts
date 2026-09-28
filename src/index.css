@@ -3,49 +3,49 @@
 
 @layer base {
   :root {
-    /* ── Exact Slate Design Tokens ── */
-    --bg: #0F172A;
-    /* Tailwind slate-900 */
-    --surface: #1E293B;
-    /* Tailwind slate-800 */
-    --surface-2: #334155;
-    /* Tailwind slate-700 */
-    --border: #334155;
-    /* Tailwind slate-700 */
-    --text: #F8FAFC;
-    /* Tailwind slate-50 */
-    --muted: #94A3B8;
-    /* Tailwind slate-400 */
-    --accent: #F59E0B;
-    --accent-dark: #D97706;
-    --green: #22C55E;
-    --red: #EF4444;
+    /* ── 2026 Refined Dark Commerce Design Tokens ── */
+    --bg:             #0B0D10; /* Near-black canvas */
+    --surface:        #11151A; /* Primary cards & containers */
+    --surface-2:      #151A20; /* Search input, wells, raised containers */
+    --surface-3:      #1A2027; /* Chips, pills, active states */
+    --border:         #252D36; /* Default thin border */
+    --border-strong:  #303945; /* Hover & interactive borders */
+    --border-subtle:  #1A2027;
+    --text:           #F5F7FA; /* Primary text */
+    --text-secondary: #B6BEC8; /* Secondary text */
+    --muted:          #7E8995; /* Muted captions & timestamps */
+    --text-muted:     #7E8995;
+    --text-primary:   #F5F7FA;
+    --text-inverse:   #0B0D10;
 
-    /* ── Aliases for components ── */
-    --bg-base: #0F172A;
-    --bg-surface: #1E293B;
-    --bg-raised: #334155;
-    --bg-input: #1E293B;
-    --border-default: #334155;
-    --border-subtle: #1E293B;
-    --border-strong: #475569;
-    --text-primary: #F8FAFC;
-    --text-secondary: #94A3B8;
-    --text-muted: #64748B;
-    --text-inverse: #0F172A;
-    --accent-hover: #FFB126;
-    --accent-subtle: rgba(245, 158, 11, 0.14);
-    --green-subtle: rgba(34, 197, 94, 0.15);
-    --red-subtle: rgba(239, 68, 68, 0.15);
+    /* ── Brand Accent (Used Sparingly) ── */
+    --accent:         #F59E0B;
+    --accent-dark:    #D97706;
+    --accent-hover:   #FFB126;
+    --accent-subtle:  rgba(245, 158, 11, 0.12);
+
+    /* ── Status Colors ── */
+    --green:          #22C55E;
+    --green-subtle:   rgba(34, 197, 94, 0.12);
+    --red:            #EF4444;
+    --red-subtle:     rgba(239, 68, 68, 0.12);
+
+    /* ── Aliases for legacy/backward compatibility ── */
+    --bg-base:        #0B0D10;
+    --bg-surface:     #11151A;
+    --bg-raised:      #151A20;
+    --bg-input:       #151A20;
+    --border-default: #252D36;
 
     /* ── Typography Tokens ── */
-    --font-heading: 'Lexend', system-ui, -apple-system, sans-serif;
-    --font-body: 'Source Sans 3', system-ui, -apple-system, sans-serif;
-    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --font-heading:   'Lexend', system-ui, -apple-system, sans-serif;
+    --font-body:      'Source Sans 3', system-ui, -apple-system, sans-serif;
+    --font-mono:      'JetBrains Mono', ui-monospace, monospace;
 
-    /* ── Border Radius ── */
+    /* ── Restrained Border Radius (4–8px maximum) ── */
     --radius-sm: 4px;
     --radius-md: 6px;
+    --radius-lg: 8px;
   }
 
   *,

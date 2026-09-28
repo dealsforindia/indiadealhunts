@@ -4,10 +4,10 @@ export const DealSkeleton: React.FC = () => {
   return (
     <div
       style={{
-        backgroundColor: 'var(--bg-surface)',
-        border: '1px solid var(--border-default)',
-        borderRadius: '2px',
-        padding: '10px',
+        backgroundColor: 'var(--surface)',
+        border: '1px solid var(--border)',
+        borderRadius: '6px',
+        padding: '12px',
         display: 'flex',
         flexDirection: 'column',
         gap: '8px',
@@ -19,7 +19,7 @@ export const DealSkeleton: React.FC = () => {
         style={{
           width: '100%',
           aspectRatio: '4 / 3',
-          borderRadius: '2px',
+          borderRadius: '4px',
         }}
       />
 
