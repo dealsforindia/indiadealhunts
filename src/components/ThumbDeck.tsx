@@ -22,7 +22,7 @@ export const ThumbDeck: React.FC<ThumbDeckProps> = ({
   return (
     <nav
       aria-label="Mobile thumb navigation"
-      className="md:hidden glass-panel"
+      className="md:hidden pro-card"
       style={{
         position: 'fixed',
         bottom: 0,

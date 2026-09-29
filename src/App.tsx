@@ -203,7 +203,10 @@ export const App: React.FC = () => {
         flexDirection: 'column',
       }}
     >
-      {/* ── 0. Top Scroll Progress Indicator (Micro-interaction 15: 2px Amber line) ── */}
+      {/* ── 0. Global Ambient Mesh Background ── */}
+      <div className="ambient-mesh"></div>
+
+      {/* ── 0.1 Top Scroll Progress Indicator ── */}
       <motion.div
         style={{
           scaleX,
@@ -217,6 +220,7 @@ export const App: React.FC = () => {
           zIndex: 9999,
           pointerEvents: 'none',
         }}
+        className="glow-amber"
       />
 
       {/* ── 1. Header (Navbar) ── */}

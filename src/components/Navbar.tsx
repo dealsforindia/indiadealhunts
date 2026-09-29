@@ -62,7 +62,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header
-      className="sticky top-0 z-50 h-14 md:h-16 glass-panel"
+      className="sticky top-0 z-50 h-14 md:h-16 pro-card"
       style={{
         borderBottom: '1px solid var(--border)',
       }}
