@@ -173,7 +173,29 @@ export interface LookupResult {
 }
 
 export type SortOption = 'worth' | 'newest' | 'discount' | 'price_low' | 'price_high';
-export type NavTab = 'home' | 'ending_soon' | 'best_worth' | 'active_offers' | 'lookup' | 'submit_deal' | 'about' | 'how_we_verify' | 'contact';
+export type NavTab = 'home' | 'ending_soon' | 'best_worth' | 'active_offers' | 'lookup' | 'submit_deal' | 'about' | 'how_we_verify' | 'wall_of_happiness' | 'contact';
+
+export interface CommunityBrag {
+  id: string;
+  name: string;
+  city: string;
+  product: string;
+  store: string;
+  sale_price: number;
+  saved_amount: number;
+  comment: string;
+  relative_time: string;
+  avatar_bg?: string;
+}
+
+export interface WallStats {
+  total_saved_inr: number;
+  formatted_savings: string;
+  active_deals_count: number;
+  verified_shoppers_count: number;
+  satisfaction_rate: string;
+  updated_at: number;
+}
 
 export interface TickerItem {
   id: string;

@@ -164,6 +164,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             { id: 'home', label: 'Latest' },
             { id: 'ending_soon', label: 'Popular' },
             { id: 'best_worth', label: 'Top Value' },
+            { id: 'wall_of_happiness', label: '💖 Wall of Happiness' },
           ].map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -472,6 +473,20 @@ export const Navbar: React.FC<NavbarProps> = ({
             }}
           >
             Top Value
+          </button>
+          <button
+            onClick={() => { onTabChange('wall_of_happiness'); setMobileMenuOpen(false); }}
+            style={{
+              textAlign: 'left',
+              padding: '10px 0',
+              fontSize: '15px',
+              fontFamily: 'var(--font-heading)',
+              fontWeight: activeTab === 'wall_of_happiness' ? 700 : 500,
+              color: activeTab === 'wall_of_happiness' ? '#F59E0B' : '#F5F7FA',
+              borderBottom: '1px solid #1B222C',
+            }}
+          >
+            💖 Wall of Happiness
           </button>
           <button
             onClick={() => { onOpenLookup(); setMobileMenuOpen(false); }}

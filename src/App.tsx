@@ -16,6 +16,7 @@ import { LegalModal, LegalDocType } from './components/LegalModal';
 import { AboutPage } from './components/AboutPage';
 import { HowWeVerify } from './components/HowWeVerify';
 import { ContactPage } from './components/ContactPage';
+import { WallOfHappiness } from './components/WallOfHappiness';
 import { DealSkeletonGrid } from './components/DealSkeleton';
 import { MarqueeTicker } from './components/MarqueeTicker';
 import { HowDealsWorkModal } from './components/HowDealsWorkModal';
@@ -263,6 +264,13 @@ export const App: React.FC = () => {
       ) : activeTab === 'how_we_verify' ? (
         <main style={{ flex: 1, padding: '40px 20px', maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
           <HowWeVerify />
+        </main>
+      ) : activeTab === 'wall_of_happiness' ? (
+        <main style={{ flex: 1, width: '100%' }}>
+          <WallOfHappiness
+            onBackToHome={() => setActiveTab('home')}
+            onNavigateTab={(tab) => setActiveTab(tab)}
+          />
         </main>
       ) : activeTab === 'contact' ? (
         <main style={{ flex: 1, padding: '40px 20px', maxWidth: '1080px', margin: '0 auto', width: '100%' }}>

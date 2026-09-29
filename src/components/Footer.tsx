@@ -241,6 +241,12 @@ export const Footer: React.FC<FooterProps> = ({
                 Top Value
               </button>
               <button
+                onClick={() => handleLinkClick('wall_of_happiness')}
+                style={{ textAlign: 'left', color: '#9099A6', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              >
+                💖 Wall of Happiness
+              </button>
+              <button
                 onClick={() => {
                   const rail = document.getElementById('category-rail');
                   if (rail) rail.scrollIntoView({ behavior: 'smooth' });
