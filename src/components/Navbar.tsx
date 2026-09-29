@@ -62,9 +62,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header
-      className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg)] h-14 md:h-16"
+      className="sticky top-0 z-50 h-14 md:h-16 glass-panel"
       style={{
-        backgroundColor: 'var(--bg)',
         borderBottom: '1px solid var(--border)',
       }}
     >
@@ -141,12 +140,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               </svg>
             </span>
             <span
+              className="gradient-text"
               style={{
                 fontFamily: 'var(--font-heading)',
                 fontWeight: 800,
                 fontSize: '18px',
                 letterSpacing: '-0.02em',
-                color: '#F5F7FA',
                 lineHeight: 1,
               }}
             >
@@ -358,26 +357,20 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Submit Deal CTA (Desktop only) */}
           <button
-            className="hidden md:inline-flex items-center"
+            className="hidden md:inline-flex items-center btn-primary"
             onClick={onOpenSubmit}
             style={{
               height: '36px',
               padding: '0 14px',
-              backgroundColor: '#F59E0B',
-              color: '#090A0C',
-              borderRadius: '4px',
+              borderRadius: 'var(--radius-sm)',
               fontFamily: 'var(--font-heading)',
-              fontWeight: 700,
               fontSize: '13px',
               letterSpacing: '-0.01em',
               gap: '6px',
               border: 'none',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
-              transition: 'background-color 120ms ease',
             }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#FFB126'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F59E0B'; }}
           >
             Submit Deal
           </button>

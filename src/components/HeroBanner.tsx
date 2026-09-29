@@ -107,14 +107,14 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
           >
             {/* Desktop Headline */}
             <div className="hidden sm:block" style={{ fontSize: 'clamp(36px, 4vw, 54px)', fontWeight: 800 }}>
-              <span style={{ color: '#F5F7FA', display: 'block' }}>Best Deals in India,</span>
-              <span style={{ color: '#F59E0B', display: 'block' }}>All in One Place.</span>
+              <span style={{ color: '#F8FAFC', display: 'block' }}>Best Deals in India,</span>
+              <span className="gradient-text" style={{ display: 'block' }}>All in One Place.</span>
             </div>
 
-            {/* Mobile Headline (matches user mockup: "Best Deals \n in India.") */}
+            {/* Mobile Headline */}
             <div className="sm:hidden" style={{ fontSize: '32px', fontWeight: 800, lineHeight: 1.06 }}>
-              <span style={{ color: '#F5F7FA', display: 'block' }}>Best Deals</span>
-              <span style={{ color: '#F59E0B', display: 'block' }}>in India.</span>
+              <span style={{ color: '#F8FAFC', display: 'block' }}>Best Deals</span>
+              <span className="gradient-text" style={{ display: 'block' }}>in India.</span>
             </div>
           </h1>
 
@@ -226,27 +226,20 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
             {/* Amber Search Submit Button (52px width) */}
             <motion.button
               type="button"
+              className="btn-primary"
               whileTap={{ scale: 0.96 }}
               onClick={submitSearch}
               aria-label="Submit search"
               style={{
                 width: '52px',
                 height: '52px',
-                backgroundColor: '#F59E0B',
-                color: '#0B0D10',
                 border: 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
                 flexShrink: 0,
-                transition: 'background-color 120ms ease',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#FFB126';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F59E0B';
+                borderRadius: '0 6px 6px 0',
               }}
             >
               <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
@@ -338,17 +331,15 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 
           {/* Framed Featured Deal Spotlight Card */}
           <motion.div
+            className="glass-panel"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: 'easeOut' }}
             style={{
               position: 'relative',
               width: '320px',
-              backgroundColor: 'var(--surface)',
-              border: '1px solid var(--border)',
-              borderRadius: '6px',
+              borderRadius: 'var(--radius-md)',
               overflow: 'hidden',
-              boxShadow: '0 12px 28px rgba(0, 0, 0, 0.5)',
               display: 'flex',
               flexDirection: 'column',
             }}
@@ -515,13 +506,11 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                 href="https://www.amazon.in/dp/B09N3ZNHTY"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="btn-primary"
                 style={{
                   height: '34px',
-                  backgroundColor: '#F59E0B',
-                  color: '#0B0D10',
-                  borderRadius: '4px',
+                  borderRadius: 'var(--radius-sm)',
                   fontFamily: 'var(--font-heading)',
-                  fontWeight: 800,
                   fontSize: '12px',
                   letterSpacing: '0.02em',
                   textTransform: 'uppercase',
@@ -531,13 +520,6 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                   gap: '6px',
                   textDecoration: 'none',
                   marginTop: '4px',
-                  transition: 'background-color 120ms ease',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#FFB126';
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#F59E0B';
                 }}
               >
                 <span>Get Deal</span>

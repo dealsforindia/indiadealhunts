@@ -22,15 +22,18 @@ export const ThumbDeck: React.FC<ThumbDeckProps> = ({
   return (
     <nav
       aria-label="Mobile thumb navigation"
-      className="md:hidden"
+      className="md:hidden glass-panel"
       style={{
         position: 'fixed',
         bottom: 0,
         left: 0,
         right: 0,
         zIndex: 40,
-        backgroundColor: 'var(--bg-base)',
         borderTop: '1px solid var(--border-default)',
+        borderBottom: 'none',
+        borderLeft: 'none',
+        borderRight: 'none',
+        borderRadius: 0,
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         display: 'flex',
         alignItems: 'center',

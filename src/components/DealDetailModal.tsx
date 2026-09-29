@@ -150,6 +150,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
       }}
     >
       <motion.div
+        className="glass-panel"
         initial={{ opacity: 0, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 10, scale: 0.98 }}
@@ -159,9 +160,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
           maxWidth: '720px',
           maxHeight: '90vh',
           overflowY: 'auto',
-          backgroundColor: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: '6px',
+          borderRadius: 'var(--radius-md)',
           display: 'flex',
           flexDirection: 'column',
           boxShadow: '0 25px 50px rgba(0, 0, 0, 0.7)',
@@ -473,26 +472,22 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             href={deal.url}
             target="_blank"
             rel="noopener noreferrer sponsored"
+            className="btn-primary"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
               padding: '0 20px',
               height: '42px',
-              backgroundColor: 'var(--accent)',
-              color: 'var(--text-inverse)',
               fontFamily: 'var(--font-heading)',
               fontSize: '12px',
               fontWeight: 700,
               textDecoration: 'none',
-              borderRadius: '2px',
+              borderRadius: 'var(--radius-sm)',
               textTransform: 'uppercase',
               letterSpacing: '0.04em',
-              transition: 'background-color 150ms ease',
               flexShrink: 0,
             }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = 'var(--accent-hover)'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = 'var(--accent)'; }}
           >
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
               <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

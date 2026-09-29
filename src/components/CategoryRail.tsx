@@ -116,10 +116,13 @@ export const CategoryRail: React.FC<CategoryRailProps> = ({
     <nav
       id="category-rail"
       aria-label="Category navigation rail"
-      className="sticky top-14 md:top-16 z-40"
+      className="sticky top-14 md:top-16 z-40 glass-panel"
       style={{
-        backgroundColor: 'var(--bg)',
         borderBottom: '1px solid var(--border)',
+        borderTop: 'none',
+        borderLeft: 'none',
+        borderRight: 'none',
+        borderRadius: 0,
       }}
     >
       <div

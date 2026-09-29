@@ -84,6 +84,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   return (
     <motion.article
       onClick={handleCardClick}
+      className="glass-panel card-hover"
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
@@ -94,21 +95,12 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
       layout="position"
       style={{
         minHeight: '440px',
-        backgroundColor: 'var(--surface)',
-        border: '1px solid var(--border)',
-        borderRadius: '6px',
+        borderRadius: 'var(--radius-md)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
         cursor: 'pointer',
         position: 'relative',
-        transition: 'border-color 150ms ease',
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-strong)';
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
       }}
     >
       {/* ── Top Bar: Discount Badge + Favorite Heart Button ── */}
@@ -425,16 +417,14 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           href={deal.url}
           target="_blank"
           rel="noopener noreferrer"
+          className="btn-primary"
           onClick={(e) => e.stopPropagation()}
           whileTap={{ scale: 0.98 }}
           aria-label={`Get deal for ${displayTitle} on ${deal.store}`}
           style={{
             height: '40px',
-            backgroundColor: '#F59E0B',
-            color: '#0B0D10',
-            borderRadius: '4px',
+            borderRadius: 'var(--radius-sm)',
             fontFamily: 'var(--font-heading)',
-            fontWeight: 800,
             fontSize: '13px',
             letterSpacing: '0.02em',
             textTransform: 'uppercase',
@@ -444,13 +434,6 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             gap: '6px',
             textDecoration: 'none',
             marginTop: '8px',
-            transition: 'background-color 120ms ease',
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#FFB126';
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#F59E0B';
           }}
         >
           <span>Get Deal</span>
