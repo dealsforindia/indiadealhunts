@@ -175,3 +175,28 @@ export interface LookupResult {
 export type SortOption = 'worth' | 'newest' | 'discount' | 'price_low' | 'price_high';
 export type NavTab = 'home' | 'ending_soon' | 'best_worth' | 'active_offers' | 'lookup' | 'submit_deal' | 'about' | 'how_we_verify' | 'contact';
 
+export interface TickerItem {
+  id: string;
+  title: string;
+  price: number;
+  mrp: number;
+  discount_pct: number;
+  store: string;
+  image?: string;
+  url: string;
+  badge?: string;
+  relative_time?: string;
+  consensus_count?: number;
+  worth_score?: number;
+}
+
+export interface TickerResponse {
+  items: TickerItem[];
+  stats: {
+    total_live_deals: number;
+    today_drops: number;
+    avg_discount: number;
+    updated_at: number;
+  };
+}
+

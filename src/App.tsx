@@ -17,6 +17,8 @@ import { AboutPage } from './components/AboutPage';
 import { HowWeVerify } from './components/HowWeVerify';
 import { ContactPage } from './components/ContactPage';
 import { DealSkeletonGrid } from './components/DealSkeleton';
+import { MarqueeTicker } from './components/MarqueeTicker';
+import { HowDealsWorkModal } from './components/HowDealsWorkModal';
 import type { PublicDeal, PublicDealsResponse, SortOption, NavTab } from './types';
 import { calculateWorthScore } from './utils/worthScore';
 import { searchDealsClient } from './utils/semanticSearch';
@@ -54,6 +56,7 @@ export const App: React.FC = () => {
   const [lookupUrl, setLookupUrl] = useState<string>('');
   const [isSubmitOpen, setIsSubmitOpen] = useState<boolean>(false);
   const [activeLegal, setActiveLegal] = useState<LegalDocType>(null);
+  const [isVerifyModalOpen, setIsVerifyModalOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = useCallback((msg: string) => {
@@ -241,6 +244,15 @@ export const App: React.FC = () => {
         }}
         onOpenSubmit={() => setIsSubmitOpen(true)}
         onFocusSearch={handleFocusSearch}
+      />
+
+      {/* ── Real-Time Loot Radar Marquee Ticker ── */}
+      <MarqueeTicker
+        onSelectDeal={(deal) => {
+          const fullDeal = deals.find((d) => d.id === deal.id);
+          setSelectedDetailDeal((fullDeal || deal) as PublicDeal);
+        }}
+        onOpenVerify={() => setIsVerifyModalOpen(true)}
       />
 
       {/* ── Tab Views: About, How We Verify, Contact, Submit ── */}
@@ -539,6 +551,16 @@ export const App: React.FC = () => {
       <LegalModal
         type={activeLegal}
         onClose={() => setActiveLegal(null)}
+      />
+
+      {/* ── Autonomous Deal Verification Pipeline Modal ── */}
+      <HowDealsWorkModal
+        isOpen={isVerifyModalOpen}
+        onClose={() => setIsVerifyModalOpen(false)}
+        onViewFullPage={() => {
+          setIsVerifyModalOpen(false);
+          setActiveTab('how_we_verify');
+        }}
       />
 
       {/* ── Floating Action Toast ── */}

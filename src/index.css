@@ -338,3 +338,31 @@ textarea:focus-visible {
   background-size: 200% 200%;
   animation: liquid-sweep 4s ease infinite;
 }
+
+/* ── 2026 Marquee Ticker Utilities ── */
+@keyframes marquee-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-marquee-drift {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marquee-drift 38s linear infinite;
+}
+
+.animate-marquee-drift:hover,
+.animate-marquee-drift:focus-within {
+  animation-play-state: paused;
+}
+
+@media (max-width: 640px) {
+  .animate-marquee-drift {
+    animation-duration: 28s;
+  }
+}
