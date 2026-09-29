@@ -222,3 +222,29 @@ export interface TickerResponse {
   };
 }
 
+export interface CategoryStoryItem {
+  id: string;
+  title: string;
+  price: number;
+  mrp: number;
+  discount_pct: number;
+  store: string;
+  image?: string;
+  url: string;
+}
+
+export interface CategoryStoryCollection {
+  id: string;
+  title: string;
+  emoji: string;
+  ring_color: string;
+  badge: string;
+  category_filter: string;
+  items: CategoryStoryItem[];
+}
+
+export interface StoriesResponse {
+  stories: CategoryStoryCollection[];
+  updated_at: number;
+}
+

@@ -20,6 +20,7 @@ import { WallOfHappiness } from './components/WallOfHappiness';
 import { DealSkeletonGrid } from './components/DealSkeleton';
 import { MarqueeTicker } from './components/MarqueeTicker';
 import { HowDealsWorkModal } from './components/HowDealsWorkModal';
+import { CategoryStories } from './components/CategoryStories';
 import type { PublicDeal, PublicDealsResponse, SortOption, NavTab } from './types';
 import { calculateWorthScore } from './utils/worthScore';
 import { searchDealsClient } from './utils/semanticSearch';
@@ -293,6 +294,17 @@ export const App: React.FC = () => {
             }}
           />
 
+          {/* ── 2.5 Flash Category Stories Rail (Instagram-style) ── */}
+          <CategoryStories
+            onSelectCategoryFilter={(cat) => {
+              setSelectedCategory(cat);
+              const dealGrid = document.getElementById('deals-section');
+              if (dealGrid) {
+                dealGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }}
+          />
+
           {/* ── 3. Category Rail (Sticky below header) ── */}
           <CategoryRail
             selectedCategory={selectedCategory}
@@ -314,6 +326,7 @@ export const App: React.FC = () => {
 
           {/* ── 5. Deal Section: Latest Verified Deals ── */}
           <section
+            id="deals-section"
             className="px-3 md:px-5 w-full"
             style={{
               maxWidth: '1320px',

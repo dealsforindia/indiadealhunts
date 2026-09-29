@@ -365,4 +365,24 @@ textarea:focus-visible {
   .animate-marquee-drift {
     animation-duration: 28s;
   }
-}
+}
+
+/* ── Category Stories Rail & Ring Utilities ── */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes story-gradient-rotate {
+  0% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(45deg); }
+  100% { filter: hue-rotate(0deg); }
+}
+
+.animate-story-glow {
+  animation: story-gradient-rotate 4s ease-in-out infinite;
+}
+
