@@ -84,7 +84,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   return (
     <motion.article
       onClick={handleCardClick}
-      className="glass-panel"
+      className="pro-card"
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -2 }}
@@ -329,12 +329,8 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
         {/* Title (2 lines clamped) */}
         <h3
           title={displayTitle}
+          className="pro-title"
           style={{
-            fontSize: '15px',
-            fontWeight: 600,
-            lineHeight: 1.3,
-            color: '#F5F7FA',
-            fontFamily: 'var(--font-body)',
             margin: 0,
             display: '-webkit-box',
             WebkitLineClamp: 2,
@@ -350,12 +346,11 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
         <div style={{ marginTop: 'auto', paddingTop: '4px' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
             <span
-              className="price-num"
+              className="pro-price"
               style={{
-                fontFamily: 'var(--font-mono)',
                 fontSize: '20px',
                 fontWeight: 800,
-                color: '#F5F7FA',
+                color: '#F4F4F7',
                 lineHeight: 1,
               }}
             >
@@ -418,15 +413,16 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           href={deal.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="btn-primary"
+          className="glow-pill-amber"
           onClick={(e) => e.stopPropagation()}
           whileTap={{ scale: 0.98 }}
           aria-label={`Get deal for ${displayTitle} on ${deal.store}`}
           style={{
             height: '40px',
-            borderRadius: 'var(--radius-sm)',
+            borderRadius: '999px',
             fontFamily: 'var(--font-heading)',
             fontSize: '13px',
+            fontWeight: 700,
             letterSpacing: '0.02em',
             textTransform: 'uppercase',
             display: 'flex',

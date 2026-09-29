@@ -68,15 +68,14 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
         initial={{ opacity: 0, scale: 0.95, rotateX: 10 }}
         animate={{ opacity: 1, scale: 1, rotateX: 0 }}
         transition={{ duration: 0.5, type: "spring", bounce: 0.4 }}
-        className="glass-panel"
+        className="pro-card"
         style={{
           width: '100%',
           maxWidth: '600px',
-          borderRadius: 'var(--radius-md)',
+          borderRadius: 'var(--radius-lg)',
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-          boxShadow: '0 30px 60px rgba(0, 0, 0, 0.7)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -151,14 +150,14 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary"
+              className="glow-pill-primary"
               style={{
                 padding: '0 16px',
                 fontWeight: 600,
                 fontSize: '13px',
                 cursor: 'pointer',
                 opacity: loading ? 0.5 : 1,
-                borderRadius: 'var(--radius-sm)',
+                borderRadius: '999px',
                 whiteSpace: 'nowrap',
                 display: 'flex',
                 alignItems: 'center',

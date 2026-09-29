@@ -328,7 +328,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 
           {/* Framed Featured Deal Spotlight Card */}
           <motion.div
-            className="glass-panel"
+            className="pro-card"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: 'easeOut' }}
@@ -449,12 +449,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
               </div>
 
               <div
+                className="pro-title"
                 style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  color: '#F5F7FA',
-                  lineHeight: 1.3,
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -466,11 +462,11 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
               {/* Price & Savings */}
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '2px' }}>
                 <span
+                  className="pro-price"
                   style={{
-                    fontFamily: 'var(--font-mono)',
                     fontSize: '18px',
                     fontWeight: 800,
-                    color: '#F5F7FA',
+                    color: '#F4F4F7',
                     lineHeight: 1,
                   }}
                 >
@@ -504,12 +500,13 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                 href="https://www.amazon.in/dp/B09N3ZNHTY"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary"
+                className="glow-pill-amber"
                 style={{
                   height: '34px',
-                  borderRadius: 'var(--radius-sm)',
+                  borderRadius: '999px',
                   fontFamily: 'var(--font-heading)',
                   fontSize: '12px',
+                  fontWeight: 700,
                   letterSpacing: '0.02em',
                   textTransform: 'uppercase',
                   display: 'flex',
