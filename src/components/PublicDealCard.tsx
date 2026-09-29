@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, useMotionValue, useTransform, useSpring } from 'motion/react';
+import { motion } from 'motion/react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 
@@ -56,29 +56,6 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   const [imgError, setImgError] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
-  // 3D Tilt Setup
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  
-  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 40 });
-  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 40 });
-  
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["7deg", "-7deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-7deg", "7deg"]);
-  
-  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    x.set(mouseX / rect.width - 0.5);
-    y.set(mouseY / rect.height - 0.5);
-  };
-  
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
   const cleanImageUrl = getCleanImageUrl(deal.image);
   const displayTitle = cleanTitle(deal);
   const isExpired = Boolean(deal.is_expired || deal.status === 'expired' || deal.is_over);
@@ -106,13 +83,11 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
 
   return (
     <motion.article
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
       onClick={handleCardClick}
       className="glass-panel"
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4, boxShadow: '0 25px 50px rgba(0,0,0,0.5)', borderColor: 'var(--border-strong)' }}
+      whileHover={{ y: -2 }}
       transition={{
         duration: 0.35,
         ease: 'easeOut',
@@ -120,10 +95,6 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
       }}
       layout="position"
       style={{
-        rotateX,
-        rotateY,
-        transformPerspective: 1200,
-        transformStyle: 'preserve-3d',
         minHeight: '440px',
         borderRadius: 'var(--radius-md)',
         display: 'flex',

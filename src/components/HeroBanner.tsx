@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, useMotionValue, useTransform, useSpring } from 'motion/react';
+import { motion } from 'motion/react';
 
 interface HeroBannerProps {
   searchQuery: string;
@@ -55,26 +55,6 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
     onSearch(query);
   };
 
-  // 3D Tilt Setup for Spotlight Card
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 40 });
-  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 40 });
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
-  
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    x.set(mouseX / rect.width - 0.5);
-    y.set(mouseY / rect.height - 0.5);
-  };
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
   return (
     <section
       style={{
@@ -84,45 +64,16 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         overflow: 'hidden',
       }}
     >
-      {/* ── Immersive Animated Background ── */}
-      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
-        <motion.div
-          animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-          transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-          style={{
-            position: 'absolute',
-            top: '-40%',
-            left: '-10%',
-            width: '120%',
-            height: '140%',
-            background: 'radial-gradient(ellipse at center, rgba(245, 158, 11, 0.12) 0%, transparent 60%)',
-            filter: 'blur(80px)',
-          }}
-        />
-        <motion.div
-          animate={{ rotate: -360, scale: [1, 1.5, 1], x: [0, 100, 0], y: [0, -50, 0] }}
-          transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
-          style={{
-            position: 'absolute',
-            bottom: '-30%',
-            right: '-10%',
-            width: '90%',
-            height: '100%',
-            background: 'radial-gradient(circle at center, rgba(236, 72, 153, 0.08) 0%, transparent 50%)',
-            filter: 'blur(80px)',
-          }}
-        />
-      </div>
       <div
         className="px-3 md:px-5 w-full lg:grid-cols-[1.15fr_0.85fr]"
         style={{
           maxWidth: '1280px',
           margin: '0 auto',
-          paddingTop: '32px',
-          paddingBottom: '28px',
+          paddingTop: '64px', /* More breathing room for 2026 layouts */
+          paddingBottom: '64px',
           display: 'grid',
           gridTemplateColumns: '1fr',
-          gap: '24px',
+          gap: '40px',
           alignItems: 'center',
         }}
       >
@@ -181,13 +132,10 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
             Handpicked deals, price drops and offers from Amazon, Flipkart and top stores. Save time. Save money.
           </p>
 
-          {/* ── Search Bar (52px height, with smooth focus micro-interaction) ── */}
+          {/* ── Search Bar (52px height) ── */}
           <motion.div
             animate={{
-              borderColor: isFocused ? '#F59E0B' : '#303845',
-              boxShadow: isFocused
-                ? '0 0 0 4px rgba(245,158,11,.15), 0 0 20px rgba(245,158,11,.2)'
-                : '0 0 0 0 rgba(0,0,0,0)',
+              borderColor: isFocused ? 'var(--text-primary)' : 'var(--border-strong)',
             }}
             transition={{ duration: 0.2 }}
             style={{
@@ -366,13 +314,13 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
             padding: '8px 0',
           }}
         >
-          {/* Subtle Ambient Radial Glow */}
+          {/* Subtle Ambient Glow */}
           <div
             style={{
               position: 'absolute',
               width: '320px',
               height: '240px',
-              background: 'radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%)',
               filter: 'blur(32px)',
               pointerEvents: 'none',
             }}
@@ -381,11 +329,9 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
           {/* Framed Featured Deal Spotlight Card */}
           <motion.div
             className="glass-panel"
-            initial={{ opacity: 0, y: 12, rotateX: 15 }}
-            animate={{ opacity: 1, y: 0, rotateX: 0 }}
-            transition={{ duration: 0.6, ease: 'easeOut', type: 'spring', damping: 20 }}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
             style={{
               position: 'relative',
               width: '320px',
@@ -393,11 +339,6 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
-              rotateX,
-              rotateY,
-              transformPerspective: 1200,
-              transformStyle: 'preserve-3d',
-              boxShadow: '0 30px 60px rgba(0,0,0,0.6)',
               cursor: 'pointer',
             }}
           >
