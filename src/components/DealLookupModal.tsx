@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { IconClose, IconSearch, IconShieldCheck, IconExternalLink } from './Icons';
 
 interface DealLookupModalProps {
@@ -63,16 +64,19 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
       }}
       onClick={onClose}
     >
-      <div
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, rotateX: 10 }}
+        animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+        transition={{ duration: 0.5, type: "spring", bounce: 0.4 }}
+        className="glass-panel"
         style={{
           width: '100%',
           maxWidth: '600px',
-          backgroundColor: 'var(--bg-surface)',
-          border: '1px solid var(--border-default)',
-          borderRadius: '2px',
+          borderRadius: 'var(--radius-md)',
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
+          boxShadow: '0 30px 60px rgba(0, 0, 0, 0.7)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -147,17 +151,18 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
             <button
               type="submit"
               disabled={loading}
+              className="btn-primary"
               style={{
                 padding: '0 16px',
-                backgroundColor: 'var(--accent)',
-                border: 'none',
-                color: 'var(--text-inverse)',
                 fontWeight: 600,
                 fontSize: '13px',
                 cursor: 'pointer',
                 opacity: loading ? 0.5 : 1,
-                borderRadius: '2px',
+                borderRadius: 'var(--radius-sm)',
                 whiteSpace: 'nowrap',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               {loading ? 'Analyzing...' : 'Verify Deal'}
@@ -299,7 +304,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
