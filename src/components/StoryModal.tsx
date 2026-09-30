@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import type { CategoryStoryCollection, CategoryStoryItem } from '../types';
 
@@ -25,6 +26,16 @@ export const StoryModal: React.FC<StoryModalProps> = ({
   const [progress, setProgress] = useState<number>(0);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [imageError, setImageError] = useState<boolean>(false);
+
+  // Body scroll lock
+  useEffect(() => {
+    if (!isOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isOpen]);
 
   // Sync initialCollectionIndex when modal opens
   useEffect(() => {
@@ -126,11 +137,14 @@ export const StoryModal: React.FC<StoryModalProps> = ({
     border: 'rgba(255, 255, 255, 0.2)',
   };
 
-  return (
+  return createPortal(
     <AnimatePresence>
       <div
         className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-xl"
         style={{ touchAction: 'none' }}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
       >
         {/* Desktop Prev Collection Arrow */}
         {collectionIdx > 0 && (
@@ -157,11 +171,12 @@ export const StoryModal: React.FC<StoryModalProps> = ({
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className="relative w-full max-w-[430px] rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-between"
           style={{
-            height: 'min(780px, 92vh)',
+            height: 'min(780px, calc(100dvh - 1.5rem))',
             background: 'linear-gradient(180deg, #101422 0%, #0B0E17 100%)',
             border: '1px solid rgba(255, 255, 255, 0.12)',
             boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 40px rgba(245, 130, 32, 0.1)',
           }}
+          onClick={(e) => e.stopPropagation()}
           onMouseDown={() => setIsPaused(true)}
           onMouseUp={() => setIsPaused(false)}
           onTouchStart={() => setIsPaused(true)}
@@ -390,6 +405,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({
           </button>
         )}
       </div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };

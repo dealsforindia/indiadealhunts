@@ -58,6 +58,22 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [categoriesOpen]);
 
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+    const handleResize = () => {
+      if (window.innerWidth >= 768) setMobileMenuOpen(false);
+    };
+    window.addEventListener('keydown', handleEsc);
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('keydown', handleEsc);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [mobileMenuOpen]);
+
   const handleCategoryClick = (catId: string) => {
     if (onSelectCategory) {
       onSelectCategory(catId);
@@ -305,7 +321,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden border-b border-slate-200 bg-white px-5 py-4 flex flex-col gap-3 shadow-xl"
+            className="md:hidden border-b border-slate-200 bg-white px-5 py-4 flex flex-col gap-3 shadow-xl max-h-[calc(100dvh-4.5rem)] overflow-y-auto overscroll-contain"
           >
             <div className="flex flex-col gap-1">
               <button

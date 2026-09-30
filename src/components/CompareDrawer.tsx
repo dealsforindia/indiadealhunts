@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
@@ -20,6 +21,20 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
   onRemoveDeal,
   onClearAll,
 }) => {
+  useEffect(() => {
+    if (!isOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCloseModal();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onCloseModal]);
+
   if (compareDeals.length === 0) return null;
 
   return (
@@ -29,7 +44,7 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 50, opacity: 0 }}
-        className="fixed bottom-16 md:bottom-6 left-1/2 -translate-x-1/2 z-40 bg-slate-900 text-white px-4 py-2.5 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-700"
+        className="fixed bottom-[calc(68px+env(safe-area-inset-bottom,0px))] md:bottom-6 left-1/2 -translate-x-1/2 z-[45] bg-slate-900 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-xl flex items-center gap-2 sm:gap-3 border border-slate-700 max-w-[calc(100vw-1.5rem)]"
       >
         <div className="flex items-center gap-2">
           <span className="text-base">⚖️</span>
@@ -80,16 +95,16 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
 
       {/* ── Full Comparison Modal Table ── */}
       <AnimatePresence>
-        {isOpen && (
+        {isOpen && createPortal(
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-sm"
             onClick={onCloseModal}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
-              className="w-full max-w-4xl bg-white rounded-2xl border border-slate-200 shadow-2xl p-6 overflow-hidden flex flex-col max-h-[90vh]"
+              className="w-full max-w-4xl bg-white rounded-2xl border border-slate-200 shadow-2xl p-4 sm:p-6 overflow-hidden flex flex-col max-h-[calc(100dvh-2rem)] overscroll-contain"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
@@ -209,7 +224,8 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
                 </table>
               </div>
             </motion.div>
-          </div>
+          </div>,
+          document.body
         )}
       </AnimatePresence>
     </>

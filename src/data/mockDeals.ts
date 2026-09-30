@@ -2,7 +2,7 @@ import { PublicDeal } from '../types';
 
 export const INITIAL_VERIFIED_DEALS: PublicDeal[] = [
   {
-    id: 'mock-boat-airdopes-141',
+    id: 'amz_boat_airdopes_141_pro',
     title: 'boAt Airdopes 141 Pro TWS Earbuds',
     price: 899,
     mrp: 2499,
@@ -10,7 +10,7 @@ export const INITIAL_VERIFIED_DEALS: PublicDeal[] = [
     savings: 1600,
     store: 'Amazon',
     image: 'https://m.media-amazon.com/images/I/51HBom8xz7L._SL1500_.jpg',
-    url: 'https://www.amazon.in/dp/B0B551Y7W6',
+    url: 'https://www.amazon.in/dp/B0B551Y7W6?tag=dealshare0b7-21',
     category: 'Electronics',
     posted_at: Math.floor(Date.now() / 1000) - 7200,
     worth_score: 96,
@@ -21,7 +21,7 @@ export const INITIAL_VERIFIED_DEALS: PublicDeal[] = [
     consensus_badge: 'Consensus Loot',
   },
   {
-    id: 'mock-puma-smashic-sneakers',
+    id: 'fkrt_puma_smashic_sneakers',
     title: "Puma Men's Smashic Sneakers",
     price: 1799,
     mrp: 2899,
@@ -40,7 +40,7 @@ export const INITIAL_VERIFIED_DEALS: PublicDeal[] = [
     consensus_badge: 'Verified Drop',
   },
   {
-    id: 'mock-boat-wave-call-2',
+    id: 'amz_boat_wave_call_2',
     title: 'boAt Wave Call 2 Smartwatch',
     price: 1299,
     mrp: 2999,
@@ -48,7 +48,7 @@ export const INITIAL_VERIFIED_DEALS: PublicDeal[] = [
     savings: 1700,
     store: 'Amazon',
     image: 'https://m.media-amazon.com/images/I/61TapeOXotL._SL1500_.jpg',
-    url: 'https://www.amazon.in/dp/B0C7CS2C47',
+    url: 'https://www.amazon.in/dp/B0C7CS2C47?tag=dealshare0b7-21',
     category: 'Electronics',
     posted_at: Math.floor(Date.now() / 1000) - 21600,
     worth_score: 91,
@@ -59,7 +59,7 @@ export const INITIAL_VERIFIED_DEALS: PublicDeal[] = [
     consensus_badge: 'Consensus Loot',
   },
   {
-    id: 'mock-acer-aspire-5',
+    id: 'fkrt_acer_aspire_5',
     title: 'Acer Aspire 5 Intel Core i5 (16GB/512GB SSD)',
     price: 44990,
     mrp: 94990,
@@ -78,7 +78,7 @@ export const INITIAL_VERIFIED_DEALS: PublicDeal[] = [
     consensus_badge: 'Consensus Loot',
   },
   {
-    id: 'mock-sony-wh-ch520',
+    id: 'amz_sony_wh_ch520',
     title: 'Sony WH-CH520 Wireless Headphones',
     price: 2990,
     mrp: 9990,
@@ -86,7 +86,7 @@ export const INITIAL_VERIFIED_DEALS: PublicDeal[] = [
     savings: 7000,
     store: 'Amazon',
     image: 'https://m.media-amazon.com/images/I/41JACWT-wWL._SL1200_.jpg',
-    url: 'https://www.amazon.in/dp/B0BS1PRV4L',
+    url: 'https://www.amazon.in/dp/B0BS1PRV4L?tag=dealshare0b7-21',
     category: 'Electronics',
     posted_at: Math.floor(Date.now() / 1000) - 28800,
     worth_score: 98,
@@ -97,7 +97,7 @@ export const INITIAL_VERIFIED_DEALS: PublicDeal[] = [
     consensus_badge: 'Historic Low',
   },
   {
-    id: 'mock-realme-12-pro',
+    id: 'fkrt_realme_12_pro',
     title: 'realme 12 Pro 5G (8GB/256GB)',
     price: 18999,
     mrp: 38999,
@@ -116,7 +116,7 @@ export const INITIAL_VERIFIED_DEALS: PublicDeal[] = [
     consensus_badge: 'Consensus Loot',
   },
   {
-    id: 'mock-fire-boltt-phoenix',
+    id: 'amz_fire_boltt_phoenix',
     title: 'Fire-Boltt Phoenix Pro Smartwatch',
     price: 1199,
     mrp: 2999,
@@ -124,7 +124,7 @@ export const INITIAL_VERIFIED_DEALS: PublicDeal[] = [
     savings: 1800,
     store: 'Amazon',
     image: 'https://m.media-amazon.com/images/I/61y2VVWcGBL._SL1500_.jpg',
-    url: 'https://www.amazon.in/dp/B0BY2W7GGM',
+    url: 'https://www.amazon.in/dp/B0BY2W7GGM?tag=dealshare0b7-21',
     category: 'Electronics',
     posted_at: Math.floor(Date.now() / 1000) - 21600,
     worth_score: 90,
@@ -135,7 +135,7 @@ export const INITIAL_VERIFIED_DEALS: PublicDeal[] = [
     consensus_badge: 'Verified Drop',
   },
   {
-    id: 'mock-philips-air-fryer',
+    id: 'fkrt_philips_air_fryer',
     title: 'Philips Air Fryer (4.1L, 1400W)',
     price: 5799,
     mrp: 9999,

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { SortOption } from '../types';
 
@@ -92,6 +93,20 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
     setDraftSort(sortBy);
     setMobileDrawerOpen(true);
   };
+
+  useEffect(() => {
+    if (!mobileDrawerOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileDrawerOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [mobileDrawerOpen]);
 
   const applyMobileDrawer = () => {
     onSelectStore(draftStore);
@@ -319,14 +334,14 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
 
       {/* ── Mobile Filter Drawer ── */}
       <AnimatePresence>
-        {mobileDrawerOpen && (
-          <div className="fixed inset-0 z-50 flex flex-col justify-end">
+        {mobileDrawerOpen && createPortal(
+          <div className="fixed inset-0 z-[100] flex flex-col justify-end">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileDrawerOpen(false)}
-              className="fixed inset-0 bg-black/40 backdrop-blur-xs"
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs cursor-pointer"
             />
 
             <motion.div
@@ -334,7 +349,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-              className="relative bg-white border-t border-slate-200 rounded-t-3xl max-h-[85vh] overflow-y-auto p-5 flex flex-col gap-4 z-10 shadow-2xl"
+              className="relative bg-white border-t border-slate-200 rounded-t-3xl max-h-[85vh] sm:max-h-[calc(100dvh-3rem)] overflow-y-auto overscroll-contain p-5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] flex flex-col gap-4 z-10 shadow-2xl"
             >
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <h3 className="font-heading font-extrabold text-base text-slate-900">
@@ -343,7 +358,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                 <button
                   type="button"
                   onClick={() => setMobileDrawerOpen(false)}
-                  className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center text-sm"
+                  className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center text-sm cursor-pointer"
                 >
                   ✕
                 </button>
@@ -360,7 +375,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                       key={s.id}
                       type="button"
                       onClick={() => setDraftStore(s.id)}
-                      className={`p-2.5 rounded-xl text-xs font-semibold text-left border transition-all ${
+                      className={`p-2.5 rounded-xl text-xs font-semibold text-left border transition-all cursor-pointer ${
                         draftStore === s.id
                           ? 'bg-blue-50 text-blue-700 border-blue-300 font-bold'
                           : 'bg-slate-50 text-slate-700 border-slate-200'
@@ -383,7 +398,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                       key={o.value}
                       type="button"
                       onClick={() => setDraftSort(o.value)}
-                      className={`p-2.5 rounded-xl text-xs font-semibold flex items-center justify-between border transition-all ${
+                      className={`p-2.5 rounded-xl text-xs font-semibold flex items-center justify-between border transition-all cursor-pointer ${
                         draftSort === o.value
                           ? 'bg-blue-50 text-blue-700 border-blue-300 font-bold'
                           : 'bg-slate-50 text-slate-700 border-slate-200'
@@ -404,7 +419,8 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                 Apply Filters ({totalDeals.toLocaleString('en-IN')} drops)
               </button>
             </motion.div>
-          </div>
+          </div>,
+          document.body
         )}
       </AnimatePresence>
     </>

@@ -40,9 +40,9 @@ export const App: React.FC = () => {
   // Navigation Tab State
   const [activeTab, setActiveTab] = useState<NavTab>('home');
 
-  // Deals State (Preloaded with high-value verified drops)
-  const [deals, setDeals] = useState<PublicDeal[]>(INITIAL_VERIFIED_DEALS);
-  const [loading, setLoading] = useState<boolean>(false);
+  // Deals State (Starts empty with skeleton shimmer until live drops load from API)
+  const [deals, setDeals] = useState<PublicDeal[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,7 +54,7 @@ export const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // Pagination
-  const [totalDeals, setTotalDeals] = useState<number>(INITIAL_VERIFIED_DEALS.length);
+  const [totalDeals, setTotalDeals] = useState<number>(0);
   const [skip, setSkip] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const PAGE_SIZE = 40;
@@ -241,6 +241,8 @@ export const App: React.FC = () => {
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : 'Failed to fetch deals';
         console.warn('Live API sync notice, serving verified catalog:', msg);
+        setDeals((prev) => (prev.length === 0 ? INITIAL_VERIFIED_DEALS : prev));
+        setTotalDeals((prev) => (prev === 0 ? INITIAL_VERIFIED_DEALS.length : prev));
       } finally {
         setLoading(false);
         setLoadingMore(false);
@@ -698,28 +700,12 @@ export const App: React.FC = () => {
       {/* ── Floating Action Toast ── */}
       {toastMessage && (
         <div
-          style={{
-            position: 'fixed',
-            bottom: '76px',
-            right: '20px',
-            zIndex: 110,
-            backgroundColor: '#0F172A',
-            border: '1px solid #1E293B',
-            borderRadius: '12px',
-            padding: '10px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            color: '#FFFFFF',
-            fontSize: '13px',
-            fontFamily: 'var(--font-heading)',
-            fontWeight: 600,
-            boxShadow: '0 12px 28px -4px rgba(15, 23, 42, 0.25)',
-            animation: 'fadeIn 150ms ease-out',
-          }}
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-[calc(76px+env(safe-area-inset-bottom,0px))] md:bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-6 md:translate-x-0 z-[200] bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 flex items-center gap-2 text-white text-xs font-heading font-semibold shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-150 max-w-[calc(100vw-32px)]"
         >
-          <span style={{ color: '#10B981' }}>✓</span>
-          {toastMessage}
+          <span className="text-emerald-400 font-bold">✓</span>
+          <span className="truncate">{toastMessage}</span>
         </div>
       )}
     </div>

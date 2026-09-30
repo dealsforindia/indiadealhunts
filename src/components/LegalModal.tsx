@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { IconClose, IconShieldCheck, IconCheck, IconDocument, IconInfo, IconExternalLink } from './Icons';
 
 export type LegalDocType = 'disclosure' | 'verify' | 'terms' | 'privacy' | null;
@@ -14,23 +15,24 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
       if (e.key === 'Escape') onClose();
     };
     if (type) {
+      const prev = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = prev;
+        window.removeEventListener('keydown', handleKeyDown);
+      };
     }
-    return () => {
-      document.body.style.overflow = 'unset';
-      window.removeEventListener('keydown', handleKeyDown);
-    };
   }, [type, onClose]);
 
   if (!type) return null;
 
-  return (
+  return createPortal(
     <div
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 60,
+        zIndex: 100,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -49,7 +51,8 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
           position: 'relative',
           width: '100%',
           maxWidth: '640px',
-          maxHeight: '85vh',
+          maxHeight: 'min(88vh, calc(100dvh - 2rem))',
+          overscrollBehavior: 'contain',
           backgroundColor: '#FFFFFF',
           border: '1px solid #E2E8F0',
           borderRadius: '16px',
@@ -292,6 +295,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

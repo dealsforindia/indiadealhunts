@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, CreditCard, Sparkles, Check, ShieldCheck, Zap } from 'lucide-react';
 import { SUPPORTED_CREDIT_CARDS, getSavedCards, saveSelectedCards } from '../utils/cardSavings';
 
@@ -14,6 +15,21 @@ export const CardCalculatorModal: React.FC<CardCalculatorModalProps> = ({
   onCardsUpdated,
 }) => {
   const [selectedCards, setSelectedCards] = useState<string[]>(() => getSavedCards());
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -39,16 +55,16 @@ export const CardCalculatorModal: React.FC<CardCalculatorModalProps> = ({
     if (onCardsUpdated) onCardsUpdated([]);
   };
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-labelledby="card-modal-title"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 max-h-[90vh] overflow-y-auto shadow-2xl"
+        className="relative w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 max-h-[calc(100dvh-2rem)] overflow-y-auto shadow-2xl overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -161,6 +177,7 @@ export const CardCalculatorModal: React.FC<CardCalculatorModalProps> = ({
           Apply Card Discounts & View Feed
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

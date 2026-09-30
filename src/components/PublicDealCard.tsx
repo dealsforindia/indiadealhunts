@@ -106,13 +106,17 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
 
   useEffect(() => {
     if (!shareOpen) return;
-    const handleClick = (e: MouseEvent) => {
+    const handleClick = (e: MouseEvent | TouchEvent) => {
       if (shareRef.current && !shareRef.current.contains(e.target as Node)) {
         setShareOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener('touchstart', handleClick, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('touchstart', handleClick);
+    };
   }, [shareOpen]);
 
   const cleanImageUrl = getCleanImageUrl(deal.image);
@@ -168,10 +172,11 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden',
+        overflow: 'visible',
         cursor: 'pointer',
         position: 'relative',
         backgroundColor: '#FFFFFF',
+        zIndex: shareOpen ? 30 : 1,
       }}
     >
       {/* ── Top Bar: Store Pill + Time + Save Heart ── */}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
@@ -37,9 +38,31 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     if (isOpen) {
       setQuery('');
       setSelectedIndex(0);
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
       setTimeout(() => inputRef.current?.focus(), 50);
+      return () => {
+        document.body.style.overflow = prev;
+      };
     }
   }, [isOpen]);
+
+  const filteredResults = useMemo(() => {
+    const q = query.toLowerCase().trim();
+    return deals
+      .filter((d) => {
+        if (selectedStore !== 'all' && !d.store.toLowerCase().includes(selectedStore.toLowerCase())) {
+          return false;
+        }
+        if (!q) return true;
+        return (
+          d.title.toLowerCase().includes(q) ||
+          d.store.toLowerCase().includes(q) ||
+          (d.category && d.category.toLowerCase().includes(q))
+        );
+      })
+      .slice(0, 6);
+  }, [deals, query, selectedStore]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -67,30 +90,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, selectedIndex]);
-
-  const filteredResults = useMemo(() => {
-    const q = query.toLowerCase().trim();
-    return deals
-      .filter((d) => {
-        if (selectedStore !== 'all' && !d.store.toLowerCase().includes(selectedStore.toLowerCase())) {
-          return false;
-        }
-        if (!q) return true;
-        return (
-          d.title.toLowerCase().includes(q) ||
-          d.store.toLowerCase().includes(q) ||
-          (d.category && d.category.toLowerCase().includes(q))
-        );
-      })
-      .slice(0, 6);
-  }, [deals, query, selectedStore]);
+  }, [isOpen, selectedIndex, filteredResults, query, onSelectDeal, onSearchSubmit, onClose]);
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-150"
+      className="fixed inset-0 z-[100] flex items-start justify-center pt-12 sm:pt-20 px-3 sm:px-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-150"
       onClick={onClose}
     >
       <motion.div
@@ -98,7 +104,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.97, y: -10 }}
         transition={{ duration: 0.15, ease: 'easeOut' }}
-        className="w-full max-w-2xl bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col"
+        className="w-full max-w-2xl bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[calc(100dvh-3rem)] overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Bar Input */}
@@ -235,6 +241,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           ))}
         </div>
       </motion.div>
-    </div>
+    </div>,
+    document.body
   );
 };

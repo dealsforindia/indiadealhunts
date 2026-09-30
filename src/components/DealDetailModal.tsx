@@ -106,10 +106,11 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
     if (!deal) return;
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose(); };
     document.addEventListener('keydown', handler);
+    const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.removeEventListener('keydown', handler);
-      document.body.style.overflow = '';
+      document.body.style.overflow = prev;
     };
   }, [deal, handleClose]);
 
@@ -178,8 +179,9 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
         style={{
           width: '100%',
           maxWidth: '740px',
-          maxHeight: '90vh',
+          maxHeight: 'min(92vh, calc(100dvh - 1.5rem))',
           overflowY: 'auto',
+          overscrollBehavior: 'contain',
           borderRadius: '16px',
           backgroundColor: '#FFFFFF',
           border: '1px solid #E2E8F0',

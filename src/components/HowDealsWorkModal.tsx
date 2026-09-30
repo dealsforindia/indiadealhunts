@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { IconShieldCheck, IconExternalLink } from './Icons';
 
@@ -108,13 +109,27 @@ export const HowDealsWorkModal: React.FC<HowDealsWorkModalProps> = ({
 }) => {
   const [selectedStep, setSelectedStep] = useState<string>('ingestion');
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const currentStep = PIPELINE_STEPS.find((s) => s.id === selectedStep) || PIPELINE_STEPS[0];
 
-  return (
+  return createPortal(
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-sm">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-sm">
         {/* Backdrop click */}
         <div className="absolute inset-0" onClick={onClose} />
 
@@ -124,7 +139,7 @@ export const HowDealsWorkModal: React.FC<HowDealsWorkModalProps> = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 12 }}
           transition={{ duration: 0.2 }}
-          className="relative w-full max-w-3xl max-h-[90vh] flex flex-col bg-white border border-slate-200/90 rounded-2xl shadow-2xl overflow-hidden z-10"
+          className="relative w-full max-w-3xl max-h-[calc(100dvh-2rem)] flex flex-col bg-white border border-slate-200/90 rounded-2xl shadow-2xl overflow-hidden z-10 overscroll-contain"
         >
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 bg-slate-50">
@@ -140,7 +155,7 @@ export const HowDealsWorkModal: React.FC<HowDealsWorkModalProps> = ({
                   </span>
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Every product passes through our 5-stage automated anti-fake verification system.
+                  Every drop is audited through our 5-stage automated pipeline to filter inflated MRPs, dead links, and spam.
                 </p>
               </div>
             </div>
@@ -288,6 +303,7 @@ export const HowDealsWorkModal: React.FC<HowDealsWorkModalProps> = ({
           </div>
         </motion.div>
       </div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };

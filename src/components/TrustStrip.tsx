@@ -18,7 +18,7 @@ const TRUST_POINTS = [
       </svg>
     ),
     title: 'Real Discounts Only',
-    description: 'We test against 90-day price trends to eliminate fake MRP markups.',
+    description: 'Tested against 90-day price trends to eliminate artificial MRP inflation.',
   },
   {
     icon: (
