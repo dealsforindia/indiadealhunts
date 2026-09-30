@@ -124,23 +124,19 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
       if (slugMatch?.[1]) {
         const title = slugMatch[1].replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
         const isFk = targetUrl.includes('flipkart') || targetUrl.includes('shopsy');
-        const estPrice = isFk ? 899 : 799;
-        const estMrp = 2499;
 
         const fallbackData = {
           status: 'success',
           product_name: title,
           title: title,
-          price: estPrice,
-          mrp: estMrp,
-          discount_pct: Math.round(((estMrp - estPrice) / estMrp) * 100),
+          price: 0,
+          pendingLivePrice: true,
           url: targetUrl,
           store: isFk ? 'Flipkart' : 'Amazon India',
           is_deal: true,
-          verdict: 'Merchant listing verified. Real-time multi-store price checked against catalog.',
+          verdict: 'Merchant listing identified. Open the product page below to verify current checkout price.',
         };
         setResult(fallbackData);
-        setTargetPrice(String(Math.round(estPrice * 0.88)));
       } else {
         throw new Error('Could not analyze product link. Please check that the URL is an active Amazon, Flipkart, or Myntra link.');
       }
@@ -332,17 +328,15 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                     )}
                   </div>
 
-                  {/* Multi-Store Arbitrage Comparison Table */}
+                  {/* Multi-Store Arbitrage / Verification Table */}
                   {arbitrageData && (
                     <div className="mt-1 p-3.5 rounded-xl bg-white border border-slate-200 flex flex-col gap-2.5 shadow-2xs">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-heading font-extrabold text-slate-900 flex items-center gap-1">
-                          <span>⚡ Real-Time Arbitrage Matrix</span>
+                          <span>⚡ Real-Time Price Verification</span>
                         </span>
                         <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
-                          {arbitrageData.percentageCheaper > 0
-                            ? `Save ${arbitrageData.percentageCheaper}% (${arbitrageData.winnerStore})`
-                            : 'Matched Pricing'}
+                          Live Store Links
                         </span>
                       </div>
 
@@ -351,24 +345,30 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                           <div
                             key={idx}
                             className={`p-2.5 rounded-lg border flex flex-col gap-1 transition-all ${
-                              q.isWinner
+                              q.isVerifiedDeal
                                 ? 'bg-emerald-50/50 border-emerald-300 ring-1 ring-emerald-200'
                                 : 'bg-slate-50 border-slate-200'
                             }`}
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-[11px] font-bold text-slate-800">{q.store}</span>
-                              {q.isWinner && (
+                              {q.isVerifiedDeal && (
                                 <span className="text-[9px] font-mono font-extrabold text-emerald-700 uppercase bg-emerald-100 px-1 py-0.2 rounded">
-                                  BEST
+                                  VERIFIED
                                 </span>
                               )}
                             </div>
-                            <div className="text-sm font-mono font-black text-slate-900">
-                              ₹{q.price.toLocaleString('en-IN')}
-                            </div>
+                            {q.price !== undefined && q.price > 0 ? (
+                              <div className="text-sm font-mono font-black text-slate-900">
+                                ₹{q.price.toLocaleString('en-IN')}
+                              </div>
+                            ) : (
+                              <div className="text-xs font-mono font-bold text-slate-500">
+                                {q.statusText}
+                              </div>
+                            )}
                             <span className="text-[9.5px] font-mono text-slate-500">
-                              {q.isWinner ? '🏆 Lowest Price' : q.badge}
+                              {q.badge}
                             </span>
                             <a
                               href={q.url}
@@ -376,7 +376,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                               rel="noopener noreferrer"
                               className="mt-1 text-[10px] font-semibold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1"
                             >
-                              <span>View Store</span>
+                              <span>{q.actionText}</span>
                               <IconExternalLink size={10} />
                             </a>
                           </div>

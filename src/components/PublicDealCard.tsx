@@ -519,7 +519,12 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           )}
 
           {/* Quick Commerce & Retail Intelligence Badges */}
-          {price >= 1500 && (
+          {price >= 1500 && Boolean(
+            (deal.category || '').toLowerCase().includes('electron') ||
+            (deal.category || '').toLowerCase().includes('mobile') ||
+            (deal.category || '').toLowerCase().includes('laptop') ||
+            (deal.category || '').toLowerCase().includes('appliance')
+          ) && (
             <div
               style={{
                 marginTop: '5px',
@@ -807,9 +812,9 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           </div>
         </div>
 
-        {/* Quick Shopping Utilities Bar */}
+        {/* Quick Shopping Utilities Bar (Contextual & Product-Specific) */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', paddingTop: '6px', paddingBottom: '2px', overflowX: 'auto' }}>
-          {onOpenCardEmi && (
+          {onOpenCardEmi && deal.price >= 3000 && (
             <button
               type="button"
               onClick={(e) => {
@@ -830,14 +835,42 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
                 gap: '4px',
                 whiteSpace: 'nowrap',
               }}
-              title="Calculate Bank Card Discount & EMI"
+              title="Calculate Bank Card Discount & No-Cost EMI"
             >
               <span>💳</span>
               <span>Cards & EMI</span>
             </button>
           )}
 
-          {onOpenPriceAlert && (
+          {onOpenCardEmi && deal.price < 3000 && deal.price >= 400 && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenCardEmi(deal);
+              }}
+              style={{
+                padding: '4px 8px',
+                borderRadius: '6px',
+                backgroundColor: '#F0FDF4',
+                color: '#166534',
+                fontSize: '11px',
+                fontWeight: 600,
+                border: '1px solid #BBF7D0',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                whiteSpace: 'nowrap',
+              }}
+              title="Calculate 5% Card Cashback"
+            >
+              <span>💳</span>
+              <span>5% Card</span>
+            </button>
+          )}
+
+          {onOpenPriceAlert && deal.price >= 150 && (
             <button
               type="button"
               onClick={(e) => {
@@ -865,7 +898,11 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             </button>
           )}
 
-          {onOpenExchange && (deal.price >= 5000 || (deal.category || '').toLowerCase().includes('mobile') || (deal.category || '').toLowerCase().includes('electron')) && (
+          {onOpenExchange && (
+            (deal.category || '').toLowerCase().includes('mobile') ||
+            (deal.category || '').toLowerCase().includes('phone') ||
+            /\b(smartphone|smartphones|phone|iphone|galaxy|oneplus|realme|redmi|poco|iqoo|pixel|motorola|laptop|macbook)\b/i.test(deal.title || '')
+          ) && deal.price >= 4000 && (
             <button
               type="button"
               onClick={(e) => {
@@ -886,7 +923,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
                 gap: '4px',
                 whiteSpace: 'nowrap',
               }}
-              title="Estimate Phone Trade-in / Exchange Value"
+              title="Estimate Old Phone Trade-in / Exchange Value"
             >
               <span>🔄</span>
               <span>Trade-in</span>

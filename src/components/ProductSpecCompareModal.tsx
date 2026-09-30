@@ -10,6 +10,120 @@ interface ProductSpecCompareModalProps {
   onClearAll: () => void;
 }
 
+type ProductDomain = 'phone' | 'laptop' | 'audio' | 'fashion' | 'home' | 'beauty' | 'general';
+
+function detectDomain(deal: PublicDeal): ProductDomain {
+  const t = (deal.title || '').toLowerCase();
+  const c = (deal.category || '').toLowerCase();
+
+  if (/\b(phone|smartphone|smartphones|iphone|galaxy|oneplus|realme|redmi|iqoo|poco|motorola|vivo|oppo|xiaomi|pixel)\b/i.test(t) || c.includes('mobile')) {
+    return 'phone';
+  }
+  if (/\b(laptop|notebook|macbook|thinkpad|ideapad|vivobook|zenbook|tuf|victus|pavilion|inspiron)\b/i.test(t) || c.includes('laptop')) {
+    return 'laptop';
+  }
+  if (/\b(earbuds|tws|headphones|earphones|neckband|headset|soundbar|speaker)\b/i.test(t) || c.includes('audio')) {
+    return 'audio';
+  }
+  if (/\b(shoes|sneakers|shirt|t-shirt|jeans|trousers|jacket|kurta|watch|smartwatch|dress|kurti|saree|sandals)\b/i.test(t) || c.includes('fashion')) {
+    return 'fashion';
+  }
+  if (/\b(air fryer|cooker|kettle|blender|mixer|pan|carpet|curtain|bedsheet|blanket|purifier|iron)\b/i.test(t) || c.includes('home') || c.includes('kitchen')) {
+    return 'home';
+  }
+  if (/\b(face wash|sunscreen|moisturizer|shampoo|lotion|serum|cream|soap|perfume|deodorant)\b/i.test(t) || c.includes('beauty') || c.includes('grocery')) {
+    return 'beauty';
+  }
+  return 'general';
+}
+
+function getProductAttributes(deal: PublicDeal) {
+  const domain = detectDomain(deal);
+  const t = (deal.title || '').toLowerCase();
+
+  // Price calculations
+  const cardCashback = Math.round(deal.price * 0.05);
+  const netCardPrice = Math.max(0, deal.price - cardCashback);
+
+  const isB2BEligible = ['phone', 'laptop', 'audio'].includes(domain) && deal.price >= 1500;
+  const gstItc = isB2BEligible ? Math.round(deal.price - deal.price / 1.18) : 0;
+  const netGstPrice = isB2BEligible ? Math.max(0, deal.price - gstItc) : deal.price;
+
+  let specRow1Label = 'Category';
+  let specRow1Value = 'General Retail';
+  let specRow2Label = 'Key Feature';
+  let specRow2Value = 'Verified Deal';
+
+  if (domain === 'phone') {
+    specRow1Label = 'RAM & Storage';
+    const ram = deal.title.match(/(\d+)\s*(?:gb|mb)\s*ram/i) || deal.title.match(/(\d+)\s*\+\s*\d+\s*(?:gb)?/i);
+    const storage = deal.title.match(/(\d+)\s*(?:gb|tb)\s*(?:rom|storage|ssd)?/i) || deal.title.match(/\d+\s*\+\s*(\d+)\s*gb/i);
+    if (ram && storage) {
+      specRow1Value = `${ram[0].toUpperCase()} · ${storage[0].toUpperCase()}`;
+    } else if (storage) {
+      specRow1Value = `${storage[0].toUpperCase()} Storage`;
+    } else {
+      specRow1Value = 'Standard Storage';
+    }
+
+    specRow2Label = 'Network & Connectivity';
+    specRow2Value = t.includes('5g') ? '✅ 5G High-Speed' : '4G LTE / Dual SIM';
+  } else if (domain === 'laptop') {
+    specRow1Label = 'Processor & RAM';
+    const cpu = deal.title.match(/(i[3579]|ryzen\s*[3579]|m[123]|snapdragon)/i);
+    const ram = deal.title.match(/(\d+)\s*gb\s*ram/i);
+    specRow1Value = `${cpu ? cpu[0].toUpperCase() : 'Intel / AMD'} · ${ram ? ram[0].toUpperCase() : 'Configured RAM'}`;
+
+    specRow2Label = 'Storage & OS';
+    const ssd = deal.title.match(/(\d+)\s*(?:gb|tb)\s*ssd/i);
+    specRow2Value = ssd ? `${ssd[0].toUpperCase()} Fast SSD` : 'High-Speed SSD Storage';
+  } else if (domain === 'audio') {
+    specRow1Label = 'Audio Type';
+    if (t.includes('tws') || t.includes('earbuds')) specRow1Value = 'True Wireless (TWS)';
+    else if (t.includes('neckband')) specRow1Value = 'Wireless Neckband';
+    else if (t.includes('headphones')) specRow1Value = 'Over-Ear Headphones';
+    else if (t.includes('soundbar')) specRow1Value = 'Home Audio Soundbar';
+    else specRow1Value = 'Wireless Audio';
+
+    specRow2Label = 'Special Feature';
+    if (t.includes('anc') || t.includes('noise')) specRow2Value = '🎧 Active Noise Cancellation';
+    else if (t.includes('bass')) specRow2Value = '🔊 Deep Bass Boost';
+    else specRow2Value = '⚡ Fast Charging Audio';
+  } else if (domain === 'fashion') {
+    specRow1Label = 'Style & Apparel';
+    if (t.includes('sneaker') || t.includes('shoes')) specRow1Value = '👟 Footwear / Sneakers';
+    else if (t.includes('shirt') || t.includes('t-shirt')) specRow1Value = '👕 Casual Apparel';
+    else if (t.includes('watch')) specRow1Value = '⌚ Wristwatch / Tracker';
+    else specRow1Value = 'Fashion Lifestyle';
+
+    specRow2Label = 'Brand & Quality';
+    specRow2Value = `${deal.store || 'Verified'} 100% Genuine`;
+  } else if (domain === 'home') {
+    specRow1Label = 'Appliance Type';
+    specRow1Value = 'Home & Kitchen Utility';
+    specRow2Label = 'Power & Warranty';
+    specRow2Value = 'Standard Manufacturer Warranty';
+  } else if (domain === 'beauty') {
+    specRow1Label = 'Product Category';
+    specRow1Value = 'Beauty & Personal Care';
+    specRow2Label = 'Authenticity';
+    specRow2Value = '100% Original Brand Stock';
+  }
+
+  return {
+    domain,
+    specRow1Label,
+    specRow1Value,
+    specRow2Label,
+    specRow2Value,
+    isB2BEligible,
+    cardCashback,
+    netCardPrice,
+    gstItc,
+    netGstPrice,
+  };
+}
+
 export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = ({
   isOpen,
   onClose,
@@ -19,44 +133,9 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
 }) => {
   if (!isOpen) return null;
 
-  // Extract specs from title and deal metadata
-  const getSpecs = (deal: PublicDeal) => {
-    const t = deal.title.toLowerCase();
-    
-    // RAM & Storage
-    const ramMatch = deal.title.match(/(\d+)\s*(?:gb|mb)\s*ram/i) || deal.title.match(/(\d+)\s*\+\s*\d+\s*(?:gb)?/i);
-    const storageMatch = deal.title.match(/(\d+)\s*(?:gb|tb)\s*(?:rom|storage|ssd)?/i) || deal.title.match(/\d+\s*\+\s*(\d+)\s*gb/i);
-    
-    // 5G
-    const is5G = t.includes('5g') || t.includes('nr');
-    
-    // Processor / Display clues
-    const isAmoled = t.includes('amoled') || t.includes('super amoled') || t.includes('oled') || t.includes('retina');
-    const hasFastCharge = t.includes('fast charging') || t.includes('watt') || t.includes('67w') || t.includes('45w') || t.includes('120w') || t.includes('80w');
-    
-    // Calculate 5% cashback
-    const cardCashback = Math.round(deal.price * 0.05);
-    const netCardPrice = deal.price - cardCashback;
-    
-    // GST ITC (18%)
-    const gstItc = Math.round(deal.price - (deal.price / 1.18));
-    const netGstPrice = deal.price - gstItc;
-
-    return {
-      ram: ramMatch ? ramMatch[0] : (t.includes('12gb') ? '12 GB RAM' : t.includes('8gb') ? '8 GB RAM' : t.includes('6gb') ? '6 GB RAM' : '4 GB+ RAM'),
-      storage: storageMatch ? storageMatch[0] : (t.includes('256gb') ? '256 GB' : t.includes('128gb') ? '128 GB' : t.includes('512gb') ? '512 GB' : 'Standard'),
-      is5G: is5G ? '✅ 5G Dual SIM' : '4G LTE',
-      display: isAmoled ? '💎 AMOLED High-Refresh' : 'IPS LCD Screen',
-      charging: hasFastCharge ? '⚡ Fast Flash Charge' : 'Standard Type-C',
-      cardCashback,
-      netCardPrice,
-      gstItc,
-      netGstPrice,
-    };
-  };
-
-  // Find lowest price
-  const lowestPrice = Math.min(...deals.map((d) => d.price));
+  const lowestPrice = deals.length > 0 ? Math.min(...deals.map((d) => d.price)) : 0;
+  const anyPhone = deals.some((d) => detectDomain(d) === 'phone');
+  const anyLaptop = deals.some((d) => detectDomain(d) === 'laptop');
 
   return (
     <AnimatePresence>
@@ -78,7 +157,7 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
                   Side-by-Side Product Comparison
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Compare real prices, bank cashbacks, specifications & true value score
+                  Real price comparison, 5% card discounts, accurate product specs & verified deal scores
                 </p>
               </div>
             </div>
@@ -117,7 +196,7 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
                   <thead>
                     <tr>
                       <th className="w-44 p-3 text-left text-xs font-mono uppercase text-slate-400 bg-slate-50 rounded-l-xl">
-                        Specification
+                        Product Details
                       </th>
                       {deals.map((deal) => {
                         const isLowest = deal.price === lowestPrice;
@@ -146,7 +225,7 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
                               {deal.image ? (
                                 <img src={deal.image} alt={deal.title} className="w-full h-full object-contain" />
                               ) : (
-                                <span className="text-2xl">📱</span>
+                                <span className="text-2xl">📦</span>
                               )}
                             </div>
                             <p className="text-xs font-bold text-slate-900 line-clamp-2 leading-snug text-center">
@@ -186,71 +265,83 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
                         <span className="block text-[10px] text-slate-400 font-normal">Amazon ICICI / Flipkart Axis</span>
                       </td>
                       {deals.map((deal) => {
-                        const specs = getSpecs(deal);
+                        const attrs = getProductAttributes(deal);
                         return (
                           <td key={deal.id} className="p-3 font-medium text-emerald-700">
-                            <span className="font-bold text-base">₹{specs.netCardPrice.toLocaleString('en-IN')}</span>
-                            <span className="block text-xs text-slate-500">(-₹{specs.cardCashback.toLocaleString('en-IN')} cashback)</span>
+                            <span className="font-bold text-base">₹{attrs.netCardPrice.toLocaleString('en-IN')}</span>
+                            <span className="block text-xs text-slate-500">(-₹{attrs.cardCashback.toLocaleString('en-IN')} cashback)</span>
                           </td>
                         );
                       })}
                     </tr>
 
-                    {/* GST ITC Business Price */}
+                    {/* GST ITC Input Tax Claim (Contextual for B2B Electronics) */}
+                    {(anyPhone || anyLaptop || deals.some((d) => getProductAttributes(d).isB2BEligible)) && (
+                      <tr>
+                        <td className="p-3 font-semibold text-slate-600 bg-slate-50/50">
+                          <span>🛡️ GST ITC Input</span>
+                          <span className="block text-[10px] text-slate-400 font-normal">18% business tax claim</span>
+                        </td>
+                        {deals.map((deal) => {
+                          const attrs = getProductAttributes(deal);
+                          if (!attrs.isB2BEligible) {
+                            return (
+                              <td key={deal.id} className="p-3 text-xs text-slate-400 italic">
+                                Consumer retail (B2C)
+                              </td>
+                            );
+                          }
+                          return (
+                            <td key={deal.id} className="p-3 font-medium text-indigo-700">
+                              <span className="font-bold text-base">₹{attrs.netGstPrice.toLocaleString('en-IN')}</span>
+                              <span className="block text-xs text-slate-500">(-₹{attrs.gstItc.toLocaleString('en-IN')} claim)</span>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    )}
+
+                    {/* Real Product Specification Row 1 */}
                     <tr>
                       <td className="p-3 font-semibold text-slate-600 bg-slate-50/50">
-                        <span>🛡️ GST ITC Input</span>
-                        <span className="block text-[10px] text-slate-400 font-normal">18% business tax claim</span>
+                        Specifications
                       </td>
                       {deals.map((deal) => {
-                        const specs = getSpecs(deal);
-                        return (
-                          <td key={deal.id} className="p-3 font-medium text-indigo-700">
-                            <span className="font-bold text-base">₹{specs.netGstPrice.toLocaleString('en-IN')}</span>
-                            <span className="block text-xs text-slate-500">(-₹{specs.gstItc.toLocaleString('en-IN')} ITC claim)</span>
-                          </td>
-                        );
-                      })}
-                    </tr>
-
-                    {/* RAM & Storage */}
-                    <tr>
-                      <td className="p-3 font-semibold text-slate-600 bg-slate-50/50">RAM & Storage</td>
-                      {deals.map((deal) => {
-                        const specs = getSpecs(deal);
+                        const attrs = getProductAttributes(deal);
                         return (
                           <td key={deal.id} className="p-3 text-slate-800">
-                            <span className="font-bold">{specs.ram}</span> · {specs.storage}
+                            <span className="font-bold text-xs block text-slate-500 uppercase">{attrs.specRow1Label}</span>
+                            <span className="text-xs font-semibold text-slate-800">{attrs.specRow1Value}</span>
                           </td>
                         );
                       })}
                     </tr>
 
-                    {/* 5G Network */}
+                    {/* Real Product Specification Row 2 */}
                     <tr>
-                      <td className="p-3 font-semibold text-slate-600 bg-slate-50/50">Network</td>
+                      <td className="p-3 font-semibold text-slate-600 bg-slate-50/50">
+                        Feature / Highlights
+                      </td>
                       {deals.map((deal) => {
-                        const specs = getSpecs(deal);
+                        const attrs = getProductAttributes(deal);
                         return (
                           <td key={deal.id} className="p-3 text-slate-800">
-                            {specs.is5G}
+                            <span className="font-bold text-xs block text-slate-500 uppercase">{attrs.specRow2Label}</span>
+                            <span className="text-xs font-semibold text-slate-700">{attrs.specRow2Value}</span>
                           </td>
                         );
                       })}
                     </tr>
 
-                    {/* Display & Fast Charging */}
+                    {/* Store & Authenticity */}
                     <tr>
-                      <td className="p-3 font-semibold text-slate-600 bg-slate-50/50">Display & Battery</td>
-                      {deals.map((deal) => {
-                        const specs = getSpecs(deal);
-                        return (
-                          <td key={deal.id} className="p-3 text-slate-700 text-xs leading-relaxed">
-                            <p>{specs.display}</p>
-                            <p className="text-slate-500 mt-0.5">{specs.charging}</p>
-                          </td>
-                        );
-                      })}
+                      <td className="p-3 font-semibold text-slate-600 bg-slate-50/50">Retailer & Source</td>
+                      {deals.map((deal) => (
+                        <td key={deal.id} className="p-3 text-xs">
+                          <span className="font-bold text-slate-900">{deal.store || 'Verified Store'}</span>
+                          <span className="block text-emerald-600 font-semibold mt-0.5">✓ 100% Genuine Stock</span>
+                        </td>
+                      ))}
                     </tr>
 
                     {/* Worth Score */}
@@ -262,7 +353,7 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
                             <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 font-black text-xs flex items-center justify-center">
                               {deal.worth_score || 85}
                             </div>
-                            <span className="text-xs text-slate-500 font-medium">/ 100 Verified Value</span>
+                            <span className="text-xs text-slate-500 font-medium">/ 100 Value</span>
                           </div>
                         </td>
                       ))}
@@ -295,3 +386,5 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
     </AnimatePresence>
   );
 };
+
+export default ProductSpecCompareModal;

@@ -15,7 +15,6 @@ interface DealDetailModalProps {
   onShowToast?: (msg: string) => void;
   onToggleSave?: (deal: PublicDeal) => void;
   onOpenTool?: (toolId: string) => void;
-  onOpenFeature150?: (featureId: number) => void;
 }
 
 function getStoreDisplayName(store?: string): string {
@@ -62,7 +61,6 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   onShowToast,
   onToggleSave,
   onOpenTool,
-  onOpenFeature150,
 }) => {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
@@ -128,6 +126,18 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   const storeName = getStoreDisplayName(deal.store);
 
   const gstItcAmount = price > 0 ? Math.round(price - price / 1.18) : 0;
+
+  const catLower = (deal.category || '').toLowerCase();
+  const titleLower = (deal.title || '').toLowerCase();
+  const isTechOrAppliance =
+    catLower.includes('electron') ||
+    catLower.includes('mobile') ||
+    catLower.includes('laptop') ||
+    catLower.includes('appliance') ||
+    /\b(phone|smartphone|smartphones|laptop|macbook|monitor|printer|tablet|ipad|ac|refrigerator|washing machine|smartwatch)\b/i.test(titleLower);
+  const isB2BEligible = isTechOrAppliance && price >= 1500;
+  const isFashion = catLower.includes('fashion') || /\b(shoes|sneakers|shirt|t-shirt|jeans|dress|saree|kurta|trousers|sandals|handbag|jacket)\b/i.test(titleLower);
+  const isGroceryBeauty = catLower.includes('grocery') || catLower.includes('beauty') || /\b(face wash|cream|shampoo|soap|atta|oil|tea|coffee|biscuit|dry fruits)\b/i.test(titleLower);
   const bestCardSavings = useMemo(() => {
     if (!price || price <= 0) return null;
     const instant10 = Math.max(0, Math.min(1500, price * 0.1) - 117);
@@ -513,7 +523,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               mrp={mrp}
             />
 
-            {/* Multi-Store Real-Time Arbitrage Matrix */}
+            {/* Multi-Store Real-Time Live Check Matrix */}
             {arbitrage && (
               <div style={{
                 display: 'flex',
@@ -526,19 +536,19 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontFamily: 'var(--font-heading)', fontSize: '12px', fontWeight: 800, color: '#0F172A' }}>
-                    ⚡ Multi-Store Arbitrage Comparison
+                    ⚡ Multi-Store Real-Time Price Verification
                   </span>
                   <span style={{
                     fontFamily: 'var(--font-mono)',
-                    fontSize: '10.5px',
+                    fontSize: '10px',
                     fontWeight: 700,
-                    color: '#1D4ED8',
-                    backgroundColor: '#EFF6FF',
-                    border: '1px solid #DBEAFE',
+                    color: '#059669',
+                    backgroundColor: '#ECFDF5',
+                    border: '1px solid #A7F3D0',
                     padding: '2px 6px',
                     borderRadius: '4px',
                   }}>
-                    {arbitrage.percentageCheaper > 0 ? `Save ${arbitrage.percentageCheaper}% Here` : 'Best Rate'}
+                    Live Store Links
                   </span>
                 </div>
 
@@ -553,47 +563,59 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                         justifyContent: 'space-between',
                         padding: '8px 10px',
                         borderRadius: '8px',
-                        backgroundColor: q.isWinner ? '#FFFFFF' : '#F1F5F9',
-                        border: `1px solid ${q.isWinner ? '#A7F3D0' : '#E2E8F0'}`,
-                        boxShadow: q.isWinner ? '0 1px 2px rgba(16, 185, 129, 0.1)' : 'none',
+                        backgroundColor: q.isVerifiedDeal ? '#FFFFFF' : '#F1F5F9',
+                        border: `1px solid ${q.isVerifiedDeal ? '#A7F3D0' : '#E2E8F0'}`,
+                        boxShadow: q.isVerifiedDeal ? '0 1px 2px rgba(16, 185, 129, 0.1)' : 'none',
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span style={{ fontFamily: 'var(--font-heading)', fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>
                           {q.store}
                         </span>
-                        {q.isWinner && (
-                          <span style={{
-                            fontFamily: 'var(--font-mono)',
-                            fontSize: '9.5px',
-                            fontWeight: 700,
-                            color: '#065F46',
-                            backgroundColor: '#ECFDF5',
-                            border: '1px solid #A7F3D0',
-                            padding: '1px 5px',
-                            borderRadius: '4px',
-                          }}>
-                            LOWEST
-                          </span>
-                        )}
+                        <span style={{
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: '9.5px',
+                          fontWeight: 700,
+                          color: q.isVerifiedDeal ? '#065F46' : '#475569',
+                          backgroundColor: q.isVerifiedDeal ? '#ECFDF5' : '#E2E8F0',
+                          border: `1px solid ${q.isVerifiedDeal ? '#A7F3D0' : '#CBD5E1'}`,
+                          padding: '1px 5px',
+                          borderRadius: '4px',
+                        }}>
+                          {q.badge}
+                        </span>
                       </div>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{
-                          fontFamily: 'var(--font-mono)',
-                          fontSize: '13px',
-                          fontWeight: 800,
-                          color: q.isWinner ? '#059669' : '#64748B',
-                        }}>
-                          ₹{q.price.toLocaleString('en-IN')}
-                        </span>
-                        <span style={{
-                          fontFamily: 'var(--font-mono)',
-                          fontSize: '10px',
-                          color: q.isWinner ? '#059669' : '#94A3B8',
-                        }}>
-                          {q.isWinner ? '🏆 Verified' : `+₹${q.deltaVsWinner.toLocaleString('en-IN')}`}
-                        </span>
+                        {q.price !== undefined ? (
+                          <span style={{
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '13px',
+                            fontWeight: 800,
+                            color: '#059669',
+                          }}>
+                            ₹{q.price.toLocaleString('en-IN')}
+                          </span>
+                        ) : null}
+                        <a
+                          href={q.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '10.5px',
+                            fontWeight: 700,
+                            color: q.isVerifiedDeal ? '#059669' : '#2563EB',
+                            textDecoration: 'none',
+                            backgroundColor: q.isVerifiedDeal ? '#F0FDF4' : '#EFF6FF',
+                            border: `1px solid ${q.isVerifiedDeal ? '#BBF7D0' : '#DBEAFE'}`,
+                            padding: '3px 8px',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {q.actionText}
+                        </a>
                       </div>
                     </div>
                   ))}
@@ -628,69 +650,172 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                     Deal Intelligence &amp; Buyer Protections
                   </span>
                 </div>
-                {onOpenFeature150 && (
-                  <button
-                    type="button"
-                    onClick={() => { onClose(); onOpenFeature150(1); }}
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '10px',
-                      fontWeight: 700,
-                      color: '#4F46E5',
-                      backgroundColor: '#EEF2FF',
-                      border: '1px solid #C7D2FE',
-                      padding: '2px 8px',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    All 150 Engines →
-                  </button>
-                )}
               </div>
 
-              {/* 3 Value Pillars for this Deal */}
+              {/* 3 Value Pillars for this Deal (Strictly Category-Aware) */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '8px' }}>
-                {/* 1. GST ITC */}
-                <div style={{
-                  padding: '10px 12px',
-                  borderRadius: '10px',
-                  backgroundColor: '#FFFFFF',
-                  border: '1px solid #E2E8F0',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '2px',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#64748B', fontWeight: 700 }}>
-                      🧾 GST ITC SHIELD
+                {/* 1. Category Pillar: GST ITC for Tech/Appliances, Authenticity for Fashion, Freshness for Grocery */}
+                {isB2BEligible ? (
+                  <div style={{
+                    padding: '10px 12px',
+                    borderRadius: '10px',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E2E8F0',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#64748B', fontWeight: 700 }}>
+                        🧾 GST ITC SHIELD
+                      </span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 800, color: '#059669' }}>
+                        Save ₹{gstItcAmount.toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '11px', color: '#334155', fontWeight: 600 }}>
+                      Net B2B: ₹{Math.round(price - gstItcAmount).toLocaleString('en-IN')}
                     </span>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 800, color: '#059669' }}>
-                      Save ₹{gstItcAmount.toLocaleString('en-IN')}
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => { onClose(); onOpenTool?.('gst'); }}
+                      style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '9.5px',
+                        color: '#2563EB',
+                        textAlign: 'left',
+                        marginTop: '4px',
+                        cursor: 'pointer',
+                        border: 'none',
+                        background: 'none',
+                        padding: 0,
+                        fontWeight: 700,
+                      }}
+                    >
+                      Calculate 40% Dep. →
+                    </button>
                   </div>
-                  <span style={{ fontSize: '11px', color: '#334155', fontWeight: 600 }}>
-                    Net B2B: ₹{Math.round(price - gstItcAmount).toLocaleString('en-IN')}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => { onClose(); onOpenTool?.('gst'); }}
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '9.5px',
-                      color: '#2563EB',
-                      textAlign: 'left',
-                      marginTop: '4px',
-                      cursor: 'pointer',
-                      border: 'none',
-                      background: 'none',
-                      padding: 0,
-                      fontWeight: 700,
-                    }}
-                  >
-                    Calculate 40% Dep. →
-                  </button>
-                </div>
+                ) : isFashion ? (
+                  <div style={{
+                    padding: '10px 12px',
+                    borderRadius: '10px',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E2E8F0',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#64748B', fontWeight: 700 }}>
+                        👗 SIZE &amp; AUTHENTICITY
+                      </span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 800, color: '#7C3AED' }}>
+                        100% Brand Stock
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '11px', color: '#334155', fontWeight: 600 }}>
+                      Doorstep size replacement if tags intact
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => { onClose(); onOpenTool?.('returns'); }}
+                      style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '9.5px',
+                        color: '#2563EB',
+                        textAlign: 'left',
+                        marginTop: '4px',
+                        cursor: 'pointer',
+                        border: 'none',
+                        background: 'none',
+                        padding: 0,
+                        fontWeight: 700,
+                      }}
+                    >
+                      Return Rules Checklist →
+                    </button>
+                  </div>
+                ) : isGroceryBeauty ? (
+                  <div style={{
+                    padding: '10px 12px',
+                    borderRadius: '10px',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E2E8F0',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#64748B', fontWeight: 700 }}>
+                        🌿 FRESHNESS &amp; BATCH
+                      </span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 800, color: '#059669' }}>
+                        Sealed Pack
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '11px', color: '#334155', fontWeight: 600 }}>
+                      Direct manufacturer batch &amp; shelf-life check
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => { onClose(); onOpenTool?.('unit_price'); }}
+                      style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '9.5px',
+                        color: '#2563EB',
+                        textAlign: 'left',
+                        marginTop: '4px',
+                        cursor: 'pointer',
+                        border: 'none',
+                        background: 'none',
+                        padding: 0,
+                        fontWeight: 700,
+                      }}
+                    >
+                      Unit Price / Gram Math →
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{
+                    padding: '10px 12px',
+                    borderRadius: '10px',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E2E8F0',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#64748B', fontWeight: 700 }}>
+                        🛡️ BUYER GUARANTEE
+                      </span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 800, color: '#0284C7' }}>
+                        Verified Store
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '11px', color: '#334155', fontWeight: 600 }}>
+                      Authentic merchant billing &amp; transit cover
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => { onClose(); onOpenTool?.('returns'); }}
+                      style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '9.5px',
+                        color: '#2563EB',
+                        textAlign: 'left',
+                        marginTop: '4px',
+                        cursor: 'pointer',
+                        border: 'none',
+                        background: 'none',
+                        padding: 0,
+                        fontWeight: 700,
+                      }}
+                    >
+                      Delivery &amp; Return Safety →
+                    </button>
+                  </div>
+                )}
 
                 {/* 2. Card Optimizer */}
                 {bestCardSavings && (

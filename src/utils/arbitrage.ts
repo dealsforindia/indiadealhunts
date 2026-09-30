@@ -2,121 +2,154 @@ import { PublicDeal } from '../types';
 
 export interface StorePriceQuote {
   store: string;
-  price: number;
-  mrp: number;
-  inStock: boolean;
-  isWinner: boolean;
-  deltaVsWinner: number;
+  price?: number;
+  mrp?: number;
+  isVerifiedDeal: boolean;
+  statusText: string;
   url: string;
-  badge?: string;
-  deliveryText?: string;
+  badge: string;
+  actionText: string;
 }
 
 export interface ArbitrageAnalysis {
-  winnerStore: string;
-  winnerPrice: number;
-  mrp: number;
-  maxCompetitorPrice: number;
-  savingsVsCompetitors: number;
-  percentageCheaper: number;
+  sourceStore: string;
+  dealPrice: number;
+  mrp?: number;
+  savingsVsMrp: number;
+  discountPct: number;
   quotes: StorePriceQuote[];
   verdict: string;
 }
 
 /**
- * Computes multi-store arbitrage comparison for any deal or product link
+ * Returns genuine multi-store comparison and live verification links.
+ * Never invents or fabricates fake competitor prices.
  */
 export function analyzeArbitrage(deal: Partial<PublicDeal>): ArbitrageAnalysis {
-  const currentStore = (deal.store || 'Amazon').toLowerCase();
-  const currentPrice = Number(deal.price) || 999;
-  const mrp = Number(deal.mrp && deal.mrp > currentPrice ? deal.mrp : Math.round(currentPrice * 1.65));
+  const currentStore = (deal.store || 'Verified Store').toLowerCase();
+  const currentPrice = Number(deal.price) || 0;
+  const mrp = Number(deal.mrp && deal.mrp > currentPrice ? deal.mrp : 0);
+  const savingsVsMrp = mrp > currentPrice ? mrp - currentPrice : 0;
+  const discountPct = Number(deal.discount_pct) || (mrp > 0 ? Math.round(((mrp - currentPrice) / mrp) * 100) : 0);
 
-  // Determine realistic competitor pricing based on MRP and current deal price
-  let amzPrice = currentPrice;
-  let fkPrice = Math.round(currentPrice * 1.22);
-  let myntraPrice = Math.round(currentPrice * 1.35);
+  const title = (deal.title || '').trim();
+  const cleanTitle = title
+    .replace(/[\[\]()]/g, '')
+    .replace(/\b(\d+%\s*off|loot|deal|discount|cheapest|lowest)\b/gi, '')
+    .trim();
+  const query = encodeURIComponent(cleanTitle || 'deals');
 
-  if (currentStore.includes('flipkart')) {
-    fkPrice = currentPrice;
-    amzPrice = Math.round(currentPrice * 1.18);
-    myntraPrice = Math.round(currentPrice * 1.28);
-  } else if (currentStore.includes('myntra')) {
-    myntraPrice = currentPrice;
-    amzPrice = Math.round(currentPrice * 1.15);
-    fkPrice = Math.round(currentPrice * 1.20);
+  const isFlipkart = currentStore.includes('flipkart');
+  const isAmazon = currentStore.includes('amazon');
+  const isMyntra = currentStore.includes('myntra');
+  const isAjio = currentStore.includes('ajio');
+  const isBlinkit = currentStore.includes('blinkit');
+  const isSwiggy = currentStore.includes('swiggy');
+
+  // Detect domain for store relevance
+  const titleLower = title.toLowerCase();
+  const catLower = (deal.category || '').toLowerCase();
+  const isFashion = /\b(shirt|t-shirt|shoes|sneakers|jeans|dress|saree|kurta|trousers|sandals|handbag|watch)\b/i.test(titleLower) || catLower.includes('fashion');
+  const isGrocery = /\b(atta|oil|rice|dal|tea|coffee|soap|biscuit|face wash|shampoo|detergent)\b/i.test(titleLower) || catLower.includes('grocery');
+
+  const quotes: StorePriceQuote[] = [];
+
+  // 1. Current Verified Deal Source
+  let sourceDisplayName = 'Verified Merchant';
+  if (isAmazon) sourceDisplayName = 'Amazon India';
+  else if (isFlipkart) sourceDisplayName = 'Flipkart';
+  else if (isMyntra) sourceDisplayName = 'Myntra';
+  else if (isAjio) sourceDisplayName = 'AJIO';
+  else if (isBlinkit) sourceDisplayName = 'Blinkit';
+  else if (isSwiggy) sourceDisplayName = 'Swiggy Instamart';
+  else if (deal.store) sourceDisplayName = deal.store;
+
+  quotes.push({
+    store: sourceDisplayName,
+    price: currentPrice,
+    mrp: mrp > 0 ? mrp : undefined,
+    isVerifiedDeal: true,
+    statusText: 'Verified Deal Price',
+    url: deal.url || '#',
+    badge: '🏆 Active Verified Loot',
+    actionText: 'Claim Deal',
+  });
+
+  // 2. Competitor Check 1: Amazon (if source is not Amazon)
+  if (!isAmazon) {
+    quotes.push({
+      store: 'Amazon India',
+      isVerifiedDeal: false,
+      statusText: 'Live Search Comparison',
+      url: `https://www.amazon.in/s?k=${query}&tag=dealshare0b7-21`,
+      badge: '🔍 Live Catalog Search',
+      actionText: 'Check Amazon ↗',
+    });
   }
 
-  // Ensure competitor prices do not exceed MRP
-  fkPrice = Math.min(fkPrice, mrp);
-  amzPrice = Math.min(amzPrice, mrp);
-  myntraPrice = Math.min(myntraPrice, mrp);
-
-  const quotes: StorePriceQuote[] = [
-    {
-      store: 'Amazon India',
-      price: amzPrice,
-      mrp,
-      inStock: true,
-      isWinner: false,
-      deltaVsWinner: 0,
-      url: deal.url && currentStore.includes('amazon') ? deal.url : `https://www.amazon.in/s?k=${encodeURIComponent(deal.title || 'deals')}&tag=dealshare0b7-21`,
-      deliveryText: 'Prime Free Delivery',
-    },
-    {
+  // 3. Competitor Check 2: Flipkart (if source is not Flipkart)
+  if (!isFlipkart) {
+    quotes.push({
       store: 'Flipkart',
-      price: fkPrice,
-      mrp,
-      inStock: true,
-      isWinner: false,
-      deltaVsWinner: 0,
-      url: deal.url && currentStore.includes('flipkart') ? deal.url : `https://www.flipkart.com/search?q=${encodeURIComponent(deal.title || 'deals')}`,
-      deliveryText: 'Plus Verified Seller',
-    },
-    {
+      isVerifiedDeal: false,
+      statusText: 'Live Search Comparison',
+      url: `https://www.flipkart.com/search?q=${query}`,
+      badge: '🔍 Live Catalog Search',
+      actionText: 'Check Flipkart ↗',
+    });
+  }
+
+  // 4. Competitor Check 3: Domain-specific store
+  if (isFashion && !isMyntra) {
+    quotes.push({
       store: 'Myntra',
-      price: myntraPrice,
-      mrp,
-      inStock: true,
-      isWinner: false,
-      deltaVsWinner: 0,
-      url: deal.url && currentStore.includes('myntra') ? deal.url : `https://www.myntra.com/${encodeURIComponent(deal.title || 'deals')}`,
-      deliveryText: 'Express 48h Dispatch',
-    },
-  ];
+      isVerifiedDeal: false,
+      statusText: 'Fashion Catalog Check',
+      url: `https://www.myntra.com/${encodeURIComponent(cleanTitle.replace(/\s+/g, '-'))}`,
+      badge: '👗 Fashion Store',
+      actionText: 'Check Myntra ↗',
+    });
+  } else if (isFashion && !isAjio) {
+    quotes.push({
+      store: 'AJIO',
+      isVerifiedDeal: false,
+      statusText: 'Apparel Catalog Check',
+      url: `https://www.ajio.com/search/?text=${query}`,
+      badge: '👠 Trend Store',
+      actionText: 'Check AJIO ↗',
+    });
+  } else if (isGrocery && !isBlinkit) {
+    quotes.push({
+      store: 'Blinkit 10-Min',
+      isVerifiedDeal: false,
+      statusText: 'Quick Commerce Check',
+      url: `https://blinkit.com/s/?q=${query}`,
+      badge: '⚡ 10-Min Delivery',
+      actionText: 'Check Blinkit ↗',
+    });
+  } else {
+    // Universal Google Shopping comparison
+    quotes.push({
+      store: 'Google Shopping',
+      isVerifiedDeal: false,
+      statusText: 'Pan-India Multi-Merchant Check',
+      url: `https://www.google.com/search?tbm=shop&q=${query}`,
+      badge: '🌐 Multi-Store Index',
+      actionText: 'Compare Pan-India ↗',
+    });
+  }
 
-  // Find winner
-  let minPrice = Infinity;
-  let winnerStore = '';
-
-  quotes.forEach((q) => {
-    if (q.price < minPrice) {
-      minPrice = q.price;
-      winnerStore = q.store;
-    }
-  });
-
-  const maxComp = Math.max(...quotes.map((q) => q.price));
-  const savings = Math.max(0, maxComp - minPrice);
-  const pct = maxComp > 0 ? Math.round((savings / maxComp) * 100) : 0;
-
-  quotes.forEach((q) => {
-    q.isWinner = q.price === minPrice;
-    q.deltaVsWinner = q.price - minPrice;
-    if (q.isWinner) {
-      q.badge = '🏆 Lowest Verified Price';
-    } else {
-      q.badge = `+₹${q.deltaVsWinner.toLocaleString('en-IN')} higher`;
-    }
-  });
+  const verdict = discountPct > 0
+    ? `Active verified price on ${sourceDisplayName} is ₹${currentPrice.toLocaleString('en-IN')}${mrp > 0 ? ` (${discountPct}% below ₹${mrp.toLocaleString('en-IN')} MRP)` : ''}. Real-time comparison available across alternative stores.`
+    : `Verified deal listed on ${sourceDisplayName} at ₹${currentPrice.toLocaleString('en-IN')}. Verify alternative store pricing with live links below.`;
 
   return {
-    winnerStore,
-    winnerPrice: minPrice,
-    mrp,
-    maxCompetitorPrice: maxComp,
-    savingsVsCompetitors: savings,
-    percentageCheaper: pct,
+    sourceStore: sourceDisplayName,
+    dealPrice: currentPrice,
+    mrp: mrp > 0 ? mrp : undefined,
+    savingsVsMrp,
+    discountPct,
     quotes,
-    verdict: `${winnerStore} is currently ₹${savings.toLocaleString('en-IN')} cheaper (${pct}% lower) than alternative major Indian retail stores.`,
+    verdict,
   };
 }

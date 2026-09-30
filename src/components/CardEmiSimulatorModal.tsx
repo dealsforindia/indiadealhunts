@@ -181,29 +181,41 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
               </div>
             </div>
 
-            {/* No-Cost EMI Tenure */}
-            <div>
-              <label className="block text-xs font-mono uppercase text-slate-400 font-semibold mb-2">
-                2. Choose No-Cost EMI Tenure
-              </label>
-              <div className="grid grid-cols-4 gap-2">
-                {[3, 6, 9, 12].map((months) => (
-                  <button
-                    key={months}
-                    type="button"
-                    onClick={() => setEmiTenure(months)}
-                    className={`py-2 px-3 rounded-xl text-center border transition-all cursor-pointer ${
-                      emiTenure === months
-                        ? 'bg-slate-900 text-white font-bold border-slate-900 shadow-xs'
-                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-transparent font-medium text-xs'
-                    }`}
-                  >
-                    <span className="block text-sm font-bold">{months}M</span>
-                    <span className="text-[10px] opacity-80">₹{Math.round(priceAfterCard / months).toLocaleString('en-IN')}/mo</span>
-                  </button>
-                ))}
+            {/* No-Cost EMI Tenure (Only applicable for purchases >= ₹3,000 per Indian banking rules) */}
+            {deal.price >= 3000 ? (
+              <div>
+                <label className="block text-xs font-mono uppercase text-slate-400 font-semibold mb-2">
+                  2. Choose No-Cost EMI Tenure
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  {[3, 6, 9, 12].map((months) => (
+                    <button
+                      key={months}
+                      type="button"
+                      onClick={() => setEmiTenure(months)}
+                      className={`py-2 px-3 rounded-xl text-center border transition-all cursor-pointer ${
+                        emiTenure === months
+                          ? 'bg-slate-900 text-white font-bold border-slate-900 shadow-xs'
+                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-transparent font-medium text-xs'
+                      }`}
+                    >
+                      <span className="block text-sm font-bold">{months}M</span>
+                      <span className="text-[10px] opacity-80">₹{Math.round(priceAfterCard / months).toLocaleString('en-IN')}/mo</span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-900 flex items-start gap-2.5">
+                <span className="text-base shrink-0">ℹ️</span>
+                <div className="text-xs">
+                  <p className="font-bold">No-Cost EMI threshold: Min. ₹3,000</p>
+                  <p className="text-[11px] text-amber-800 mt-0.5">
+                    Per Indian banking guidelines, credit card EMI is enabled for cart values of ₹3,000+. For this item, upfront 5% cashback or flat card discounts apply directly!
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Price Breakdown Calculation Card */}
             <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50 via-teal-50/50 to-white border border-emerald-200/80 shadow-xs space-y-2">
@@ -218,15 +230,23 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
               <div className="pt-2 border-t border-emerald-200/60 flex items-baseline justify-between">
                 <div>
                   <span className="text-xs font-bold text-slate-900 block">Final Net Price:</span>
-                  <span className="text-[11px] text-slate-500">Payable in {emiTenure} installments</span>
+                  <span className="text-[11px] text-slate-500">
+                    {deal.price >= 3000 ? `Payable in ${emiTenure} installments` : 'Single payment with instant savings'}
+                  </span>
                 </div>
                 <div className="text-right">
                   <span className="text-2xl font-black text-emerald-800">
                     ₹{priceAfterCard.toLocaleString('en-IN')}
                   </span>
-                  <span className="block text-xs font-bold text-slate-600">
-                    Just ₹{monthlyEmi.toLocaleString('en-IN')} / month
-                  </span>
+                  {deal.price >= 3000 ? (
+                    <span className="block text-xs font-bold text-slate-600">
+                      Just ₹{monthlyEmi.toLocaleString('en-IN')} / month
+                    </span>
+                  ) : (
+                    <span className="block text-[11px] font-bold text-emerald-700">
+                      Save ₹{cardDiscount.toLocaleString('en-IN')} upfront
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
