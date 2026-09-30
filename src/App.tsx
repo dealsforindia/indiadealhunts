@@ -25,6 +25,7 @@ import type { PublicDeal, PublicDealsResponse, SortOption, NavTab } from './type
 import { calculateWorthScore } from './utils/worthScore';
 import { searchDealsClient } from './utils/semanticSearch';
 import { INITIAL_VERIFIED_DEALS } from './data/mockDeals';
+import { getSavedDealIds, toggleSavedDealId, subscribeSavedDeals } from './utils/savedDeals';
 
 const EDGE_API = import.meta.env.VITE_EDGE_API_URL || 'https://dealflow-edge.pottemasshippo.workers.dev';
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
@@ -61,11 +62,38 @@ export const App: React.FC = () => {
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Saved Deals (Favorites) State
+  const [savedDealIds, setSavedDealIds] = useState<string[]>(() => getSavedDealIds());
+
+  useEffect(() => {
+    return subscribeSavedDeals((ids) => setSavedDealIds(ids));
+  }, []);
+
   const showToast = useCallback((msg: string) => {
     setToastMessage(msg);
     setTimeout(() => {
       setToastMessage((cur) => (cur === msg ? null : cur));
     }, 2800);
+  }, []);
+
+  const handleToggleSaveDeal = useCallback((deal: PublicDeal) => {
+    const { isSaved, list } = toggleSavedDealId(deal.id);
+    setSavedDealIds(list);
+    showToast(isSaved ? 'Saved to your Loot Bookmarks!' : 'Removed from saved deals');
+  }, [showToast]);
+
+  const flashLootCount = useMemo(() => {
+    return deals.filter((d) => (d.discount_pct || 0) >= 70).length;
+  }, [deals]);
+
+  const handleFilterFlashLoot = useCallback(() => {
+    setActiveTab('home');
+    setSelectedCategory('all');
+    setSelectedStore('all');
+    setSearchQuery('');
+    setSortBy('discount');
+    const section = document.getElementById('deals-section');
+    if (section) section.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
   // Top Page Scroll Progress (Micro-interaction 15: 2px Amber indicator)
@@ -187,7 +215,9 @@ export const App: React.FC = () => {
     }
 
     // Tab-based filtering
-    if (activeTab === 'ending_soon') {
+    if (activeTab === 'saved') {
+      result = result.filter((d) => savedDealIds.includes(d.id));
+    } else if (activeTab === 'ending_soon') {
       // Popular / High discount
       result = [...result].sort((a, b) => (b.discount_pct || 0) - (a.discount_pct || 0));
     } else if (activeTab === 'best_worth') {
@@ -196,7 +226,7 @@ export const App: React.FC = () => {
     }
 
     return result;
-  }, [deals, searchQuery, selectedCategory, selectedStore, activeTab]);
+  }, [deals, searchQuery, selectedCategory, selectedStore, activeTab, savedDealIds]);
 
   const handleFocusSearch = () => {
     const inputEl = document.getElementById('hero-search-input') as HTMLInputElement | null;
@@ -256,6 +286,7 @@ export const App: React.FC = () => {
         }}
         onOpenSubmit={() => setIsSubmitOpen(true)}
         onFocusSearch={handleFocusSearch}
+        savedCount={savedDealIds.length}
       />
 
       {/* ── Real-Time Loot Radar Marquee Ticker ── */}
@@ -302,6 +333,8 @@ export const App: React.FC = () => {
               setLookupUrl(url || '');
               setIsLookupOpen(true);
             }}
+            highDiscountCount={flashLootCount}
+            onFilterFlashLoot={handleFilterFlashLoot}
           />
 
           {/* ── 2.5 Flash Category Stories Rail (Instagram-style) ── */}
@@ -348,21 +381,31 @@ export const App: React.FC = () => {
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </span>
                   <h2 className="font-heading text-xl sm:text-2xl font-black tracking-tight text-slate-900 m-0">
-                    <span className="hidden sm:inline">Latest Verified Drops</span>
-                    <span className="sm:hidden">Latest Drops</span>
+                    {activeTab === 'saved' ? (
+                      <span>💖 Saved Loot Bookmarks</span>
+                    ) : (
+                      <>
+                        <span className="hidden sm:inline">Latest Verified Drops</span>
+                        <span className="sm:hidden">Latest Drops</span>
+                      </>
+                    )}
                   </h2>
                   <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    LIVE RADAR
+                    {activeTab === 'saved' ? 'BOOKMARKS' : 'LIVE RADAR'}
                   </span>
                 </div>
                 <p className="text-slate-500 text-xs sm:text-sm mt-1">
-                  Cross-referenced against 90-day price history • Verified affiliate-direct links
+                  {activeTab === 'saved'
+                    ? 'Your bookmarked loot deals saved locally in your browser.'
+                    : 'Cross-referenced against 90-day price history • Verified affiliate-direct links'}
                 </p>
               </div>
 
               {/* Deal count */}
               <span className="font-mono text-xs sm:text-sm text-slate-500 font-semibold">
-                {totalDeals ? `${totalDeals.toLocaleString('en-IN')} drops` : '3,350+ drops'}
+                {activeTab === 'saved'
+                  ? `${filteredDeals.length} saved`
+                  : totalDeals ? `${totalDeals.toLocaleString('en-IN')} drops` : '3,350+ drops'}
               </span>
             </div>
 
@@ -384,6 +427,22 @@ export const App: React.FC = () => {
                   className="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl cursor-pointer shadow-sm"
                 >
                   Retry Connection
+                </button>
+              </div>
+            ) : activeTab === 'saved' && filteredDeals.length === 0 ? (
+              <div className="py-14 px-6 text-center max-w-md mx-auto rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col items-center">
+                <span className="text-4xl mb-3">💖</span>
+                <h3 className="font-heading font-bold text-slate-900 mb-2">
+                  No Saved Deals Yet
+                </h3>
+                <p className="text-xs text-slate-500 mb-5 max-w-xs leading-relaxed">
+                  Tap the heart icon on any verified deal card to bookmark bargains here for instant tracking.
+                </p>
+                <button
+                  onClick={() => setActiveTab('home')}
+                  className="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl cursor-pointer shadow-sm transition-all hover:scale-105"
+                >
+                  Browse Verified Drops →
                 </button>
               </div>
             ) : filteredDeals.length === 0 ? (
@@ -417,6 +476,9 @@ export const App: React.FC = () => {
                         key={deal.id}
                         deal={deal}
                         index={idx}
+                        isSaved={savedDealIds.includes(deal.id)}
+                        onToggleSave={handleToggleSaveDeal}
+                        onShowToast={showToast}
                         onSelectDeal={(d) => setSelectedDetailDeal(d)}
                       />
                     ))}
@@ -476,6 +538,7 @@ export const App: React.FC = () => {
         }}
         onOpenSubmit={() => setIsSubmitOpen(true)}
         onFocusSearch={handleFocusSearch}
+        savedCount={savedDealIds.length}
       />
 
       {/* ── Deal Detail Modal (Opens when card clicked) ── */}
@@ -483,6 +546,7 @@ export const App: React.FC = () => {
         deal={selectedDetailDeal}
         onClose={() => setSelectedDetailDeal(null)}
         onShowToast={showToast}
+        onToggleSave={handleToggleSaveDeal}
       />
 
       {/* ── Price Lookup Tool Modal ── */}

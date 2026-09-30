@@ -9,6 +9,7 @@ interface NavbarProps {
   onOpenLookup: () => void;
   onOpenSubmit: () => void;
   onFocusSearch?: () => void;
+  savedCount?: number;
 }
 
 const TELEGRAM_URL = 'https://t.me/dealsforindiachannel';
@@ -30,6 +31,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenLookup,
   onOpenSubmit,
   onFocusSearch,
+  savedCount = 0,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
@@ -122,6 +124,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             { id: 'home', label: 'Latest Deals' },
             { id: 'ending_soon', label: 'Top Discounts' },
             { id: 'best_worth', label: 'Worth Score' },
+            { id: 'saved', label: savedCount ? `Saved (${savedCount})` : 'Saved Loot' },
             { id: 'wall_of_happiness', label: '💖 Wall of Happiness' },
           ].map((tab) => {
             const isActive = activeTab === tab.id;

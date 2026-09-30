@@ -48,9 +48,12 @@ export interface PublicDeal {
   is_mega_haul?: boolean;
   haul_store?: string;
   pincodes?: string[];
-  cities?: string[];
-  total_items?: number;
   items?: MegaHaulItem[];
+  arbitrage?: {
+    winnerStore: string;
+    savingsVsOthers: number;
+    stores: Array<{ store: string; price: number; inStock: boolean; url?: string }>;
+  } | null;
 }
 
 export interface MegaHaulItem {
@@ -173,7 +176,7 @@ export interface LookupResult {
 }
 
 export type SortOption = 'worth' | 'newest' | 'discount' | 'price_low' | 'price_high';
-export type NavTab = 'home' | 'ending_soon' | 'best_worth' | 'active_offers' | 'lookup' | 'submit_deal' | 'about' | 'how_we_verify' | 'wall_of_happiness' | 'contact';
+export type NavTab = 'home' | 'ending_soon' | 'best_worth' | 'active_offers' | 'lookup' | 'submit_deal' | 'about' | 'how_we_verify' | 'wall_of_happiness' | 'contact' | 'saved';
 
 export interface CommunityBrag {
   id: string;

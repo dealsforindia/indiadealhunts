@@ -5,6 +5,8 @@ interface HeroBannerProps {
   searchQuery: string;
   onSearch: (query: string) => void;
   onOpenLookup?: (url?: string) => void;
+  highDiscountCount?: number;
+  onFilterFlashLoot?: () => void;
 }
 
 const POPULAR_SEARCHES = [
@@ -27,6 +29,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   searchQuery,
   onSearch,
   onOpenLookup,
+  highDiscountCount,
+  onFilterFlashLoot,
 }) => {
   const [input, setInput] = useState(searchQuery);
   const [isFocused, setIsFocused] = useState(false);
@@ -58,16 +62,30 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
     <section className="relative overflow-hidden pt-8 pb-12 md:py-16 bg-gradient-to-b from-white via-slate-50/50 to-white border-b border-slate-200/80">
       <div className="max-w-[1340px] mx-auto px-4 md:px-6 grid grid-cols-1 lg:grid-cols-[1.18fr_0.82fr] gap-10 md:gap-12 items-center">
         {/* ── Left Column: Headline, Search Capsule, Quick Store Filters ── */}
-        <div className="flex flex-col gap-5 max-w-2xl">
-          {/* Eyebrow Badge */}
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-4 max-w-2xl">
+          {/* Eyebrows: Live Radar + Interactive Flash Loot Banner */}
+          <div className="flex flex-wrap items-center gap-2.5">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-mono text-[11px] font-bold">
               <span className="flex h-2 w-2 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
               </span>
-              <span>LIVE AI LOOT RADAR · 27 CHANNELS MONITORED</span>
+              <span>LIVE AI LOOT RADAR · 27 CHANNELS</span>
             </span>
+
+            {onFilterFlashLoot && (
+              <button
+                type="button"
+                onClick={onFilterFlashLoot}
+                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 font-mono text-[11px] font-bold transition-all cursor-pointer shadow-2xs"
+              >
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-600"></span>
+                </span>
+                <span>⚡ {highDiscountCount ? `${highDiscountCount} Drops at 70%+ OFF` : 'Drops at 70%+ OFF'} →</span>
+              </button>
+            )}
           </div>
 
           {/* Main Headline */}

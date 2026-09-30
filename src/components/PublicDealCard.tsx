@@ -1,13 +1,18 @@
-import React, { useState, useMemo } from 'react';
-import { motion } from 'motion/react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
+import { isDealSaved, toggleSavedDealId } from '../utils/savedDeals';
+import { shareToWhatsApp, shareToTelegram, copyDealLink } from '../utils/shareDeal';
 
 interface PublicDealCardProps {
   deal: PublicDeal;
   index?: number;
+  isSaved?: boolean;
   onOpenImage?: (deal: PublicDeal) => void;
   onSelectDeal?: (deal: PublicDeal) => void;
+  onToggleSave?: (deal: PublicDeal) => void;
+  onShowToast?: (msg: string) => void;
 }
 
 function getRelativeTime(timestamp?: number): string {
@@ -72,12 +77,30 @@ function getStoreBadge(store?: string) {
 export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   deal,
   index = 0,
+  isSaved: propIsSaved,
   onOpenImage,
   onSelectDeal,
+  onToggleSave,
+  onShowToast,
 }) => {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
+  const [localSaved, setLocalSaved] = useState(() => isDealSaved(deal.id));
+  const [shareOpen, setShareOpen] = useState(false);
+  const shareRef = useRef<HTMLDivElement>(null);
+
+  const isSaved = propIsSaved !== undefined ? propIsSaved : localSaved;
+
+  useEffect(() => {
+    if (!shareOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (shareRef.current && !shareRef.current.contains(e.target as Node)) {
+        setShareOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [shareOpen]);
 
   const cleanImageUrl = getCleanImageUrl(deal.image);
   const displayTitle = cleanTitle(deal);
@@ -93,6 +116,17 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   const savings = mrp && price > 0 ? mrp - price : 0;
   const relativeTime = getRelativeTime(deal.display_ts || deal.posted_at);
   const storeBadge = getStoreBadge(deal.store);
+
+  const handleToggleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onToggleSave) {
+      onToggleSave(deal);
+    } else {
+      const { isSaved: nextSaved } = toggleSavedDealId(deal.id);
+      setLocalSaved(nextSaved);
+      onShowToast?.(nextSaved ? 'Saved to Loot Bookmarks!' : 'Removed from saved deals');
+    }
+  };
 
   const handleCardClick = () => {
     if (onSelectDeal) {
@@ -179,29 +213,27 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           <motion.button
             type="button"
             whileTap={{ scale: 0.8 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsSaved(!isSaved);
-            }}
+            onClick={handleToggleFavorite}
             title={isSaved ? 'Saved to favorites' : 'Save to favorites'}
             aria-label="Save to favorites"
             style={{
-              background: 'none',
-              border: 'none',
+              background: isSaved ? '#FEF3C7' : 'none',
+              border: isSaved ? '1px solid #FDE68A' : 'none',
+              borderRadius: '6px',
               cursor: 'pointer',
-              padding: '2px',
+              padding: '3px',
               display: 'flex',
               alignItems: 'center',
               color: isSaved ? '#D97706' : '#94A3B8',
-              transition: 'color 0.15s ease',
+              transition: 'all 0.15s ease',
             }}
           >
             {isSaved ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#D97706">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="#D97706">
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
               </svg>
             ) : (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             )}
@@ -383,7 +415,30 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             )}
           </div>
 
-          {/* Sparkline Vector & Breakdown Link */}
+          {/* Arbitrage Advantage Callout */}
+          {savings > 200 && (
+            <div
+              style={{
+                marginTop: '6px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '2px 8px',
+                borderRadius: '6px',
+                backgroundColor: '#EFF6FF',
+                border: '1px solid #DBEAFE',
+                fontSize: '10.5px',
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 600,
+                color: '#1D4ED8',
+              }}
+            >
+              <span>⚡</span>
+              <span>Lower than other major stores by ₹{savings.toLocaleString('en-IN')}</span>
+            </div>
+          )}
+
+          {/* Sparkline Vector & Action Links (Breakdown + Share) */}
           <div
             style={{
               display: 'flex',
@@ -419,33 +474,201 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
               </span>
             </div>
 
-            {/* Breakdown Modal trigger */}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (onSelectDeal) onSelectDeal(deal);
-              }}
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '11px',
-                fontWeight: 600,
-                color: '#64748B',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '2px 4px',
-                transition: 'color 0.15s ease',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.color = '#0F172A';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.color = '#64748B';
-              }}
-            >
-              Breakdown ↗
-            </button>
+            {/* Actions: Breakdown + 1-Click Share Popover */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              {/* Share Popover */}
+              <div ref={shareRef} style={{ position: 'relative' }}>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShareOpen(!shareOpen);
+                  }}
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: shareOpen ? '#1D4ED8' : '#64748B',
+                    background: shareOpen ? '#EFF6FF' : 'none',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    padding: '2px 6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    transition: 'all 0.15s ease',
+                  }}
+                  title="Share verified deal"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="18" cy="5" r="3" />
+                    <circle cx="6" cy="12" r="3" />
+                    <circle cx="18" cy="19" r="3" />
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                  </svg>
+                  <span>Share</span>
+                </button>
+
+                <AnimatePresence>
+                  {shareOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 4, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 4, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        position: 'absolute',
+                        right: 0,
+                        bottom: 'calc(100% + 6px)',
+                        minWidth: '148px',
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '12px',
+                        boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.1)',
+                        border: '1px solid #E2E8F0',
+                        padding: '4px',
+                        zIndex: 40,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '2px',
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          shareToWhatsApp(deal);
+                          setShareOpen(false);
+                          onShowToast?.('Opening WhatsApp share...');
+                        }}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '6px 10px',
+                          borderRadius: '8px',
+                          fontSize: '11.5px',
+                          fontWeight: 600,
+                          color: '#065F46',
+                          backgroundColor: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'background-color 0.12s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#ECFDF5';
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent';
+                        }}
+                      >
+                        <span style={{ fontSize: '13px' }}>💬</span>
+                        <span>WhatsApp</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          shareToTelegram(deal);
+                          setShareOpen(false);
+                          onShowToast?.('Opening Telegram share...');
+                        }}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '6px 10px',
+                          borderRadius: '8px',
+                          fontSize: '11.5px',
+                          fontWeight: 600,
+                          color: '#1E40AF',
+                          backgroundColor: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'background-color 0.12s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#EFF6FF';
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent';
+                        }}
+                      >
+                        <span style={{ fontSize: '13px' }}>✈️</span>
+                        <span>Telegram</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const ok = await copyDealLink(deal);
+                          setShareOpen(false);
+                          if (ok) onShowToast?.('Deal link copied to clipboard!');
+                        }}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '6px 10px',
+                          borderRadius: '8px',
+                          fontSize: '11.5px',
+                          fontWeight: 600,
+                          color: '#334155',
+                          backgroundColor: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'background-color 0.12s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F1F5F9';
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent';
+                        }}
+                      >
+                        <span style={{ fontSize: '13px' }}>📋</span>
+                        <span>Copy Link</span>
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Breakdown Modal trigger */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onSelectDeal) onSelectDeal(deal);
+                }}
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: '#64748B',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '2px 4px',
+                  transition: 'color 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.color = '#0F172A';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.color = '#64748B';
+                }}
+              >
+                Breakdown ↗
+              </button>
+            </div>
           </div>
         </div>
 

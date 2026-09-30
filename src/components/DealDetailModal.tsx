@@ -1,15 +1,19 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { SignaturePriceGraph } from './SignaturePriceGraph';
+import { analyzeArbitrage } from '../utils/arbitrage';
+import { shareToWhatsApp, shareToTelegram, copyDealLink } from '../utils/shareDeal';
+import { isDealSaved, toggleSavedDealId } from '../utils/savedDeals';
 
 interface DealDetailModalProps {
   deal: PublicDeal | null;
   onClose: () => void;
   onOpenImage?: (deal: PublicDeal) => void;
   onShowToast?: (msg: string) => void;
+  onToggleSave?: (deal: PublicDeal) => void;
 }
 
 function getStoreDisplayName(store?: string): string {
@@ -54,6 +58,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   onClose,
   onOpenImage,
   onShowToast,
+  onToggleSave,
 }) => {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
@@ -61,6 +66,9 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   const [copyLink, setCopyLink] = useState(false);
   const [reportSent, setReportSent] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [saved, setSaved] = useState(() => (deal ? isDealSaved(deal.id) : false));
+
+  const arbitrage = useMemo(() => (deal ? analyzeArbitrage(deal) : null), [deal]);
 
   useEffect(() => {
     if (deal) {
@@ -69,12 +77,24 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
       setCopiedCoupon(false);
       setCopyLink(false);
       setReportSent(false);
+      setSaved(isDealSaved(deal.id));
       // Small delay for entrance animation
       requestAnimationFrame(() => setVisible(true));
     } else {
       setVisible(false);
     }
   }, [deal]);
+
+  const handleToggleFavorite = () => {
+    if (!deal) return;
+    if (onToggleSave) {
+      onToggleSave(deal);
+    } else {
+      const { isSaved: next } = toggleSavedDealId(deal.id);
+      setSaved(next);
+      onShowToast?.(next ? 'Saved to Loot Bookmarks!' : 'Removed from saved deals');
+    }
+  };
 
   const handleClose = useCallback(() => {
     setVisible(false);
@@ -227,38 +247,70 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             </span>
           </div>
 
-          <button
-            onClick={handleClose}
-            aria-label="Close deal details"
-            style={{
-              width: '32px',
-              height: '32px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #E2E8F0',
-              borderRadius: '8px',
-              color: '#64748B',
-              cursor: 'pointer',
-              flexShrink: 0,
-              transition: 'all 120ms ease',
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.color = '#0F172A';
-              (e.currentTarget as HTMLButtonElement).style.borderColor = '#CBD5E1';
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F1F5F9';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.color = '#64748B';
-              (e.currentTarget as HTMLButtonElement).style.borderColor = '#E2E8F0';
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#FFFFFF';
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              type="button"
+              onClick={handleToggleFavorite}
+              title={saved ? 'Saved in Loot Bookmarks' : 'Save deal'}
+              aria-label="Save deal to bookmarks"
+              style={{
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: saved ? '#FEF3C7' : '#FFFFFF',
+                border: `1px solid ${saved ? '#FDE68A' : '#E2E8F0'}`,
+                borderRadius: '8px',
+                color: saved ? '#D97706' : '#64748B',
+                cursor: 'pointer',
+                transition: 'all 120ms ease',
+              }}
+            >
+              {saved ? (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="#D97706">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+              ) : (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </button>
+
+            <button
+              onClick={handleClose}
+              aria-label="Close deal details"
+              style={{
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E2E8F0',
+                borderRadius: '8px',
+                color: '#64748B',
+                cursor: 'pointer',
+                flexShrink: 0,
+                transition: 'all 120ms ease',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color = '#0F172A';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = '#CBD5E1';
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F1F5F9';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color = '#64748B';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = '#E2E8F0';
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#FFFFFF';
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Body: Two-column */}
@@ -445,6 +497,104 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               mrp={mrp}
             />
 
+            {/* Multi-Store Real-Time Arbitrage Matrix */}
+            {arbitrage && (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                padding: '12px',
+                borderRadius: '12px',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: '12px', fontWeight: 800, color: '#0F172A' }}>
+                    ⚡ Multi-Store Arbitrage Comparison
+                  </span>
+                  <span style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '10.5px',
+                    fontWeight: 700,
+                    color: '#1D4ED8',
+                    backgroundColor: '#EFF6FF',
+                    border: '1px solid #DBEAFE',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                  }}>
+                    {arbitrage.percentageCheaper > 0 ? `Save ${arbitrage.percentageCheaper}% Here` : 'Best Rate'}
+                  </span>
+                </div>
+
+                {/* Store Quotes Grid */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {arbitrage.quotes.map((q, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '8px 10px',
+                        borderRadius: '8px',
+                        backgroundColor: q.isWinner ? '#FFFFFF' : '#F1F5F9',
+                        border: `1px solid ${q.isWinner ? '#A7F3D0' : '#E2E8F0'}`,
+                        boxShadow: q.isWinner ? '0 1px 2px rgba(16, 185, 129, 0.1)' : 'none',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontFamily: 'var(--font-heading)', fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>
+                          {q.store}
+                        </span>
+                        {q.isWinner && (
+                          <span style={{
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '9.5px',
+                            fontWeight: 700,
+                            color: '#065F46',
+                            backgroundColor: '#ECFDF5',
+                            border: '1px solid #A7F3D0',
+                            padding: '1px 5px',
+                            borderRadius: '4px',
+                          }}>
+                            LOWEST
+                          </span>
+                        )}
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: '13px',
+                          fontWeight: 800,
+                          color: q.isWinner ? '#059669' : '#64748B',
+                        }}>
+                          ₹{q.price.toLocaleString('en-IN')}
+                        </span>
+                        <span style={{
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: '10px',
+                          color: q.isWinner ? '#059669' : '#94A3B8',
+                        }}>
+                          {q.isWinner ? '🏆 Verified' : `+₹${q.deltaVsWinner.toLocaleString('en-IN')}`}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <p style={{
+                  fontSize: '10.5px',
+                  fontFamily: 'var(--font-body)',
+                  color: '#64748B',
+                  margin: '2px 0 0',
+                  lineHeight: 1.4,
+                }}>
+                  {arbitrage.verdict}
+                </p>
+              </div>
+            )}
+
             {/* Editorial verification note */}
             <p style={{
               fontSize: '11px',
@@ -505,12 +655,66 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
           </a>
 
           <button
+            type="button"
+            onClick={() => {
+              shareToWhatsApp(deal);
+              onShowToast?.('Opening WhatsApp share...');
+            }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              padding: '0 12px',
+              height: '42px',
+              backgroundColor: '#ECFDF5',
+              border: '1px solid #A7F3D0',
+              borderRadius: '10px',
+              color: '#065F46',
+              fontFamily: 'var(--font-body)',
+              fontSize: '12px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 120ms ease',
+            }}
+            title="Share to WhatsApp"
+          >
+            <span>💬 WhatsApp</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              shareToTelegram(deal);
+              onShowToast?.('Opening Telegram share...');
+            }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              padding: '0 12px',
+              height: '42px',
+              backgroundColor: '#EFF6FF',
+              border: '1px solid #DBEAFE',
+              borderRadius: '10px',
+              color: '#1E40AF',
+              fontFamily: 'var(--font-body)',
+              fontSize: '12px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 120ms ease',
+            }}
+            title="Share to Telegram"
+          >
+            <span>✈️ Telegram</span>
+          </button>
+
+          <button
             onClick={handleShare}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '5px',
-              padding: '0 14px',
+              padding: '0 12px',
               height: '42px',
               backgroundColor: '#FFFFFF',
               border: '1px solid #E2E8F0',
@@ -530,7 +734,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               <circle cx="2" cy="6" r="1.5" stroke="currentColor" strokeWidth="1.2"/>
               <path d="M8.5 2.7L3.5 5.3M8.5 9.3L3.5 6.7" stroke="currentColor" strokeWidth="1.2"/>
             </svg>
-            {copyLink ? 'Copied!' : 'Share Deal'}
+            {copyLink ? 'Copied!' : 'Copy Link'}
           </button>
 
           <button
@@ -540,7 +744,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '5px',
-              padding: '0 14px',
+              padding: '0 12px',
               height: '42px',
               backgroundColor: '#FFFFFF',
               border: '1px solid #E2E8F0',
