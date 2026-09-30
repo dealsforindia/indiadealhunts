@@ -24,6 +24,7 @@ import { CategoryStories } from './components/CategoryStories';
 import { CommandPalette } from './components/CommandPalette';
 import { CardCalculatorModal } from './components/CardCalculatorModal';
 import { CompareDrawer } from './components/CompareDrawer';
+import { ToolsHubModal, ToolId } from './components/tools/ToolsHubModal';
 import type { PublicDeal, PublicDealsResponse, SortOption, NavTab } from './types';
 import { calculateWorthScore } from './utils/worthScore';
 import { searchDealsClient } from './utils/semanticSearch';
@@ -66,12 +67,19 @@ export const App: React.FC = () => {
   const [activeLegal, setActiveLegal] = useState<LegalDocType>(null);
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState<boolean>(false);
   const [isCardsModalOpen, setIsCardsModalOpen] = useState<boolean>(false);
+  const [isToolsHubOpen, setIsToolsHubOpen] = useState<boolean>(false);
+  const [activeToolId, setActiveToolId] = useState<ToolId>('emi');
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState<boolean>(false);
   const [compareDeals, setCompareDeals] = useState<PublicDeal[]>([]);
   const [activeCardIds, setActiveCardIds] = useState<string[]>(() => getSavedCards());
   const [isAudioActive, setIsAudioActive] = useState<boolean>(() => isAudioEnabled());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const handleOpenToolsHub = useCallback((toolId?: ToolId) => {
+    if (toolId) setActiveToolId(toolId);
+    setIsToolsHubOpen(true);
+  }, []);
 
   // Saved Deals (Favorites) State
   const [savedDealIds, setSavedDealIds] = useState<string[]>(() => getSavedDealIds());
@@ -351,6 +359,7 @@ export const App: React.FC = () => {
         onOpenSubmit={() => setIsSubmitOpen(true)}
         onFocusSearch={handleFocusSearch}
         onOpenCardsModal={() => setIsCardsModalOpen(true)}
+        onOpenToolsHub={() => handleOpenToolsHub('emi')}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         isAudioEnabled={isAudioActive}
         onToggleAudio={handleToggleAudio}
@@ -677,6 +686,13 @@ export const App: React.FC = () => {
         onCloseModal={() => setIsCompareModalOpen(false)}
         onRemoveDeal={handleRemoveCompareDeal}
         onClearAll={handleClearCompareAll}
+      />
+
+      {/* ── Shopping Utilities & Loot Lab Suite (EMI, Shrinkflation, Energy, Warranties, Budgeting) ── */}
+      <ToolsHubModal
+        isOpen={isToolsHubOpen}
+        onClose={() => setIsToolsHubOpen(false)}
+        initialToolId={activeToolId}
       />
 
       {/* ── Floating Action Toast ── */}

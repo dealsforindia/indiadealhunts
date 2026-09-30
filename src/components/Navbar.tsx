@@ -10,6 +10,7 @@ interface NavbarProps {
   onOpenSubmit: () => void;
   onFocusSearch?: () => void;
   onOpenCardsModal?: () => void;
+  onOpenToolsHub?: () => void;
   onOpenCommandPalette?: () => void;
   isAudioEnabled?: boolean;
   onToggleAudio?: () => void;
@@ -36,6 +37,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenSubmit,
   onFocusSearch,
   onOpenCardsModal,
+  onOpenToolsHub,
   onOpenCommandPalette,
   isAudioEnabled = true,
   onToggleAudio,
@@ -170,6 +172,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <span>💳</span>
               <span>Cards</span>
+            </button>
+          )}
+
+          {onOpenToolsHub && (
+            <button
+              onClick={onOpenToolsHub}
+              title="Shopping Utilities & Loot Lab (EMI, Shrinkflation, Energy, Warranties, Budgeting)"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all"
+            >
+              <span>🧰</span>
+              <span>Utilities</span>
             </button>
           )}
 
@@ -340,6 +353,15 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <span>💳 Card Savings Calculator</span>
                   <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">5% Cashback</span>
+                </button>
+              )}
+              {onOpenToolsHub && (
+                <button
+                  onClick={() => { onOpenToolsHub(); setMobileMenuOpen(false); }}
+                  className="text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 flex items-center justify-between"
+                >
+                  <span>🧰 Shopping Utilities &amp; Loot Lab</span>
+                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">5 Tools</span>
                 </button>
               )}
               {onToggleAudio && (
