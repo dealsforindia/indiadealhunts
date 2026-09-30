@@ -21,11 +21,16 @@ import { DealSkeletonGrid } from './components/DealSkeleton';
 import { MarqueeTicker } from './components/MarqueeTicker';
 import { HowDealsWorkModal } from './components/HowDealsWorkModal';
 import { CategoryStories } from './components/CategoryStories';
+import { CommandPalette } from './components/CommandPalette';
+import { CardCalculatorModal } from './components/CardCalculatorModal';
+import { CompareDrawer } from './components/CompareDrawer';
 import type { PublicDeal, PublicDealsResponse, SortOption, NavTab } from './types';
 import { calculateWorthScore } from './utils/worthScore';
 import { searchDealsClient } from './utils/semanticSearch';
 import { INITIAL_VERIFIED_DEALS } from './data/mockDeals';
 import { getSavedDealIds, toggleSavedDealId, subscribeSavedDeals } from './utils/savedDeals';
+import { getSavedCards } from './utils/cardSavings';
+import { isAudioEnabled, setAudioEnabled, playTactileClick } from './utils/audio';
 
 const EDGE_API = import.meta.env.VITE_EDGE_API_URL || 'https://dealflow-edge.pottemasshippo.workers.dev';
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
@@ -53,13 +58,19 @@ export const App: React.FC = () => {
   const [hasMore, setHasMore] = useState<boolean>(true);
   const PAGE_SIZE = 40;
 
-  // Modals
+  // Modals & Power Tools
   const [selectedDetailDeal, setSelectedDetailDeal] = useState<PublicDeal | null>(null);
   const [isLookupOpen, setIsLookupOpen] = useState<boolean>(false);
   const [lookupUrl, setLookupUrl] = useState<string>('');
   const [isSubmitOpen, setIsSubmitOpen] = useState<boolean>(false);
   const [activeLegal, setActiveLegal] = useState<LegalDocType>(null);
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState<boolean>(false);
+  const [isCardsModalOpen, setIsCardsModalOpen] = useState<boolean>(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState<boolean>(false);
+  const [compareDeals, setCompareDeals] = useState<PublicDeal[]>([]);
+  const [activeCardIds, setActiveCardIds] = useState<string[]>(() => getSavedCards());
+  const [isAudioActive, setIsAudioActive] = useState<boolean>(() => isAudioEnabled());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Saved Deals (Favorites) State
@@ -75,6 +86,59 @@ export const App: React.FC = () => {
       setToastMessage((cur) => (cur === msg ? null : cur));
     }, 2800);
   }, []);
+
+  const handleToggleCompare = useCallback((deal: PublicDeal) => {
+    setCompareDeals((prev) => {
+      const exists = prev.some((d) => d.id === deal.id);
+      if (exists) {
+        showToast('Removed from comparison');
+        return prev.filter((d) => d.id !== deal.id);
+      }
+      if (prev.length >= 3) {
+        showToast('Max 3 deals can be compared at once');
+        return prev;
+      }
+      showToast(`Added to compare dock (${prev.length + 1}/3)`);
+      return [...prev, deal];
+    });
+  }, [showToast]);
+
+  const handleRemoveCompareDeal = useCallback((id: string) => {
+    setCompareDeals((prev) => prev.filter((d) => d.id !== id));
+  }, []);
+
+  const handleClearCompareAll = useCallback(() => {
+    setCompareDeals([]);
+    setIsCompareModalOpen(false);
+  }, []);
+
+  const handleToggleAudio = useCallback(() => {
+    const next = !isAudioActive;
+    setAudioEnabled(next);
+    setIsAudioActive(next);
+    if (next) {
+      playTactileClick();
+      showToast('Sound effects enabled 🔊');
+    } else {
+      showToast('Sound effects muted 🔇');
+    }
+  }, [isAudioActive, showToast]);
+
+  // Global Keyboard Shortcuts (⌘K, Ctrl+K, /)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      } else if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
+        e.preventDefault();
+        setIsCommandPaletteOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
 
   const handleToggleSaveDeal = useCallback((deal: PublicDeal) => {
     const { isSaved, list } = toggleSavedDealId(deal.id);
@@ -286,6 +350,10 @@ export const App: React.FC = () => {
         }}
         onOpenSubmit={() => setIsSubmitOpen(true)}
         onFocusSearch={handleFocusSearch}
+        onOpenCardsModal={() => setIsCardsModalOpen(true)}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        isAudioEnabled={isAudioActive}
+        onToggleAudio={handleToggleAudio}
         savedCount={savedDealIds.length}
       />
 
@@ -477,7 +545,10 @@ export const App: React.FC = () => {
                         deal={deal}
                         index={idx}
                         isSaved={savedDealIds.includes(deal.id)}
+                        isComparing={compareDeals.some((d) => d.id === deal.id)}
+                        activeCardIds={activeCardIds}
                         onToggleSave={handleToggleSaveDeal}
+                        onToggleCompare={handleToggleCompare}
                         onShowToast={showToast}
                         onSelectDeal={(d) => setSelectedDetailDeal(d)}
                       />
@@ -570,6 +641,42 @@ export const App: React.FC = () => {
           setIsVerifyModalOpen(false);
           setActiveTab('how_we_verify');
         }}
+      />
+
+      {/* ── Credit Card Savings Calculator Modal ── */}
+      <CardCalculatorModal
+        isOpen={isCardsModalOpen}
+        onClose={() => setIsCardsModalOpen(false)}
+        onCardsUpdated={(cards) => {
+          setActiveCardIds(cards);
+          showToast('Credit card preferences updated!');
+        }}
+      />
+
+      {/* ── Apple Spotlight / Command Palette ── */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        deals={deals}
+        onSelectDeal={(deal) => {
+          setSelectedDetailDeal(deal);
+        }}
+        onSearchSubmit={(q) => {
+          setSearchQuery(q);
+          setActiveTab('home');
+          const el = document.getElementById('deals-section');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }}
+      />
+
+      {/* ── Multi-Deal Comparison Drawer & Modal ── */}
+      <CompareDrawer
+        compareDeals={compareDeals}
+        isOpen={isCompareModalOpen}
+        onOpenModal={() => setIsCompareModalOpen(true)}
+        onCloseModal={() => setIsCompareModalOpen(false)}
+        onRemoveDeal={handleRemoveCompareDeal}
+        onClearAll={handleClearCompareAll}
       />
 
       {/* ── Floating Action Toast ── */}

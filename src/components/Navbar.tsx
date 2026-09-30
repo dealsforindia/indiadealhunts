@@ -9,6 +9,10 @@ interface NavbarProps {
   onOpenLookup: () => void;
   onOpenSubmit: () => void;
   onFocusSearch?: () => void;
+  onOpenCardsModal?: () => void;
+  onOpenCommandPalette?: () => void;
+  isAudioEnabled?: boolean;
+  onToggleAudio?: () => void;
   savedCount?: number;
 }
 
@@ -31,6 +35,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenLookup,
   onOpenSubmit,
   onFocusSearch,
+  onOpenCardsModal,
+  onOpenCommandPalette,
+  isAudioEnabled = true,
+  onToggleAudio,
   savedCount = 0,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -154,6 +162,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>Price Lookup</span>
           </button>
 
+          {onOpenCardsModal && (
+            <button
+              onClick={onOpenCardsModal}
+              title="Configure Credit Card Cashback"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all"
+            >
+              <span>💳</span>
+              <span>Cards</span>
+            </button>
+          )}
+
           {/* Categories Popover */}
           <div ref={categoriesRef} className="relative">
             <button
@@ -204,23 +223,41 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </nav>
 
-        {/* ── Right: Search Trigger, Submit, Telegram CTA ── */}
-        <div className="flex items-center gap-2.5">
-          {onFocusSearch && (
+        {/* ── Right: Search Trigger, Audio, Submit, Telegram CTA ── */}
+        <div className="flex items-center gap-2">
+          {(onOpenCommandPalette || onFocusSearch) && (
             <button
-              onClick={onFocusSearch}
-              title="Search deals (Press /)"
-              aria-label="Focus search"
+              onClick={() => {
+                if (onOpenCommandPalette) onOpenCommandPalette();
+                else if (onFocusSearch) onFocusSearch();
+              }}
+              title="Search drops (⌘K / Ctrl+K / /)"
+              aria-label="Search drops"
               className="flex items-center gap-2 h-9 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-all text-xs"
             >
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                 <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.8" />
                 <path d="M11 11l3.5 3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
               </svg>
-              <span className="hidden lg:inline text-slate-500 font-mono text-[11px]">Search...</span>
-              <kbd className="hidden lg:inline-block px-1.5 py-0.5 rounded text-[10px] font-mono bg-white border border-slate-200 text-slate-500 shadow-2xs">
-                /
+              <span className="hidden xl:inline text-slate-500 font-mono text-[11px]">Quick Search</span>
+              <kbd className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] font-mono bg-white border border-slate-200 text-slate-500 shadow-2xs font-semibold">
+                ⌘K
               </kbd>
+            </button>
+          )}
+
+          {onToggleAudio && (
+            <button
+              onClick={onToggleAudio}
+              title={isAudioEnabled ? 'Tactile sound active (click to mute)' : 'Sound muted (click to enable)'}
+              aria-label="Toggle sound effects"
+              className={`flex items-center justify-center w-9 h-9 rounded-lg border text-xs transition-all ${
+                isAudioEnabled
+                  ? 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200'
+                  : 'bg-white border-slate-200 text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              <span>{isAudioEnabled ? '🔊' : '🔇'}</span>
             </button>
           )}
 
@@ -236,12 +273,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             target="_blank"
             rel="noopener noreferrer"
             title="Join 45,000+ Hunters on Telegram"
-            className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm shadow-blue-500/20 active:scale-95 transition-all"
+            className="inline-flex items-center gap-2 h-9 px-3.5 sm:px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm shadow-blue-500/20 active:scale-95 transition-all"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.63 3.73-.53.36-1.02.54-1.45.53-.48-.01-1.4-.27-2.09-.49-.84-.27-1.51-.42-1.45-.88.03-.24.37-.49 1.02-.75 4-1.74 6.68-2.88 8.03-3.44 3.82-1.59 4.62-1.87 5.14-1.88.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.16-.04.29z" />
             </svg>
-            <span>Join Telegram</span>
+            <span className="hidden sm:inline">Join Telegram</span>
+            <span className="sm:hidden">Join</span>
           </a>
         </div>
       </div>
@@ -295,6 +333,24 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 🔍 Price History Lookup
               </button>
+              {onOpenCardsModal && (
+                <button
+                  onClick={() => { onOpenCardsModal(); setMobileMenuOpen(false); }}
+                  className="text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 flex items-center justify-between"
+                >
+                  <span>💳 Card Savings Calculator</span>
+                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">5% Cashback</span>
+                </button>
+              )}
+              {onToggleAudio && (
+                <button
+                  onClick={onToggleAudio}
+                  className="text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 flex items-center justify-between"
+                >
+                  <span>🔊 Sound Effects</span>
+                  <span className="text-xs font-mono font-bold text-slate-500">{isAudioEnabled ? 'ON' : 'MUTED'}</span>
+                </button>
+              )}
               <button
                 onClick={() => { onOpenSubmit(); setMobileMenuOpen(false); }}
                 className="text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100"

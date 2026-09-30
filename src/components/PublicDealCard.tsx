@@ -4,14 +4,19 @@ import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { isDealSaved, toggleSavedDealId } from '../utils/savedDeals';
 import { shareToWhatsApp, shareToTelegram, copyDealLink } from '../utils/shareDeal';
+import { calculateBestCardSavings } from '../utils/cardSavings';
+import { playTactileClick, playSuccessChime } from '../utils/audio';
 
 interface PublicDealCardProps {
   deal: PublicDeal;
   index?: number;
   isSaved?: boolean;
+  isComparing?: boolean;
+  activeCardIds?: string[];
   onOpenImage?: (deal: PublicDeal) => void;
   onSelectDeal?: (deal: PublicDeal) => void;
   onToggleSave?: (deal: PublicDeal) => void;
+  onToggleCompare?: (deal: PublicDeal) => void;
   onShowToast?: (msg: string) => void;
 }
 
@@ -78,9 +83,12 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   deal,
   index = 0,
   isSaved: propIsSaved,
+  isComparing = false,
+  activeCardIds,
   onOpenImage,
   onSelectDeal,
   onToggleSave,
+  onToggleCompare,
   onShowToast,
 }) => {
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -90,6 +98,11 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   const shareRef = useRef<HTMLDivElement>(null);
 
   const isSaved = propIsSaved !== undefined ? propIsSaved : localSaved;
+
+  const cardSavings = useMemo(() => {
+    if (!activeCardIds || activeCardIds.length === 0) return null;
+    return calculateBestCardSavings(deal, activeCardIds);
+  }, [deal, activeCardIds]);
 
   useEffect(() => {
     if (!shareOpen) return;
@@ -119,16 +132,19 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
+    playTactileClick();
     if (onToggleSave) {
       onToggleSave(deal);
     } else {
       const { isSaved: nextSaved } = toggleSavedDealId(deal.id);
       setLocalSaved(nextSaved);
+      if (nextSaved) playSuccessChime();
       onShowToast?.(nextSaved ? 'Saved to Loot Bookmarks!' : 'Removed from saved deals');
     }
   };
 
   const handleCardClick = () => {
+    playTactileClick();
     if (onSelectDeal) {
       onSelectDeal(deal);
     } else if (onOpenImage) {
@@ -194,6 +210,36 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             <span className={discount >= 50 ? 'badge-discount-fire' : 'badge-discount-emerald'}>
               -{discount}% OFF
             </span>
+          )}
+
+          {onToggleCompare && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                playTactileClick();
+                onToggleCompare(deal);
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px',
+                padding: '2px 6px',
+                borderRadius: '5px',
+                fontSize: '10px',
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 700,
+                border: `1px solid ${isComparing ? '#3B82F6' : '#E2E8F0'}`,
+                backgroundColor: isComparing ? '#EFF6FF' : '#FFFFFF',
+                color: isComparing ? '#1D4ED8' : '#64748B',
+                cursor: 'pointer',
+                transition: 'all 120ms ease',
+              }}
+              title={isComparing ? 'Remove from comparison' : 'Compare deal'}
+            >
+              <span>{isComparing ? '✓' : '+'}</span>
+              <span>Compare</span>
+            </button>
           )}
         </div>
 
@@ -438,6 +484,29 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             </div>
           )}
 
+          {/* Credit Card Cashback Effective Price */}
+          {cardSavings && (
+            <div
+              style={{
+                marginTop: '5px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '2px 8px',
+                borderRadius: '6px',
+                backgroundColor: '#F0FDF4',
+                border: '1px solid #BBF7D0',
+                fontSize: '10.5px',
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 700,
+                color: '#15803D',
+              }}
+            >
+              <span>💳</span>
+              <span>₹{cardSavings.effectivePrice.toLocaleString('en-IN')} with {cardSavings.cardName}</span>
+            </div>
+          )}
+
           {/* Sparkline Vector & Action Links (Breakdown + Share) */}
           <div
             style={{
@@ -677,7 +746,10 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           href={deal.url}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            playTactileClick();
+          }}
           className="btn-loot"
           whileTap={{ scale: 0.97 }}
           aria-label={`Get deal for ${displayTitle} on ${deal.store}`}
