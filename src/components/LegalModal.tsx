@@ -35,7 +35,9 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '16px',
-        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        backgroundColor: 'rgba(15, 23, 42, 0.45)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
       }}
       role="dialog"
       aria-modal="true"
@@ -48,9 +50,10 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
           width: '100%',
           maxWidth: '640px',
           maxHeight: '85vh',
-          backgroundColor: 'var(--bg-surface)',
-          border: '1px solid var(--border-default)',
-          borderRadius: '2px',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '16px',
+          boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
@@ -64,20 +67,20 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '12px 16px',
-            borderBottom: '1px solid var(--border-default)',
-            backgroundColor: 'var(--bg-base)',
+            padding: '14px 18px',
+            borderBottom: '1px solid #F1F5F9',
+            backgroundColor: '#F8FAFC',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <IconShieldCheck size={16} color="var(--accent)" />
+            <IconShieldCheck size={16} color="#2563EB" />
             <h2
               id="legal-modal-title"
               style={{
                 fontSize: '15px',
-                fontWeight: 600,
+                fontWeight: 700,
                 fontFamily: 'var(--font-heading)',
-                color: 'var(--text-primary)',
+                color: '#0F172A',
                 margin: 0,
               }}
             >
@@ -263,9 +266,9 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
         {/* Modal Footer */}
         <div
           style={{
-            padding: '12px 16px',
-            borderTop: '1px solid var(--border-default)',
-            backgroundColor: 'var(--bg-base)',
+            padding: '14px 18px',
+            borderTop: '1px solid #F1F5F9',
+            backgroundColor: '#F8FAFC',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-end',
@@ -274,14 +277,15 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
           <button
             onClick={onClose}
             style={{
-              padding: '6px 14px',
+              padding: '8px 18px',
               fontSize: '12px',
-              fontWeight: 500,
-              color: 'var(--text-primary)',
-              backgroundColor: 'var(--bg-raised)',
-              border: '1px solid var(--border-strong)',
-              borderRadius: '2px',
+              fontWeight: 700,
+              color: '#FFFFFF',
+              backgroundColor: '#0F172A',
+              border: 'none',
+              borderRadius: '8px',
               cursor: 'pointer',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
             }}
           >
             Close

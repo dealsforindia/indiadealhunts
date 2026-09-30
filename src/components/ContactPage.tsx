@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IconCheck, IconChevronRight, IconClose } from './Icons';
+import { IconCheck } from './Icons';
 
 interface ContactPageProps {
   onBackToHome?: () => void;
@@ -44,114 +44,73 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
   };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '32px 16px', display: 'flex', flexDirection: 'column', gap: '28px' }}>
+    <div className="max-w-2xl mx-auto py-8 px-4 sm:px-6 flex flex-col gap-8">
       {/* Breadcrumb */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-muted)' }}>
+      <div className="flex items-center gap-2 text-xs text-slate-400">
         <button
           onClick={onBackToHome}
-          style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0 }}
+          className="hover:text-blue-600 transition-colors cursor-pointer bg-transparent border-0 p-0 font-medium"
         >
           Home
         </button>
         <span>/</span>
-        <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>Contact &amp; Feedback</span>
+        <span className="text-slate-800 font-semibold">Contact & Support</span>
       </div>
 
       {/* Header */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <h1
-          style={{
-            fontSize: 'clamp(24px, 4vw, 32px)',
-            fontWeight: 700,
-            fontFamily: 'var(--font-heading)',
-            color: 'var(--text-primary)',
-            letterSpacing: '-0.02em',
-            margin: 0,
-          }}
-        >
-          Contact &amp; Feedback
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-heading font-black tracking-tight text-slate-900">
+          Contact & Curation Desk
         </h1>
-        <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
-          Report a broken link, provide deal suggestions, or reach our technical moderation desk. Direct email: <a href="mailto:hello@rudranil.me" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>hello@rudranil.me</a>.
+        <p className="text-slate-600 text-sm leading-relaxed">
+          Report an expired deal, provide partnership inquiries, or suggest feature requests to our engineering team. Direct inquiries: <a href="mailto:hello@rudranil.me" className="text-blue-600 font-medium hover:underline">hello@rudranil.me</a>.
         </p>
       </div>
 
       {submitted ? (
-        <div
-          style={{
-            padding: '24px',
-            backgroundColor: 'var(--bg-surface)',
-            border: '1px solid var(--green)',
-            borderRadius: '2px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-            alignItems: 'flex-start',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--green)', fontWeight: 600, fontSize: '16px' }}>
-            <IconCheck size={18} />
-            <span>Message Received</span>
+        <div className="p-8 rounded-2xl bg-white border border-emerald-200 flex flex-col gap-3 items-center text-center shadow-sm">
+          <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-xs">
+            <IconCheck size={24} />
           </div>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
-            Thank you for reaching out. Your feedback has been forwarded to our curation desk.
+          <h3 className="text-lg font-bold font-heading text-slate-900">
+            Message Received
+          </h3>
+          <p className="text-xs text-slate-500 max-w-md leading-relaxed">
+            Thank you for reaching out! Your note has been dispatched to our moderation queue. We will review and respond if needed.
           </p>
           <button
             onClick={() => {
               setSubmitted(false);
               setMessage('');
             }}
-            style={{
-              marginTop: '8px',
-              padding: '6px 14px',
-              backgroundColor: 'var(--bg-raised)',
-              border: '1px solid var(--border-default)',
-              color: 'var(--text-primary)',
-              fontSize: '12px',
-              borderRadius: '2px',
-              cursor: 'pointer',
-            }}
+            className="mt-2 px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 text-xs font-bold border border-slate-300 cursor-pointer transition-colors"
           >
-            Send Another Message
+            Send Another Note
           </button>
         </div>
       ) : (
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            padding: '24px',
-            backgroundColor: 'var(--bg-surface)',
-            border: '1px solid var(--border-default)',
-            borderRadius: '2px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px',
-          }}
-        >
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
+        <form onSubmit={handleSubmit} className="p-6 sm:p-8 rounded-2xl bg-white border border-slate-200/90 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow">
+          {submitError && (
+            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs">
+              {submitError}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
                 Your Name
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Optional"
-                style={{
-                  padding: '9px 12px',
-                  backgroundColor: 'var(--bg-base)',
-                  border: '1px solid var(--border-default)',
-                  borderRadius: '2px',
-                  color: 'var(--text-primary)',
-                  fontSize: '13px',
-                  outline: 'none',
-                }}
+                placeholder="Rohan Sharma"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
               />
             </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
+            <div>
+              <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
                 Email Address *
               </label>
               <input
@@ -159,91 +118,49 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="shopper@example.com"
-                style={{
-                  padding: '9px 12px',
-                  backgroundColor: 'var(--bg-base)',
-                  border: '1px solid var(--border-default)',
-                  borderRadius: '2px',
-                  color: 'var(--text-primary)',
-                  fontSize: '13px',
-                  outline: 'none',
-                }}
+                placeholder="rohan@gmail.com"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
               />
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
+          <div>
+            <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
               Subject
             </label>
             <select
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              style={{
-                padding: '9px 12px',
-                backgroundColor: 'var(--bg-base)',
-                border: '1px solid var(--border-default)',
-                borderRadius: '2px',
-                color: 'var(--text-primary)',
-                fontSize: '13px',
-                outline: 'none',
-              }}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
             >
-              <option value="Feedback">General Feedback</option>
-              <option value="Broken Link">Broken or Expired Deal Link</option>
-              <option value="Deal Suggestion">Deal Suggestion</option>
-              <option value="Partnership">Retail Partnership</option>
+              <option value="Feedback">Feedback & Suggestions</option>
+              <option value="Expired Deal">Report an Expired / Fake Deal</option>
+              <option value="Channel Partnership">Telegram Channel Partnership</option>
+              <option value="Technical">Technical Bug / API Question</option>
             </select>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
-              Message *
+          <div>
+            <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
+              Your Message *
             </label>
             <textarea
               required
               rows={4}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Describe your question, issue, or suggestion..."
-              style={{
-                padding: '9px 12px',
-                backgroundColor: 'var(--bg-base)',
-                border: '1px solid var(--border-default)',
-                borderRadius: '2px',
-                color: 'var(--text-primary)',
-                fontSize: '13px',
-                outline: 'none',
-                resize: 'vertical',
-              }}
+              placeholder="Describe the deal URL, bug, or feedback..."
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
             />
           </div>
 
-          {submitError && (
-            <div style={{ padding: '10px 12px', backgroundColor: 'var(--red-subtle)', border: '1px solid var(--red)', color: 'var(--red)', fontSize: '12px', borderRadius: '2px' }}>
-              {submitError}
-            </div>
-          )}
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                padding: '9px 20px',
-                backgroundColor: 'var(--accent)',
-                color: 'var(--text-inverse)',
-                fontWeight: 600,
-                fontSize: '13px',
-                borderRadius: '2px',
-                cursor: 'pointer',
-                opacity: loading ? 0.6 : 1,
-              }}
-            >
-              {loading ? 'Submitting...' : 'Send Message'}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="h-11 rounded-xl bg-slate-900 hover:bg-black text-white font-extrabold text-xs sm:text-sm tracking-wide shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer disabled:opacity-60"
+          >
+            {loading ? 'Sending Message...' : 'Send Message →'}
+          </button>
         </form>
       )}
     </div>

@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 
-// Define explicit types instead of `any`
 interface DealSubmissionResult {
   status: string;
   message?: string;
@@ -33,7 +32,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!url.trim() && !tip.trim()) {
-      setError('Please provide either a product link or a tip text.');
+      setError('Please provide either a product link or deal description.');
       return;
     }
 
@@ -42,9 +41,6 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
 
     try {
       const targetUrl = url.trim() || tip.trim();
-      
-      // If we have a file, use FormData. Otherwise use JSON.
-      // Assuming backend supports both or multipart fallback
       let res: Response;
       
       if (file) {
@@ -101,170 +97,162 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
     setFile(null);
     setSubmitted(false);
     setError(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    setDealResult(null);
   };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 16px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '32px' }}>
-        <button onClick={onBackToHome} style={{ background: 'none', border: 'none', color: '#6B6B6B', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-body)' }}>
-          &larr; Back to Home
+    <div className="max-w-2xl mx-auto py-8 px-4 sm:px-6 flex flex-col gap-8">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-xs text-slate-400">
+        <button
+          onClick={onBackToHome}
+          className="hover:text-blue-600 transition-colors cursor-pointer bg-transparent border-0 p-0 font-medium"
+        >
+          Home
         </button>
+        <span>/</span>
+        <span className="text-slate-800 font-semibold">Submit a Deal</span>
       </div>
 
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '32px', fontFamily: 'var(--font-heading)', color: '#F5F5F5', margin: '0 0 8px' }}>
-          Submit a Deal
+      {/* Header */}
+      <div className="flex flex-col gap-2">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-mono text-[11px] font-bold w-fit">
+          <span>⚡ COMMUNITY SUBMISSIONS</span>
+        </div>
+        <h1 className="text-3xl font-heading font-black tracking-tight text-slate-900">
+          Submit a Deal or Loot Drop
         </h1>
-        <p style={{ fontSize: '14px', color: '#A3A3A3', margin: 0, fontFamily: 'var(--font-body)' }}>
-          Found a massive price drop? Share it with the community. Approved deals get published to Telegram automatically.
+        <p className="text-slate-600 text-sm leading-relaxed">
+          Found an insane price drop, flash error, or promo code? Share it with the community. Our AI pipeline verifies live pricing and credits fast contributors.
         </p>
       </div>
 
       {submitted ? (
-        <div style={{ padding: '32px', backgroundColor: '#0F2018', border: '1px solid #166534', borderRadius: '4px', textAlign: 'center' }}>
-          <h3 style={{ fontSize: '20px', fontFamily: 'var(--font-heading)', color: '#22C55E', margin: '0 0 8px' }}>
-            Deal Submitted Successfully
+        <div className="p-8 rounded-2xl bg-white border border-emerald-200 flex flex-col gap-3 items-center text-center shadow-sm">
+          <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 text-xl font-bold shadow-xs">
+            ✓
+          </div>
+          <h3 className="text-lg font-bold font-heading text-slate-900">
+            Deal Submitted for Review!
           </h3>
-          <p style={{ fontSize: '13px', color: '#A3A3A3', marginBottom: '24px' }}>
-            Thank you for contributing. Our AI verification engine is processing the link.
-            {dealResult?.deal_id && <span style={{ display: 'block', marginTop: '8px' }}>Tracking ID: <code style={{ color: '#F5F5F5' }}>{dealResult.deal_id}</code></span>}
+          <p className="text-xs text-slate-500 max-w-md leading-relaxed">
+            {dealResult?.message || 'Thank you! Our automated pipeline is now scraping price history and stock status. If verified, it will broadcast to our feeds.'}
           </p>
-          <button
-            onClick={handleReset}
-            style={{
-              padding: '10px 20px', backgroundColor: '#F5F5F5', color: '#0A0A0A', border: 'none',
-              borderRadius: '2px', fontWeight: 600, fontSize: '13px', cursor: 'pointer', fontFamily: 'var(--font-body)'
-            }}
-          >
-            Submit Another Deal
-          </button>
+          <div className="flex items-center gap-3 mt-3">
+            <button
+              onClick={handleReset}
+              className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold cursor-pointer transition-colors shadow-sm active:scale-95"
+            >
+              Submit Another Deal
+            </button>
+            <button
+              onClick={onBackToHome}
+              className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 text-xs font-semibold border border-slate-300 cursor-pointer transition-colors"
+            >
+              Back to Home
+            </button>
+          </div>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          
+        <form onSubmit={handleSubmit} className="p-6 sm:p-8 rounded-2xl bg-white border border-slate-200/90 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow">
           {error && (
-            <div style={{ padding: '12px 16px', backgroundColor: '#1F0D0D', border: '1px solid #450A0A', color: '#EF4444', fontSize: '13px', borderRadius: '2px' }}>
+            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs">
               {error}
             </div>
           )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label htmlFor="deal-url" style={{ fontSize: '12px', fontWeight: 600, color: '#F5F5F5' }}>Deal URL (Required)</label>
-              <input
-                id="deal-url"
-                type="url"
-                required
-                placeholder="https://amazon.in/dp/..."
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                style={{ padding: '10px 12px', backgroundColor: '#0A0A0A', border: '1px solid #262626', color: '#F5F5F5', fontSize: '14px', borderRadius: '2px', outline: 'none' }}
-              />
-            </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label htmlFor="deal-store" style={{ fontSize: '12px', fontWeight: 600, color: '#F5F5F5' }}>Store</label>
+          <div>
+            <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
+              Product URL *
+            </label>
+            <input
+              type="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://www.amazon.in/dp/..."
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            <div>
+              <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
+                Store
+              </label>
               <select
-                id="deal-store"
                 value={store}
                 onChange={(e) => setStore(e.target.value)}
-                style={{ padding: '10px 12px', backgroundColor: '#0A0A0A', border: '1px solid #262626', color: '#F5F5F5', fontSize: '14px', borderRadius: '2px', outline: 'none' }}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
               >
                 <option value="Amazon">Amazon</option>
                 <option value="Flipkart">Flipkart</option>
                 <option value="Myntra">Myntra</option>
                 <option value="AJIO">AJIO</option>
-                <option value="Swiggy">Swiggy</option>
+                <option value="Swiggy">Swiggy Instamart</option>
                 <option value="Zepto">Zepto</option>
-                <option value="Blinkit">Blinkit</option>
-                <option value="Other">Other</option>
+                <option value="Other">Other Store</option>
               </select>
             </div>
-          </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label htmlFor="deal-price" style={{ fontSize: '12px', fontWeight: 600, color: '#F5F5F5' }}>Sale Price (₹)</label>
+            <div>
+              <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
+                Deal Price (₹)
+              </label>
               <input
-                id="deal-price"
                 type="number"
-                placeholder="e.g. 499"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                style={{ padding: '10px 12px', backgroundColor: '#0A0A0A', border: '1px solid #262626', color: '#F5F5F5', fontSize: '14px', borderRadius: '2px', outline: 'none' }}
+                placeholder="899"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
               />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label htmlFor="deal-mrp" style={{ fontSize: '12px', fontWeight: 600, color: '#A3A3A3' }}>Regular MRP (Optional)</label>
+
+            <div>
+              <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
+                MRP / Regular (₹)
+              </label>
               <input
-                id="deal-mrp"
                 type="number"
-                placeholder="e.g. 1999"
                 value={mrp}
                 onChange={(e) => setMrp(e.target.value)}
-                style={{ padding: '10px 12px', backgroundColor: '#0A0A0A', border: '1px solid #262626', color: '#F5F5F5', fontSize: '14px', borderRadius: '2px', outline: 'none' }}
+                placeholder="2499"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
               />
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label htmlFor="deal-tip" style={{ fontSize: '12px', fontWeight: 600, color: '#F5F5F5' }}>How to claim / Bank offers</label>
+          <div>
+            <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
+              Coupon Code / Offer Notes
+            </label>
             <textarea
-              id="deal-tip"
               rows={3}
-              placeholder="e.g. Apply ₹200 coupon on page and use SBI credit card for extra 10% off."
               value={tip}
               onChange={(e) => setTip(e.target.value)}
-              style={{ padding: '10px 12px', backgroundColor: '#0A0A0A', border: '1px solid #262626', color: '#F5F5F5', fontSize: '14px', borderRadius: '2px', outline: 'none', resize: 'vertical' }}
+              placeholder="e.g. Apply 10% coupon checkbox + ₹200 ICICI card discount"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
             />
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label htmlFor="deal-file" style={{ fontSize: '12px', fontWeight: 600, color: '#F5F5F5' }}>Screenshot (Optional, max 5MB)</label>
+          <div>
+            <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
+              Your Email (Optional, for reward credit)
+            </label>
             <input
-              id="deal-file"
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-              style={{ padding: '10px 12px', backgroundColor: '#0A0A0A', border: '1px solid #262626', color: '#F5F5F5', fontSize: '14px', borderRadius: '2px', outline: 'none', cursor: 'pointer' }}
-            />
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', paddingTop: '16px', borderTop: '1px solid #1E1E1E' }}>
-            <label htmlFor="deal-email" style={{ fontSize: '12px', fontWeight: 600, color: '#F5F5F5' }}>Your Email (Optional, for updates)</label>
-            <input
-              id="deal-email"
               type="email"
-              placeholder="you@domain.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              style={{ padding: '10px 12px', backgroundColor: '#0A0A0A', border: '1px solid #262626', color: '#F5F5F5', fontSize: '14px', borderRadius: '2px', outline: 'none' }}
+              placeholder="hunter@gmail.com"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            style={{
-              marginTop: '16px',
-              padding: '14px',
-              backgroundColor: '#D47A10',
-              color: '#0A0A0A',
-              border: 'none',
-              borderRadius: '2px',
-              fontWeight: 600,
-              fontSize: '14px',
-              fontFamily: 'var(--font-body)',
-              cursor: 'pointer',
-              opacity: loading ? 0.7 : 1,
-              transition: 'background-color 150ms ease',
-            }}
+            className="mt-2 h-11 rounded-xl bg-slate-900 hover:bg-black text-white font-extrabold text-xs sm:text-sm tracking-wide shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer disabled:opacity-60"
           >
-            {loading ? 'Submitting...' : 'Submit Deal to Engineers'}
+            {loading ? 'Validating Link & Metrics...' : 'Submit Deal to Verification Desk →'}
           </button>
         </form>
       )}

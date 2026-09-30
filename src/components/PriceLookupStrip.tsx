@@ -6,105 +6,39 @@ interface PriceLookupStripProps {
 
 export const PriceLookupStrip: React.FC<PriceLookupStripProps> = ({ onOpenLookup }) => {
   return (
-    <div
-      style={{
-        maxWidth: '1320px',
-        margin: '36px auto 0',
-        padding: '0 20px',
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: '6px',
-          padding: '24px 28px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '20px',
-          flexWrap: 'wrap',
-        }}
-      >
-        {/* Left: Icon + Text description */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '18px', maxWidth: '720px' }}>
-          {/* Circular Search Icon badge */}
-          <div
-            style={{
-              width: '46px',
-              height: '46px',
-              borderRadius: '50%',
-              backgroundColor: 'rgba(34, 197, 94, 0.1)',
-              border: '1.5px solid rgba(34, 197, 94, 0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#22C55E',
-              flexShrink: 0,
-            }}
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    <div className="max-w-[1340px] mx-auto px-4 md:px-6 my-10 w-full">
+      <div className="relative rounded-2xl bg-white border border-slate-200/90 p-6 sm:p-8 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        {/* Subtle decorative glow */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Left Content */}
+        <div className="flex items-start sm:items-center gap-4 sm:gap-5 max-w-2xl">
+          {/* Emblem */}
+          <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 flex-shrink-0 shadow-sm">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 3v18h18" />
+              <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
             </svg>
           </div>
 
           <div>
-            <h3
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: '18px',
-                fontWeight: 700,
-                color: '#F5F7FA',
-                margin: 0,
-                lineHeight: 1.3,
-              }}
-            >
-              Can't find the right deal?
+            <h3 className="font-heading text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-snug">
+              Wondering if a deal is actually genuine?
             </h3>
-            <p
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '14px',
-                color: '#9099A6',
-                margin: '4px 0 0',
-                lineHeight: 1.4,
-              }}
-            >
-              Use our Price Lookup tool to check the real price history and best time to buy.
+            <p className="text-slate-500 text-xs sm:text-sm mt-1 leading-relaxed">
+              Use our real-time Price Lookup tool to verify 90-day price history, all-time lows, and detect inflated MRPs before buying.
             </p>
           </div>
         </div>
 
-        {/* Right: Button action */}
+        {/* Right CTA Button */}
         <button
           type="button"
           onClick={onOpenLookup}
-          style={{
-            height: '42px',
-            padding: '0 22px',
-            backgroundColor: '#F59E0B',
-            color: '#0B0D10',
-            borderRadius: '4px',
-            fontFamily: 'var(--font-heading)',
-            fontWeight: 700,
-            fontSize: '13px',
-            border: 'none',
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            whiteSpace: 'nowrap',
-            transition: 'background-color 120ms ease',
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#FFB126';
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F59E0B';
-          }}
+          className="h-11 px-6 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs sm:text-sm tracking-wide shadow-sm hover:shadow-md active:scale-95 transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap self-stretch sm:self-auto justify-center"
         >
-          Open Price Lookup →
+          <span>Analyze Any Product Link</span>
+          <span>→</span>
         </button>
       </div>
     </div>

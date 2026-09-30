@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
@@ -46,6 +46,29 @@ function cleanTitle(deal: PublicDeal): string {
   return title;
 }
 
+function getStoreBadge(store?: string) {
+  const s = (store || '').toLowerCase();
+  if (s.includes('amazon')) {
+    return { name: 'Amazon', color: '#B45309', bg: '#FEF3C7', border: '#FDE68A', icon: '🛒' };
+  }
+  if (s.includes('flipkart')) {
+    return { name: 'Flipkart', color: '#0284C7', bg: '#E0F2FE', border: '#BAE6FD', icon: '🛍️' };
+  }
+  if (s.includes('myntra')) {
+    return { name: 'Myntra', color: '#BE185D', bg: '#FCE7F3', border: '#FBCFE8', icon: '👗' };
+  }
+  if (s.includes('ajio')) {
+    return { name: 'AJIO', color: '#1D4ED8', bg: '#EFF6FF', border: '#DBEAFE', icon: '🏷️' };
+  }
+  if (s.includes('desidime')) {
+    return { name: 'DesiDime', color: '#DC2626', bg: '#FEE2E2', border: '#FECACA', icon: '🔥' };
+  }
+  if (s.includes('swiggy') || s.includes('instamart')) {
+    return { name: 'Swiggy', color: '#C2410C', bg: '#FFEDD5', border: '#FED7AA', icon: '⚡' };
+  }
+  return { name: store || 'Store', color: '#047857', bg: '#D1FAE5', border: '#A7F3D0', icon: '✓' };
+}
+
 export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   deal,
   index = 0,
@@ -69,6 +92,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
 
   const savings = mrp && price > 0 ? mrp - price : 0;
   const relativeTime = getRelativeTime(deal.display_ts || deal.posted_at);
+  const storeBadge = getStoreBadge(deal.store);
 
   const handleCardClick = () => {
     if (onSelectDeal) {
@@ -78,127 +102,121 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
     }
   };
 
-  // Discount badge styling: Red when >= 50%, Green when < 50%
-  const isHighDiscount = discount >= 50;
-
   return (
     <motion.article
       onClick={handleCardClick}
-      className="pro-card"
-      initial={{ opacity: 0, y: 14 }}
+      className="deal-card-premium group"
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -2 }}
+      whileHover={{ y: -4 }}
       transition={{
-        duration: 0.35,
+        duration: 0.25,
         ease: 'easeOut',
-        delay: (index % 12) * 0.035,
+        delay: (index % 12) * 0.025,
       }}
       layout="position"
       style={{
-        minHeight: '440px',
-        borderRadius: 'var(--radius-md)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
         cursor: 'pointer',
         position: 'relative',
+        backgroundColor: '#FFFFFF',
       }}
     >
-      {/* ── Top Bar: Discount Badge + Favorite Heart Button ── */}
+      {/* ── Top Bar: Store Pill + Time + Save Heart ── */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '10px 12px 6px',
+          padding: '12px 14px 10px',
           zIndex: 2,
         }}
       >
-        {discount > 0 ? (
-          <motion.span
-            initial={{ opacity: 0, scale: 0.75 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.18, duration: 0.25 }}
-            style={{
-              padding: '2px 7px',
-              borderRadius: '4px',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '11px',
-              fontWeight: 700,
-              backgroundColor: isHighDiscount ? '#3A1714' : '#123322',
-              color: isHighDiscount ? '#FF6B5F' : '#4ADE80',
-              letterSpacing: '0.02em',
-            }}
-          >
-            -{discount}%
-          </motion.span>
-        ) : (
+        {/* Store Pill */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span
             style={{
-              padding: '2px 7px',
-              borderRadius: '4px',
-              fontFamily: 'var(--font-mono)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '3px 8px',
+              borderRadius: '6px',
               fontSize: '11px',
+              fontFamily: 'var(--font-heading)',
               fontWeight: 700,
-              backgroundColor: '#1B222C',
-              color: '#9099A6',
+              color: storeBadge.color,
+              backgroundColor: storeBadge.bg,
+              border: `1px solid ${storeBadge.border}`,
+              letterSpacing: '0.01em',
             }}
           >
-            DEAL
+            <span>{storeBadge.icon}</span>
+            <span>{storeBadge.name}</span>
           </span>
-        )}
 
-        {/* Favorite Heart Button ♡ / ♥ */}
-        <motion.button
-          type="button"
-          whileTap={{ scale: 0.85 }}
-          animate={{ scale: isSaved ? [1, 1.25, 1] : 1 }}
-          transition={{ duration: 0.2 }}
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsSaved(!isSaved);
-          }}
-          title={isSaved ? 'Saved to favorites' : 'Save to favorites'}
-          aria-label="Toggle favorite"
-          style={{
-            width: '28px',
-            height: '28px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: isSaved ? '#F59E0B' : '#9099A6',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: 0,
-            borderRadius: '4px',
-            transition: 'color 120ms ease',
-          }}
-          onMouseEnter={(e) => {
-            if (!isSaved) (e.currentTarget as HTMLButtonElement).style.color = '#F5F7FA';
-          }}
-          onMouseLeave={(e) => {
-            if (!isSaved) (e.currentTarget as HTMLButtonElement).style.color = '#9099A6';
-          }}
-        >
-          {isSaved ? (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#F59E0B">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </svg>
-          ) : (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          {discount > 0 && (
+            <span className={discount >= 50 ? 'badge-discount-fire' : 'badge-discount-emerald'}>
+              -{discount}% OFF
+            </span>
           )}
-        </motion.button>
+        </div>
+
+        {/* Right: Timestamp & Favorite Heart */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '11px',
+              color: '#94A3B8',
+              fontWeight: 500,
+            }}
+          >
+            {relativeTime}
+          </span>
+
+          <motion.button
+            type="button"
+            whileTap={{ scale: 0.8 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsSaved(!isSaved);
+            }}
+            title={isSaved ? 'Saved to favorites' : 'Save to favorites'}
+            aria-label="Save to favorites"
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '2px',
+              display: 'flex',
+              alignItems: 'center',
+              color: isSaved ? '#D97706' : '#94A3B8',
+              transition: 'color 0.15s ease',
+            }}
+          >
+            {isSaved ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#D97706">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </motion.button>
+        </div>
       </div>
 
-      {/* ── Product Image: 4:3 Aspect Ratio Container ── */}
+      {/* ── Product Media Stage (4:3 Ratio with Zoom on Hover) ── */}
       <div
         style={{
           position: 'relative',
           aspectRatio: '4 / 3',
-          backgroundColor: 'var(--bg)',
+          backgroundColor: '#F8FAFC',
+          borderTop: '1px solid #F1F5F9',
+          borderBottom: '1px solid #F1F5F9',
           padding: '16px',
           display: 'flex',
           alignItems: 'center',
@@ -218,15 +236,17 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
               src={cleanImageUrl}
               alt={displayTitle}
               loading="lazy"
-              initial={{ opacity: 0, scale: 1.03 }}
-              animate={{ opacity: imgLoaded ? 1 : 0, scale: imgLoaded ? 1 : 1.03 }}
-              transition={{ duration: 0.45, ease: 'easeOut' }}
+              initial={{ scale: 1 }}
+              whileHover={{ scale: 1.06 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
               onLoad={() => setImgLoaded(true)}
               onError={() => setImgError(true)}
               style={{
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
+                opacity: imgLoaded ? 1 : 0,
+                transition: 'opacity 0.25s ease',
               }}
             />
           </>
@@ -238,7 +258,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
-              color: '#687482',
+              color: '#64748B',
             }}
           >
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -252,12 +272,14 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           </div>
         )}
 
+        {/* Expired Overlay */}
         {isExpired && (
           <div
             style={{
               position: 'absolute',
               inset: 0,
-              backgroundColor: 'rgba(13, 14, 17, 0.85)',
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(4px)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -267,12 +289,13 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
               style={{
                 fontFamily: 'var(--font-mono)',
                 fontSize: '11px',
-                fontWeight: 700,
-                color: '#EF4444',
-                backgroundColor: '#3A1714',
-                padding: '4px 10px',
-                borderRadius: '4px',
-                border: '1px solid #7F1D1D',
+                fontWeight: 800,
+                color: '#E11D48',
+                backgroundColor: '#FFE4E6',
+                padding: '6px 14px',
+                borderRadius: '8px',
+                border: '1px solid #FECDD3',
+                boxShadow: '0 2px 8px rgba(225, 29, 72, 0.15)',
               }}
             >
               OFFER EXPIRED
@@ -281,57 +304,27 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
         )}
       </div>
 
-      {/* ── Content Stage ── */}
+      {/* ── Content Body ── */}
       <div
         style={{
-          padding: '12px 14px 14px',
+          padding: '14px 16px 16px',
           display: 'flex',
           flexDirection: 'column',
           flex: 1,
-          gap: '8px',
+          gap: '10px',
+          backgroundColor: '#FFFFFF',
         }}
       >
-        {/* Store & Relative Timestamp */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            {deal.store?.toLowerCase().includes('amazon') ? (
-              <span style={{ color: '#F59E0B', fontSize: '13px' }}>🛒</span>
-            ) : deal.store?.toLowerCase().includes('flipkart') ? (
-              <span style={{ color: '#38BDF8', fontSize: '13px' }}>🛍️</span>
-            ) : (
-              <span style={{ color: '#10B981', fontSize: '13px' }}>🏷️</span>
-            )}
-            <span
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '11px',
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                color: deal.store?.toLowerCase().includes('amazon') ? '#F59E0B' : '#9099A6',
-                letterSpacing: '0.04em',
-              }}
-            >
-              {deal.store || 'Store'}
-            </span>
-          </div>
-
-          <span
-            style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '11px',
-              color: '#687482',
-            }}
-          >
-            {relativeTime}
-          </span>
-        </div>
-
-        {/* Title (2 lines clamped) */}
+        {/* Title */}
         <h3
           title={displayTitle}
-          className="pro-title"
           style={{
             margin: 0,
+            fontFamily: 'var(--font-body)',
+            fontSize: '14px',
+            fontWeight: 700,
+            lineHeight: 1.4,
+            color: '#0F172A',
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
@@ -342,105 +335,146 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           {displayTitle}
         </h3>
 
-        {/* Pricing & Savings Block */}
+        {/* Pricing Row */}
         <div style={{ marginTop: 'auto', paddingTop: '4px' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
             <span
-              className="pro-price"
               style={{
+                fontFamily: 'var(--font-mono)',
                 fontSize: '20px',
                 fontWeight: 800,
-                color: '#F4F4F7',
+                color: '#0F172A',
                 lineHeight: 1,
+                letterSpacing: '-0.02em',
               }}
             >
-              {price > 0 ? `₹${price.toLocaleString('en-IN')}` : 'See price'}
+              {price > 0 ? `₹${price.toLocaleString('en-IN')}` : 'Check Price'}
             </span>
+
             {mrp && (
               <span
-                className="price-num"
                 style={{
+                  fontFamily: 'var(--font-mono)',
                   fontSize: '12px',
-                  color: '#687482',
+                  color: '#94A3B8',
                   textDecoration: 'line-through',
                 }}
               >
                 ₹{mrp.toLocaleString('en-IN')}
               </span>
             )}
-          </div>
 
-          {/* Savings Callout & Optional Tiny Price-Drop Signal */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px', flexWrap: 'wrap', marginTop: '3px' }}>
-            {savings > 0 ? (
-              <div
+            {savings > 0 && (
+              <span
                 style={{
-                  fontSize: '12px',
-                  fontFamily: 'var(--font-body)',
-                  fontWeight: 600,
-                  color: '#22C55E',
-                  whiteSpace: 'nowrap',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  color: '#059669',
+                  backgroundColor: '#ECFDF5',
+                  border: '1px solid #A7F3D0',
+                  padding: '2px 7px',
+                  borderRadius: '6px',
+                  marginLeft: 'auto',
                 }}
               >
                 Save ₹{savings.toLocaleString('en-IN')}
-              </div>
-            ) : <div />}
+              </span>
+            )}
+          </div>
 
-            {discount >= 25 && (
-              <div
-                className="hidden sm:inline-flex"
+          {/* Sparkline Vector & Breakdown Link */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '6px',
+              marginTop: '10px',
+              paddingTop: '8px',
+              borderTop: '1px solid #F1F5F9',
+            }}
+          >
+            {/* Embedded Mini Sparkline with emerald trend */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <svg width="54" height="15" viewBox="0 0 54 15" fill="none">
+                <path
+                  d="M2 13 L18 8 L34 11 L52 3"
+                  stroke="#2563EB"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <circle cx="52" cy="3" r="2.5" fill="#2563EB" />
+              </svg>
+              <span
                 style={{
-                  alignItems: 'center',
-                  gap: '3px',
-                  fontSize: '10px',
                   fontFamily: 'var(--font-mono)',
-                  fontWeight: 600,
-                  color: '#38BDF8',
-                  whiteSpace: 'nowrap',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  color: '#059669',
                 }}
               >
-                <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                  <path d="M1 3l4 4 2.5-2.5L11 8M11 8H7.5M11 8V4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <span>Price Drop</span>
-              </div>
-            )}
+                {discount >= 20 ? `↓ ${discount}% drop` : 'Verified loot'}
+              </span>
+            </div>
+
+            {/* Breakdown Modal trigger */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onSelectDeal) onSelectDeal(deal);
+              }}
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: '11px',
+                fontWeight: 600,
+                color: '#64748B',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '2px 4px',
+                transition: 'color 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color = '#0F172A';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color = '#64748B';
+              }}
+            >
+              Breakdown ↗
+            </button>
           </div>
         </div>
 
-        {/* Primary CTA Button: GET DEAL → */}
+        {/* Primary Action Button: ⚡ GRAB DEAL → */}
         <motion.a
           href={deal.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="glow-pill-amber"
           onClick={(e) => e.stopPropagation()}
-          whileTap={{ scale: 0.98 }}
+          className="btn-loot"
+          whileTap={{ scale: 0.97 }}
           aria-label={`Get deal for ${displayTitle} on ${deal.store}`}
           style={{
             height: '40px',
-            borderRadius: '999px',
-            fontFamily: 'var(--font-heading)',
+            width: '100%',
+            borderRadius: '10px',
             fontSize: '13px',
-            fontWeight: 700,
-            letterSpacing: '0.02em',
             textTransform: 'uppercase',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '6px',
+            gap: '8px',
             textDecoration: 'none',
             marginTop: '8px',
+            cursor: 'pointer',
           }}
         >
-          <span>Get Deal</span>
-          <motion.span
-            whileHover={{ x: 4 }}
-            transition={{ type: 'spring', stiffness: 400 }}
-            style={{ display: 'inline-block' }}
-          >
-            →
-          </motion.span>
+          <span>⚡ Grab Deal</span>
+          <span>→</span>
         </motion.a>
       </div>
     </motion.article>

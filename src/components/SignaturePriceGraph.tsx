@@ -41,7 +41,7 @@ export const SignaturePriceGraph: React.FC<SignaturePriceGraphProps> = ({
           style={{
             fontFamily: 'var(--font-mono)',
             fontSize: '10px',
-            color: '#9099A6',
+            color: '#64748B',
             textTransform: 'uppercase',
             letterSpacing: '0.08em',
             fontWeight: 700,
@@ -57,8 +57,9 @@ export const SignaturePriceGraph: React.FC<SignaturePriceGraphProps> = ({
             fontFamily: 'var(--font-mono)',
             fontSize: '11px',
             fontWeight: 700,
-            color: '#22C55E',
-            backgroundColor: '#123322',
+            color: '#059669',
+            backgroundColor: '#ECFDF5',
+            border: '1px solid #A7F3D0',
             padding: '2px 8px',
             borderRadius: '4px',
           }}
@@ -74,20 +75,20 @@ export const SignaturePriceGraph: React.FC<SignaturePriceGraphProps> = ({
           preserveAspectRatio="none"
         >
           <defs>
-            <linearGradient id="price-amber-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.35" />
-              <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.0" />
+            <linearGradient id="price-blue-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#2563EB" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="#2563EB" stopOpacity="0.0" />
             </linearGradient>
           </defs>
 
           {/* Background Grid Lines */}
-          <line x1="20" y1={startY} x2="300" y2={startY} stroke="#1F2630" strokeDasharray="3 3" strokeWidth="1" />
-          <line x1="20" y1={currentY} x2="300" y2={currentY} stroke="#1F2630" strokeDasharray="3 3" strokeWidth="1" />
+          <line x1="20" y1={startY} x2="300" y2={startY} stroke="#E2E8F0" strokeDasharray="3 3" strokeWidth="1" />
+          <line x1="20" y1={currentY} x2="300" y2={currentY} stroke="#E2E8F0" strokeDasharray="3 3" strokeWidth="1" />
 
           {/* Area Fill */}
           <motion.path
             d={areaPath}
-            fill="url(#price-amber-grad)"
+            fill="url(#price-blue-grad)"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.55, duration: 0.5 }}
@@ -97,7 +98,7 @@ export const SignaturePriceGraph: React.FC<SignaturePriceGraphProps> = ({
           <motion.path
             d={path}
             fill="none"
-            stroke="#F59E0B"
+            stroke="#2563EB"
             strokeWidth="2.5"
             strokeLinecap="round"
             initial={{ pathLength: 0, opacity: 0 }}
@@ -106,11 +107,11 @@ export const SignaturePriceGraph: React.FC<SignaturePriceGraphProps> = ({
           />
 
           {/* High Price Marker */}
-          <circle cx={startX} cy={startY} r="3" fill="#687482" />
+          <circle cx={startX} cy={startY} r="3" fill="#94A3B8" />
           <text
             x={startX + 6}
             y={startY - 6}
-            fill="#9099A6"
+            fill="#64748B"
             fontSize="10"
             fontFamily="JetBrains Mono, monospace"
             fontWeight="600"
@@ -123,7 +124,7 @@ export const SignaturePriceGraph: React.FC<SignaturePriceGraphProps> = ({
             cx={currentX}
             cy={currentY}
             r="4.5"
-            fill="#F59E0B"
+            fill="#2563EB"
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.9, type: 'spring', stiffness: 300 }}
@@ -135,7 +136,7 @@ export const SignaturePriceGraph: React.FC<SignaturePriceGraphProps> = ({
             cy={currentY}
             r="6"
             fill="none"
-            stroke="#F59E0B"
+            stroke="#2563EB"
             strokeWidth="1.5"
             initial={{ scale: 0.6, opacity: 0.7 }}
             animate={{ scale: 2.2, opacity: 0 }}
@@ -147,7 +148,7 @@ export const SignaturePriceGraph: React.FC<SignaturePriceGraphProps> = ({
             x={currentX - 10}
             y={currentY + 16}
             textAnchor="end"
-            fill="#F59E0B"
+            fill="#0F172A"
             fontSize="12"
             fontFamily="JetBrains Mono, monospace"
             fontWeight="800"
@@ -158,10 +159,10 @@ export const SignaturePriceGraph: React.FC<SignaturePriceGraphProps> = ({
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#687482' }}>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#94A3B8' }}>
           30 days ago
         </span>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#F59E0B', fontWeight: 600 }}>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#2563EB', fontWeight: 600 }}>
           Today (Verified Low)
         </span>
       </div>

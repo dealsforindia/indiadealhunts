@@ -82,13 +82,13 @@ const FALLBACK_TICKER_ITEMS: TickerItem[] = [
 ];
 
 const STORE_THEME: Record<string, { bg: string; text: string; border: string }> = {
-  Amazon: { bg: 'rgba(255, 153, 0, 0.12)', text: '#FF9900', border: 'rgba(255, 153, 0, 0.3)' },
-  Flipkart: { bg: 'rgba(40, 116, 240, 0.12)', text: '#3B82F6', border: 'rgba(40, 116, 240, 0.3)' },
-  Myntra: { bg: 'rgba(255, 63, 108, 0.12)', text: '#FF3F6C', border: 'rgba(255, 63, 108, 0.3)' },
-  AJIO: { bg: 'rgba(203, 163, 91, 0.12)', text: '#EAB308', border: 'rgba(203, 163, 91, 0.3)' },
-  Zepto: { bg: 'rgba(168, 85, 247, 0.14)', text: '#A855F7', border: 'rgba(168, 85, 247, 0.3)' },
-  Swiggy: { bg: 'rgba(249, 115, 22, 0.12)', text: '#F97316', border: 'rgba(249, 115, 22, 0.3)' },
-  DesiDime: { bg: 'rgba(239, 68, 68, 0.12)', text: '#EF4444', border: 'rgba(239, 68, 68, 0.3)' },
+  Amazon: { bg: '#FEF3C7', text: '#92400E', border: '#FDE68A' },
+  Flipkart: { bg: '#EFF6FF', text: '#1D4ED8', border: '#BFDBFE' },
+  Myntra: { bg: '#FDF2F8', text: '#BE185D', border: '#FBCFE8' },
+  AJIO: { bg: '#FEFCE8', text: '#A16207', border: '#FEF08A' },
+  Zepto: { bg: '#FAF5FF', text: '#7E22CE', border: '#E9D5FF' },
+  Swiggy: { bg: '#FFF7ED', text: '#C2410C', border: '#FFEDD5' },
+  DesiDime: { bg: '#FEF2F2', text: '#B91C1C', border: '#FECACA' },
 };
 
 export const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ onSelectDeal, onOpenVerify }) => {
@@ -97,11 +97,20 @@ export const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ onSelectDeal, onOp
 
   const fetchTicker = useCallback(async () => {
     try {
-      let res = await fetch(`${EDGE_API}/deals/ticker`);
-      if (!res.ok) {
+      let res: Response | null = null;
+      try {
         res = await fetch(`${API_BASE}/api/v1/deals/ticker`);
+      } catch {
+        res = null;
       }
-      if (res.ok) {
+      if (!res || !res.ok) {
+        try {
+          res = await fetch(`${EDGE_API}/deals/ticker`);
+        } catch {
+          res = null;
+        }
+      }
+      if (res && res.ok) {
         const data = await res.json();
         if (data && Array.isArray(data.items) && data.items.length > 0) {
           setTickerData(data);
@@ -146,19 +155,19 @@ export const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ onSelectDeal, onOp
   };
 
   return (
-    <div className="relative w-full z-20 bg-black/70 backdrop-blur-md border-b border-white/[0.08] overflow-hidden select-none">
+    <div className="relative w-full z-20 bg-slate-50/95 backdrop-blur-md border-b border-slate-200 overflow-hidden select-none">
       <div className="max-w-[1400px] mx-auto flex items-center h-10 px-2 sm:px-4">
         
         {/* Left Live Badge */}
-        <div className="flex items-center gap-2 pr-3 sm:pr-4 border-r border-white/[0.08] flex-shrink-0">
+        <div className="flex items-center gap-2 pr-3 sm:pr-4 border-r border-slate-200 flex-shrink-0">
           <div className="relative flex items-center justify-center">
             <span className="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" />
           </div>
-          <span className="text-[11px] font-mono font-bold tracking-wider text-emerald-400 uppercase hidden xs:inline">
+          <span className="text-[11px] font-mono font-bold tracking-wider text-emerald-700 uppercase hidden xs:inline">
             Live Radar
           </span>
-          <span className="text-[10px] sm:text-[11px] font-mono px-1.5 py-0.5 rounded bg-white/[0.06] text-zinc-300 font-semibold border border-white/[0.05]">
+          <span className="text-[10px] sm:text-[11px] font-mono px-2 py-0.5 rounded-full bg-white text-slate-700 font-semibold border border-slate-200 shadow-2xs">
             {totalDeals.toLocaleString()}+ drops
           </span>
         </div>
@@ -169,22 +178,20 @@ export const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ onSelectDeal, onOp
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <div className="animate-marquee-drift flex items-center gap-3">
-            {/* Render 2x array for seamless infinite looping */}
+          <div className="animate-marquee-drift flex items-center gap-2.5">
             {[...items, ...items].map((item, idx) => {
               const theme = STORE_THEME[item.store] || {
-                bg: 'rgba(255, 255, 255, 0.08)',
-                text: '#E4E4E7',
-                border: 'rgba(255, 255, 255, 0.15)',
+                bg: '#F1F5F9',
+                text: '#334155',
+                border: '#CBD5E1',
               };
 
               return (
                 <button
                   key={`${item.id}-${idx}`}
                   onClick={() => handleCardClick(item)}
-                  className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-zinc-900/80 hover:bg-zinc-800 border border-white/[0.08] hover:border-white/20 transition-all text-left flex-shrink-0 cursor-pointer group"
+                  className="flex items-center gap-2 px-3 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 hover:border-slate-300 transition-all text-left flex-shrink-0 cursor-pointer shadow-2xs group"
                 >
-                  {/* Store Badge */}
                   <span
                     className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded border"
                     style={{
@@ -196,34 +203,24 @@ export const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ onSelectDeal, onOp
                     {item.store}
                   </span>
 
-                  {/* Title */}
-                  <span className="text-[11px] font-medium text-zinc-200 group-hover:text-white transition-colors truncate max-w-[140px] sm:max-w-[220px]">
+                  <span className="text-[11px] font-medium text-slate-800 group-hover:text-blue-600 transition-colors truncate max-w-[140px] sm:max-w-[220px]">
                     {item.title}
                   </span>
 
-                  {/* Price */}
                   <div className="flex items-baseline gap-1">
-                    <span className="text-[11px] font-bold text-emerald-400 font-mono">
+                    <span className="text-[11px] font-bold text-emerald-600 font-mono">
                       ₹{item.price.toLocaleString()}
                     </span>
                     {item.mrp && item.mrp > item.price && (
-                      <span className="text-[9px] text-zinc-500 line-through font-mono hidden sm:inline">
+                      <span className="text-[9px] text-slate-400 line-through font-mono hidden sm:inline">
                         ₹{item.mrp.toLocaleString()}
                       </span>
                     )}
                   </div>
 
-                  {/* Discount / Badge */}
                   {item.badge && (
-                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
                       {item.badge}
-                    </span>
-                  )}
-
-                  {/* Relative time */}
-                  {item.relative_time && (
-                    <span className="text-[9px] font-mono text-zinc-500 hidden md:inline">
-                      {item.relative_time}
                     </span>
                   )}
                 </button>
@@ -234,15 +231,14 @@ export const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ onSelectDeal, onOp
 
         {/* Right Verify Button */}
         {onOpenVerify && (
-          <div className="pl-2 sm:pl-3 border-l border-white/[0.08] flex-shrink-0">
+          <div className="pl-2 sm:pl-3 border-l border-slate-200 flex-shrink-0">
             <button
               onClick={onOpenVerify}
-              className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-zinc-300 hover:text-white transition-all text-[11px] font-medium cursor-pointer"
-              title="Learn how our automated multi-layer pipeline verifies genuine deals"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900 transition-all text-[11px] font-medium cursor-pointer shadow-2xs"
             >
-              <IconShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <IconShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               <span className="hidden sm:inline">How We Verify</span>
-              <IconChevronRight className="w-2.5 h-2.5 text-zinc-500" />
+              <IconChevronRight className="w-2.5 h-2.5 text-slate-400" />
             </button>
           </div>
         )}

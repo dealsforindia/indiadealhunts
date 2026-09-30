@@ -39,11 +39,11 @@ const CATEGORIES = [
 ];
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: 'newest', label: 'Sort: Latest' },
-  { value: 'discount', label: 'Sort: Highest Discount' },
-  { value: 'worth', label: 'Sort: Top Value' },
-  { value: 'price_low', label: 'Sort: Price: Low to High' },
-  { value: 'price_high', label: 'Sort: Price: High to Low' },
+  { value: 'newest', label: '⏰ Sort: Latest Drops' },
+  { value: 'discount', label: '🔥 Sort: Highest % Off' },
+  { value: 'worth', label: '🏆 Sort: Top Value Score' },
+  { value: 'price_low', label: '🏷️ Sort: Price: Low to High' },
+  { value: 'price_high', label: '💎 Sort: Price: High to Low' },
 ];
 
 export const DealToolbar: React.FC<DealToolbarProps> = ({
@@ -62,7 +62,6 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
   const [sortOpen, setSortOpen] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
-  // Temporary drawer state for mobile apply
   const [draftStore, setDraftStore] = useState(selectedStore);
   const [draftCat, setDraftCat] = useState(selectedCategory);
   const [draftSort, setDraftSort] = useState(sortBy);
@@ -71,7 +70,6 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
   const catRef = useRef<HTMLDivElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
 
-  // Close desktop popovers on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (storeRef.current && !storeRef.current.contains(e.target as Node)) {
@@ -108,262 +106,154 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
 
   return (
     <>
-      <div
-        className="px-3 md:px-5 w-full"
-        style={{
-          maxWidth: '1320px',
-          margin: '0 auto',
-          paddingTop: '16px',
-          paddingBottom: '12px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '12px',
-        }}
-      >
+      <div className="max-w-[1340px] mx-auto px-4 md:px-6 pt-5 pb-3 flex items-center justify-between gap-3 w-full">
         {/* ── Desktop: Left Filter Popovers ── */}
-        <div className="hidden sm:flex" style={{ alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+        <div className="hidden sm:flex items-center gap-2.5 flex-wrap">
           {/* Store Dropdown */}
-          <div ref={storeRef} style={{ position: 'relative' }}>
+          <div ref={storeRef} className="relative">
             <button
               type="button"
               onClick={() => { setStoreOpen(!storeOpen); setCatOpen(false); setSortOpen(false); }}
               aria-expanded={storeOpen}
-              style={{
-                height: '36px',
-                padding: '0 12px',
-                backgroundColor: 'var(--surface)',
-                border: `1px solid ${selectedStore !== 'all' ? '#F59E0B' : 'var(--border)'}`,
-                borderRadius: '4px',
-                color: selectedStore !== 'all' ? '#F59E0B' : '#F5F7FA',
-                fontSize: '12px',
-                fontFamily: 'var(--font-body)',
-                fontWeight: 500,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                transition: 'border-color 120ms ease',
-              }}
+              className={`h-9 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-2 border transition-all cursor-pointer shadow-2xs ${
+                selectedStore !== 'all'
+                  ? 'bg-blue-50 text-blue-700 border-blue-200 font-bold'
+                  : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+              }`}
             >
               <span>{desktopStoreLabel}</span>
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className={`transition-transform ${storeOpen ? 'rotate-180' : ''}`}>
+                <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
 
-            {storeOpen && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 'calc(100% + 4px)',
-                  left: 0,
-                  width: '160px',
-                  backgroundColor: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '4px',
-                  padding: '4px',
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
-                  zIndex: 60,
-                }}
-              >
-                {STORES.map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => { onSelectStore(s.id); setStoreOpen(false); }}
-                    style={{
-                      width: '100%',
-                      textAlign: 'left',
-                      padding: '6px 8px',
-                      fontSize: '12px',
-                      fontFamily: 'var(--font-body)',
-                      color: selectedStore === s.id ? '#F59E0B' : '#F5F7FA',
-                      backgroundColor: selectedStore === s.id ? 'var(--surface-2)' : 'transparent',
-                      borderRadius: '3px',
-                      border: 'none',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    {s.label}
-                    {selectedStore === s.id && <span>✓</span>}
-                  </button>
-                ))}
-              </div>
-            )}
+            <AnimatePresence>
+              {storeOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                  transition={{ duration: 0.12 }}
+                  className="absolute top-full left-0 mt-2 w-44 rounded-2xl bg-white border border-slate-200 p-1.5 shadow-xl z-50"
+                >
+                  {STORES.map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => { onSelectStore(s.id); setStoreOpen(false); }}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-medium transition-colors text-left ${
+                        selectedStore === s.id
+                          ? 'bg-blue-50 text-blue-700 font-bold'
+                          : 'text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span>{s.label}</span>
+                      {selectedStore === s.id && <span className="text-blue-600">✓</span>}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Category Dropdown */}
-          <div ref={catRef} style={{ position: 'relative' }}>
+          <div ref={catRef} className="relative">
             <button
               type="button"
               onClick={() => { setCatOpen(!catOpen); setStoreOpen(false); setSortOpen(false); }}
               aria-expanded={catOpen}
-              style={{
-                height: '36px',
-                padding: '0 12px',
-                backgroundColor: 'var(--surface)',
-                border: `1px solid ${selectedCategory !== 'all' ? '#F59E0B' : 'var(--border)'}`,
-                borderRadius: '4px',
-                color: selectedCategory !== 'all' ? '#F59E0B' : '#F5F7FA',
-                fontSize: '12px',
-                fontFamily: 'var(--font-body)',
-                fontWeight: 500,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                transition: 'border-color 120ms ease',
-              }}
+              className={`h-9 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-2 border transition-all cursor-pointer shadow-2xs ${
+                selectedCategory !== 'all'
+                  ? 'bg-blue-50 text-blue-700 border-blue-200 font-bold'
+                  : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+              }`}
             >
               <span>{desktopCatLabel}</span>
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className={`transition-transform ${catOpen ? 'rotate-180' : ''}`}>
+                <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
 
-            {catOpen && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 'calc(100% + 4px)',
-                  left: 0,
-                  width: '170px',
-                  backgroundColor: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '4px',
-                  padding: '4px',
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
-                  zIndex: 60,
-                }}
-              >
-                {CATEGORIES.map((c) => (
-                  <button
-                    key={c.id}
-                    onClick={() => { onSelectCategory(c.id); setCatOpen(false); }}
-                    style={{
-                      width: '100%',
-                      textAlign: 'left',
-                      padding: '6px 8px',
-                      fontSize: '12px',
-                      fontFamily: 'var(--font-body)',
-                      color: selectedCategory === c.id ? '#F59E0B' : '#F5F7FA',
-                      backgroundColor: selectedCategory === c.id ? 'var(--surface-2)' : 'transparent',
-                      borderRadius: '3px',
-                      border: 'none',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    {c.label}
-                    {selectedCategory === c.id && <span>✓</span>}
-                  </button>
-                ))}
-              </div>
-            )}
+            <AnimatePresence>
+              {catOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                  transition={{ duration: 0.12 }}
+                  className="absolute top-full left-0 mt-2 w-48 rounded-2xl bg-white border border-slate-200 p-1.5 shadow-xl z-50"
+                >
+                  {CATEGORIES.map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => { onSelectCategory(c.id); setCatOpen(false); }}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-medium transition-colors text-left ${
+                        selectedCategory === c.id
+                          ? 'bg-blue-50 text-blue-700 font-bold'
+                          : 'text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span>{c.label}</span>
+                      {selectedCategory === c.id && <span className="text-blue-600">✓</span>}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Sort Dropdown */}
-          <div ref={sortRef} style={{ position: 'relative' }}>
+          <div ref={sortRef} className="relative">
             <button
               type="button"
               onClick={() => { setSortOpen(!sortOpen); setStoreOpen(false); setCatOpen(false); }}
               aria-expanded={sortOpen}
-              style={{
-                height: '36px',
-                padding: '0 12px',
-                backgroundColor: 'var(--surface)',
-                border: `1px solid ${sortBy !== 'newest' ? '#F59E0B' : 'var(--border)'}`,
-                borderRadius: '4px',
-                color: sortBy !== 'newest' ? '#F59E0B' : '#F5F7FA',
-                fontSize: '12px',
-                fontFamily: 'var(--font-body)',
-                fontWeight: 500,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                transition: 'border-color 120ms ease',
-              }}
+              className={`h-9 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-2 border transition-all cursor-pointer shadow-2xs ${
+                sortBy !== 'newest'
+                  ? 'bg-blue-50 text-blue-700 border-blue-200 font-bold'
+                  : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+              }`}
             >
               <span>{desktopSortLabel}</span>
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className={`transition-transform ${sortOpen ? 'rotate-180' : ''}`}>
+                <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
 
-            {sortOpen && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 'calc(100% + 4px)',
-                  left: 0,
-                  width: '180px',
-                  backgroundColor: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '4px',
-                  padding: '4px',
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
-                  zIndex: 60,
-                }}
-              >
-                {SORT_OPTIONS.map((o) => (
-                  <button
-                    key={o.value}
-                    onClick={() => { onSortChange(o.value); setSortOpen(false); }}
-                    style={{
-                      width: '100%',
-                      textAlign: 'left',
-                      padding: '6px 8px',
-                      fontSize: '12px',
-                      fontFamily: 'var(--font-body)',
-                      color: sortBy === o.value ? '#F59E0B' : '#F5F7FA',
-                      backgroundColor: sortBy === o.value ? 'var(--surface-2)' : 'transparent',
-                      borderRadius: '3px',
-                      border: 'none',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    {o.label}
-                    {sortBy === o.value && <span>✓</span>}
-                  </button>
-                ))}
-              </div>
-            )}
+            <AnimatePresence>
+              {sortOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                  transition={{ duration: 0.12 }}
+                  className="absolute top-full left-0 mt-2 w-56 rounded-2xl bg-white border border-slate-200 p-1.5 shadow-xl z-50"
+                >
+                  {SORT_OPTIONS.map((o) => (
+                    <button
+                      key={o.value}
+                      onClick={() => { onSortChange(o.value); setSortOpen(false); }}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-medium transition-colors text-left ${
+                        sortBy === o.value
+                          ? 'bg-blue-50 text-blue-700 font-bold'
+                          : 'text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span>{o.label}</span>
+                      {sortBy === o.value && <span className="text-blue-600">✓</span>}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
-        {/* ── Mobile: Full-width Filter & Sort Button ── */}
-        <div className="flex sm:hidden" style={{ width: '100%', alignItems: 'center', justifyContent: 'space-between' }}>
-          <motion.button
+        {/* ── Mobile: Filter & Sort Button ── */}
+        <div className="flex sm:hidden items-center justify-between w-full">
+          <button
             type="button"
-            whileTap={{ scale: 0.98 }}
             onClick={openMobileDrawer}
-            style={{
-              height: '40px',
-              padding: '0 16px',
-              backgroundColor: 'var(--surface)',
-              border: '1px solid var(--border)',
-              borderRadius: '6px',
-              color: '#F5F7FA',
-              fontFamily: 'var(--font-body)',
-              fontSize: '13px',
-              fontWeight: 600,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              cursor: 'pointer',
-            }}
+            className="h-9 px-3.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-800 flex items-center gap-2 cursor-pointer shadow-2xs"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="4" y1="21" x2="4" y2="14" />
@@ -372,70 +262,34 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
               <line x1="12" y1="8" x2="12" y2="3" />
               <line x1="20" y1="21" x2="20" y2="16" />
               <line x1="20" y1="12" x2="20" y2="3" />
-              <line x1="1" y1="14" x2="7" y2="14" />
-              <line x1="9" y1="8" x2="15" y2="8" />
-              <line x1="17" y1="16" x2="23" y2="16" />
             </svg>
-            <span>Filter &amp; Sort</span>
-            <span style={{ color: '#9099A6' }}>›</span>
-          </motion.button>
+            <span>Filter & Sort</span>
+            <span className="text-slate-400">›</span>
+          </button>
 
-          <span
-            style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '12px',
-              color: '#9099A6',
-            }}
-          >
-            {totalDeals.toLocaleString('en-IN')} deals
+          <span className="font-mono text-xs text-slate-500 font-semibold">
+            {totalDeals.toLocaleString('en-IN')} drops
           </span>
         </div>
 
-        {/* ── Desktop Right: Count & View Toggles ── */}
-        <div className="hidden sm:flex" style={{ alignItems: 'center', gap: '14px', marginLeft: 'auto' }}>
-          <span
-            style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '13px',
-              color: '#9099A6',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {totalDeals.toLocaleString('en-IN')} deals
+        {/* ── Desktop Right: Deals Count & View Grid/List Toggles ── */}
+        <div className="hidden sm:flex items-center gap-3.5 ml-auto">
+          <span className="font-mono text-xs font-semibold text-slate-500">
+            {totalDeals.toLocaleString('en-IN')} live drops
           </span>
 
           {onViewModeChange && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: 'var(--surface)',
-                border: '1px solid var(--border)',
-                borderRadius: '4px',
-                padding: '2px',
-                gap: '2px',
-              }}
-            >
+            <div className="flex items-center bg-slate-100 rounded-xl p-0.5 gap-0.5 border border-slate-200">
               <button
                 type="button"
                 onClick={() => onViewModeChange('grid')}
                 title="Grid view"
                 aria-label="Grid view"
-                style={{
-                  width: '30px',
-                  height: '30px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: '3px',
-                  backgroundColor: viewMode === 'grid' ? '#F59E0B' : 'transparent',
-                  color: viewMode === 'grid' ? '#090A0C' : '#9099A6',
-                  border: 'none',
-                  cursor: 'pointer',
-                  transition: 'background-color 100ms ease, color 100ms ease',
-                }}
+                className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors cursor-pointer ${
+                  viewMode === 'grid' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-900'
+                }`}
               >
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
                   <rect x="2" y="2" width="5" height="5" rx="1" />
                   <rect x="9" y="2" width="5" height="5" rx="1" />
                   <rect x="2" y="9" width="5" height="5" rx="1" />
@@ -446,23 +300,13 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
               <button
                 type="button"
                 onClick={() => onViewModeChange('list')}
-                title="Compact list view"
+                title="List view"
                 aria-label="List view"
-                style={{
-                  width: '30px',
-                  height: '30px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: '3px',
-                  backgroundColor: viewMode === 'list' ? '#F59E0B' : 'transparent',
-                  color: viewMode === 'list' ? '#090A0C' : '#9099A6',
-                  border: 'none',
-                  cursor: 'pointer',
-                  transition: 'background-color 100ms ease, color 100ms ease',
-                }}
+                className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors cursor-pointer ${
+                  viewMode === 'list' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-900'
+                }`}
               >
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <line x1="3" y1="5" x2="13" y2="5" strokeLinecap="round" />
                   <line x1="3" y1="8" x2="13" y2="8" strokeLinecap="round" />
                   <line x1="3" y1="11" x2="13" y2="11" strokeLinecap="round" />
@@ -473,106 +317,54 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
         </div>
       </div>
 
-      {/* ── Mobile Filter & Sort Drawer (Bottom Sheet) ── */}
+      {/* ── Mobile Filter Drawer ── */}
       <AnimatePresence>
         {mobileDrawerOpen && (
-          <div
-            style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 90,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'flex-end',
-            }}
-          >
-            {/* Backdrop */}
+          <div className="fixed inset-0 z-50 flex flex-col justify-end">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileDrawerOpen(false)}
-              style={{
-                position: 'fixed',
-                inset: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.75)',
-                backdropFilter: 'blur(4px)',
-              }}
+              className="fixed inset-0 bg-black/40 backdrop-blur-xs"
             />
 
-            {/* Bottom Sheet */}
             <motion.div
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-              style={{
-                position: 'relative',
-                backgroundColor: 'var(--surface)',
-                borderTop: '1px solid var(--border)',
-                borderRadius: '16px 16px 0 0',
-                maxHeight: '85vh',
-                overflowY: 'auto',
-                padding: '20px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '18px',
-                zIndex: 95,
-              }}
+              className="relative bg-white border-t border-slate-200 rounded-t-3xl max-h-[85vh] overflow-y-auto p-5 flex flex-col gap-4 z-10 shadow-2xl"
             >
-              {/* Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid var(--border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#F5F7FA', fontFamily: 'var(--font-heading)' }}>
-                    Filter &amp; Sort
-                  </h3>
-                  <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#9099A6' }}>
-                    ({totalDeals.toLocaleString('en-IN')} deals)
-                  </span>
-                </div>
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 className="font-heading font-extrabold text-base text-slate-900">
+                  Filter & Sort Drops
+                </h3>
                 <button
                   type="button"
                   onClick={() => setMobileDrawerOpen(false)}
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#9099A6',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: '18px',
-                  }}
+                  className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center text-sm"
                 >
                   ✕
                 </button>
               </div>
 
-              {/* Stores Selection */}
+              {/* Stores */}
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontFamily: 'var(--font-mono)', color: '#9099A6', textTransform: 'uppercase', marginBottom: '8px', fontWeight: 700 }}>
+                <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-2">
                   Store
                 </label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px' }}>
+                <div className="grid grid-cols-2 gap-2">
                   {STORES.map((s) => (
                     <button
                       key={s.id}
                       type="button"
                       onClick={() => setDraftStore(s.id)}
-                      style={{
-                        padding: '8px 12px',
-                        textAlign: 'left',
-                        fontSize: '13px',
-                        borderRadius: '4px',
-                        border: `1px solid ${draftStore === s.id ? '#F59E0B' : 'var(--border)'}`,
-                        backgroundColor: draftStore === s.id ? 'var(--surface-2)' : 'transparent',
-                        color: draftStore === s.id ? '#F59E0B' : '#F5F7FA',
-                        fontFamily: 'var(--font-body)',
-                        fontWeight: draftStore === s.id ? 700 : 400,
-                        cursor: 'pointer',
-                      }}
+                      className={`p-2.5 rounded-xl text-xs font-semibold text-left border transition-all ${
+                        draftStore === s.id
+                          ? 'bg-blue-50 text-blue-700 border-blue-300 font-bold'
+                          : 'bg-slate-50 text-slate-700 border-slate-200'
+                      }`}
                     >
                       {s.label}
                     </button>
@@ -580,60 +372,37 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                 </div>
               </div>
 
-              {/* Sort Selection */}
+              {/* Sort */}
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontFamily: 'var(--font-mono)', color: '#9099A6', textTransform: 'uppercase', marginBottom: '8px', fontWeight: 700 }}>
+                <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-2">
                   Sort Order
                 </label>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div className="flex flex-col gap-1.5">
                   {SORT_OPTIONS.map((o) => (
                     <button
                       key={o.value}
                       type="button"
                       onClick={() => setDraftSort(o.value)}
-                      style={{
-                        padding: '8px 12px',
-                        textAlign: 'left',
-                        fontSize: '13px',
-                        borderRadius: '4px',
-                        border: `1px solid ${draftSort === o.value ? '#F59E0B' : 'var(--border)'}`,
-                        backgroundColor: draftSort === o.value ? 'var(--surface-2)' : 'transparent',
-                        color: draftSort === o.value ? '#F59E0B' : '#F5F7FA',
-                        fontFamily: 'var(--font-body)',
-                        fontWeight: draftSort === o.value ? 700 : 400,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}
+                      className={`p-2.5 rounded-xl text-xs font-semibold flex items-center justify-between border transition-all ${
+                        draftSort === o.value
+                          ? 'bg-blue-50 text-blue-700 border-blue-300 font-bold'
+                          : 'bg-slate-50 text-slate-700 border-slate-200'
+                      }`}
                     >
                       <span>{o.label}</span>
-                      {draftSort === o.value && <span>✓</span>}
+                      {draftSort === o.value && <span className="text-blue-600">✓</span>}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Apply Button */}
-              <motion.button
+              <button
                 type="button"
-                whileTap={{ scale: 0.98 }}
                 onClick={applyMobileDrawer}
-                style={{
-                  height: '44px',
-                  backgroundColor: '#F59E0B',
-                  color: '#090A0C',
-                  borderRadius: '6px',
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '14px',
-                  fontWeight: 800,
-                  border: 'none',
-                  cursor: 'pointer',
-                  marginTop: '8px',
-                }}
+                className="mt-2 h-11 rounded-xl bg-slate-900 text-white font-bold text-sm tracking-wide shadow-sm active:scale-95 transition-all cursor-pointer"
               >
-                Apply Filters ({totalDeals.toLocaleString('en-IN')} deals)
-              </motion.button>
+                Apply Filters ({totalDeals.toLocaleString('en-IN')} drops)
+              </button>
             </motion.div>
           </div>
         )}

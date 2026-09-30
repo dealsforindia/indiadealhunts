@@ -96,13 +96,23 @@ export const App: React.FC = () => {
         if (selectedStore !== 'all') params.append('store', selectedStore);
         if (selectedCategory !== 'all') params.append('category', selectedCategory);
 
-        let res = await fetch(`${EDGE_API}/deals?${params.toString()}`);
-        if (!res.ok) {
+        let res: Response | null = null;
+        try {
           res = await fetch(`${API_BASE}/api/v1/deals/public?${params.toString()}`);
+        } catch {
+          res = null;
         }
 
-        if (!res.ok) {
-          throw new Error(`API returned status ${res.status}`);
+        if (!res || !res.ok) {
+          try {
+            res = await fetch(`${EDGE_API}/deals?${params.toString()}`);
+          } catch {
+            res = null;
+          }
+        }
+
+        if (!res || !res.ok) {
+          throw new Error(`API returned status ${res ? res.status : 'network error'}`);
         }
 
         const data: PublicDealsResponse = await res.json();
@@ -327,119 +337,61 @@ export const App: React.FC = () => {
           {/* ── 5. Deal Section: Latest Verified Deals ── */}
           <section
             id="deals-section"
-            className="px-3 md:px-5 w-full"
-            style={{
-              maxWidth: '1320px',
-              margin: '0 auto',
-              paddingTop: '12px',
-              paddingBottom: '32px',
-            }}
+            className="max-w-[1340px] mx-auto px-4 md:px-6 pt-4 pb-10 w-full"
           >
             {/* Section Header */}
-            <div
-              style={{
-                marginBottom: '18px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
+            <div className="flex items-center justify-between mb-5">
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '18px', color: '#F59E0B' }}>⚡</span>
-                  <h2
-                    style={{
-                      fontFamily: 'var(--font-heading)',
-                      fontSize: '20px',
-                      fontWeight: 800,
-                      letterSpacing: '-0.02em',
-                      color: '#F5F7FA',
-                      margin: 0,
-                    }}
-                  >
-                    <span className="hidden sm:inline">Latest Verified Deals</span>
-                    <span className="sm:hidden">Latest Deals</span>
+                <div className="flex items-center gap-2">
+                  <span className="flex h-2 w-2 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <h2 className="font-heading text-xl sm:text-2xl font-black tracking-tight text-slate-900 m-0">
+                    <span className="hidden sm:inline">Latest Verified Drops</span>
+                    <span className="sm:hidden">Latest Drops</span>
                   </h2>
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    LIVE RADAR
+                  </span>
                 </div>
-                <p
-                  className="hidden sm:block"
-                  style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '13px',
-                    color: '#9099A6',
-                    margin: '4px 0 0',
-                  }}
-                >
-                  Handpicked and verified by our team • Updated frequently
+                <p className="text-slate-500 text-xs sm:text-sm mt-1">
+                  Cross-referenced against 90-day price history • Verified affiliate-direct links
                 </p>
               </div>
 
-              {/* Mobile Deal Count */}
-              <span
-                className="sm:hidden"
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '12px',
-                  color: '#9099A6',
-                }}
-              >
-                {totalDeals ? `${totalDeals.toLocaleString('en-IN')} deals` : '1,248 deals'}
+              {/* Deal count */}
+              <span className="font-mono text-xs sm:text-sm text-slate-500 font-semibold">
+                {totalDeals ? `${totalDeals.toLocaleString('en-IN')} drops` : '3,350+ drops'}
               </span>
             </div>
 
             {/* Cards Grid / Empty States */}
             {loading && deals.length === 0 ? (
-              <div style={{ padding: '24px 0' }}>
+              <div className="py-8">
                 <DealSkeletonGrid count={8} />
               </div>
             ) : error && deals.length === 0 ? (
-              <div
-                style={{
-                  padding: '48px 24px',
-                  textAlign: 'center',
-                  maxWidth: '460px',
-                  margin: '0 auto',
-                  borderRadius: '6px',
-                  border: '1px solid #3A1714',
-                  backgroundColor: 'var(--surface)',
-                }}
-              >
-                <h3 style={{ fontWeight: 700, color: '#F5F7FA', marginBottom: '8px' }}>
+              <div className="py-12 px-6 text-center max-w-md mx-auto rounded-2xl border border-rose-200 bg-white shadow-sm">
+                <h3 className="font-heading font-bold text-slate-900 mb-2">
                   Could not load deals
                 </h3>
-                <p style={{ fontSize: '13px', color: '#FF6B5F', marginBottom: '18px' }}>
+                <p className="text-xs text-rose-600 mb-4">
                   {error}
                 </p>
                 <button
                   onClick={() => fetchDeals(0, false)}
-                  style={{
-                    padding: '8px 20px',
-                    backgroundColor: '#F59E0B',
-                    color: '#090A0C',
-                    fontWeight: 700,
-                    fontSize: '13px',
-                    borderRadius: '4px',
-                  }}
+                  className="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl cursor-pointer shadow-sm"
                 >
                   Retry Connection
                 </button>
               </div>
             ) : filteredDeals.length === 0 ? (
-              <div
-                style={{
-                  padding: '56px 24px',
-                  textAlign: 'center',
-                  maxWidth: '460px',
-                  margin: '0 auto',
-                  borderRadius: '6px',
-                  border: '1px solid var(--border)',
-                  backgroundColor: 'var(--surface)',
-                }}
-              >
-                <h3 style={{ fontWeight: 700, color: '#F5F7FA', marginBottom: '8px' }}>
+              <div className="py-14 px-6 text-center max-w-md mx-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <h3 className="font-heading font-bold text-slate-900 mb-2">
                   No deals found
                 </h3>
-                <p style={{ fontSize: '13px', color: '#9099A6', marginBottom: '18px' }}>
+                <p className="text-xs text-slate-500 mb-4">
                   Try adjusting your filters or search terms.
                 </p>
                 <button
@@ -448,15 +400,7 @@ export const App: React.FC = () => {
                     setSelectedCategory('all');
                     setSearchQuery('');
                   }}
-                  style={{
-                    padding: '8px 20px',
-                    backgroundColor: 'var(--surface-2)',
-                    color: '#F5F7FA',
-                    fontWeight: 600,
-                    fontSize: '13px',
-                    borderRadius: '4px',
-                    border: '1px solid var(--border-strong)',
-                  }}
+                  className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold text-xs rounded-xl border border-slate-300 cursor-pointer transition-colors"
                 >
                   Clear Filters
                 </button>
@@ -481,33 +425,13 @@ export const App: React.FC = () => {
 
                 {/* Load More Button */}
                 {hasMore && filteredDeals.length > 0 && (
-                  <div style={{ textAlign: 'center', marginTop: '36px' }}>
+                  <div className="text-center mt-10">
                     <button
                       onClick={handleLoadMore}
                       disabled={loadingMore}
-                      style={{
-                        padding: '10px 24px',
-                        backgroundColor: 'var(--surface)',
-                        border: '1px solid var(--border)',
-                        color: 'var(--text)',
-                        borderRadius: '4px',
-                        fontSize: '13px',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        opacity: loadingMore ? 0.6 : 1,
-                        transition: 'border-color 120ms ease, background-color 120ms ease',
-                      }}
-                      onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.borderColor = '#F59E0B';
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
-                      }}
+                      className="h-11 px-7 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 hover:border-slate-400 text-slate-800 hover:text-slate-900 font-bold text-xs sm:text-sm transition-all cursor-pointer inline-flex items-center gap-2 shadow-sm hover:shadow-md active:scale-95"
                     >
-                      {loadingMore ? 'Loading More Drops...' : 'Load More Deals ↓'}
+                      {loadingMore ? 'Loading More Drops...' : '⚡ Load More Drops ↓'}
                     </button>
                   </div>
                 )}
@@ -589,25 +513,25 @@ export const App: React.FC = () => {
         <div
           style={{
             position: 'fixed',
-            bottom: '72px',
+            bottom: '76px',
             right: '20px',
             zIndex: 110,
-            backgroundColor: '#141820',
-            border: '1px solid #F59E0B',
-            borderRadius: '4px',
+            backgroundColor: '#0F172A',
+            border: '1px solid #1E293B',
+            borderRadius: '12px',
             padding: '10px 16px',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            color: '#F5F7FA',
+            color: '#FFFFFF',
             fontSize: '13px',
             fontFamily: 'var(--font-heading)',
             fontWeight: 600,
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
+            boxShadow: '0 12px 28px -4px rgba(15, 23, 42, 0.25)',
             animation: 'fadeIn 150ms ease-out',
           }}
         >
-          <span style={{ color: '#F59E0B' }}>✓</span>
+          <span style={{ color: '#10B981' }}>✓</span>
           {toastMessage}
         </div>
       )}

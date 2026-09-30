@@ -10,16 +10,17 @@ interface HeroBannerProps {
 const POPULAR_SEARCHES = [
   'TWS under 999',
   'iPhone 16',
-  'Laptop deals',
-  'Smart TV',
-  "Men's shoes",
-  'Kitchen appliances',
+  'Gaming Laptops',
+  'Smart TV 55"',
+  "Men's Sneakers",
+  'Kitchen Air Fryer',
 ];
 
-const MOBILE_SEARCHES = [
-  'TWS 999',
-  'iPhone',
-  'Laptops',
+const QUICK_STORES = [
+  { name: 'Amazon', color: 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100' },
+  { name: 'Flipkart', color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' },
+  { name: 'Myntra', color: 'bg-pink-50 text-pink-700 border-pink-200 hover:bg-pink-100' },
+  { name: 'Zepto / Swiggy', color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' },
 ];
 
 export const HeroBanner: React.FC<HeroBannerProps> = ({
@@ -31,12 +32,10 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Sync external search query changes to internal input
   useEffect(() => {
     setInput(searchQuery);
   }, [searchQuery]);
 
-  // Submit search without per-keystroke API spam
   const submitSearch = () => {
     const trimmed = input.trim();
     if (
@@ -56,120 +55,48 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   };
 
   return (
-    <section
-      style={{
-        position: 'relative',
-        backgroundColor: 'var(--bg)',
-        borderBottom: '1px solid var(--border)',
-        overflow: 'hidden',
-      }}
-    >
-      <div
-        className="px-3 md:px-5 w-full lg:grid-cols-[1.15fr_0.85fr]"
-        style={{
-          maxWidth: '1280px',
-          margin: '0 auto',
-          paddingTop: '64px', /* More breathing room for 2026 layouts */
-          paddingBottom: '64px',
-          display: 'grid',
-          gridTemplateColumns: '1fr',
-          gap: '40px',
-          alignItems: 'center',
-        }}
-      >
-        {/* ── Left Content: Eyebrow, Headline, Subheadline, Search, Popular Pills ── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', maxWidth: '640px' }}>
-          {/* Eyebrow Tag */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '11px',
-                fontWeight: 700,
-                color: '#D97706',
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-              }}
-            >
-              <span className="hidden sm:inline">VERIFIED · DEALS · REAL DISCOUNTS · NO SPAM</span>
-              <span className="sm:hidden">VERIFIED DEALS · NO SPAM</span>
+    <section className="relative overflow-hidden pt-8 pb-12 md:py-16 bg-gradient-to-b from-white via-slate-50/50 to-white border-b border-slate-200/80">
+      <div className="max-w-[1340px] mx-auto px-4 md:px-6 grid grid-cols-1 lg:grid-cols-[1.18fr_0.82fr] gap-10 md:gap-12 items-center">
+        {/* ── Left Column: Headline, Search Capsule, Quick Store Filters ── */}
+        <div className="flex flex-col gap-5 max-w-2xl">
+          {/* Eyebrow Badge */}
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-mono text-[11px] font-bold">
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+              </span>
+              <span>LIVE AI LOOT RADAR · 27 CHANNELS MONITORED</span>
             </span>
           </div>
 
-          {/* Headline */}
-          <h1
-            style={{
-              fontFamily: 'var(--font-heading)',
-              lineHeight: 1.02,
-              letterSpacing: '-0.025em',
-              margin: 0,
-            }}
-          >
-            {/* Desktop Headline */}
-            <div className="hidden sm:block" style={{ fontSize: 'clamp(36px, 4vw, 54px)', fontWeight: 800 }}>
-              <span style={{ color: '#F8FAFC', display: 'block' }}>Best Deals in India,</span>
-              <span className="gradient-text" style={{ display: 'block' }}>All in One Place.</span>
-            </div>
-
-            {/* Mobile Headline */}
-            <div className="sm:hidden" style={{ fontSize: '32px', fontWeight: 800, lineHeight: 1.06 }}>
-              <span style={{ color: '#F8FAFC', display: 'block' }}>Best Deals</span>
-              <span className="gradient-text" style={{ display: 'block' }}>in India.</span>
-            </div>
+          {/* Main Headline */}
+          <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-900 leading-[1.1]">
+            India's Steepest{' '}
+            <span className="text-blue-600">
+              Price Drops & Loot Deals,
+            </span>{' '}
+            Verified in Real Time.
           </h1>
 
-          {/* Subheadline */}
-          <p
-            style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: '15px',
-              color: '#9099A6',
-              lineHeight: 1.5,
-              margin: 0,
-              maxWidth: '520px',
-            }}
-          >
-            Handpicked deals, price drops and offers from Amazon, Flipkart and top stores. Save time. Save money.
+          {/* Subtitle */}
+          <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-xl">
+            Scraped instantly from top curator channels and verified against 90-day price trends. Never overpay on Amazon, Flipkart, or Myntra again.
           </p>
 
-          {/* ── Search Bar (52px height) ── */}
-          <motion.div
-            animate={{
-              borderColor: isFocused ? 'var(--text-primary)' : 'var(--border-strong)',
-            }}
-            transition={{ duration: 0.2 }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              height: '52px',
-              backgroundColor: 'var(--surface)',
-              border: '1px solid var(--border)',
-              borderRadius: '6px',
-              overflow: 'hidden',
-              marginTop: '4px',
-              width: '100%',
-              maxWidth: '100%',
-            }}
-          >
-            {/* Search Icon with subtle 2px shift on focus */}
-            <motion.span
-              animate={{ x: isFocused ? 2 : 0, color: isFocused ? '#F59E0B' : '#687482' }}
-              transition={{ duration: 0.15 }}
-              style={{
-                paddingLeft: '16px',
-                paddingRight: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <svg width="18" height="18" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.6"/>
-                <path d="M11 11l3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+          {/* ── Floating White Search Capsule ── */}
+          <div className={`relative flex items-center h-14 w-full rounded-2xl bg-white border transition-all duration-200 ${
+            isFocused
+              ? 'border-blue-500 ring-4 ring-blue-100 shadow-lg'
+              : 'border-slate-300/80 hover:border-slate-400 shadow-md'
+          }`}>
+            <div className="pl-4 pr-2 text-slate-400 flex items-center">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={isFocused ? '#2563EB' : 'currentColor'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
-            </motion.span>
+            </div>
 
-            {/* Input Field */}
             <input
               ref={inputRef}
               type="text"
@@ -180,22 +107,12 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
               onKeyDown={(e) => {
                 if (e.key === 'Enter') submitSearch();
               }}
-              placeholder="Search products or paste URL..."
+              placeholder="Search 3,350+ drops, products or paste product link..."
               aria-label="Search deals or paste product URL"
               id="hero-search-input"
-              style={{
-                flex: 1,
-                backgroundColor: 'transparent',
-                border: 'none',
-                outline: 'none',
-                fontSize: '14px',
-                fontFamily: 'var(--font-body)',
-                color: '#F5F7FA',
-                minWidth: 0,
-              }}
+              className="flex-1 bg-transparent border-0 outline-none text-sm sm:text-base text-slate-900 placeholder:text-slate-400 px-2 min-w-0"
             />
 
-            {/* Clear button if input has text */}
             {input && (
               <button
                 type="button"
@@ -204,320 +121,140 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                   onSearch('');
                 }}
                 aria-label="Clear search"
-                style={{
-                  padding: '0 8px',
-                  color: '#687482',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
+                className="px-2 text-slate-400 hover:text-slate-700 transition-colors"
               >
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
               </button>
             )}
 
-            {/* Amber Search Submit Button (52px width) */}
-            <motion.button
-              type="button"
-              className="btn-primary"
-              whileTap={{ scale: 0.96 }}
-              onClick={submitSearch}
-              aria-label="Submit search"
-              style={{
-                width: '52px',
-                height: '52px',
-                border: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                flexShrink: 0,
-                borderRadius: '0 6px 6px 0',
-              }}
-            >
-              <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-                <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.8"/>
-                <path d="M11 11l3.5 3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-            </motion.button>
-          </motion.div>
-
-          {/* ── Popular Search Pills (Desktop) ── */}
-          <div className="hidden sm:flex" style={{ flexWrap: 'wrap', gap: '8px', alignItems: 'center', marginTop: '4px' }}>
-            {POPULAR_SEARCHES.map((term) => (
+            <div className="pr-1.5">
               <button
-                key={term}
                 type="button"
-                onClick={() => handleChipClick(term)}
-                style={{
-                  padding: '5px 11px',
-                  fontSize: '12px',
-                  fontFamily: 'var(--font-body)',
-                  color: 'var(--muted)',
-                  backgroundColor: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  transition: 'color 120ms ease, border-color 120ms ease',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.color = '#F5F7FA';
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-strong)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.color = 'var(--muted)';
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
-                }}
+                onClick={submitSearch}
+                className="h-11 px-5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm tracking-wide shadow-sm active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
               >
-                {term}
+                <span>Find Deals</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
               </button>
-            ))}
+            </div>
           </div>
 
-          {/* Mobile pills (3 compact pills) */}
-          <div className="flex sm:hidden" style={{ flexWrap: 'wrap', gap: '6px', alignItems: 'center', marginTop: '2px' }}>
-            {MOBILE_SEARCHES.map((term) => (
-              <button
-                key={term}
-                type="button"
-                onClick={() => handleChipClick(term)}
-                style={{
-                  padding: '4px 10px',
-                  fontSize: '11px',
-                  fontFamily: 'var(--font-body)',
-                  color: 'var(--muted)',
-                  backgroundColor: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {term}
-              </button>
-            ))}
+          {/* ── Popular Search Tags & Store Filters ── */}
+          <div className="flex flex-col gap-2.5">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] font-mono uppercase text-slate-400 font-semibold tracking-wider">
+                Popular:
+              </span>
+              {POPULAR_SEARCHES.map((term) => (
+                <button
+                  key={term}
+                  type="button"
+                  onClick={() => handleChipClick(term)}
+                  className="px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer"
+                >
+                  {term}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap pt-1">
+              <span className="text-[11px] font-mono uppercase text-slate-400 font-semibold tracking-wider">
+                Top Stores:
+              </span>
+              {QUICK_STORES.map((s) => (
+                <button
+                  key={s.name}
+                  type="button"
+                  onClick={() => handleChipClick(s.name.split(' ')[0])}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer ${s.color}`}
+                >
+                  {s.name}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* ── Right Content: One Restrained Featured Visual (No 3D tilt, no infinite float) ── */}
-        <div
-          className="hidden lg:flex"
-          style={{
-            position: 'relative',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '8px 0',
-          }}
-        >
-          {/* Subtle Ambient Glow */}
-          <div
-            style={{
-              position: 'absolute',
-              width: '320px',
-              height: '240px',
-              background: 'radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%)',
-              filter: 'blur(32px)',
-              pointerEvents: 'none',
-            }}
-          />
-
-          {/* Framed Featured Deal Spotlight Card */}
+        {/* ── Right Column: Apple-Style #1 Spotlight Deal Card ── */}
+        <div className="hidden lg:flex items-center justify-center">
           <motion.div
-            className="pro-card"
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: 'easeOut' }}
-            style={{
-              position: 'relative',
-              width: '320px',
-              borderRadius: 'var(--radius-md)',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-              cursor: 'pointer',
-            }}
+            transition={{ duration: 0.3 }}
+            className="w-full max-w-[380px] rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xl hover:shadow-2xl transition-all relative overflow-hidden group"
           >
-            {/* Spotlight Header Bar */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '8px 12px',
-                borderBottom: '1px solid var(--border)',
-                backgroundColor: 'var(--surface-2)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '11px', color: '#F59E0B' }}>⚡</span>
-                <span
-                  style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '10px',
-                    fontWeight: 700,
-                    color: '#F59E0B',
-                    letterSpacing: '0.06em',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  Featured Spotlight
+            {/* Spotlight Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                </span>
+                <span className="font-mono text-[11px] font-extrabold uppercase tracking-wider text-slate-900">
+                  ⚡ Spotlight Loot Drop
                 </span>
               </div>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '10px',
-                  fontWeight: 600,
-                  color: '#22C55E',
-                }}
-              >
-                <span>✓</span> Verified Drop
+              <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                Score: 98/100
               </span>
             </div>
 
-            {/* Product Image Stage (4:3) */}
-            <div
-              style={{
-                position: 'relative',
-                height: '145px',
-                backgroundColor: 'var(--bg)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '12px',
-              }}
-            >
+            {/* Product Image Stage */}
+            <div className="relative aspect-[4/3] rounded-xl bg-slate-50 flex items-center justify-center p-4 my-3 overflow-hidden border border-slate-100">
               <img
                 src="https://m.media-amazon.com/images/I/51HBom8xz7L._SL1500_.jpg"
                 alt="boAt Airdopes 141 Pro"
-                style={{
-                  maxHeight: '100%',
-                  maxWidth: '100%',
-                  objectFit: 'contain',
-                }}
+                className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
-              <span
-                style={{
-                  position: 'absolute',
-                  top: '8px',
-                  left: '8px',
-                  padding: '2px 6px',
-                  borderRadius: '3px',
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  backgroundColor: '#3A1714',
-                  color: '#FF6B5F',
-                  letterSpacing: '0.02em',
-                }}
-              >
-                -64%
+              <span className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg text-xs font-black tracking-wide bg-rose-600 text-white shadow-sm">
+                -64% OFF
+              </span>
+              <span className="absolute bottom-2.5 right-2.5 text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-white text-slate-700 border border-slate-200 shadow-2xs">
+                Amazon India
               </span>
             </div>
 
-            {/* Product Details */}
-            <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span
-                  style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    color: '#F59E0B',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  Amazon India
-                </span>
-                <span
-                  style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '10px',
-                    color: '#687482',
-                  }}
-                >
-                  1h ago
-                </span>
-              </div>
+            {/* Product Title & Info */}
+            <div className="flex flex-col gap-2">
+              <h3 className="font-heading text-sm font-bold text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
+                boAt Airdopes 141 Pro True Wireless Earbuds
+              </h3>
 
-              <div
-                className="pro-title"
-                style={{
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                boAt Airdopes 141 Pro TWS Earbuds
-              </div>
-
-              {/* Price & Savings */}
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '2px' }}>
-                <span
-                  className="pro-price"
-                  style={{
-                    fontSize: '18px',
-                    fontWeight: 800,
-                    color: '#F4F4F7',
-                    lineHeight: 1,
-                  }}
-                >
+              {/* Price Row */}
+              <div className="flex items-baseline gap-2">
+                <span className="font-mono text-2xl font-extrabold text-slate-900">
                   ₹899
                 </span>
-                <span
-                  style={{
-                    fontSize: '11px',
-                    color: '#687482',
-                    textDecoration: 'line-through',
-                    fontFamily: 'var(--font-mono)',
-                  }}
-                >
+                <span className="font-mono text-xs text-slate-400 line-through">
                   ₹2,499
                 </span>
-                <span
-                  style={{
-                    fontSize: '11px',
-                    fontFamily: 'var(--font-body)',
-                    fontWeight: 600,
-                    color: '#22C55E',
-                    marginLeft: 'auto',
-                  }}
-                >
+                <span className="text-xs font-mono font-bold text-emerald-600 ml-auto">
                   Save ₹1,600
                 </span>
               </div>
 
-              {/* Action Button */}
+              {/* Claimed progress bar */}
+              <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mt-1">
+                <div className="bg-blue-600 h-full w-[72%] rounded-full" />
+              </div>
+              <div className="flex justify-between items-center text-[10.5px] font-mono text-slate-500">
+                <span>72% claimed</span>
+                <span className="text-amber-600 font-semibold">⚡ Lightning Deal</span>
+              </div>
+
+              {/* CTA Button */}
               <a
                 href="https://www.amazon.in/dp/B09N3ZNHTY"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="glow-pill-amber"
-                style={{
-                  height: '34px',
-                  borderRadius: '999px',
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  letterSpacing: '0.02em',
-                  textTransform: 'uppercase',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  textDecoration: 'none',
-                  marginTop: '4px',
-                }}
+                className="mt-2 w-full h-10 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs tracking-wide shadow-sm hover:shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"
               >
-                <span>Get Deal</span>
+                <span>Grab Spotlight Deal</span>
                 <span>→</span>
               </a>
             </div>

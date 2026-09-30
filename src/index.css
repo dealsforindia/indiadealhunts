@@ -1,52 +1,60 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @layer base {
   :root {
-    /* ── 2026 Spatial & Brutalist Tokens ── */
-    --bg:             #000000; /* True black */
-    --surface:        rgba(20, 20, 20, 0.4); /* Ultra-sheer glass */
-    --surface-2:      rgba(30, 30, 30, 0.5);
-    --surface-3:      rgba(45, 45, 45, 0.6);
-    --border:         rgba(255, 255, 255, 0.06); /* Hairline */
-    --border-strong:  rgba(255, 255, 255, 0.12);
-    --border-subtle:  rgba(255, 255, 255, 0.03);
-    --text:           #FFFFFF;
-    --text-secondary: #A1A1AA;
-    --muted:          #71717A;
-    --text-muted:     #71717A;
-    --text-primary:   #FFFFFF;
-    --text-inverse:   #000000;
+    /* ── Apple / Stripe Clean Modern Light Mode Theme Tokens ── */
+    --bg-canvas:              #F8FAFC; /* Pristine Slate-50 Canvas */
+    --bg-surface:             #FFFFFF; /* Pure White Card Surfaces */
+    --bg-surface-elevated:    #FFFFFF; /* Floating Popover Surfaces */
+    --bg-surface-card:        #FFFFFF; /* Deal Card Background */
+    --border-subtle:          #E2E8F0; /* Slate-200 Clean Borders */
+    --border-strong:          #CBD5E1; /* Slate-300 Active Borders */
+    --border-accent:          #2563EB; /* Stripe Royal Blue */
 
-    /* ── Singular Sophisticated Accent ── */
-    --accent:         #F58220; /* Refined Amber/Orange */
-    --accent-dark:    #C05A10;
-    --accent-hover:   #FFA040;
-    --accent-subtle:  rgba(245, 130, 32, 0.1);
-    --accent-glow:    0 0 30px rgba(245, 130, 32, 0.15);
+    /* ── Apple & Stripe Accents ── */
+    --accent-primary:         #0F172A; /* Slate-900 Primary Action */
+    --accent-primary-hover:   #1E293B;
+    --accent-blue:            #2563EB; /* Stripe Blue */
+    --accent-blue-hover:      #1D4ED8;
+    --accent-emerald:         #059669; /* Verified Savings Green */
+    --accent-amber:           #D97706; /* Warning / Amazon Warmth */
+    --accent-rose:            #E11D48; /* Flash Loot Rose */
 
-    /* ── Status Colors ── */
-    --green:          #10B981;
-    --green-subtle:   rgba(16, 185, 129, 0.15);
-    --red:            #EF4444;
-    --red-subtle:     rgba(239, 68, 68, 0.15);
+    /* ── High-Contrast Text Hierarchy ── */
+    --text-primary:           #0F172A; /* Slate 900 */
+    --text-secondary:         #475569; /* Slate 600 */
+    --text-muted:             #94A3B8; /* Slate 400 */
+    --text-inverse:           #FFFFFF;
 
-    /* ── Aliases for legacy/backward compatibility ── */
-    --bg-base:        #09090b;
-    --bg-surface:     rgba(24, 24, 27, 0.6);
-    --bg-raised:      rgba(39, 39, 42, 0.7);
-    --bg-input:       rgba(24, 24, 27, 0.8);
-    --border-default: rgba(255, 255, 255, 0.08);
+    /* ── Radii ── */
+    --radius-sm:              8px;
+    --radius-md:              12px;
+    --radius-lg:              16px;
+    --radius-xl:              24px;
+    --radius-full:            9999px;
 
-    /* ── Typography Tokens (Aligned with tg-setup) ── */
-    --font-heading:   'Inter', 'Lexend', system-ui, -apple-system, sans-serif;
-    --font-body:      'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
-    --font-mono:      'JetBrains Mono', ui-monospace, monospace;
+    /* ── Compatibility Aliases ── */
+    --bg:                     #F8FAFC;
+    --surface:                #FFFFFF;
+    --surface-2:              #F1F5F9;
+    --surface-3:              #E2E8F0;
+    --border:                 #E2E8F0;
+    --border-hairline:        #E2E8F0;
+    --border-default:         #E2E8F0;
+    --text:                   #0F172A;
+    --muted:                  #64748B;
+    --accent:                 #2563EB;
+    --accent-hover:           #1D4ED8;
+    --green:                  #059669;
+    --red:                    #E11D48;
+    --bg-base:                #F8FAFC;
 
-    /* ── Restrained Border Radius ── */
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 16px;
+    /* ── Typography Hierarchy ── */
+    --font-heading:           'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-brand:             'Outfit', system-ui, sans-serif;
+    --font-body:              'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    --font-mono:              'JetBrains Mono', ui-monospace, monospace;
   }
 
   *,
@@ -61,28 +69,28 @@
     font-size: 16px;
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
-    background-color: var(--bg);
+    background-color: #F8FAFC;
   }
 
   body {
     font-family: var(--font-body);
-    background-color: #07080E;
-    color: var(--text);
+    background-color: #F8FAFC;
+    color: var(--text-primary);
     line-height: 1.5;
     overflow-x: hidden;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-image: 
-      radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(255, 45, 85, 0.04) 0px, transparent 50%),
-      radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.03) 0px, transparent 50%);
+      radial-gradient(at 10% 0%, rgba(37, 99, 235, 0.04) 0px, transparent 40%),
+      radial-gradient(at 90% 0%, rgba(217, 119, 6, 0.04) 0px, transparent 40%),
+      radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.03) 0px, transparent 40%);
     background-attachment: fixed;
   }
 
   ::selection {
-    background-color: var(--accent);
-    color: #090A0C;
+    background-color: #2563EB;
+    color: #FFFFFF;
   }
 
   h1,
@@ -92,9 +100,9 @@
   h5,
   h6 {
     font-family: var(--font-heading);
-    line-height: 1.25;
-    letter-spacing: -0.02em;
-    color: var(--text);
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    color: #0F172A;
   }
 
   a {
@@ -115,23 +123,23 @@
   }
 }
 
-/* ── Minimalist Scrollbar ───────────────────────────────── */
+/* ── Minimalist Clean Scrollbar ────────────────────────── */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg);
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 4px;
+  background: #CBD5E1;
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #384454;
+  background: #94A3B8;
 }
 
 .scrollbar-none::-webkit-scrollbar {
@@ -143,246 +151,163 @@
   scrollbar-width: none;
 }
 
-/* ── Accessible Focus Rings (WCAG 2.1 AA) ───────────────── */
+/* ── Accessible Focus Rings ────────────────────────────── */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid #2563EB;
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
-/* ── Typography Utilities ───────────────────────────────── */
-.font-heading {
-  font-family: var(--font-heading);
-}
-
-.font-body {
-  font-family: var(--font-body);
-}
-
-.font-mono {
-  font-family: var(--font-mono);
-}
-
-/* ── Tabular Numerals for Pricing ────────────────────────── */
+/* ── Tabular Pricing Numerals ──────────────────────────── */
 .price-num {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
 }
 
-/* ── Zero Layout-Shift Skeleton Loader (CLS = 0) ────────── */
-@keyframes skeleton-flat-pulse {
+/* ── Apple / Stripe Clean Deal Card ────────────────────── */
+.deal-card-premium,
+.pro-card,
+.broadsheet-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.22s ease, 
+              box-shadow 0.22s ease;
+}
 
-  0%,
-  100% {
-    opacity: 0.6;
-  }
+.deal-card-premium:hover,
+.pro-card:hover,
+.broadsheet-card:hover {
+  transform: translateY(-3px);
+  border-color: #CBD5E1;
+  box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
+}
 
-  50% {
-    opacity: 0.3;
-  }
+/* ── High-Converting Tactile Buttons ──────────────────── */
+.btn-primary,
+.glow-pill-amber,
+.btn-loot {
+  background: #0F172A;
+  color: #FFFFFF;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border-radius: var(--radius-md);
+  border: none;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, 
+              background-color 0.15s ease,
+              box-shadow 0.15s ease;
+}
+
+.btn-primary:hover,
+.glow-pill-amber:hover,
+.btn-loot:hover {
+  background: #1E293B;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+  color: #FFFFFF;
+}
+
+.btn-secondary {
+  background: #FFFFFF;
+  color: #0F172A;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.btn-secondary:hover {
+  border-color: #CBD5E1;
+  background: #F8FAFC;
+}
+
+/* ── Clean Light Discount Pills ────────────────────────── */
+.badge-discount-fire {
+  background: #FEF2F2;
+  color: #DC2626;
+  border: 1px solid #FECACA;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.01em;
+}
+
+.badge-discount-emerald {
+  background: #ECFDF5;
+  color: #059669;
+  border: 1px solid #A7F3D0;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.01em;
+}
+
+/* ── Clean Glassmorphism Panels ────────────────────────── */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+/* ── Light Gradient Text ──────────────────────────────── */
+.gradient-text-amber {
+  background: linear-gradient(135deg, #0F172A 30%, #D97706 80%, #B45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-text-blue {
+  background: linear-gradient(135deg, #0F172A 30%, #2563EB 75%, #1D4ED8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Skeleton Pulse ───────────────────────────────────── */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.35; }
 }
 
 .skeleton {
-  background-color: var(--surface-2);
-  animation: skeleton-flat-pulse 1.4s ease-in-out infinite;
-  border-radius: 4px;
+  background-color: #E2E8F0;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  border-radius: 8px;
 }
 
-/* ── Animations ─────────────────────────────────────────── */
-@keyframes modalSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px) scale(0.98);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-.animate-modal {
-  animation: modalSlideUp 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-fade-in {
-  animation: fadeIn 150ms ease-out forwards;
-}
-
-/* ── Responsive Overrides (high specificity to protect against inline styles) ── */
-@media (min-width: 768px) {
-  .desktop-hidden {
-    display: none !important;
-  }
-}
-
-@media (max-width: 767px) {
-  .mobile-hidden {
-    display: none !important;
-  }
-}
-
-/* ── 2026 Spatial Glassmorphism ── */
-.glass-panel {
-  background: var(--surface);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border: 1px solid var(--border);
-  box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.05), 0 8px 32px rgba(0, 0, 0, 0.4);
-}
-
-.glass-panel:hover {
-  border-color: var(--border-strong);
-  background: var(--surface-2);
-}
-
-.gradient-text {
-  color: var(--text-primary);
-  /* Stripped neon rainbow for 2026 typographic seriousness */
-}
-
-.btn-primary {
-  background: var(--text-primary);
-  color: var(--text-inverse);
-  font-weight: 600;
-  border-radius: 9999px; /* Pill shape for 2026 */
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s;
-  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.1);
-}
-
-.btn-primary:hover {
-  background: #E4E4E7;
-  transform: scale(1.02);
-}
-
-.card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-  border-color: var(--border-strong);
-}
-
-/* ── tg-setup Pro Styles ── */
-.pro-card {
-  background: linear-gradient(180deg, rgba(20, 24, 38, 0.82) 0%, rgba(11, 13, 21, 0.92) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 12px 30px -10px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.pro-card:hover {
-  border-color: rgba(16, 185, 129, 0.35);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.15), 0 16px 40px -10px rgba(0, 0, 0, 0.8), 0 0 30px -4px rgba(16, 185, 129, 0.15);
-  transform: translateY(-2px);
-}
-
-.specular-top {
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
-}
-
-.ambient-mesh {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  z-index: 0;
-  background: 
-    radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 85% 20%, rgba(255, 45, 85, 0.06) 0%, transparent 40%),
-    radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 50%);
-}
-
-.glow-pill-primary {
-  background: linear-gradient(135deg, #6366F1, #4F46E5);
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
-  color: white;
-  border: none;
-}
-
-.glow-pill-amber {
-  background: linear-gradient(135deg, #F59E0B, #D97706);
-  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
-  color: white;
-  border: none;
-}
-
-@keyframes liquid-sweep {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.liquid-sweep {
-  background-size: 200% 200%;
-  animation: liquid-sweep 4s ease infinite;
-}
-
-/* ── 2026 Marquee Ticker Utilities ── */
+/* ── Marquee Ticker Drift ─────────────────────────────── */
 @keyframes marquee-drift {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  100% {
-    transform: translate3d(-50%, 0, 0);
-  }
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
 }
 
 .animate-marquee-drift {
   display: flex;
   width: max-content;
   will-change: transform;
-  animation: marquee-drift 38s linear infinite;
+  animation: marquee-drift 35s linear infinite;
 }
 
 .animate-marquee-drift:hover,
 .animate-marquee-drift:focus-within {
   animation-play-state: paused;
 }
-
-@media (max-width: 640px) {
-  .animate-marquee-drift {
-    animation-duration: 28s;
-  }
-}
-
-/* ── Category Stories Rail & Ring Utilities ── */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-@keyframes story-gradient-rotate {
-  0% { filter: hue-rotate(0deg); }
-  50% { filter: hue-rotate(45deg); }
-  100% { filter: hue-rotate(0deg); }
-}
-
-.animate-story-glow {
-  animation: story-gradient-rotate 4s ease-in-out infinite;
-}
-

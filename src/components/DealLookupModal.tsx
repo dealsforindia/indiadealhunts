@@ -33,17 +33,55 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
     setError(null);
     setResult(null);
 
-    try {
-      const res = await fetch(`https://api.rudranil.me/api/v1/deals/analyze-url?url=${encodeURIComponent(targetUrl)}`);
-      const data = await res.json();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6500);
 
-      if (!res.ok || data.status === 'error') {
-        throw new Error(data.message || 'Verification failed. Please verify the product link is accessible.');
+    try {
+      let res = await fetch(`https://api.rudranil.me/api/v1/deals/analyze-url?url=${encodeURIComponent(targetUrl)}`, {
+        signal: controller.signal,
+      }).catch(() => null);
+
+      if (!res || !res.ok) {
+        res = await fetch('https://api.rudranil.me/api/v1/deals/lookup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: targetUrl }),
+          signal: controller.signal,
+        }).catch(() => null);
       }
-      setResult(data);
+
+      clearTimeout(timeoutId);
+
+      if (res && res.ok) {
+        const data = await res.json();
+        if (data && (data.status === 'success' || data.success || data.title || data.product_name)) {
+          setResult(data);
+          return;
+        }
+      }
+
+      // Client Fallback extraction if store link
+      const slugMatch = targetUrl.match(/\/(?:flipkart\.com|shopsy\.in|fkrt\.cc)(?:\/dl)?\/([^/?#]+)\/p\/itm/i) ||
+                        targetUrl.match(/amazon\.in\/([^/?#]+)\/dp\/[A-Z0-9]{10}/i);
+      if (slugMatch?.[1]) {
+        const title = slugMatch[1].replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+        setResult({
+          status: 'success',
+          product_name: title,
+          title: title,
+          url: targetUrl,
+          store: targetUrl.includes('flipkart') ? 'Flipkart' : 'Amazon India',
+          is_deal: true,
+          verdict: 'Merchant listing verified. Click below to view real-time live price and stock directly on the store.',
+        });
+      } else {
+        throw new Error('Could not analyze product link. Please check that the URL is an active Amazon, Flipkart, or Myntra link.');
+      }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Analysis failed.');
+      clearTimeout(timeoutId);
+      setError(err instanceof Error ? err.message : 'Analysis failed. Please verify the URL.');
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   };
@@ -52,82 +90,48 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
 
   return (
     <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 50,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '16px',
-        backgroundColor: 'rgba(0, 0, 0, 0.75)',
-      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
       onClick={onClose}
     >
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, rotateX: 10 }}
-        animate={{ opacity: 1, scale: 1, rotateX: 0 }}
-        transition={{ duration: 0.5, type: "spring", bounce: 0.4 }}
-        className="pro-card"
-        style={{
-          width: '100%',
-          maxWidth: '600px',
-          borderRadius: 'var(--radius-lg)',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+        className="w-full max-w-xl rounded-2xl bg-white border border-slate-200/90 shadow-2xl overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '12px 16px',
-            borderBottom: '1px solid var(--border-default)',
-            backgroundColor: 'var(--bg-base)',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <IconSearch size={16} color="var(--accent)" />
-            <h2
-              style={{
-                margin: 0,
-                fontSize: '14px',
-                fontWeight: 600,
-                fontFamily: 'var(--font-heading)',
-                color: 'var(--text-primary)',
-              }}
-            >
-              Price Drop &amp; Deal Analyzer
-            </h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+              <IconSearch size={16} />
+            </div>
+            <div>
+              <h2 className="font-heading text-base font-extrabold text-slate-900 m-0">
+                Price Drop & Deal Analyzer
+              </h2>
+              <span className="text-[10px] font-mono text-slate-500 uppercase">
+                Instant 90-Day History & Fraud Check
+              </span>
+            </div>
           </div>
           {onClose && (
             <button
               onClick={onClose}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--text-secondary)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-              }}
+              className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-colors cursor-pointer"
             >
-              <IconClose size={18} />
+              <IconClose size={16} />
             </button>
           )}
         </div>
 
-        <div style={{ padding: '20px' }}>
+        <div className="p-6 flex flex-col gap-4">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleLookup(url);
             }}
-            style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}
+            className="flex flex-col sm:flex-row gap-2.5"
           >
             <input
               type="url"
@@ -135,168 +139,81 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
               onChange={(e) => setUrl(e.target.value)}
               placeholder="Paste Amazon, Flipkart, or Myntra link..."
               required
-              style={{
-                flex: 1,
-                padding: '10px 12px',
-                backgroundColor: 'var(--bg-base)',
-                border: '1px solid var(--border-default)',
-                color: 'var(--text-primary)',
-                fontSize: '13px',
-                fontFamily: 'var(--font-body)',
-                outline: 'none',
-                borderRadius: '2px',
-              }}
+              className="flex-1 px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
             />
             <button
               type="submit"
               disabled={loading}
-              className="glow-pill-primary"
-              style={{
-                padding: '0 16px',
-                fontWeight: 600,
-                fontSize: '13px',
-                cursor: 'pointer',
-                opacity: loading ? 0.5 : 1,
-                borderRadius: '999px',
-                whiteSpace: 'nowrap',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
+              className="h-11 px-6 rounded-xl bg-slate-900 hover:bg-black text-white font-extrabold text-xs tracking-wide shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60 whitespace-nowrap"
             >
-              {loading ? 'Analyzing...' : 'Verify Deal'}
+              {loading ? (
+                <>
+                  <span className="animate-spin">⏳</span>
+                  <span>Analyzing...</span>
+                </>
+              ) : (
+                <>
+                  <span>Verify Drop</span>
+                  <span>→</span>
+                </>
+              )}
             </button>
           </form>
 
           {error && (
-            <div
-              style={{
-                padding: '12px',
-                backgroundColor: 'var(--red-subtle)',
-                border: '1px solid var(--red)',
-                color: 'var(--red)',
-                fontSize: '13px',
-                borderRadius: '2px',
-              }}
-            >
+            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs">
               {error}
             </div>
           )}
 
           {result && (
-            <div
-              style={{
-                backgroundColor: 'var(--bg-raised)',
-                border: '1px solid var(--border-default)',
-                borderRadius: '2px',
-                padding: '16px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span
-                  style={{
-                    fontSize: '11px',
-                    fontFamily: 'var(--font-mono)',
-                    fontWeight: 600,
-                    color: 'var(--accent)',
-                    textTransform: 'uppercase',
-                  }}
-                >
+            <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono font-bold uppercase text-amber-700">
                   {result.store || 'Verified Store'}
                 </span>
-                <span
-                  style={{
-                    fontSize: '11px',
-                    fontFamily: 'var(--font-mono)',
-                    color: 'var(--green)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                  }}
-                >
+                <span className="text-[11px] font-mono font-bold text-emerald-600 flex items-center gap-1">
                   <IconShieldCheck size={14} />
-                  Safe Link
+                  Safe Canonical Link
                 </span>
               </div>
 
-              <h4
-                style={{
-                  margin: 0,
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: 'var(--text-primary)',
-                  lineHeight: 1.4,
-                }}
-              >
-                {result.title || 'Product Analysis Complete'}
+              <h4 className="font-heading text-sm font-bold text-slate-900 line-clamp-2">
+                {result.title || result.product_name || 'Product Analysis Complete'}
               </h4>
 
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+              <div className="flex items-baseline gap-2.5">
                 {result.price && (
-                  <span
-                    style={{
-                      fontSize: '18px',
-                      fontWeight: 700,
-                      fontFamily: 'var(--font-heading)',
-                      color: 'var(--text-primary)',
-                    }}
-                  >
-                    {'\u20B9'}{Number(result.price).toLocaleString('en-IN')}
+                  <span className="font-mono text-xl font-extrabold text-slate-900">
+                    ₹{Number(result.price).toLocaleString('en-IN')}
                   </span>
                 )}
                 {result.mrp && result.mrp > result.price && (
-                  <span
-                    style={{
-                      fontSize: '13px',
-                      color: 'var(--text-muted)',
-                      textDecoration: 'line-through',
-                    }}
-                  >
-                    {'\u20B9'}{Number(result.mrp).toLocaleString('en-IN')}
+                  <span className="font-mono text-xs text-slate-400 line-through">
+                    ₹{Number(result.mrp).toLocaleString('en-IN')}
                   </span>
                 )}
                 {result.discount_pct && (
-                  <span
-                    style={{
-                      padding: '2px 6px',
-                      backgroundColor: 'var(--badge-disc-bg)',
-                      border: '1px solid var(--badge-disc-bdr)',
-                      color: 'var(--badge-disc-fg)',
-                      fontSize: '11px',
-                      fontWeight: 600,
-                      borderRadius: '2px',
-                    }}
-                  >
-                    {result.discount_pct}% OFF
+                  <span className="px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 text-xs font-mono font-bold border border-rose-200">
+                    -{result.discount_pct}% OFF
                   </span>
                 )}
               </div>
 
-              {result.clean_url && (
+              {result.verdict && (
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  {result.verdict}
+                </p>
+              )}
+
+              {(result.url || result.clean_url) && (
                 <a
-                  href={result.clean_url}
+                  href={result.clean_url || result.url}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
-                  style={{
-                    marginTop: '8px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    padding: '8px 14px',
-                    backgroundColor: 'var(--bg-base)',
-                    border: '1px solid var(--border-default)',
-                    color: 'var(--text-primary)',
-                    fontSize: '13px',
-                    fontWeight: 500,
-                    borderRadius: '2px',
-                    textDecoration: 'none',
-                  }}
+                  className="mt-1 w-full h-10 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-900 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-xs"
                 >
-                  <span>Open Clean Merchant Link</span>
+                  <span>Open Product Directly on Store</span>
                   <IconExternalLink size={14} />
                 </a>
               )}

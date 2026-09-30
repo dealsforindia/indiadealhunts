@@ -155,11 +155,20 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
     let isMounted = true;
     const loadStories = async () => {
       try {
-        let res = await fetch(`${EDGE_API}/deals/stories`);
-        if (!res.ok) {
-          res = await fetch(`${API_BASE}/deals/stories`);
+        let res: Response | null = null;
+        try {
+          res = await fetch(`${API_BASE}/api/v1/deals/stories`);
+        } catch {
+          res = null;
         }
-        if (res.ok) {
+        if (!res || !res.ok) {
+          try {
+            res = await fetch(`${EDGE_API}/deals/stories`);
+          } catch {
+            res = null;
+          }
+        }
+        if (res && res.ok) {
           const data: StoriesResponse = await res.json();
           if (isMounted && data.stories && data.stories.length > 0) {
             // Filter collections that actually have deals
@@ -236,24 +245,21 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
   return (
     <>
       <section
-        className="w-full py-4 border-b border-white/[0.06]"
-        style={{
-          background: 'linear-gradient(180deg, rgba(11, 14, 23, 0.6) 0%, rgba(7, 9, 15, 0.8) 100%)',
-        }}
+        className="w-full py-4 bg-white border-b border-slate-200/80"
         aria-label="Flash Deal Stories"
       >
-        <div className="max-w-[1320px] mx-auto px-3 md:px-5">
+        <div className="max-w-[1340px] mx-auto px-4 md:px-6">
           {/* Header Row */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
               </span>
-              <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-white/90 font-mono">
-                Flash Stories & Curated Hauls
+              <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800 font-mono">
+                Flash Stories &amp; Curated Hauls
               </h3>
-              <span className="hidden sm:inline-block text-[11px] text-white/40">
+              <span className="hidden sm:inline-block text-[11px] text-slate-400">
                 • Tap to preview 5-sec deals
               </span>
             </div>
@@ -263,7 +269,7 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
               <button
                 type="button"
                 onClick={() => handleScroll('left')}
-                className="w-7 h-7 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-white/60 hover:text-white transition-all text-xs cursor-pointer"
+                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-all text-xs cursor-pointer"
                 title="Scroll Left"
                 aria-label="Scroll Left"
               >
@@ -272,7 +278,7 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
               <button
                 type="button"
                 onClick={() => handleScroll('right')}
-                className="w-7 h-7 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-white/60 hover:text-white transition-all text-xs cursor-pointer"
+                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-all text-xs cursor-pointer"
                 title="Scroll Right"
                 aria-label="Scroll Right"
               >
@@ -308,39 +314,39 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
                     <div
                       className={`w-[66px] h-[66px] sm:w-[72px] sm:h-[72px] rounded-full p-[2.5px] transition-all duration-300 transform group-hover:scale-105 ${
                         isViewed
-                          ? 'bg-white/20'
-                          : `bg-gradient-to-tr ${story.ring_color} animate-story-glow shadow-md shadow-amber-500/10`
+                          ? 'bg-slate-200'
+                          : `bg-gradient-to-tr ${story.ring_color} shadow-sm`
                       }`}
                     >
-                      <div className="w-full h-full rounded-full bg-[#0C101A] p-[2px] flex items-center justify-center overflow-hidden relative">
+                      <div className="w-full h-full rounded-full bg-white p-[2px] flex items-center justify-center overflow-hidden relative shadow-2xs">
                         {previewImg ? (
                           <img
                             src={previewImg}
                             alt={story.title}
-                            className="w-full h-full object-cover rounded-full filter brightness-95 group-hover:scale-110 transition-transform duration-300"
+                            className="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-300"
                             loading="lazy"
                           />
                         ) : (
-                          <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center text-2xl">
+                          <div className="w-full h-full rounded-full bg-slate-100 flex items-center justify-center text-2xl">
                             {story.emoji}
                           </div>
                         )}
 
                         {/* Centered Emoji Overlay Badge */}
-                        <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-black/80 border border-white/20 flex items-center justify-center text-[11px] shadow-sm">
+                        <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[11px] shadow-2xs">
                           {story.emoji}
                         </div>
                       </div>
                     </div>
 
                     {/* Badge Pill for Hottest */}
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-0.2 rounded-full text-[9px] font-black uppercase tracking-wider bg-black/90 border border-amber-500/40 text-amber-300 whitespace-nowrap shadow-sm">
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-0.2 rounded-full text-[9px] font-bold uppercase tracking-wider bg-slate-900 text-white whitespace-nowrap shadow-sm">
                       {story.badge}
                     </div>
                   </div>
 
                   {/* Story Label */}
-                  <span className="text-[12px] font-medium text-white/80 group-hover:text-amber-400 transition-colors tracking-tight text-center max-w-[80px] sm:max-w-[90px] truncate mt-1">
+                  <span className="text-[12px] font-semibold text-slate-700 group-hover:text-blue-600 transition-colors tracking-tight text-center max-w-[80px] sm:max-w-[90px] truncate mt-1">
                     {story.title}
                   </span>
                 </button>
