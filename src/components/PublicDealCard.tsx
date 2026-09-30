@@ -512,6 +512,61 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             </div>
           )}
 
+          {/* Quick Commerce & Retail Intelligence Badges */}
+          {price >= 1500 && (
+            <div
+              style={{
+                marginTop: '5px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                flexWrap: 'wrap',
+              }}
+            >
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '3px',
+                  padding: '1px 6px',
+                  borderRadius: '5px',
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  fontSize: '10px',
+                  fontFamily: 'var(--font-mono)',
+                  fontWeight: 600,
+                  color: '#475569',
+                }}
+                title="Input Tax Credit claimable on GST Business Invoice (18% slab)"
+              >
+                <span>🧾</span>
+                <span>GST ITC: -₹{Math.round(price - price / 1.18).toLocaleString('en-IN')}</span>
+              </span>
+
+              {!cardSavings && (
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '3px',
+                    padding: '1px 6px',
+                    borderRadius: '5px',
+                    backgroundColor: '#F0FDF4',
+                    border: '1px solid #DCFCE7',
+                    fontSize: '10px',
+                    fontFamily: 'var(--font-mono)',
+                    fontWeight: 600,
+                    color: '#166534',
+                  }}
+                  title="5% Cashback on Amazon Pay ICICI / Flipkart Axis"
+                >
+                  <span>💳</span>
+                  <span>5% Card: -₹{Math.round(price * 0.05).toLocaleString('en-IN')}</span>
+                </span>
+              )}
+            </div>
+          )}
+
           {/* Sparkline Vector & Action Links (Breakdown + Share) */}
           <div
             style={{

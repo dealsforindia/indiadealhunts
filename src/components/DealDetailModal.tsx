@@ -14,6 +14,8 @@ interface DealDetailModalProps {
   onOpenImage?: (deal: PublicDeal) => void;
   onShowToast?: (msg: string) => void;
   onToggleSave?: (deal: PublicDeal) => void;
+  onOpenTool?: (toolId: string) => void;
+  onOpenFeature150?: (featureId: number) => void;
 }
 
 function getStoreDisplayName(store?: string): string {
@@ -59,6 +61,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   onOpenImage,
   onShowToast,
   onToggleSave,
+  onOpenTool,
+  onOpenFeature150,
 }) => {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
@@ -122,6 +126,16 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   const discount = deal.discount_pct || 0;
   const savings = mrp ? mrp - price : 0;
   const storeName = getStoreDisplayName(deal.store);
+
+  const gstItcAmount = price > 0 ? Math.round(price - price / 1.18) : 0;
+  const bestCardSavings = useMemo(() => {
+    if (!price || price <= 0) return null;
+    const instant10 = Math.max(0, Math.min(1500, price * 0.1) - 117);
+    const cashback5 = price * 0.05;
+    const bestRoute = price > 30000 ? '5% Unlimited Cashback' : '10% Instant Bank Card';
+    const bestAmount = Math.round(Math.max(instant10, cashback5));
+    return { bestRoute, bestAmount, instant10: Math.round(instant10), cashback5: Math.round(cashback5) };
+  }, [price]);
 
   const handleCopyCoupon = () => {
     if (!deal.coupon) return;
@@ -596,6 +610,175 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                 </p>
               </div>
             )}
+
+            {/* ── Real-Time Shopping Intelligence & Protections ── */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+              padding: '14px',
+              borderRadius: '16px',
+              backgroundColor: '#F8FAFC',
+              border: '1px solid #E2E8F0',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '14px' }}>🛡️</span>
+                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: '12px', fontWeight: 800, color: '#0F172A' }}>
+                    Deal Intelligence &amp; Buyer Protections
+                  </span>
+                </div>
+                {onOpenFeature150 && (
+                  <button
+                    type="button"
+                    onClick={() => { onClose(); onOpenFeature150(1); }}
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      color: '#4F46E5',
+                      backgroundColor: '#EEF2FF',
+                      border: '1px solid #C7D2FE',
+                      padding: '2px 8px',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    All 150 Engines →
+                  </button>
+                )}
+              </div>
+
+              {/* 3 Value Pillars for this Deal */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '8px' }}>
+                {/* 1. GST ITC */}
+                <div style={{
+                  padding: '10px 12px',
+                  borderRadius: '10px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E2E8F0',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '2px',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#64748B', fontWeight: 700 }}>
+                      🧾 GST ITC SHIELD
+                    </span>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 800, color: '#059669' }}>
+                      Save ₹{gstItcAmount.toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: '11px', color: '#334155', fontWeight: 600 }}>
+                    Net B2B: ₹{Math.round(price - gstItcAmount).toLocaleString('en-IN')}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => { onClose(); onOpenTool?.('gst'); }}
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '9.5px',
+                      color: '#2563EB',
+                      textAlign: 'left',
+                      marginTop: '4px',
+                      cursor: 'pointer',
+                      border: 'none',
+                      background: 'none',
+                      padding: 0,
+                      fontWeight: 700,
+                    }}
+                  >
+                    Calculate 40% Dep. →
+                  </button>
+                </div>
+
+                {/* 2. Card Optimizer */}
+                {bestCardSavings && (
+                  <div style={{
+                    padding: '10px 12px',
+                    borderRadius: '10px',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E2E8F0',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#64748B', fontWeight: 700 }}>
+                        💳 BEST PAYMENT
+                      </span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 800, color: '#0284C7' }}>
+                        +₹{bestCardSavings.bestAmount.toLocaleString('en-IN')} Off
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '11px', color: '#334155', fontWeight: 600 }}>
+                      {bestCardSavings.bestRoute}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => { onClose(); onOpenTool?.('bank_offers'); }}
+                      style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '9.5px',
+                        color: '#2563EB',
+                        textAlign: 'left',
+                        marginTop: '4px',
+                        cursor: 'pointer',
+                        border: 'none',
+                        background: 'none',
+                        padding: 0,
+                        fontWeight: 700,
+                      }}
+                    >
+                      Compare Gyftr 16% →
+                    </button>
+                  </div>
+                )}
+
+                {/* 3. OBD & Return Rule */}
+                <div style={{
+                  padding: '10px 12px',
+                  borderRadius: '10px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E2E8F0',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '2px',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#64748B', fontWeight: 700 }}>
+                      🛡️ RETURN SAFEGUARD
+                    </span>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 800, color: '#D97706' }}>
+                      Pre-OTP Rule
+                    </span>
+                  </div>
+                  <span style={{ fontSize: '11px', color: '#334155', fontWeight: 600 }}>
+                    {storeName.includes('Flipkart') || storeName.includes('Amazon')
+                      ? 'Open Box Delivery: Check screen before sharing OTP!'
+                      : 'Doorstep pickup window: Keep brand tags intact.'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => { onClose(); onOpenTool?.('returns'); }}
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '9.5px',
+                      color: '#2563EB',
+                      textAlign: 'left',
+                      marginTop: '4px',
+                      cursor: 'pointer',
+                      border: 'none',
+                      background: 'none',
+                      padding: 0,
+                      fontWeight: 700,
+                    }}
+                  >
+                    6-Step OBD Checklist →
+                  </button>
+                </div>
+              </div>
+            </div>
 
             {/* Editorial verification note */}
             <p style={{

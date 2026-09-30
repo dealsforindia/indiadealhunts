@@ -11,6 +11,7 @@ interface NavbarProps {
   onFocusSearch?: () => void;
   onOpenCardsModal?: () => void;
   onOpenToolsHub?: () => void;
+  onOpenFeatures150?: () => void;
   onOpenCommandPalette?: () => void;
   isAudioEnabled?: boolean;
   onToggleAudio?: () => void;
@@ -38,6 +39,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onFocusSearch,
   onOpenCardsModal,
   onOpenToolsHub,
+  onOpenFeatures150,
   onOpenCommandPalette,
   isAudioEnabled = true,
   onToggleAudio,
@@ -195,10 +197,21 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={onOpenToolsHub}
               title="Shopping Utilities & Loot Lab (EMI, Shrinkflation, Energy, Warranties, Budgeting)"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer"
             >
               <span>🧰</span>
               <span>Utilities</span>
+            </button>
+          )}
+
+          {onOpenFeatures150 && (
+            <button
+              onClick={onOpenFeatures150}
+              title="150 Retail Decision Engines & Loot Intelligence Matrix"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200/80 transition-all cursor-pointer shadow-2xs"
+            >
+              <span>🌟</span>
+              <span>150 Engines</span>
             </button>
           )}
 
@@ -377,7 +390,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className="text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 flex items-center justify-between"
                 >
                   <span>🧰 Shopping Utilities &amp; Loot Lab</span>
-                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">5 Tools</span>
+                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">12 Engines</span>
+                </button>
+              )}
+              {onOpenFeatures150 && (
+                <button
+                  onClick={() => { onOpenFeatures150(); setMobileMenuOpen(false); }}
+                  className="text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 flex items-center justify-between"
+                >
+                  <span>🌟 150 Retail Decision Engines</span>
+                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">150 Engines</span>
                 </button>
               )}
               {onToggleAudio && (

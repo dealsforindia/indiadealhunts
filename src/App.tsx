@@ -25,6 +25,7 @@ import { CommandPalette } from './components/CommandPalette';
 import { CardCalculatorModal } from './components/CardCalculatorModal';
 import { CompareDrawer } from './components/CompareDrawer';
 import { ToolsHubModal, ToolId } from './components/tools/ToolsHubModal';
+import { FeatureCatalog150Modal } from './components/FeatureCatalog150Modal';
 import type { PublicDeal, PublicDealsResponse, SortOption, NavTab } from './types';
 import { calculateWorthScore } from './utils/worthScore';
 import { searchDealsClient } from './utils/semanticSearch';
@@ -68,7 +69,9 @@ export const App: React.FC = () => {
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState<boolean>(false);
   const [isCardsModalOpen, setIsCardsModalOpen] = useState<boolean>(false);
   const [isToolsHubOpen, setIsToolsHubOpen] = useState<boolean>(false);
-  const [activeToolId, setActiveToolId] = useState<ToolId>('emi');
+  const [activeToolId, setActiveToolId] = useState<ToolId>('gst');
+  const [isFeatures150Open, setIsFeatures150Open] = useState<boolean>(false);
+  const [activeFeature150Id, setActiveFeature150Id] = useState<number>(1);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState<boolean>(false);
   const [compareDeals, setCompareDeals] = useState<PublicDeal[]>([]);
@@ -79,6 +82,11 @@ export const App: React.FC = () => {
   const handleOpenToolsHub = useCallback((toolId?: ToolId) => {
     if (toolId) setActiveToolId(toolId);
     setIsToolsHubOpen(true);
+  }, []);
+
+  const handleOpenFeatures150 = useCallback((featureId?: number) => {
+    if (featureId) setActiveFeature150Id(featureId);
+    setIsFeatures150Open(true);
   }, []);
 
   // Saved Deals (Favorites) State
@@ -361,7 +369,8 @@ export const App: React.FC = () => {
         onOpenSubmit={() => setIsSubmitOpen(true)}
         onFocusSearch={handleFocusSearch}
         onOpenCardsModal={() => setIsCardsModalOpen(true)}
-        onOpenToolsHub={() => handleOpenToolsHub('emi')}
+        onOpenToolsHub={() => handleOpenToolsHub('gst')}
+        onOpenFeatures150={() => handleOpenFeatures150(1)}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         isAudioEnabled={isAudioActive}
         onToggleAudio={handleToggleAudio}
@@ -629,6 +638,8 @@ export const App: React.FC = () => {
         onClose={() => setSelectedDetailDeal(null)}
         onShowToast={showToast}
         onToggleSave={handleToggleSaveDeal}
+        onOpenTool={(toolId) => handleOpenToolsHub(toolId as ToolId)}
+        onOpenFeature150={handleOpenFeatures150}
       />
 
       {/* ── Price Lookup Tool Modal ── */}
@@ -696,6 +707,17 @@ export const App: React.FC = () => {
         isOpen={isToolsHubOpen}
         onClose={() => setIsToolsHubOpen(false)}
         initialToolId={activeToolId}
+      />
+
+      {/* ── 150 Retail Decision Engines & Loot Intelligence Matrix ── */}
+      <FeatureCatalog150Modal
+        isOpen={isFeatures150Open}
+        onClose={() => setIsFeatures150Open(false)}
+        initialFeatureId={activeFeature150Id}
+        onOpenSpecificTool={(toolId) => {
+          setIsFeatures150Open(false);
+          handleOpenToolsHub(toolId as ToolId);
+        }}
       />
 
       {/* ── Floating Action Toast ── */}
