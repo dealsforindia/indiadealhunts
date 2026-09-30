@@ -472,8 +472,8 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             )}
           </div>
 
-          {/* Arbitrage Advantage Callout */}
-          {savings > 200 && (
+          {/* Verified MRP Discount Callout */}
+          {savings > 200 && mrp && (
             <div
               style={{
                 marginTop: '6px',
@@ -491,7 +491,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
               }}
             >
               <span>⚡</span>
-              <span>Lower than other major stores by ₹{savings.toLocaleString('en-IN')}</span>
+              <span>Verified drop: ₹{savings.toLocaleString('en-IN')} below MRP ({discount}% off)</span>
             </div>
           )}
 

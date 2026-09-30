@@ -352,6 +352,11 @@ export const App: React.FC = () => {
     return result;
   }, [deals, searchQuery, selectedCategory, selectedStore, activeTab, savedDealIds]);
 
+  const spotlightDeal = useMemo(() => {
+    if (!deals || deals.length === 0) return null;
+    return deals.find((d) => d.discount_pct && d.discount_pct >= 50 && d.price > 200 && d.image) || deals[0];
+  }, [deals]);
+
   const handleFocusSearch = () => {
     const inputEl = document.getElementById('hero-search-input') as HTMLInputElement | null;
     if (inputEl) {
@@ -469,10 +474,12 @@ export const App: React.FC = () => {
             }}
             highDiscountCount={flashLootCount}
             onFilterFlashLoot={handleFilterFlashLoot}
+            spotlightDeal={spotlightDeal}
           />
 
           {/* ── 2.5 Flash Category Stories Rail (Instagram-style) ── */}
           <CategoryStories
+            deals={deals}
             onSelectCategoryFilter={(cat) => {
               setSelectedCategory(cat);
               const dealGrid = document.getElementById('deals-section');

@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'motion/react';
+import { PublicDeal } from '../types';
+import { getCleanImageUrl } from '../utils/imageUrl';
 
 interface HeroBannerProps {
   searchQuery: string;
@@ -9,6 +11,7 @@ interface HeroBannerProps {
   onOpenLookup?: (url?: string) => void;
   highDiscountCount?: number;
   onFilterFlashLoot?: () => void;
+  spotlightDeal?: PublicDeal | null;
 }
 
 const QUICK_BUDGET_CHIPS = [
@@ -44,6 +47,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   onOpenLookup,
   highDiscountCount,
   onFilterFlashLoot,
+  spotlightDeal,
 }) => {
   const [input, setInput] = useState(searchQuery);
   const [isFocused, setIsFocused] = useState(false);
@@ -264,85 +268,111 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
           </div>
         </div>
 
-        {/* ── Right Column: Apple-Style #1 Spotlight Deal Card ── */}
+        {/* ── Right Column: Apple-Style #1 Spotlight Deal Card (Dynamic Real Deal) ── */}
         <div className="hidden lg:flex items-center justify-center">
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="w-full max-w-[380px] rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xl hover:shadow-2xl transition-all relative overflow-hidden group"
-          >
-            {/* Spotlight Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <span className="flex h-2 w-2 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-                </span>
-                <span className="font-mono text-[11px] font-extrabold uppercase tracking-wider text-slate-900">
-                  ⚡ Spotlight Loot Drop
-                </span>
-              </div>
-              <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                Score: 98/100
-              </span>
-            </div>
+          {(() => {
+            const activeSpotlight = spotlightDeal || {
+              id: 'spotlight-default',
+              title: 'boAt Airdopes 141 Pro True Wireless Earbuds',
+              price: 899,
+              mrp: 2499,
+              discount_pct: 64,
+              store: 'Amazon India',
+              image: 'https://m.media-amazon.com/images/I/51HBom8xz7L._SL1500_.jpg',
+              url: 'https://www.amazon.in/dp/B09N3ZNHTY?tag=dealshare0b7-21',
+            };
+            const spotPrice = activeSpotlight.price || 0;
+            const spotMrp = activeSpotlight.mrp && activeSpotlight.mrp > spotPrice ? activeSpotlight.mrp : undefined;
+            const spotSavings = spotMrp ? spotMrp - spotPrice : 0;
+            const spotDiscount = activeSpotlight.discount_pct || (spotMrp ? Math.round(((spotMrp - spotPrice) / spotMrp) * 100) : 0);
+            const spotImage = getCleanImageUrl(activeSpotlight.image) || 'https://m.media-amazon.com/images/I/51HBom8xz7L._SL1500_.jpg';
 
-            {/* Product Image Stage */}
-            <div className="relative aspect-[4/3] rounded-xl bg-slate-50 flex items-center justify-center p-4 my-3 overflow-hidden border border-slate-100">
-              <img
-                src="https://m.media-amazon.com/images/I/51HBom8xz7L._SL1500_.jpg"
-                alt="boAt Airdopes 141 Pro"
-                className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
-              />
-              <span className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg text-xs font-black tracking-wide bg-rose-600 text-white shadow-sm">
-                -64% OFF
-              </span>
-              <span className="absolute bottom-2.5 right-2.5 text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-white text-slate-700 border border-slate-200 shadow-2xs">
-                Amazon India
-              </span>
-            </div>
-
-            {/* Product Title & Info */}
-            <div className="flex flex-col gap-2">
-              <h3 className="font-heading text-sm font-bold text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
-                boAt Airdopes 141 Pro True Wireless Earbuds
-              </h3>
-
-              {/* Price Row */}
-              <div className="flex items-baseline gap-2">
-                <span className="font-mono text-2xl font-extrabold text-slate-900">
-                  ₹899
-                </span>
-                <span className="font-mono text-xs text-slate-400 line-through">
-                  ₹2,499
-                </span>
-                <span className="text-xs font-mono font-bold text-emerald-600 ml-auto">
-                  Save ₹1,600
-                </span>
-              </div>
-
-              {/* Claimed progress bar */}
-              <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mt-1">
-                <div className="bg-blue-600 h-full w-[72%] rounded-full" />
-              </div>
-              <div className="flex justify-between items-center text-[10.5px] font-mono text-slate-500">
-                <span>72% claimed</span>
-                <span className="text-amber-600 font-semibold">⚡ Lightning Deal</span>
-              </div>
-
-              {/* CTA Button */}
-              <a
-                href="https://www.amazon.in/dp/B09N3ZNHTY"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 w-full h-10 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs tracking-wide shadow-sm hover:shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="w-full max-w-[380px] rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xl hover:shadow-2xl transition-all relative overflow-hidden group"
               >
-                <span>Grab Spotlight Deal</span>
-                <span>→</span>
-              </a>
-            </div>
-          </motion.div>
+                {/* Spotlight Header */}
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-2 w-2 relative">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                    </span>
+                    <span className="font-mono text-[11px] font-extrabold uppercase tracking-wider text-slate-900">
+                      ⚡ Spotlight Loot Drop
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    Verified Drop
+                  </span>
+                </div>
+
+                {/* Product Image Stage */}
+                <div className="relative aspect-[4/3] rounded-xl bg-slate-50 flex items-center justify-center p-4 my-3 overflow-hidden border border-slate-100">
+                  <img
+                    src={spotImage}
+                    alt={activeSpotlight.title}
+                    className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+                  />
+                  {spotDiscount > 0 && (
+                    <span className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg text-xs font-black tracking-wide bg-rose-600 text-white shadow-sm">
+                      -{spotDiscount}% OFF
+                    </span>
+                  )}
+                  <span className="absolute bottom-2.5 right-2.5 text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-white text-slate-700 border border-slate-200 shadow-2xs">
+                    {activeSpotlight.store || 'Verified Store'}
+                  </span>
+                </div>
+
+                {/* Product Title & Info */}
+                <div className="flex flex-col gap-2">
+                  <h3 className="font-heading text-sm font-bold text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
+                    {activeSpotlight.title}
+                  </h3>
+
+                  {/* Price Row */}
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-mono text-2xl font-extrabold text-slate-900">
+                      ₹{spotPrice.toLocaleString('en-IN')}
+                    </span>
+                    {spotMrp && (
+                      <span className="font-mono text-xs text-slate-400 line-through">
+                        ₹{spotMrp.toLocaleString('en-IN')}
+                      </span>
+                    )}
+                    {spotSavings > 0 && (
+                      <span className="text-xs font-mono font-bold text-emerald-600 ml-auto">
+                        Save ₹{spotSavings.toLocaleString('en-IN')}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Verified indicator */}
+                  <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mt-1">
+                    <div className="bg-blue-600 h-full w-[88%] rounded-full" />
+                  </div>
+                  <div className="flex justify-between items-center text-[10.5px] font-mono text-slate-500">
+                    <span>Live merchant rate</span>
+                    <span className="text-amber-600 font-semibold">⚡ Verified Loot</span>
+                  </div>
+
+                  {/* CTA Button */}
+                  <a
+                    href={activeSpotlight.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 w-full h-10 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs tracking-wide shadow-sm hover:shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"
+                  >
+                    <span>Grab Spotlight Deal</span>
+                    <span>→</span>
+                  </a>
+                </div>
+              </motion.div>
+            );
+          })()}
         </div>
       </div>
     </section>

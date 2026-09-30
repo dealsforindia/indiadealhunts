@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
-import type { CategoryStoryCollection, StoriesResponse } from '../types';
+import type { CategoryStoryCollection, StoriesResponse, PublicDeal } from '../types';
 import { StoryModal } from './StoryModal';
 
 interface CategoryStoriesProps {
   onSelectCategoryFilter?: (catFilter: string) => void;
+  deals?: PublicDeal[];
 }
 
 const EDGE_API = import.meta.env.VITE_EDGE_API_URL || 'https://dealflow-edge.pottemasshippo.workers.dev';
@@ -194,11 +195,95 @@ const FALLBACK_STORIES: CategoryStoryCollection[] = [
   },
 ];
 
-export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCategoryFilter }) => {
+export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCategoryFilter, deals }) => {
   const [collections, setCollections] = useState<CategoryStoryCollection[]>(FALLBACK_STORIES);
   const [selectedStoryIndex, setSelectedStoryIndex] = useState<number | null>(null);
   const [viewedStoryIds, setViewedStoryIds] = useState<Set<string>>(new Set());
   const railRef = useRef<HTMLDivElement>(null);
+
+  // Automatically construct live stories from active deals if available
+  useEffect(() => {
+    if (!deals || deals.length === 0) return;
+
+    const liveSteals = deals.filter((d) => d.discount_pct && d.discount_pct >= 60 && d.image && d.price > 0).slice(0, 6);
+    const liveBudget = deals.filter((d) => d.price > 0 && d.price <= 499 && d.image).slice(0, 6);
+    const liveTech = deals.filter((d) => {
+      const c = (d.category || '').toLowerCase();
+      const t = (d.title || '').toLowerCase();
+      return (c.includes('mobile') || c.includes('electron') || c.includes('laptop') || /\b(phone|tws|earbuds|laptop|watch)\b/i.test(t)) && d.image;
+    }).slice(0, 6);
+    const liveFashion = deals.filter((d) => {
+      const c = (d.category || '').toLowerCase();
+      const t = (d.title || '').toLowerCase();
+      return (c.includes('fashion') || /\b(shoes|sneakers|shirt|kurti|dress|saree)\b/i.test(t)) && d.image;
+    }).slice(0, 6);
+    const liveGrocery = deals.filter((d) => {
+      const c = (d.category || '').toLowerCase();
+      const s = (d.store || '').toLowerCase();
+      return (c.includes('grocery') || c.includes('beauty') || s.includes('blinkit') || s.includes('swiggy') || s.includes('zepto')) && d.image;
+    }).slice(0, 6);
+
+    const dynamicStories: CategoryStoryCollection[] = [];
+    if (liveSteals.length > 0) {
+      dynamicStories.push({
+        id: 'loot70',
+        title: '70%+ Steals',
+        emoji: '⚡',
+        ring_color: 'from-amber-400 via-rose-500 to-purple-600',
+        badge: 'HOTTEST',
+        category_filter: 'loot70',
+        items: liveSteals,
+      });
+    }
+    if (liveBudget.length > 0) {
+      dynamicStories.push({
+        id: 'under199',
+        title: 'Under ₹499 Loot',
+        emoji: '🏷️',
+        ring_color: 'from-teal-400 via-emerald-500 to-green-600',
+        badge: 'BUDGET',
+        category_filter: 'all',
+        items: liveBudget,
+      });
+    }
+    if (liveTech.length > 0) {
+      dynamicStories.push({
+        id: 'tech',
+        title: 'Audio & Tech',
+        emoji: '🎧',
+        ring_color: 'from-sky-400 via-blue-500 to-indigo-600',
+        badge: 'TECH',
+        category_filter: 'Electronics',
+        items: liveTech,
+      });
+    }
+    if (liveFashion.length > 0) {
+      dynamicStories.push({
+        id: 'fashion',
+        title: 'Wardrobe Hauls',
+        emoji: '👗',
+        ring_color: 'from-pink-400 via-fuchsia-500 to-rose-600',
+        badge: 'STYLE',
+        category_filter: 'Fashion',
+        items: liveFashion,
+      });
+    }
+    if (liveGrocery.length > 0) {
+      dynamicStories.push({
+        id: 'quick_drop',
+        title: '10-Min Drops',
+        emoji: '🍏',
+        ring_color: 'from-emerald-400 via-teal-500 to-cyan-600',
+        badge: 'GROCERY',
+        category_filter: 'Grocery',
+        items: liveGrocery,
+      });
+    }
+
+    if (dynamicStories.length > 0) {
+      setCollections(dynamicStories);
+    }
+  }, [deals]);
 
   // Fetch real-time live curated stories from backend
   useEffect(() => {
@@ -229,7 +314,7 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
           }
         }
       } catch (err) {
-        console.warn('Stories endpoint background notice, using curated fallback:', err);
+        console.warn('Stories endpoint background notice, using dynamic deals:', err);
       }
     };
 
