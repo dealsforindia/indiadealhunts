@@ -24,8 +24,11 @@ import { CategoryStories } from './components/CategoryStories';
 import { CommandPalette } from './components/CommandPalette';
 import { CardCalculatorModal } from './components/CardCalculatorModal';
 import { CompareDrawer } from './components/CompareDrawer';
+import { ProductSpecCompareModal } from './components/ProductSpecCompareModal';
+import { CardEmiSimulatorModal } from './components/CardEmiSimulatorModal';
+import { PriceDropAlertModal } from './components/PriceDropAlertModal';
+import { PhoneExchangeEstimatorModal } from './components/PhoneExchangeEstimatorModal';
 import { ToolsHubModal, ToolId } from './components/tools/ToolsHubModal';
-import { FeatureCatalog150Modal } from './components/FeatureCatalog150Modal';
 import type { PublicDeal, PublicDealsResponse, SortOption, NavTab } from './types';
 import { calculateWorthScore } from './utils/worthScore';
 import { searchDealsClient } from './utils/semanticSearch';
@@ -51,8 +54,18 @@ export const App: React.FC = () => {
   const [selectedStore, setSelectedStore] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [debouncedSearch, setDebouncedSearch] = useState<string>('');
+  const [searchMode, setSearchMode] = useState<'db' | 'live'>('db');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  // Debounce search query (300ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim());
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Pagination
   const [totalDeals, setTotalDeals] = useState<number>(0);
@@ -62,6 +75,10 @@ export const App: React.FC = () => {
 
   // Modals & Power Tools
   const [selectedDetailDeal, setSelectedDetailDeal] = useState<PublicDeal | null>(null);
+  const [activeFeatureDeal, setActiveFeatureDeal] = useState<PublicDeal | null>(null);
+  const [isCardEmiOpen, setIsCardEmiOpen] = useState<boolean>(false);
+  const [isPriceAlertOpen, setIsPriceAlertOpen] = useState<boolean>(false);
+  const [isTradeInOpen, setIsTradeInOpen] = useState<boolean>(false);
   const [isLookupOpen, setIsLookupOpen] = useState<boolean>(false);
   const [lookupUrl, setLookupUrl] = useState<string>('');
   const [isSubmitOpen, setIsSubmitOpen] = useState<boolean>(false);
@@ -70,8 +87,6 @@ export const App: React.FC = () => {
   const [isCardsModalOpen, setIsCardsModalOpen] = useState<boolean>(false);
   const [isToolsHubOpen, setIsToolsHubOpen] = useState<boolean>(false);
   const [activeToolId, setActiveToolId] = useState<ToolId>('gst');
-  const [isFeatures150Open, setIsFeatures150Open] = useState<boolean>(false);
-  const [activeFeature150Id, setActiveFeature150Id] = useState<number>(1);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState<boolean>(false);
   const [compareDeals, setCompareDeals] = useState<PublicDeal[]>([]);
@@ -82,11 +97,6 @@ export const App: React.FC = () => {
   const handleOpenToolsHub = useCallback((toolId?: ToolId) => {
     if (toolId) setActiveToolId(toolId);
     setIsToolsHubOpen(true);
-  }, []);
-
-  const handleOpenFeatures150 = useCallback((featureId?: number) => {
-    if (featureId) setActiveFeature150Id(featureId);
-    setIsFeatures150Open(true);
   }, []);
 
   // Saved Deals (Favorites) State
@@ -195,12 +205,43 @@ export const App: React.FC = () => {
       setError(null);
 
       try {
+        // Mode 1: Live External Store Crawler
+        if (searchMode === 'live' && debouncedSearch) {
+          try {
+            const extRes = await fetch(`${API_BASE}/api/v1/deals/external-search?q=${encodeURIComponent(debouncedSearch)}`);
+            if (extRes.ok) {
+              const extData = await extRes.json();
+              if (extData && Array.isArray(extData.deals)) {
+                const incomingDeals: PublicDeal[] = extData.deals.map((deal: any) => {
+                  const score = typeof deal.worth_score === 'number' ? deal.worth_score : calculateWorthScore(deal).score;
+                  return {
+                    ...deal,
+                    worth_score: score,
+                    display_ts: deal.posted_at ? deal.posted_at * 1000 : Date.now(),
+                  };
+                });
+                setDeals(incomingDeals);
+                setTotalDeals(extData.count || incomingDeals.length);
+                setHasMore(false);
+                setSkip(0);
+                return;
+              }
+            }
+          } catch (extErr) {
+            console.warn('Live crawler fallback to DB:', extErr);
+          }
+        }
+
+        // Mode 2: 9,400+ Verified Deals Database (MongoDB)
         const params = new URLSearchParams({
-          limit: PAGE_SIZE.toString(),
+          limit: (debouncedSearch ? 80 : PAGE_SIZE).toString(),
           skip: currentSkip.toString(),
           sort: sortBy,
         });
 
+        if (debouncedSearch) {
+          params.append('search', debouncedSearch);
+        }
         if (selectedStore !== 'all') params.append('store', selectedStore);
         if (selectedCategory !== 'all') params.append('category', selectedCategory);
 
@@ -256,7 +297,7 @@ export const App: React.FC = () => {
         setLoadingMore(false);
       }
     },
-    [selectedStore, selectedCategory, sortBy]
+    [selectedStore, selectedCategory, sortBy, debouncedSearch, searchMode]
   );
 
   // Initial fetch and on filter/sort changes
@@ -275,9 +316,10 @@ export const App: React.FC = () => {
   const filteredDeals = useMemo(() => {
     let result = deals;
 
-    // Search query filtering
+    // Search query filtering: Rank / filter locally while preserving server results
     if (searchQuery.trim()) {
-      result = searchDealsClient(result, searchQuery).deals;
+      const clientFiltered = searchDealsClient(result, searchQuery).deals;
+      result = clientFiltered.length > 0 ? clientFiltered : result;
     }
 
     // Category filtering
@@ -370,7 +412,6 @@ export const App: React.FC = () => {
         onFocusSearch={handleFocusSearch}
         onOpenCardsModal={() => setIsCardsModalOpen(true)}
         onOpenToolsHub={() => handleOpenToolsHub('gst')}
-        onOpenFeatures150={() => handleOpenFeatures150(1)}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         isAudioEnabled={isAudioActive}
         onToggleAudio={handleToggleAudio}
@@ -417,6 +458,11 @@ export const App: React.FC = () => {
           <HeroBanner
             searchQuery={searchQuery}
             onSearch={(q) => setSearchQuery(q)}
+            searchMode={searchMode}
+            onSearchModeChange={(mode) => {
+              setSearchMode(mode);
+              showToast(mode === 'live' ? '🌐 Live Multi-Store Crawler Active' : '⚡ 9,400+ Verified Loot Drops Active');
+            }}
             onOpenLookup={(url) => {
               setLookupUrl(url || '');
               setIsLookupOpen(true);
@@ -460,6 +506,58 @@ export const App: React.FC = () => {
             id="deals-section"
             className="max-w-[1340px] mx-auto px-4 md:px-6 pt-4 pb-10 w-full"
           >
+            {/* ── Active Search Intelligence Telemetry Strip ── */}
+            {searchQuery.trim() && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-5 p-3.5 sm:p-4 rounded-2xl border border-blue-200/80 bg-gradient-to-r from-blue-50/90 via-sky-50/70 to-indigo-50/90 flex flex-wrap items-center justify-between gap-3 shadow-xs"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-base shadow-xs shrink-0">
+                    {searchMode === 'live' ? '🌐' : '⚡'}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs sm:text-sm font-bold text-slate-900 font-heading">
+                        {searchMode === 'live' ? 'Live Web Crawler Active' : '9,400+ Verified Deals Database'}
+                      </span>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-300">
+                        {filteredDeals.length} Verified Match{filteredDeals.length === 1 ? '' : 'es'}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 m-0 mt-0.5">
+                      Query: <span className="font-semibold text-blue-900 font-mono">"{searchQuery}"</span>
+                      {searchMode === 'db'
+                        ? ' • Natural Language budget & device matcher across 9,400 historical & live drops'
+                        : ' • Crawling real-time Amazon, Flipkart & Myntra storefronts via stealth proxy'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = searchMode === 'db' ? 'live' : 'db';
+                      setSearchMode(next);
+                      showToast(next === 'live' ? '🌐 Live Multi-Store Crawler Active' : '⚡ 9,400+ Verified Loot Drops Active');
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-bold cursor-pointer transition-colors shadow-2xs"
+                  >
+                    {searchMode === 'db' ? '🌐 Switch to Live Crawler' : '⚡ Switch to 9.4k Database'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold cursor-pointer transition-colors"
+                  >
+                    Clear ✕
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
             {/* Section Header */}
             <div className="flex items-center justify-between mb-5">
               <div>
@@ -571,6 +669,18 @@ export const App: React.FC = () => {
                         onToggleCompare={handleToggleCompare}
                         onShowToast={showToast}
                         onSelectDeal={(d) => setSelectedDetailDeal(d)}
+                        onOpenCardEmi={(d) => {
+                          setActiveFeatureDeal(d);
+                          setIsCardEmiOpen(true);
+                        }}
+                        onOpenPriceAlert={(d) => {
+                          setActiveFeatureDeal(d);
+                          setIsPriceAlertOpen(true);
+                        }}
+                        onOpenExchange={(d) => {
+                          setActiveFeatureDeal(d);
+                          setIsTradeInOpen(true);
+                        }}
                       />
                     ))}
                   </AnimatePresence>
@@ -639,7 +749,6 @@ export const App: React.FC = () => {
         onShowToast={showToast}
         onToggleSave={handleToggleSaveDeal}
         onOpenTool={(toolId) => handleOpenToolsHub(toolId as ToolId)}
-        onOpenFeature150={handleOpenFeatures150}
       />
 
       {/* ── Price Lookup Tool Modal ── */}
@@ -692,14 +801,45 @@ export const App: React.FC = () => {
         onOpenTool={handleOpenToolsHub}
       />
 
-      {/* ── Multi-Deal Comparison Drawer & Modal ── */}
+      {/* ── Multi-Deal Comparison Drawer & Floating Dock ── */}
       <CompareDrawer
         compareDeals={compareDeals}
-        isOpen={isCompareModalOpen}
+        isOpen={false}
         onOpenModal={() => setIsCompareModalOpen(true)}
         onCloseModal={() => setIsCompareModalOpen(false)}
         onRemoveDeal={handleRemoveCompareDeal}
         onClearAll={handleClearCompareAll}
+      />
+
+      {/* ── Product Spec Comparison Modal (Detailed Tech Specs, 5% Cashback, GST ITC) ── */}
+      <ProductSpecCompareModal
+        isOpen={isCompareModalOpen}
+        onClose={() => setIsCompareModalOpen(false)}
+        deals={compareDeals}
+        onRemoveDeal={handleRemoveCompareDeal}
+        onClearAll={handleClearCompareAll}
+      />
+
+      {/* ── Bank Cards & EMI Simulator Modal (HDFC, ICICI, SBI, Axis, Amazon Pay + No-Cost EMI) ── */}
+      <CardEmiSimulatorModal
+        isOpen={isCardEmiOpen}
+        onClose={() => setIsCardEmiOpen(false)}
+        deal={activeFeatureDeal}
+      />
+
+      {/* ── Target Price Drop Alert Modal (Wired to MongoDB PriceAlerts) ── */}
+      <PriceDropAlertModal
+        isOpen={isPriceAlertOpen}
+        onClose={() => setIsPriceAlertOpen(false)}
+        deal={activeFeatureDeal}
+        onSuccessToast={showToast}
+      />
+
+      {/* ── Old Phone Trade-In & Exchange Estimator Modal (Condition grading & cash-in value) ── */}
+      <PhoneExchangeEstimatorModal
+        isOpen={isTradeInOpen}
+        onClose={() => setIsTradeInOpen(false)}
+        deal={activeFeatureDeal}
       />
 
       {/* ── Shopping Utilities & Loot Lab Suite (EMI, Shrinkflation, Energy, Warranties, Budgeting) ── */}
@@ -707,17 +847,6 @@ export const App: React.FC = () => {
         isOpen={isToolsHubOpen}
         onClose={() => setIsToolsHubOpen(false)}
         initialToolId={activeToolId}
-      />
-
-      {/* ── 150 Retail Decision Engines & Loot Intelligence Matrix ── */}
-      <FeatureCatalog150Modal
-        isOpen={isFeatures150Open}
-        onClose={() => setIsFeatures150Open(false)}
-        initialFeatureId={activeFeature150Id}
-        onOpenSpecificTool={(toolId) => {
-          setIsFeatures150Open(false);
-          handleOpenToolsHub(toolId as ToolId);
-        }}
       />
 
       {/* ── Floating Action Toast ── */}

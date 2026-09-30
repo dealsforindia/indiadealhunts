@@ -4,18 +4,29 @@ import { motion } from 'motion/react';
 interface HeroBannerProps {
   searchQuery: string;
   onSearch: (query: string) => void;
+  searchMode?: 'db' | 'live';
+  onSearchModeChange?: (mode: 'db' | 'live') => void;
   onOpenLookup?: (url?: string) => void;
   highDiscountCount?: number;
   onFilterFlashLoot?: () => void;
 }
 
+const QUICK_BUDGET_CHIPS = [
+  { label: '📱 Mobiles Under 320k', query: 'mobile under 320k' },
+  { label: '📱 Mobiles Under 25k', query: 'mobile under 25k' },
+  { label: '📱 Mobiles Under 40k', query: 'mobile under 40k' },
+  { label: '🍏 iPhones Under 100k', query: 'iphone under 100k' },
+  { label: '💻 Laptops Under 50k', query: 'laptop under 50k' },
+  { label: '🎧 TWS Under 1500', query: 'earbuds under 1500' },
+];
+
 const POPULAR_SEARCHES = [
-  'TWS under 999',
-  'iPhone 16',
-  'Gaming Laptops',
+  'mobile under 320k',
+  'mobile under 25k',
+  'iPhone 16 / 17',
+  'Gaming Laptops under 50k',
   'Smart TV 55"',
-  "Men's Sneakers",
-  'Kitchen Air Fryer',
+  'TWS under 999',
 ];
 
 const QUICK_STORES = [
@@ -28,6 +39,8 @@ const QUICK_STORES = [
 export const HeroBanner: React.FC<HeroBannerProps> = ({
   searchQuery,
   onSearch,
+  searchMode = 'db',
+  onSearchModeChange,
   onOpenLookup,
   highDiscountCount,
   onFilterFlashLoot,
@@ -102,6 +115,36 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
             Scraped instantly from top curator channels and verified against 90-day price trends. Never overpay on Amazon, Flipkart, or Myntra again.
           </p>
 
+          {/* Search Source Selector */}
+          {onSearchModeChange && (
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100/90 border border-slate-200/80 w-fit text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => onSearchModeChange('db')}
+                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                  searchMode === 'db'
+                    ? 'bg-white text-slate-900 shadow-xs font-bold'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <span>⚡ 9,400+ Verified Loot Drops</span>
+                <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-100 text-emerald-700">Real Data</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onSearchModeChange('live')}
+                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                  searchMode === 'live'
+                    ? 'bg-blue-600 text-white shadow-xs font-bold'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <span>🌐 Live Multi-Store Crawler</span>
+                <span className="px-1.5 py-0.5 rounded text-[10px] bg-blue-100 text-blue-700">Live</span>
+              </button>
+            </div>
+          )}
+
           {/* ── Floating White Search Capsule ── */}
           <div className={`relative flex items-center h-14 w-full rounded-2xl bg-white border transition-all duration-200 ${
             isFocused
@@ -125,7 +168,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
               onKeyDown={(e) => {
                 if (e.key === 'Enter') submitSearch();
               }}
-              placeholder="Search 3,350+ drops, products or paste product link..."
+              placeholder={searchMode === 'live' ? "Live crawler: 'mobile under 320k', 'samsung galaxy'..." : "Search 9,400+ verified drops, e.g. 'mobile under 320k' or paste link..."}
               aria-label="Search deals or paste product URL"
               id="hero-search-input"
               className="flex-1 bg-transparent border-0 outline-none text-sm sm:text-base text-slate-900 placeholder:text-slate-400 px-2 min-w-0"
@@ -159,6 +202,29 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </button>
+            </div>
+          </div>
+
+          {/* ── Quick Budget Filter Chips ── */}
+          <div className="flex flex-col gap-2 pt-0.5">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[11px] font-mono uppercase text-slate-400 font-semibold tracking-wider flex items-center gap-1">
+                <span>🎯</span> Quick Budgets:
+              </span>
+              {QUICK_BUDGET_CHIPS.map((chip) => (
+                <button
+                  key={chip.query}
+                  type="button"
+                  onClick={() => handleChipClick(chip.query)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer flex items-center gap-1 ${
+                    input.toLowerCase().includes(chip.query.toLowerCase())
+                      ? 'bg-blue-50 border-blue-300 text-blue-700 font-bold shadow-2xs'
+                      : 'bg-white/80 border-slate-200/80 hover:bg-slate-100 text-slate-700'
+                  }`}
+                >
+                  <span>{chip.label}</span>
+                </button>
+              ))}
             </div>
           </div>
 

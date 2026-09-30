@@ -17,6 +17,9 @@ interface PublicDealCardProps {
   onSelectDeal?: (deal: PublicDeal) => void;
   onToggleSave?: (deal: PublicDeal) => void;
   onToggleCompare?: (deal: PublicDeal) => void;
+  onOpenCardEmi?: (deal: PublicDeal) => void;
+  onOpenPriceAlert?: (deal: PublicDeal) => void;
+  onOpenExchange?: (deal: PublicDeal) => void;
   onShowToast?: (msg: string) => void;
 }
 
@@ -89,6 +92,9 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   onSelectDeal,
   onToggleSave,
   onToggleCompare,
+  onOpenCardEmi,
+  onOpenPriceAlert,
+  onOpenExchange,
   onShowToast,
 }) => {
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -799,6 +805,121 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Quick Shopping Utilities Bar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', paddingTop: '6px', paddingBottom: '2px', overflowX: 'auto' }}>
+          {onOpenCardEmi && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenCardEmi(deal);
+              }}
+              style={{
+                padding: '4px 8px',
+                borderRadius: '6px',
+                backgroundColor: '#ECFDF5',
+                color: '#065F46',
+                fontSize: '11px',
+                fontWeight: 600,
+                border: '1px solid #A7F3D0',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                whiteSpace: 'nowrap',
+              }}
+              title="Calculate Bank Card Discount & EMI"
+            >
+              <span>💳</span>
+              <span>Cards & EMI</span>
+            </button>
+          )}
+
+          {onOpenPriceAlert && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenPriceAlert(deal);
+              }}
+              style={{
+                padding: '4px 8px',
+                borderRadius: '6px',
+                backgroundColor: '#FFFBEB',
+                color: '#92400E',
+                fontSize: '11px',
+                fontWeight: 600,
+                border: '1px solid #FDE68A',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                whiteSpace: 'nowrap',
+              }}
+              title="Set Target Price Drop Alert"
+            >
+              <span>🔔</span>
+              <span>Alert</span>
+            </button>
+          )}
+
+          {onOpenExchange && (deal.price >= 5000 || (deal.category || '').toLowerCase().includes('mobile') || (deal.category || '').toLowerCase().includes('electron')) && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenExchange(deal);
+              }}
+              style={{
+                padding: '4px 8px',
+                borderRadius: '6px',
+                backgroundColor: '#EEF2FF',
+                color: '#3730A3',
+                fontSize: '11px',
+                fontWeight: 600,
+                border: '1px solid #C7D2FE',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                whiteSpace: 'nowrap',
+              }}
+              title="Estimate Phone Trade-in / Exchange Value"
+            >
+              <span>🔄</span>
+              <span>Trade-in</span>
+            </button>
+          )}
+
+          {onToggleCompare && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleCompare(deal);
+              }}
+              style={{
+                padding: '4px 8px',
+                borderRadius: '6px',
+                backgroundColor: isComparing ? '#2563EB' : '#F8FAFC',
+                color: isComparing ? '#FFFFFF' : '#334155',
+                fontSize: '11px',
+                fontWeight: 600,
+                border: isComparing ? '1px solid #2563EB' : '1px solid #E2E8F0',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                whiteSpace: 'nowrap',
+              }}
+              title="Compare side by side"
+            >
+              <span>⚖️</span>
+              <span>{isComparing ? 'Comparing' : 'Compare'}</span>
+            </button>
+          )}
         </div>
 
         {/* Primary Action Button: ⚡ GRAB DEAL → */}

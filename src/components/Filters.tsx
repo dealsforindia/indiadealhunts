@@ -27,13 +27,15 @@ const STORES = [
 
 const CATEGORIES = [
   { id: 'all', label: 'All Categories' },
-  { id: 'Electronics', label: 'Electronics' },
-  { id: 'Fashion', label: 'Fashion' },
-  { id: 'Home', label: 'Home & Living' },
-  { id: 'Kitchen', label: 'Kitchen' },
-  { id: 'Grocery', label: 'Grocery & Food' },
-  { id: 'Beauty', label: 'Beauty & Personal' },
-  { id: 'Sports', label: 'Sports & Fitness' },
+  { id: 'Mobiles', label: '📱 Mobiles & 5G' },
+  { id: 'Electronics', label: '🔌 Electronics' },
+  { id: 'Laptops', label: '💻 Laptops' },
+  { id: 'Fashion', label: '👗 Fashion' },
+  { id: 'Home', label: '🏠 Home & Living' },
+  { id: 'Kitchen', label: '🍳 Kitchen' },
+  { id: 'Grocery', label: '🍎 Grocery & Food' },
+  { id: 'Beauty', label: '💄 Beauty & Personal' },
+  { id: 'Sports', label: '🏋️ Sports & Fitness' },
 ];
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
