@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
+import { ToolId } from './tools/ToolsHubModal';
 
 interface CommandPaletteProps {
   isOpen: boolean;
@@ -10,7 +11,116 @@ interface CommandPaletteProps {
   deals: PublicDeal[];
   onSelectDeal: (deal: PublicDeal) => void;
   onSearchSubmit: (query: string) => void;
+  onOpenTool?: (toolId: ToolId) => void;
 }
+
+interface QuickToolItem {
+  id: ToolId;
+  name: string;
+  icon: string;
+  desc: string;
+  badge: string;
+  keywords: string[];
+}
+
+const QUICK_TOOLS: QuickToolItem[] = [
+  {
+    id: 'gst',
+    name: 'GST Input Tax Credit & Depreciation Shield',
+    icon: '🧾',
+    desc: '18%/28% ITC + Sec 32 depreciation shield for businesses',
+    badge: 'TAX',
+    keywords: ['gst', 'itc', 'tax', 'invoice', 'depreciation', 'b2b', 'laptop gst'],
+  },
+  {
+    id: 'bank_offers',
+    name: 'Bank Offer Stacking Optimizer',
+    icon: '💳',
+    desc: '10% instant vs 5% cashback & SmartBuy Gyftr vouchers',
+    badge: 'CARDS',
+    keywords: ['bank', 'card', 'cashback', 'credit', 'hdfc', 'icici', 'gyftr', 'smartbuy', 'offer'],
+  },
+  {
+    id: 'qcommerce',
+    name: 'Quick Commerce Surge & Cart Filler Finder',
+    icon: '⚡',
+    desc: 'Blinkit, Zepto, Instamart surge fee bypass & ₹10-₹30 fillers',
+    badge: 'GROCERY',
+    keywords: ['blinkit', 'zepto', 'instamart', 'quick', 'grocery', 'surge', 'filler', 'delivery fee'],
+  },
+  {
+    id: 'customs',
+    name: 'Cross-Border Tech Import & Customs Duty',
+    icon: '🛃',
+    desc: 'BCD, SWS, IGST & courier clearance on imports (AliExpress, Drop)',
+    badge: 'IMPORTS',
+    keywords: ['customs', 'duty', 'import', 'aliexpress', 'drop', 'tax', 'international', 'hsn'],
+  },
+  {
+    id: 'returns',
+    name: 'Return Window & Open Box Delivery Sentinel',
+    icon: '🛡️',
+    desc: 'Pre-OTP inspection checklist & legal dispute notice generator',
+    badge: 'RIGHTS',
+    keywords: ['return', 'refund', 'open box', 'obd', 'replacement', 'dispute', 'otp', 'legal'],
+  },
+  {
+    id: 'exchange',
+    name: 'Phone Exchange vs. Cashify Valuation',
+    icon: '📱',
+    desc: 'Flipkart exchange vs Cashify cash & festive bonus comparison',
+    badge: 'TRADE-IN',
+    keywords: ['exchange', 'phone', 'mobile', 'cashify', 'trade in', 'trade-in', 'iphone exchange'],
+  },
+  {
+    id: 'subs',
+    name: 'Subscription Payback & Break-Even Sentinel',
+    icon: '🍿',
+    desc: 'Amazon Prime, Swiggy One, Flipkart VIP payback audit',
+    badge: 'SUBS',
+    keywords: ['prime', 'swiggy one', 'zomato gold', 'flipkart vip', 'subscription', 'break even'],
+  },
+  {
+    id: 'emi',
+    name: 'No-Cost EMI & Hidden Cost Analyzer',
+    icon: '📊',
+    desc: '18% GST on interest & processing fees reality check',
+    badge: 'BANKING',
+    keywords: ['emi', 'loan', 'interest', 'no cost', 'no-cost', 'hidden charge'],
+  },
+  {
+    id: 'unit_price',
+    name: 'Grocery Unit Price & Shrinkflation Detective',
+    icon: '⚖️',
+    desc: 'Compare price per 100g/liter across pack sizes',
+    badge: 'FMCG',
+    keywords: ['unit price', 'shrinkflation', 'pack', 'gram', 'liter', 'grocery rate'],
+  },
+  {
+    id: 'energy',
+    name: 'Appliance 5-Year Electricity & BEE Payback',
+    icon: '💡',
+    desc: '5-Star vs 3-Star AC electricity cost recovery analysis',
+    badge: 'POWER',
+    keywords: ['energy', 'power', 'star', 'ac', 'refrigerator', 'bee', 'electricity', 'units'],
+  },
+  {
+    id: 'warranty',
+    name: 'Gadget & Appliance Warranty Vault',
+    icon: '🗄️',
+    desc: 'Track invoices & official brand service helplines',
+    badge: 'VAULT',
+    keywords: ['warranty', 'guarantee', 'invoice', 'service center', 'repair'],
+  },
+  {
+    id: 'budget',
+    name: 'Festival Sale Budget & Anti-FOMO Planner',
+    icon: '🎯',
+    desc: 'Diwali / BBD budget envelope & impulse regret score',
+    badge: 'BUDGET',
+    keywords: ['budget', 'festival', 'diwali', 'bbd', 'fomo', 'planner', 'impulse'],
+  },
+];
 
 const TRENDING_KEYWORDS = [
   'TWS Earbuds under 999',
@@ -28,6 +138,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   deals,
   onSelectDeal,
   onSearchSubmit,
+  onOpenTool,
 }) => {
   const [query, setQuery] = useState('');
   const [selectedStore, setSelectedStore] = useState('all');
@@ -46,6 +157,20 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       };
     }
   }, [isOpen]);
+
+  // Match Tools
+  const matchingTools = useMemo(() => {
+    const q = query.toLowerCase().trim();
+    if (!q) return [];
+    return QUICK_TOOLS.filter((t) => {
+      return (
+        t.name.toLowerCase().includes(q) ||
+        t.desc.toLowerCase().includes(q) ||
+        t.badge.toLowerCase().includes(q) ||
+        t.keywords.some((k) => k.includes(q))
+      );
+    }).slice(0, 3);
+  }, [query]);
 
   const filteredResults = useMemo(() => {
     const q = query.toLowerCase().trim();
@@ -77,7 +202,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         e.preventDefault();
         setSelectedIndex((prev) => (prev > 0 ? prev - 1 : 0));
       } else if (e.key === 'Enter') {
-        if (filteredResults[selectedIndex]) {
+        if (matchingTools.length > 0 && selectedIndex === 0 && onOpenTool) {
+          e.preventDefault();
+          onOpenTool(matchingTools[0].id);
+          onClose();
+        } else if (filteredResults[selectedIndex]) {
           e.preventDefault();
           onSelectDeal(filteredResults[selectedIndex]);
           onClose();
@@ -90,7 +219,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, selectedIndex, filteredResults, query, onSelectDeal, onSearchSubmit, onClose]);
+  }, [isOpen, selectedIndex, filteredResults, matchingTools, query, onSelectDeal, onSearchSubmit, onOpenTool, onClose]);
 
   if (!isOpen) return null;
 
@@ -121,7 +250,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               setQuery(e.target.value);
               setSelectedIndex(0);
             }}
-            placeholder="Search deals, products, or stores (e.g. iPhone, Puma, Shoes)..."
+            placeholder="Search deals, products, or utilities (e.g. iPhone, GST, Blinkit, EMI)..."
             className="flex-1 bg-transparent border-none text-slate-900 placeholder:text-slate-400 text-sm sm:text-base focus:outline-none font-medium"
           />
           {query && (
@@ -137,6 +266,47 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             ESC
           </span>
         </div>
+
+        {/* Quick Tools Match Section if query matches any utility */}
+        {matchingTools.length > 0 && onOpenTool && (
+          <div className="p-2 border-b border-slate-100 bg-slate-50/70">
+            <div className="px-2 py-1 text-[10.5px] font-mono font-bold text-slate-400 uppercase tracking-wider">
+              Shopping Utility Engines
+            </div>
+            <div className="space-y-1">
+              {matchingTools.map((tool) => (
+                <div
+                  key={tool.id}
+                  onClick={() => {
+                    onOpenTool(tool.id);
+                    onClose();
+                  }}
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-white hover:bg-slate-100/90 border border-slate-200/80 cursor-pointer transition-colors"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="text-xl shrink-0">{tool.icon}</span>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-bold text-slate-900 truncate">
+                          {tool.name}
+                        </span>
+                        <span className="text-[9.5px] font-mono font-bold px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+                          {tool.badge}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-slate-500 truncate">
+                        {tool.desc}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-bold text-indigo-600 shrink-0 ml-2">
+                    Open Engine →
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Quick Store Filter Pills */}
         <div className="flex items-center gap-1.5 px-4 py-2 border-b border-slate-100 bg-white overflow-x-auto text-xs">
@@ -220,25 +390,42 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           )}
         </div>
 
-        {/* Trending Searches Footer */}
-        <div className="px-4 py-3 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center gap-1.5 text-xs">
-          <span className="text-[10.5px] font-mono font-bold text-slate-400 uppercase">
-            Trending:
-          </span>
-          {TRENDING_KEYWORDS.map((kw) => (
-            <button
-              key={kw}
-              type="button"
-              onClick={() => {
-                setQuery(kw);
-                onSearchSubmit(kw);
-                onClose();
-              }}
-              className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 hover:text-blue-600 hover:border-blue-300 font-medium cursor-pointer transition-colors text-[11px]"
-            >
-              {kw}
-            </button>
-          ))}
+        {/* Trending Searches & Utilities Footer */}
+        <div className="px-4 py-3 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[10.5px] font-mono font-bold text-slate-400 uppercase">
+              Trending:
+            </span>
+            {TRENDING_KEYWORDS.map((kw) => (
+              <button
+                key={kw}
+                type="button"
+                onClick={() => {
+                  setQuery(kw);
+                  onSearchSubmit(kw);
+                  onClose();
+                }}
+                className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 hover:text-blue-600 hover:border-blue-300 font-medium cursor-pointer transition-colors text-[11px]"
+              >
+                {kw}
+              </button>
+            ))}
+          </div>
+
+          {onOpenTool && (
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => {
+                  onOpenTool('gst');
+                  onClose();
+                }}
+                className="text-[11px] font-bold text-indigo-700 hover:underline cursor-pointer"
+              >
+                🧰 All 12 Engines
+              </button>
+            </div>
+          )}
         </div>
       </motion.div>
     </div>,

@@ -1,13 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
+
+// Tool Components
 import { EMICalculatorTool } from './EMICalculatorTool';
+import { BankOfferStackingOptimizer } from './BankOfferStackingOptimizer';
+import { GSTInputTaxCreditCalculator } from './GSTInputTaxCreditCalculator';
 import { UnitPricingCalculatorTool } from './UnitPricingCalculatorTool';
+import { QuickCommerceDeliveryFeeOptimizer } from './QuickCommerceDeliveryFeeOptimizer';
 import { ApplianceEnergyCostCalculatorTool } from './ApplianceEnergyCostCalculatorTool';
+import { CustomsDutyImportCalculator } from './CustomsDutyImportCalculator';
+import { SubscriptionBreakEvenCalculator } from './SubscriptionBreakEvenCalculator';
+import { ReturnWindowWarrantySentinel } from './ReturnWindowWarrantySentinel';
+import { MobileExchangeValueAuditor } from './MobileExchangeValueAuditor';
 import { WarrantyExpiryTrackerTool } from './WarrantyExpiryTrackerTool';
 import { SaleBudgetPlannerTool } from './SaleBudgetPlannerTool';
 
-export type ToolId = 'emi' | 'unit_price' | 'energy' | 'warranty' | 'budget';
+export type ToolId =
+  | 'gst'
+  | 'bank_offers'
+  | 'emi'
+  | 'qcommerce'
+  | 'unit_price'
+  | 'customs'
+  | 'subs'
+  | 'returns'
+  | 'exchange'
+  | 'energy'
+  | 'warranty'
+  | 'budget';
+
+export type ToolCategory =
+  | 'all'
+  | 'banking_taxes'
+  | 'smart_checkout'
+  | 'tech_postpurchase'
+  | 'planning';
 
 interface ToolMeta {
   id: ToolId;
@@ -16,49 +44,132 @@ interface ToolMeta {
   tagline: string;
   icon: string;
   badge: string;
+  category: ToolCategory;
+  highlightTag?: string;
 }
 
 const TOOLS_CATALOG: ToolMeta[] = [
   {
+    id: 'gst',
+    title: 'GST Input Tax Credit (ITC) & Depreciation Shield',
+    shortName: 'GST ITC Shield',
+    tagline: 'Claim 18% or 28% GST on business invoices + Sec 32 Year-1 40% depreciation shield',
+    icon: '🧾',
+    badge: 'TAX & B2B',
+    category: 'banking_taxes',
+    highlightTag: 'Saves 35%+',
+  },
+  {
+    id: 'bank_offers',
+    title: 'Bank Offer Stacking & 10% vs 5% Cashback Optimizer',
+    shortName: 'Bank Offer Stacking',
+    tagline: 'Resolve 10% Instant Discount vs 5% Unlimited Cashback & SmartBuy Gyftr vouchers',
+    icon: '💳',
+    badge: 'CARDS & REWARDS',
+    category: 'banking_taxes',
+    highlightTag: 'SmartBuy 16.6%',
+  },
+  {
     id: 'emi',
     title: 'No-Cost EMI & Hidden Cost Analyzer',
     shortName: 'EMI Reality Check',
-    tagline: 'Calculates 18% GST on interest & bank processing fees hidden in "0% Interest" schemes',
-    icon: '💳',
+    tagline: 'Unmasks 18% GST on interest & bank processing fees hidden in "0% Interest" schemes',
+    icon: '📊',
     badge: 'BANKING',
+    category: 'banking_taxes',
+  },
+  {
+    id: 'qcommerce',
+    title: 'Quick Commerce Surge, Delivery & Cart Filler Optimizer',
+    shortName: 'Quick Commerce Surge',
+    tagline: 'Blinkit vs Zepto vs Instamart small-cart surcharge optimizer & magic cart filler finder',
+    icon: '⚡',
+    badge: '10-MIN GROCERY',
+    category: 'smart_checkout',
+    highlightTag: 'Zero Surge',
   },
   {
     id: 'unit_price',
     title: 'Grocery Unit Price & Shrinkflation Detective',
-    shortName: 'FMCG Unit Rates',
-    tagline: 'Compare Blinkit, Zepto & Amazon pack sizes to find the true cheapest cost per 100g',
+    shortName: 'Unit Price Detective',
+    tagline: 'Compare multi-packs, grams, and liters across stores to expose fake discounts',
     icon: '⚖️',
-    badge: 'QUICK COMMERCE',
+    badge: 'FMCG MATH',
+    category: 'smart_checkout',
+  },
+  {
+    id: 'subs',
+    title: 'Subscription Payback & Break-Even Sentinel',
+    shortName: 'Subscription ROI',
+    tagline: 'Amazon Prime vs Swiggy One vs Flipkart VIP break-even order frequency audit',
+    icon: '🍿',
+    badge: 'MEMBERSHIPS',
+    category: 'smart_checkout',
+  },
+  {
+    id: 'customs',
+    title: 'Cross-Border Tech Import & Customs Duty Sentinel',
+    shortName: 'Customs & Import Duty',
+    tagline: 'Compute BCD, Social Welfare Surcharge, IGST, and courier fees on AliExpress/Drop tech',
+    icon: '🛃',
+    badge: 'CROSS-BORDER',
+    category: 'tech_postpurchase',
+    highlightTag: 'CBIC 2024',
+  },
+  {
+    id: 'returns',
+    title: 'E-Commerce Return Window & Open Box Delivery Sentinel',
+    shortName: 'Return & OBD Sentinel',
+    tagline: 'Return deadline countdown, 6-step pre-OTP unboxing protocol, and legal dispute drafter',
+    icon: '🛡️',
+    badge: 'CONSUMER LAW',
+    category: 'tech_postpurchase',
+    highlightTag: 'Pre-OTP Check',
+  },
+  {
+    id: 'exchange',
+    title: 'Phone Exchange vs. Cashify Valuation Sentinel',
+    shortName: 'Mobile Trade-In',
+    tagline: 'Model doorstep cosmetic deductions, screen scratches, and festive exchange bonuses',
+    icon: '📱',
+    badge: 'TRADE-IN',
+    category: 'tech_postpurchase',
   },
   {
     id: 'energy',
     title: 'Appliance 5-Year Electricity & BEE Payback',
     shortName: '5-Year Power Cost',
     tagline: 'Determine if paying ₹7,000 more for a 5-Star AC recovers its cost in electricity bills',
-    icon: '⚡',
+    icon: '💡',
     badge: 'APPLIANCES',
+    category: 'tech_postpurchase',
   },
   {
     id: 'warranty',
     title: 'Gadget & Appliance Warranty Vault',
     shortName: 'Warranty Tracker',
     tagline: 'Track purchase dates, invoice numbers & official Indian service support directories',
-    icon: '🛡️',
+    icon: '🗄️',
     badge: 'POST-PURCHASE',
+    category: 'tech_postpurchase',
   },
   {
     id: 'budget',
     title: 'Festival Sale Budget & Anti-FOMO Planner',
     shortName: 'Sale Budgeting',
-    tagline: 'Allocate your Diwali / BBD budget and evaluate impulse regret risk score before buying',
+    tagline: 'Allocate Diwali / BBD budget and evaluate impulse regret risk score before buying',
     icon: '🎯',
     badge: 'FINANCIAL HEALTH',
+    category: 'planning',
   },
+];
+
+const CATEGORIES = [
+  { id: 'all' as ToolCategory, name: 'All Engines (12)' },
+  { id: 'banking_taxes' as ToolCategory, name: 'Taxes & Cards (3)' },
+  { id: 'smart_checkout' as ToolCategory, name: 'Smart Checkout (3)' },
+  { id: 'tech_postpurchase' as ToolCategory, name: 'Tech & Returns (5)' },
+  { id: 'planning' as ToolCategory, name: 'Budgeting (1)' },
 ];
 
 interface ToolsHubModalProps {
@@ -70,9 +181,10 @@ interface ToolsHubModalProps {
 export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
   isOpen,
   onClose,
-  initialToolId = 'emi',
+  initialToolId = 'gst',
 }) => {
   const [activeToolId, setActiveToolId] = useState<ToolId>(initialToolId);
+  const [activeCategory, setActiveCategory] = useState<ToolCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -97,19 +209,29 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  const filteredTools = useMemo(() => {
+    return TOOLS_CATALOG.filter((t) => {
+      if (activeCategory !== 'all' && t.category !== activeCategory) {
+        return false;
+      }
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        t.title.toLowerCase().includes(q) ||
+        t.tagline.toLowerCase().includes(q) ||
+        t.shortName.toLowerCase().includes(q) ||
+        t.badge.toLowerCase().includes(q)
+      );
+    });
+  }, [activeCategory, searchQuery]);
 
-  const filteredTools = TOOLS_CATALOG.filter((t) => {
-    if (!searchQuery.trim()) return true;
-    const q = searchQuery.toLowerCase();
-    return t.title.toLowerCase().includes(q) || t.tagline.toLowerCase().includes(q) || t.shortName.toLowerCase().includes(q);
-  });
+  if (!isOpen) return null;
 
   const activeTool = TOOLS_CATALOG.find((t) => t.id === activeToolId) || TOOLS_CATALOG[0];
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-label="Shopping Utilities & Tools Hub"
@@ -122,50 +244,93 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.96, opacity: 0, y: 10 }}
         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        className="relative w-full max-w-5xl max-h-[calc(100dvh-2rem)] flex flex-col bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden overscroll-contain"
+        className="relative w-full max-w-6xl max-h-[calc(100dvh-1.5rem)] flex flex-col bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white">
+        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-slate-200 bg-white">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-black text-lg shadow-sm">
               🧰
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-heading font-extrabold text-lg text-slate-900 tracking-tight">
+                <h2 className="font-heading font-extrabold text-base sm:text-lg text-slate-900 tracking-tight">
                   Shopping Utilities &amp; Loot Lab
                 </h2>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                  5 INDEPENDENT ENGINES
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  12 VERIFIED ENGINES
                 </span>
               </div>
-              <p className="text-xs text-slate-500 font-medium">
-                High-utility calculators and tools engineered specifically for Indian retail shoppers.
+              <p className="text-xs text-slate-500 font-medium line-clamp-1">
+                Deep Indian retail calculation suites: GST ITC, card stacking, quick-commerce surge, customs duty, and return windows.
               </p>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close dialog"
-            className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors flex items-center justify-center cursor-pointer text-sm font-bold"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center relative w-48">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search 12 tools..."
+                className="w-full pl-7 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:bg-white focus:outline-none focus:border-slate-400"
+              />
+              <span className="absolute left-2.5 text-xs text-slate-400">🔍</span>
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2 text-xs text-slate-400 hover:text-slate-600"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close dialog"
+              className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors flex items-center justify-center cursor-pointer text-sm font-bold"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        {/* Category Filter Chips Bar */}
+        <div className="px-5 sm:px-6 py-2 bg-slate-100/70 border-b border-slate-200/80 flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+          {CATEGORIES.map((cat) => {
+            const isCatActive = activeCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setActiveCategory(cat.id)}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  isCatActive
+                    ? 'bg-slate-900 text-white shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                }`}
+              >
+                {cat.name}
+              </button>
+            );
+          })}
         </div>
 
         {/* Tool Navigation Pill Strip */}
-        <div className="px-6 py-2.5 bg-slate-50/80 border-b border-slate-200/80 overflow-x-auto flex items-center gap-2 scrollbar-none">
-          {TOOLS_CATALOG.map((tool) => {
+        <div className="px-5 sm:px-6 py-2.5 bg-slate-50/90 border-b border-slate-200/80 overflow-x-auto flex items-center gap-2 scrollbar-none">
+          {filteredTools.map((tool) => {
             const isActive = tool.id === activeToolId;
             return (
               <button
                 key={tool.id}
                 type="button"
                 onClick={() => setActiveToolId(tool.id)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                   isActive
                     ? 'bg-slate-900 text-white shadow-xs'
                     : 'bg-white border border-slate-200/90 text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -173,7 +338,18 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
               >
                 <span className="text-sm">{tool.icon}</span>
                 <span>{tool.shortName}</span>
-                {isActive && (
+                {tool.highlightTag && (
+                  <span
+                    className={`text-[9px] font-mono px-1 py-0.2 rounded font-extrabold ${
+                      isActive
+                        ? 'bg-emerald-400 text-slate-950'
+                        : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    }`}
+                  >
+                    {tool.highlightTag}
+                  </span>
+                )}
+                {isActive && !tool.highlightTag && (
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 )}
               </button>
@@ -191,8 +367,15 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.15 }}
             >
+              {activeToolId === 'gst' && <GSTInputTaxCreditCalculator />}
+              {activeToolId === 'bank_offers' && <BankOfferStackingOptimizer />}
               {activeToolId === 'emi' && <EMICalculatorTool />}
+              {activeToolId === 'qcommerce' && <QuickCommerceDeliveryFeeOptimizer />}
               {activeToolId === 'unit_price' && <UnitPricingCalculatorTool />}
+              {activeToolId === 'subs' && <SubscriptionBreakEvenCalculator />}
+              {activeToolId === 'customs' && <CustomsDutyImportCalculator />}
+              {activeToolId === 'returns' && <ReturnWindowWarrantySentinel />}
+              {activeToolId === 'exchange' && <MobileExchangeValueAuditor />}
               {activeToolId === 'energy' && <ApplianceEnergyCostCalculatorTool />}
               {activeToolId === 'warranty' && <WarrantyExpiryTrackerTool />}
               {activeToolId === 'budget' && <SaleBudgetPlannerTool />}
@@ -201,7 +384,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
         </div>
 
         {/* Bottom Status Footer */}
-        <div className="px-6 py-3 border-t border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500">
+        <div className="px-5 sm:px-6 py-3 border-t border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500">
           <div className="flex items-center gap-2">
             <span className="text-slate-400">Active Engine:</span>
             <span className="font-bold text-slate-800">{activeTool.title}</span>
@@ -211,8 +394,8 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-[11px] text-slate-400 font-mono">
-              100% Client-Side • Zero Data Stored on Servers
+            <span className="text-[11px] text-slate-400 font-mono hidden sm:inline">
+              100% Client-Side • Verified Indian Retail Formulas
             </span>
             <button
               type="button"

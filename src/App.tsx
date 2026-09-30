@@ -678,6 +678,7 @@ export const App: React.FC = () => {
           const el = document.getElementById('deals-section');
           if (el) el.scrollIntoView({ behavior: 'smooth' });
         }}
+        onOpenTool={handleOpenToolsHub}
       />
 
       {/* ── Multi-Deal Comparison Drawer & Modal ── */}
