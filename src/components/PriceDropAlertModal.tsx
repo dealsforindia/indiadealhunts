@@ -9,7 +9,7 @@ interface PriceDropAlertModalProps {
   onSuccessToast?: (msg: string) => void;
 }
 
-const API_BASE = 'https://api.rudranil.me';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
 
 export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
   isOpen,

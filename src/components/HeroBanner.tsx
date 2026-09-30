@@ -15,7 +15,7 @@ interface HeroBannerProps {
 }
 
 const QUICK_BUDGET_CHIPS = [
-  { label: '📱 Mobiles Under 320k', query: 'mobile under 320k' },
+  { label: '📱 Mobiles Under 15k', query: 'mobile under 15k' },
   { label: '📱 Mobiles Under 25k', query: 'mobile under 25k' },
   { label: '📱 Mobiles Under 40k', query: 'mobile under 40k' },
   { label: '🍏 iPhones Under 100k', query: 'iphone under 100k' },
@@ -24,7 +24,7 @@ const QUICK_BUDGET_CHIPS = [
 ];
 
 const POPULAR_SEARCHES = [
-  'mobile under 320k',
+  'mobile under 15k',
   'mobile under 25k',
   'iPhone 16 / 17',
   'Gaming Laptops under 50k',

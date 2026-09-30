@@ -325,11 +325,28 @@ export const App: React.FC = () => {
     // Category filtering
     if (selectedCategory !== 'all') {
       const catLower = selectedCategory.toLowerCase();
-      result = result.filter(
-        (d) =>
-          d.category?.toLowerCase().includes(catLower) ||
-          d.title?.toLowerCase().includes(catLower)
-      );
+      const catStem = catLower.endsWith('s') && catLower.length > 4 ? catLower.slice(0, -1) : catLower;
+      
+      result = result.filter((d) => {
+        const dc = (d.category || '').toLowerCase();
+        const dt = (d.title || '').toLowerCase();
+
+        if (catLower === 'mobiles' || catLower === 'mobile') {
+          return (
+            dc.includes('mobile') ||
+            dc.includes('phone') ||
+            /\b(mobile|phone|smartphone|iphone|galaxy|oneplus|realme|redmi|poco|iqoo|pixel|motorola|vivo|oppo|xiaomi)\b/i.test(dt)
+          );
+        }
+        if (catLower === 'laptops' || catLower === 'laptop') {
+          return (
+            dc.includes('laptop') ||
+            /\b(laptop|notebook|macbook|thinkpad|ideapad|vivobook|zenbook|tuf|victus|pavilion|inspiron)\b/i.test(dt)
+          );
+        }
+
+        return dc.includes(catLower) || dc.includes(catStem) || dt.includes(catLower) || dt.includes(catStem);
+      });
     }
 
     // Store filtering
