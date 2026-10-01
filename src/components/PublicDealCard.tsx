@@ -590,28 +590,37 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
               borderTop: '1px solid #F1F5F9',
             }}
           >
-            {/* Embedded Mini Sparkline with emerald trend */}
+            {/* Price trend indicator — only shows when real MRP data confirms a discount */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <svg width="54" height="15" viewBox="0 0 54 15" fill="none">
-                <path
-                  d="M2 13 L18 8 L34 11 L52 3"
-                  stroke="#2563EB"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <circle cx="52" cy="3" r="2.5" fill="#2563EB" />
-              </svg>
-              <span
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  color: '#059669',
-                }}
-              >
-                {discount >= 20 ? `↓ ${discount}% drop` : 'Verified loot'}
-              </span>
+              {discount >= 20 && mrp ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round">
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                    <polyline points="17 6 23 6 23 12" />
+                  </svg>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      color: '#059669',
+                    }}
+                  >
+                    ↓ {discount}% below MRP
+                  </span>
+                </>
+              ) : (
+                <span
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: '#64748B',
+                  }}
+                >
+                  ✓ Verified loot
+                </span>
+              )}
             </div>
 
             {/* Actions: Breakdown + 1-Click Share Popover */}

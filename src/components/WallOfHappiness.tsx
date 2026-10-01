@@ -147,8 +147,8 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
     fetchWallData();
   }, [fetchWallData]);
 
-  // Dynamic Savings Calculations
-  const monthlySavings = Math.round(monthlySpend * 0.58);
+  // Dynamic Savings Calculations — realistic 30% average across deal categories
+  const monthlySavings = Math.round(monthlySpend * 0.30);
   const annualSavings = monthlySavings * 12;
 
   const getSavingsPerk = (annual: number) => {

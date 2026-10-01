@@ -21,19 +21,19 @@ const FALLBACK_TICKER_ITEMS: TickerItem[] = [
     store: 'Zepto',
     badge: '⚡ 95% LOOT',
     relative_time: 'Just now',
-    url: 'https://api.rudranil.me/api/v1/deals/public',
+    url: '/',
     consensus_count: 3,
   },
   {
     id: 'ticker-fb-2',
-    title: 'POPWINGS Women’s Dresses & Crop Tops @ Up to 89% Off',
+    title: "POPWINGS Women's Dresses & Crop Tops @ Up to 89% Off",
     price: 149,
     mrp: 1299,
     discount_pct: 89,
     store: 'Amazon',
     badge: '🔥 89% OFF',
     relative_time: '2m ago',
-    url: 'https://api.rudranil.me/api/v1/deals/public',
+    url: '/',
   },
   {
     id: 'ticker-fb-3',
@@ -44,7 +44,7 @@ const FALLBACK_TICKER_ITEMS: TickerItem[] = [
     store: 'Flipkart',
     badge: '💎 74% OFF',
     relative_time: '5m ago',
-    url: 'https://api.rudranil.me/api/v1/deals/public',
+    url: '/',
   },
   {
     id: 'ticker-fb-4',
@@ -55,7 +55,7 @@ const FALLBACK_TICKER_ITEMS: TickerItem[] = [
     store: 'Amazon',
     badge: '⚡ FLASH LOOT',
     relative_time: '8m ago',
-    url: 'https://api.rudranil.me/api/v1/deals/public',
+    url: '/',
   },
   {
     id: 'ticker-fb-5',
@@ -66,7 +66,7 @@ const FALLBACK_TICKER_ITEMS: TickerItem[] = [
     store: 'DesiDime',
     badge: '🔥 3 CHANNELS',
     relative_time: '12m ago',
-    url: 'https://api.rudranil.me/api/v1/deals/public',
+    url: '/',
   },
   {
     id: 'ticker-fb-6',
@@ -77,7 +77,7 @@ const FALLBACK_TICKER_ITEMS: TickerItem[] = [
     store: 'Myntra',
     badge: '⚡ 76% OFF',
     relative_time: '14m ago',
-    url: 'https://api.rudranil.me/api/v1/deals/public',
+    url: '/',
   },
 ];
 

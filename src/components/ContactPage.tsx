@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { IconCheck } from './Icons';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
+
 interface ContactPageProps {
   onBackToHome?: () => void;
   onNavigateTab?: (tab: any) => void;
@@ -22,7 +24,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
     setLoading(true);
     setSubmitError(null);
     try {
-      const res = await fetch('https://api.rudranil.me/api/v1/feedback', {
+      const res = await fetch(`${API_BASE}/api/v1/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

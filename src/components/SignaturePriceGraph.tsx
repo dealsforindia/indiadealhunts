@@ -12,9 +12,36 @@ export const SignaturePriceGraph: React.FC<SignaturePriceGraphProps> = ({
   regularPrice,
   mrp,
 }) => {
-  const highPrice = regularPrice || mrp || Math.round(currentPrice * 1.5);
+  // Only render graph when we have real price comparison data — never fabricate historical prices
+  const hasRealHistory = Boolean((regularPrice && regularPrice > currentPrice) || (mrp && mrp > currentPrice));
+  const highPrice = regularPrice || mrp || 0;
   const diff = highPrice - currentPrice;
-  const dropPct = highPrice > 0 ? Math.round((diff / highPrice) * 100) : 31;
+  const dropPct = highPrice > 0 ? Math.round((diff / highPrice) * 100) : 0;
+
+  if (!hasRealHistory) {
+    return (
+      <div
+        style={{
+          backgroundColor: 'var(--bg)',
+          border: '1px solid var(--border)',
+          borderRadius: '6px',
+          padding: '14px 16px',
+          marginTop: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          color: '#94A3B8',
+        }}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </svg>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 600 }}>
+          30-Day Price History — Not enough data yet
+        </span>
+      </div>
+    );
+  }
 
   // Coordinate geometry for 320x100 SVG stage
   const startX = 24;
