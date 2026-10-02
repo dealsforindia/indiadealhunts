@@ -29,11 +29,14 @@ import { CardEmiSimulatorModal } from './components/CardEmiSimulatorModal';
 import { PriceDropAlertModal } from './components/PriceDropAlertModal';
 import { PhoneExchangeEstimatorModal } from './components/PhoneExchangeEstimatorModal';
 import { ToolsHubModal, ToolId } from './components/tools/ToolsHubModal';
+import { TopDiscountsPage } from './components/TopDiscountsPage';
+import { WorthScorePage } from './components/WorthScorePage';
+import { SavedLootPage } from './components/SavedLootPage';
 import type { PublicDeal, PublicDealsResponse, SortOption, NavTab } from './types';
 import { calculateWorthScore } from './utils/worthScore';
 import { searchDealsClient } from './utils/semanticSearch';
 import { INITIAL_VERIFIED_DEALS } from './data/mockDeals';
-import { getSavedDealIds, toggleSavedDealId, subscribeSavedDeals } from './utils/savedDeals';
+import { getSavedDealIds, toggleSavedDealId, subscribeSavedDeals, clearAllSavedDealIds } from './utils/savedDeals';
 import { getSavedCards } from './utils/cardSavings';
 import { isAudioEnabled, setAudioEnabled, playTactileClick } from './utils/audio';
 
@@ -170,6 +173,12 @@ export const App: React.FC = () => {
     const { isSaved, list } = toggleSavedDealId(deal.id);
     setSavedDealIds(list);
     showToast(isSaved ? 'Saved to your Loot Bookmarks!' : 'Removed from saved deals');
+  }, [showToast]);
+
+  const handleClearAllSaved = useCallback(() => {
+    clearAllSavedDealIds();
+    setSavedDealIds([]);
+    showToast('Cleared all saved loot bookmarks');
   }, [showToast]);
 
   const flashLootCount = useMemo(() => {
@@ -432,8 +441,6 @@ export const App: React.FC = () => {
         }}
         onOpenSubmit={() => setIsSubmitOpen(true)}
         onFocusSearch={handleFocusSearch}
-        onOpenCardsModal={() => setIsCardsModalOpen(true)}
-        onOpenToolsHub={() => handleOpenToolsHub('gst')}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         isAudioEnabled={isAudioActive}
         onToggleAudio={handleToggleAudio}
@@ -449,33 +456,82 @@ export const App: React.FC = () => {
         onOpenVerify={() => setIsVerifyModalOpen(true)}
       />
 
-      {/* ── Tab Views: About, How We Verify, Contact, Submit ── */}
-      {activeTab === 'about' ? (
-        <main style={{ flex: 1, padding: '40px 20px', maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
-          <AboutPage />
-        </main>
-      ) : activeTab === 'how_we_verify' ? (
-        <main style={{ flex: 1, padding: '40px 20px', maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
-          <HowWeVerify />
-        </main>
-      ) : activeTab === 'wall_of_happiness' ? (
-        <main style={{ flex: 1, width: '100%' }}>
-          <WallOfHappiness
-            onBackToHome={() => setActiveTab('home')}
-            onNavigateTab={(tab) => setActiveTab(tab)}
-          />
-        </main>
-      ) : activeTab === 'contact' ? (
-        <main style={{ flex: 1, padding: '40px 20px', maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
-          <ContactPage />
-        </main>
-      ) : activeTab === 'submit_deal' || isSubmitOpen ? (
-        <main style={{ flex: 1, padding: '40px 20px', maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
-          <SubmitDeal onBackToHome={() => { setIsSubmitOpen(false); setActiveTab('home'); }} />
-        </main>
-      ) : (
-        /* ── Homepage Main Flow ── */
-        <main style={{ flex: 1, width: '100%' }}>
+      {/* ── Main Tab Router with Smooth Apple/Mobbin Animated Transitions ── */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={isSubmitOpen ? 'submit_deal' : activeTab}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full flex-1 flex flex-col"
+        >
+          {activeTab === 'ending_soon' ? (
+            <TopDiscountsPage
+              deals={deals}
+              loading={loading}
+              onSelectDeal={(d) => setSelectedDetailDeal(d)}
+              onToggleSaveDeal={handleToggleSaveDeal}
+              savedDealIds={savedDealIds}
+              onToggleCompare={handleToggleCompare}
+              compareDeals={compareDeals}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              onShowToast={showToast}
+            />
+          ) : activeTab === 'best_worth' ? (
+            <WorthScorePage
+              deals={deals}
+              loading={loading}
+              onSelectDeal={(d) => setSelectedDetailDeal(d)}
+              onToggleSaveDeal={handleToggleSaveDeal}
+              savedDealIds={savedDealIds}
+              onToggleCompare={handleToggleCompare}
+              compareDeals={compareDeals}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              onShowToast={showToast}
+            />
+          ) : activeTab === 'saved' ? (
+            <SavedLootPage
+              deals={deals}
+              savedDealIds={savedDealIds}
+              onSelectDeal={(d) => setSelectedDetailDeal(d)}
+              onToggleSaveDeal={handleToggleSaveDeal}
+              onClearAllSaved={handleClearAllSaved}
+              onToggleCompare={handleToggleCompare}
+              compareDeals={compareDeals}
+              onNavigateHome={() => setActiveTab('home')}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              onShowToast={showToast}
+            />
+          ) : activeTab === 'about' ? (
+            <div style={{ flex: 1, padding: '40px 20px', maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
+              <AboutPage />
+            </div>
+          ) : activeTab === 'how_we_verify' ? (
+            <div style={{ flex: 1, padding: '40px 20px', maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
+              <HowWeVerify />
+            </div>
+          ) : activeTab === 'wall_of_happiness' ? (
+            <div style={{ flex: 1, width: '100%' }}>
+              <WallOfHappiness
+                onBackToHome={() => setActiveTab('home')}
+                onNavigateTab={(tab) => setActiveTab(tab)}
+              />
+            </div>
+          ) : activeTab === 'contact' ? (
+            <div style={{ flex: 1, padding: '40px 20px', maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
+              <ContactPage />
+            </div>
+          ) : activeTab === 'submit_deal' || isSubmitOpen ? (
+            <div style={{ flex: 1, padding: '40px 20px', maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
+              <SubmitDeal onBackToHome={() => { setIsSubmitOpen(false); setActiveTab('home'); }} />
+            </div>
+          ) : (
+            /* ── Homepage Main Flow ── */
+            <div className="w-full flex-1">
           {/* ── 2. Hero Section & Decoupled Search ── */}
           <HeroBanner
             searchQuery={searchQuery}
@@ -591,31 +647,21 @@ export const App: React.FC = () => {
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </span>
                   <h2 className="font-heading text-xl sm:text-2xl font-black tracking-tight text-slate-900 m-0">
-                    {activeTab === 'saved' ? (
-                      <span>💖 Saved Loot Bookmarks</span>
-                    ) : (
-                      <>
-                        <span className="hidden sm:inline">Latest Verified Drops</span>
-                        <span className="sm:hidden">Latest Drops</span>
-                      </>
-                    )}
+                    <span className="hidden sm:inline">Latest Verified Drops</span>
+                    <span className="sm:hidden">Latest Drops</span>
                   </h2>
                   <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    {activeTab === 'saved' ? 'BOOKMARKS' : 'LIVE RADAR'}
+                    LIVE RADAR
                   </span>
                 </div>
                 <p className="text-slate-500 text-xs sm:text-sm mt-1">
-                  {activeTab === 'saved'
-                    ? 'Your bookmarked loot deals saved locally in your browser.'
-                    : 'Cross-referenced against 90-day price history • Verified affiliate-direct links'}
+                  Cross-referenced against 90-day price history • Verified affiliate-direct links
                 </p>
               </div>
 
               {/* Deal count */}
               <span className="font-mono text-xs sm:text-sm text-slate-500 font-semibold">
-                {activeTab === 'saved'
-                  ? `${filteredDeals.length} saved`
-                  : totalDeals ? `${totalDeals.toLocaleString('en-IN')} drops` : '3,350+ drops'}
+                {totalDeals ? `${totalDeals.toLocaleString('en-IN')} drops` : '3,350+ drops'}
               </span>
             </div>
 
@@ -637,22 +683,6 @@ export const App: React.FC = () => {
                   className="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl cursor-pointer shadow-sm"
                 >
                   Retry Connection
-                </button>
-              </div>
-            ) : activeTab === 'saved' && filteredDeals.length === 0 ? (
-              <div className="py-14 px-6 text-center max-w-md mx-auto rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col items-center">
-                <span className="text-4xl mb-3">💖</span>
-                <h3 className="font-heading font-bold text-slate-900 mb-2">
-                  No Saved Deals Yet
-                </h3>
-                <p className="text-xs text-slate-500 mb-5 max-w-xs leading-relaxed">
-                  Tap the heart icon on any verified deal card to bookmark bargains here for instant tracking.
-                </p>
-                <button
-                  onClick={() => setActiveTab('home')}
-                  className="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl cursor-pointer shadow-sm transition-all hover:scale-105"
-                >
-                  Browse Verified Drops →
                 </button>
               </div>
             ) : filteredDeals.length === 0 ? (
@@ -736,8 +766,10 @@ export const App: React.FC = () => {
 
           {/* ── 7. Trust / Verification Strip ── */}
           <TrustStrip />
-        </main>
+        </div>
       )}
+        </motion.div>
+      </AnimatePresence>
 
       {/* ── 8. Footer ── */}
       <Footer
@@ -828,7 +860,7 @@ export const App: React.FC = () => {
       {/* ── Multi-Deal Comparison Drawer & Floating Dock ── */}
       <CompareDrawer
         compareDeals={compareDeals}
-        isOpen={false}
+        isOpen={isCompareModalOpen}
         onOpenModal={() => setIsCompareModalOpen(true)}
         onCloseModal={() => setIsCompareModalOpen(false)}
         onRemoveDeal={handleRemoveCompareDeal}

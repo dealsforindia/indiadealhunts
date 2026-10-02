@@ -16,12 +16,24 @@ export function setAudioEnabled(enabled: boolean): void {
   window.dispatchEvent(new CustomEvent('dealflow_audio_toggled', { detail: enabled }));
 }
 
+// Singleton AudioContext — browsers cap concurrent instances (Chrome: 6, Safari: stricter).
+// Creating a new context per-click silently fails once the limit is hit.
+let _sharedCtx: AudioContext | null = null;
+
 function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
+  if (_sharedCtx && _sharedCtx.state !== 'closed') {
+    // Resume if suspended (e.g. after browser autoplay policy kicks in)
+    if (_sharedCtx.state === 'suspended') {
+      _sharedCtx.resume().catch(() => {});
+    }
+    return _sharedCtx;
+  }
   const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
   if (!AudioCtx) return null;
   try {
-    return new AudioCtx();
+    _sharedCtx = new AudioCtx();
+    return _sharedCtx;
   } catch {
     return null;
   }

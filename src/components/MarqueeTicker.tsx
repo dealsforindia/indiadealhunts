@@ -229,19 +229,19 @@ export const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ onSelectDeal, onOp
           </div>
         </div>
 
-        {/* Right Verify Button */}
-        {onOpenVerify && (
-          <div className="pl-2 sm:pl-3 border-l border-slate-200 flex-shrink-0">
-            <button
-              onClick={onOpenVerify}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900 transition-all text-[11px] font-medium cursor-pointer shadow-2xs"
-            >
-              <IconShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="hidden sm:inline">How We Verify</span>
-              <IconChevronRight className="w-2.5 h-2.5 text-slate-400" />
-            </button>
-          </div>
-        )}
+        {/* Right 24/7 Loot Radar Link */}
+        <div className="pl-2 sm:pl-3 border-l border-slate-200 flex-shrink-0">
+          <a
+            href="https://t.me/dealsforindiachannel"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 hover:text-blue-900 transition-all text-[11px] font-semibold cursor-pointer shadow-2xs"
+          >
+            <span>⚡</span>
+            <span className="hidden sm:inline">24/7 Telegram Alerts</span>
+            <span className="text-[10px]">↗</span>
+          </a>
+        </div>
 
       </div>
     </div>

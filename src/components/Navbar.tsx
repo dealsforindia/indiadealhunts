@@ -158,9 +158,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id as NavTab)}
-                className={`relative px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${
+                className={`relative px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-150 cursor-pointer ${
                   isActive
-                    ? 'text-white bg-slate-900 shadow-sm'
+                    ? 'text-white bg-slate-900 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
@@ -171,7 +171,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={onOpenLookup}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer"
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
               <circle cx="11" cy="11" r="8" />
@@ -179,28 +179,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             </svg>
             <span>Price Lookup</span>
           </button>
-
-          {onOpenCardsModal && (
-            <button
-              onClick={onOpenCardsModal}
-              title="Configure Credit Card Cashback"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all"
-            >
-              <span>💳</span>
-              <span>Cards</span>
-            </button>
-          )}
-
-          {onOpenToolsHub && (
-            <button
-              onClick={onOpenToolsHub}
-              title="Shopping Utilities & Loot Lab (EMI, Shrinkflation, Energy, Warranties, Budgeting)"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer"
-            >
-              <span>🧰</span>
-              <span>Utilities</span>
-            </button>
-          )}
 
 
           {/* Categories Popover */}
@@ -359,28 +337,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               <button
                 onClick={() => { onOpenLookup(); setMobileMenuOpen(false); }}
-                className="text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                className="text-left px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100"
               >
                 🔍 Price History Lookup
               </button>
-              {onOpenCardsModal && (
-                <button
-                  onClick={() => { onOpenCardsModal(); setMobileMenuOpen(false); }}
-                  className="text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 flex items-center justify-between"
-                >
-                  <span>💳 Card Savings Calculator</span>
-                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">5% Cashback</span>
-                </button>
-              )}
-              {onOpenToolsHub && (
-                <button
-                  onClick={() => { onOpenToolsHub(); setMobileMenuOpen(false); }}
-                  className="text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 flex items-center justify-between"
-                >
-                  <span>🧰 Shopping Utilities &amp; Loot Lab</span>
-                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">12 Engines</span>
-                </button>
-              )}
 
               {onToggleAudio && (
                 <button

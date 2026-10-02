@@ -131,10 +131,12 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
 
   const price = deal.price || 0;
   const mrp = deal.mrp && deal.mrp > price ? deal.mrp : undefined;
+  // Recalculate from MRP when backend sends corrupt discount_pct > 100.
+  // Exact 100 means a free/giveaway product — treat as valid and keep it.
   const discount =
-    deal.discount_pct && deal.discount_pct >= 100 && price > 0 && mrp
+    deal.discount_pct && deal.discount_pct > 100 && price > 0 && mrp
       ? Math.round(((mrp - price) / mrp) * 100)
-      : deal.discount_pct || 0;
+      : deal.discount_pct ?? 0;
 
   const savings = mrp && price > 0 ? mrp - price : 0;
   const relativeTime = getRelativeTime(deal.display_ts || deal.posted_at);

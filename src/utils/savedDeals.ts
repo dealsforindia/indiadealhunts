@@ -63,6 +63,16 @@ export function isDealSaved(id: string): boolean {
   return getSavedDealIds().includes(id);
 }
 
+export function clearAllSavedDealIds(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    window.dispatchEvent(new CustomEvent(EVENT_NAME, { detail: [] }));
+  } catch {
+    // Graceful fallback
+  }
+}
+
 export function subscribeSavedDeals(callback: (ids: string[]) => void): () => void {
   if (typeof window === 'undefined') return () => {};
 

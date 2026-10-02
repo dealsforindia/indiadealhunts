@@ -52,12 +52,8 @@ export const DealSkeleton: React.FC = () => {
 export const DealSkeletonGrid: React.FC<{ count?: number }> = ({ count = 8 }) => {
   return (
     <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-        gap: '16px',
-        width: '100%',
-      }}
+      className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5"
+      style={{ width: '100%' }}
     >
       {Array.from({ length: count }).map((_, i) => (
         <DealSkeleton key={i} />

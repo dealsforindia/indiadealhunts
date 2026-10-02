@@ -1,0 +1,189 @@
+import React, { useState, useMemo } from 'react';
+import { motion } from 'motion/react';
+import { PublicDeal } from '../types';
+import { PublicDealCard } from './PublicDealCard';
+
+interface SavedLootPageProps {
+  deals: PublicDeal[];
+  savedDealIds: string[];
+  onSelectDeal: (deal: PublicDeal) => void;
+  onToggleSaveDeal: (deal: PublicDeal) => void;
+  onClearAllSaved: () => void;
+  onToggleCompare: (deal: PublicDeal) => void;
+  compareDeals: PublicDeal[];
+  onNavigateHome: () => void;
+  viewMode: 'grid' | 'list';
+  onViewModeChange: (mode: 'grid' | 'list') => void;
+  onShowToast?: (msg: string) => void;
+}
+
+export const SavedLootPage: React.FC<SavedLootPageProps> = ({
+  deals,
+  savedDealIds,
+  onSelectDeal,
+  onToggleSaveDeal,
+  onClearAllSaved,
+  onToggleCompare,
+  compareDeals,
+  onNavigateHome,
+  viewMode,
+  onViewModeChange,
+  onShowToast,
+}) => {
+  const [searchFilter, setSearchFilter] = useState<string>('');
+
+  const savedDeals = useMemo(() => {
+    let list = deals.filter((d) => savedDealIds.includes(d.id));
+
+    if (searchFilter.trim()) {
+      const q = searchFilter.toLowerCase();
+      list = list.filter(
+        (d) =>
+          d.title.toLowerCase().includes(q) ||
+          d.category?.toLowerCase().includes(q) ||
+          d.store?.toLowerCase().includes(q)
+      );
+    }
+
+    return list;
+  }, [deals, savedDealIds, searchFilter]);
+
+  return (
+    <div className="w-full max-w-[1340px] mx-auto px-4 md:px-6 py-6 sm:py-8">
+      {/* ── Page Header (Mobbin / Apple Inspired) ── */}
+      <div className="mb-8">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200/80 text-amber-800 text-xs font-semibold mb-3">
+          <span>❤️</span>
+          <span>SAVED LOOT VAULT</span>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+              Your Bookmarked Deals
+            </h1>
+            <p className="mt-2 text-sm sm:text-base text-slate-600 max-w-xl leading-relaxed">
+              Quickly compare, monitor, and claim the deals you've saved. Bookmarks are stored locally on your device.
+            </p>
+          </div>
+
+          {savedDeals.length > 0 && (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onClearAllSaved}
+                className="px-4 py-2 rounded-full border border-rose-200 text-rose-700 bg-rose-50/50 hover:bg-rose-100 text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Clear All ({savedDealIds.length})
+              </button>
+              <button
+                type="button"
+                onClick={onNavigateHome}
+                className="px-4 py-2 rounded-full bg-slate-900 text-white hover:bg-slate-800 text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Find More Deals →
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {savedDeals.length > 0 ? (
+        <>
+          {/* ── Filter & View Toolbar ── */}
+          <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/90 p-4 mb-6 shadow-xs flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 flex-1 max-w-sm">
+              <input
+                type="text"
+                placeholder="Search saved deals..."
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                className="px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white w-full transition-all"
+              />
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-slate-500">
+                <strong className="text-slate-800 font-semibold">{savedDeals.length}</strong> deal{savedDeals.length === 1 ? '' : 's'} saved
+              </span>
+
+              <div className="hidden sm:flex items-center rounded-full bg-slate-100 p-0.5 border border-slate-200">
+                <button
+                  onClick={() => onViewModeChange('grid')}
+                  className={`p-1.5 rounded-full transition-colors ${
+                    viewMode === 'grid' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                  title="Grid View"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => onViewModeChange('list')}
+                  className={`p-1.5 rounded-full transition-colors ${
+                    viewMode === 'list' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                  title="List View"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="8" y1="6" x2="21" y2="6" />
+                    <line x1="8" y1="12" x2="21" y2="12" />
+                    <line x1="8" y1="18" x2="21" y2="18" />
+                    <line x1="3" y1="6" x2="3.01" y2="6" />
+                    <line x1="3" y1="12" x2="3.01" y2="12" />
+                    <line x1="3" y1="18" x2="3.01" y2="18" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Deals Grid ── */}
+          <motion.div
+            layout
+            className={
+              viewMode === 'grid'
+                ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5'
+                : 'flex flex-col gap-3'
+            }
+          >
+            {savedDeals.map((deal, idx) => (
+              <PublicDealCard
+                key={deal.id}
+                deal={deal}
+                index={idx}
+                onSelectDeal={onSelectDeal}
+                onToggleSave={onToggleSaveDeal}
+                isSaved={true}
+                onToggleCompare={onToggleCompare}
+                isComparing={compareDeals.some((d) => d.id === deal.id)}
+                onShowToast={onShowToast}
+              />
+            ))}
+          </motion.div>
+        </>
+      ) : (
+        /* ── Empty State (Apple / Mobbin Design Language) ── */
+        <div className="max-w-md mx-auto my-12 text-center p-8 sm:p-10 rounded-3xl bg-white border border-slate-200/90 shadow-sm">
+          <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-3xl mx-auto mb-4 border border-amber-200/60 shadow-2xs">
+            ❤️
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight">Your Loot Vault is Empty</h2>
+          <p className="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+            Click the heart icon on any deal card to save it here for instant comparison and price tracking.
+          </p>
+          <button
+            type="button"
+            onClick={onNavigateHome}
+            className="mt-6 inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold tracking-wide transition-all shadow-xs cursor-pointer"
+          >
+            <span>⚡ Browse Latest Deals</span>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};

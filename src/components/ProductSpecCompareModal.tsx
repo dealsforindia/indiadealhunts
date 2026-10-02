@@ -157,7 +157,7 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
                   Side-by-Side Product Comparison
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Real price comparison, 5% card discounts, accurate product specs & verified deal scores
+                  Real price comparison, discount depth, verified specs & deal scores
                 </p>
               </div>
             </div>
@@ -258,48 +258,7 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
                       ))}
                     </tr>
 
-                    {/* Net Price with 5% Card */}
-                    <tr>
-                      <td className="p-3 font-semibold text-slate-600 bg-slate-50/50">
-                        <span>💳 5% Card Price</span>
-                        <span className="block text-[10px] text-slate-400 font-normal">Amazon ICICI / Flipkart Axis</span>
-                      </td>
-                      {deals.map((deal) => {
-                        const attrs = getProductAttributes(deal);
-                        return (
-                          <td key={deal.id} className="p-3 font-medium text-emerald-700">
-                            <span className="font-bold text-base">₹{attrs.netCardPrice.toLocaleString('en-IN')}</span>
-                            <span className="block text-xs text-slate-500">(-₹{attrs.cardCashback.toLocaleString('en-IN')} cashback)</span>
-                          </td>
-                        );
-                      })}
-                    </tr>
-
-                    {/* GST ITC Input Tax Claim (Contextual for B2B Electronics) */}
-                    {(anyPhone || anyLaptop || deals.some((d) => getProductAttributes(d).isB2BEligible)) && (
-                      <tr>
-                        <td className="p-3 font-semibold text-slate-600 bg-slate-50/50">
-                          <span>🛡️ GST ITC Input</span>
-                          <span className="block text-[10px] text-slate-400 font-normal">18% business tax claim</span>
-                        </td>
-                        {deals.map((deal) => {
-                          const attrs = getProductAttributes(deal);
-                          if (!attrs.isB2BEligible) {
-                            return (
-                              <td key={deal.id} className="p-3 text-xs text-slate-400 italic">
-                                Consumer retail (B2C)
-                              </td>
-                            );
-                          }
-                          return (
-                            <td key={deal.id} className="p-3 font-medium text-indigo-700">
-                              <span className="font-bold text-base">₹{attrs.netGstPrice.toLocaleString('en-IN')}</span>
-                              <span className="block text-xs text-slate-500">(-₹{attrs.gstItc.toLocaleString('en-IN')} claim)</span>
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    )}
+                    {/* Deal Price */}
 
                     {/* Real Product Specification Row 1 */}
                     <tr>
