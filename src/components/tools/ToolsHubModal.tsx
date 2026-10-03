@@ -244,18 +244,18 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.96, opacity: 0, y: 10 }}
         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        className="relative w-full max-w-6xl max-h-[calc(100dvh-1.5rem)] flex flex-col bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden overscroll-contain"
+        className="relative w-full max-w-6xl max-h-[calc(100dvh-1.5rem)] flex flex-col bg-white dark:bg-[#0D1527] rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-slate-200 bg-white">
+        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-black text-lg shadow-sm">
               🧰
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-heading font-extrabold text-base sm:text-lg text-slate-900 tracking-tight">
+                <h2 className="font-heading font-extrabold text-base sm:text-lg text-slate-900 dark:text-[#F1F5F9] tracking-tight">
                   Shopping Utilities &amp; Loot Lab
                 </h2>
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -275,14 +275,14 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search 12 tools..."
-                className="w-full pl-7 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:bg-white focus:outline-none focus:border-slate-400"
+                className="w-full pl-7 pr-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs bg-slate-50 dark:bg-[#070A11] focus:bg-white dark:bg-[#0D1527] focus:outline-none focus:border-slate-400"
               />
               <span className="absolute left-2.5 text-xs text-slate-400">🔍</span>
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2 text-xs text-slate-400 hover:text-slate-600"
+                  className="absolute right-2 text-xs text-slate-400 hover:text-slate-600 dark:text-slate-400"
                 >
                   ✕
                 </button>
@@ -293,7 +293,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
               type="button"
               onClick={onClose}
               aria-label="Close dialog"
-              className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors flex items-center justify-center cursor-pointer text-sm font-bold"
+              className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-500 hover:text-slate-800 dark:text-[#F8FAFC] transition-colors flex items-center justify-center cursor-pointer text-sm font-bold"
             >
               ✕
             </button>
@@ -301,7 +301,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
         </div>
 
         {/* Category Filter Chips Bar */}
-        <div className="px-5 sm:px-6 py-2 bg-slate-100/70 border-b border-slate-200/80 flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+        <div className="px-5 sm:px-6 py-2 bg-slate-100/70 dark:bg-[#111C33]/70 border-b border-slate-200/80 dark:border-white/10 flex items-center gap-1.5 overflow-x-auto scrollbar-none">
           {CATEGORIES.map((cat) => {
             const isCatActive = activeCategory === cat.id;
             return (
@@ -312,7 +312,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
                 className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                   isCatActive
                     ? 'bg-slate-900 text-white shadow-2xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-[#F1F5F9] hover:bg-slate-200 dark:hover:bg-[#1E293B]/60 dark:bg-[#172440]/60'
                 }`}
               >
                 {cat.name}
@@ -322,7 +322,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
         </div>
 
         {/* Tool Navigation Pill Strip */}
-        <div className="px-5 sm:px-6 py-2.5 bg-slate-50/90 border-b border-slate-200/80 overflow-x-auto flex items-center gap-2 scrollbar-none">
+        <div className="px-5 sm:px-6 py-2.5 bg-slate-50/90 dark:bg-[#070A11]/90 border-b border-slate-200/80 dark:border-white/10 overflow-x-auto flex items-center gap-2 scrollbar-none">
           {filteredTools.map((tool) => {
             const isActive = tool.id === activeToolId;
             return (
@@ -333,7 +333,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                   isActive
                     ? 'bg-slate-900 text-white shadow-xs'
-                    : 'bg-white border border-slate-200/90 text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    : 'bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-[#F1F5F9] hover:bg-slate-100 dark:bg-[#111C33]'
                 }`}
               >
                 <span className="text-sm">{tool.icon}</span>
@@ -358,7 +358,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
         </div>
 
         {/* Scrollable Tool Workspace */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50/40">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50/40 dark:bg-[#070A11]/40">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeToolId}
@@ -384,11 +384,11 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
         </div>
 
         {/* Bottom Status Footer */}
-        <div className="px-5 sm:px-6 py-3 border-t border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500">
+        <div className="px-5 sm:px-6 py-3 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500">
           <div className="flex items-center gap-2">
             <span className="text-slate-400">Active Engine:</span>
-            <span className="font-bold text-slate-800">{activeTool.title}</span>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+            <span className="font-bold text-slate-800 dark:text-[#F8FAFC]">{activeTool.title}</span>
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#111C33] text-slate-600 dark:text-slate-400">
               {activeTool.badge}
             </span>
           </div>
@@ -400,7 +400,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer text-xs"
+              className="px-4 py-1.5 rounded-lg bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-700 dark:text-slate-200 font-bold transition-colors cursor-pointer text-xs"
             >
               Done
             </button>

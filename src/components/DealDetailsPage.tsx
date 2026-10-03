@@ -45,7 +45,7 @@ export default function DealDetailsPage({ deal, onBack }: DealDetailsPageProps) 
         
        {/* Breadcrumbs / Back Navigation */}
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="mb-8 flex items-center justify-between">
-          <button onClick={onBack} className="group flex items-center gap-2 text-zinc-400 hover:text-white transition-colors duration-300 bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full border border-white/5 backdrop-blur-md">
+          <button onClick={onBack} className="group flex items-center gap-2 text-zinc-400 hover:text-white transition-colors duration-300 bg-white/5 dark:bg-[#0D1527]/5 hover:bg-white/10 dark:bg-[#0D1527]/10 px-4 py-2 rounded-full border border-white/5 backdrop-blur-md">
             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
             <span className="text-sm font-medium tracking-wide">Back to deals</span>
           </button>

@@ -385,8 +385,8 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
 
   return (
     <>
-      <section
-        className="w-full py-4 bg-white border-b border-slate-200/80"
+      <section data-mobile-stories
+        className="flash-stories w-full py-4 bg-white dark:bg-[#0D1527] border-b border-slate-200/80 dark:border-white/10"
         aria-label="Flash Deal Stories"
       >
         <div className="max-w-[1340px] mx-auto px-4 md:px-6">
@@ -397,7 +397,7 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
               </span>
-              <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800 font-mono">
+              <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-[#F8FAFC] font-mono">
                 Flash Stories &amp; Curated Hauls
               </h3>
               <span className="hidden sm:inline-block text-[11px] text-slate-400">
@@ -410,7 +410,7 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
               <button
                 type="button"
                 onClick={() => handleScroll('left')}
-                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-all text-xs cursor-pointer"
+                className="w-7 h-7 rounded-full bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-[#F1F5F9] transition-all text-xs cursor-pointer"
                 title="Scroll Left"
                 aria-label="Scroll Left"
               >
@@ -419,7 +419,7 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
               <button
                 type="button"
                 onClick={() => handleScroll('right')}
-                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-all text-xs cursor-pointer"
+                className="w-7 h-7 rounded-full bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-[#F1F5F9] transition-all text-xs cursor-pointer"
                 title="Scroll Right"
                 aria-label="Scroll Right"
               >
@@ -455,12 +455,12 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
                     <div
                       className={`w-[66px] h-[66px] sm:w-[72px] sm:h-[72px] rounded-full p-[2.5px] transition-all duration-300 transform group-hover:scale-105 ${
                         isViewed
-                          ? 'bg-slate-200'
+                          ? 'bg-slate-200 dark:bg-[#172440]'
                           : `bg-gradient-to-tr ${story.ring_color} shadow-sm`
                       }`}
                     >
-                      <div className="w-full h-full rounded-full bg-white p-[2px] flex items-center justify-center overflow-hidden relative shadow-2xs">
-                        <div className="absolute inset-0 w-full h-full rounded-full bg-slate-100 flex items-center justify-center text-2xl">
+                      <div className="w-full h-full rounded-full bg-white dark:bg-[#0D1527] p-[2px] flex items-center justify-center overflow-hidden relative shadow-2xs">
+                        <div className="absolute inset-0 w-full h-full rounded-full bg-slate-100 dark:bg-[#111C33] flex items-center justify-center text-2xl">
                           {story.emoji}
                         </div>
                         {previewImg && (
@@ -476,7 +476,7 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
                         )}
 
                         {/* Centered Emoji Overlay Badge */}
-                        <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[11px] shadow-2xs">
+                        <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 flex items-center justify-center text-[11px] shadow-2xs">
                           {story.emoji}
                         </div>
                       </div>
@@ -489,7 +489,7 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
                   </div>
 
                   {/* Story Label */}
-                  <span className="text-[12px] font-semibold text-slate-700 group-hover:text-blue-600 transition-colors tracking-tight text-center max-w-[80px] sm:max-w-[90px] truncate mt-1">
+                  <span className="text-[12px] font-semibold text-slate-700 dark:text-slate-200 group-hover:text-blue-600 transition-colors tracking-tight text-center max-w-[80px] sm:max-w-[90px] truncate mt-1">
                     {story.title}
                   </span>
                 </button>

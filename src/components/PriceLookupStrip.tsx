@@ -7,7 +7,7 @@ interface PriceLookupStripProps {
 export const PriceLookupStrip: React.FC<PriceLookupStripProps> = ({ onOpenLookup }) => {
   return (
     <div className="max-w-[1340px] mx-auto px-4 md:px-6 my-10 w-full">
-      <div className="relative rounded-2xl bg-white border border-slate-200/90 p-6 sm:p-8 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="relative rounded-2xl bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 p-6 sm:p-8 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         {/* Subtle decorative glow */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
 
@@ -22,11 +22,11 @@ export const PriceLookupStrip: React.FC<PriceLookupStripProps> = ({ onOpenLookup
           </div>
 
           <div>
-            <h3 className="font-heading text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-snug">
+            <h3 className="font-heading text-lg sm:text-xl font-black text-slate-900 dark:text-[#F1F5F9] tracking-tight leading-snug">
               Wondering if a deal is actually genuine?
             </h3>
             <p className="text-slate-500 text-xs sm:text-sm mt-1 leading-relaxed">
-              Use our real-time Price Lookup tool to verify 90-day price history, all-time lows, and detect inflated MRPs before buying.
+              Paste a specific product link to inspect available price observations. History coverage varies; confirm the final price with the merchant.
             </p>
           </div>
         </div>

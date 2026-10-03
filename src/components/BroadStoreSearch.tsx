@@ -27,7 +27,7 @@ const STORE_SEARCHES = [
   {
     name: 'Google Shopping',
     label: 'Search the wider web',
-    tone: 'border-slate-200 bg-slate-50 text-slate-900 hover:bg-slate-100',
+    tone: 'border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#070A11] text-slate-900 dark:text-[#F1F5F9] hover:bg-slate-100 dark:bg-[#111C33]',
     buildUrl: (query: string) => `https://www.google.com/search?tbm=shop&q=${encodeURIComponent(query)}`,
   },
 ];
@@ -39,14 +39,14 @@ export const BroadStoreSearch: React.FC<BroadStoreSearchProps> = ({ query, compa
   return (
     <section
       aria-label="Search other stores"
-      className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${compact ? 'p-3.5' : 'p-5 sm:p-6'}`}
+      className={`rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] shadow-sm ${compact ? 'p-3.5' : 'p-5 sm:p-6'}`}
     >
       <div className="flex items-start gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-base" aria-hidden="true">
           🔎
         </div>
         <div className="min-w-0">
-          <h3 className="font-heading text-sm sm:text-base font-extrabold text-slate-900">
+          <h3 className="font-heading text-sm sm:text-base font-extrabold text-slate-900 dark:text-[#F1F5F9]">
             Search every major store for “{cleanQuery}”
           </h3>
           <p className="mt-1 text-[11px] sm:text-xs leading-relaxed text-slate-500">

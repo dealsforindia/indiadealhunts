@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { TickerItem, TickerResponse, PublicDeal } from '../types';
 import { IconShieldCheck, IconExternalLink, IconChevronRight } from './Icons';
+import { openSmartStoreLink } from '../utils/affiliateEngine';
 
 interface MarqueeTickerProps {
   onSelectDeal?: (deal: Partial<PublicDeal>) => void;
@@ -75,16 +76,16 @@ export const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ onSelectDeal, onOp
         deal_badges: [item.badge || 'Verified'],
       });
     } else if (item.url && item.url !== '#') {
-      window.open(item.url, '_blank', 'noopener,noreferrer');
+      openSmartStoreLink(item.url, item.store || 'Store');
     }
   };
 
   return (
-    <div className="relative w-full z-20 bg-slate-50/95 backdrop-blur-md border-b border-slate-200 overflow-hidden select-none">
+    <div className="relative w-full z-20 bg-slate-50/95 dark:bg-[#070A11]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/10 overflow-hidden select-none">
       <div className="max-w-[1400px] mx-auto flex items-center h-10 px-2 sm:px-4">
         
         {/* Left Live Badge */}
-        <div className="flex items-center gap-2 pr-3 sm:pr-4 border-r border-slate-200 flex-shrink-0">
+        <div className="flex items-center gap-2 pr-3 sm:pr-4 border-r border-slate-200 dark:border-white/10 flex-shrink-0">
           <div className="relative flex items-center justify-center">
             <span className="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" />
@@ -92,7 +93,7 @@ export const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ onSelectDeal, onOp
           <span className="text-[11px] font-mono font-bold tracking-wider text-emerald-700 uppercase hidden xs:inline">
             Live Radar
           </span>
-          <span className="text-[10px] sm:text-[11px] font-mono px-2 py-0.5 rounded-full bg-white text-slate-700 font-semibold border border-slate-200 shadow-2xs">
+          <span className="text-[10px] sm:text-[11px] font-mono px-2 py-0.5 rounded-full bg-white dark:bg-[#0D1527] text-slate-700 dark:text-slate-200 font-semibold border border-slate-200 dark:border-white/10 shadow-2xs">
             {totalDeals ? `${totalDeals.toLocaleString()} live drops` : 'Live data pending'}
           </span>
         </div>
@@ -117,7 +118,7 @@ export const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ onSelectDeal, onOp
                 <button
                   key={`${item.id}-${idx}`}
                   onClick={() => handleCardClick(item)}
-                  className="flex items-center gap-2 px-3 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 hover:border-slate-300 transition-all text-left flex-shrink-0 cursor-pointer shadow-2xs group"
+                  className="flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-[#0D1527] hover:bg-slate-100 dark:bg-[#111C33] border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:border-white/20 transition-all text-left flex-shrink-0 cursor-pointer shadow-2xs group"
                 >
                   <span
                     className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded border"
@@ -130,7 +131,7 @@ export const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ onSelectDeal, onOp
                     {item.store}
                   </span>
 
-                  <span className="text-[11px] font-medium text-slate-800 group-hover:text-blue-600 transition-colors truncate max-w-[140px] sm:max-w-[220px]">
+                  <span className="text-[11px] font-medium text-slate-800 dark:text-[#F8FAFC] group-hover:text-blue-600 transition-colors truncate max-w-[140px] sm:max-w-[220px]">
                     {item.title}
                   </span>
 
@@ -157,7 +158,7 @@ export const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ onSelectDeal, onOp
         </div>
 
         {/* Right 24/7 Loot Radar Link */}
-        <div className="pl-2 sm:pl-3 border-l border-slate-200 flex-shrink-0">
+        <div className="pl-2 sm:pl-3 border-l border-slate-200 dark:border-white/10 flex-shrink-0">
           <a
             href="https://t.me/dealsforindiachannel"
             target="_blank"

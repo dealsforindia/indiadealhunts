@@ -1,3 +1,4 @@
+import { MobileDealCardContent } from './MobileDealCardContent';
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PublicDeal } from '../types';
@@ -6,6 +7,14 @@ import { isDealSaved, toggleSavedDealId } from '../utils/savedDeals';
 import { shareToWhatsApp, shareToTelegram, copyDealLink } from '../utils/shareDeal';
 import { calculateBestCardSavings } from '../utils/cardSavings';
 import { playTactileClick, playSuccessChime } from '../utils/audio';
+import {
+  extractAmazonAsin,
+  buildAmazonCartUrl,
+  buildMultiAsinCartUrl,
+  generateSubId,
+  openSmartStoreLink,
+  getRecommendedBundle,
+} from '../utils/affiliateEngine';
 
 interface PublicDealCardProps {
   deal: PublicDeal;
@@ -141,6 +150,27 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
   const savings = mrp && price > 0 ? mrp - price : 0;
   const relativeTime = getRelativeTime(deal.display_ts || deal.posted_at);
   const storeBadge = getStoreBadge(deal.store);
+  const [includeBundle, setIncludeBundle] = useState(false);
+  const isAmazon = (deal.store || '').toLowerCase().includes('amazon');
+  const asin = isAmazon ? extractAmazonAsin(deal.url || deal.id) : null;
+  const subId = generateSubId('card', deal.id);
+  const bundle = asin ? getRecommendedBundle(deal.category, price) : null;
+
+  const handleLockInCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    playTactileClick();
+    if (!asin) return;
+    const cartUrl = includeBundle && bundle
+      ? buildMultiAsinCartUrl(asin, bundle.asin, undefined, subId)
+      : buildAmazonCartUrl(asin, undefined, subId);
+    openSmartStoreLink(cartUrl, 'amazon', asin, true, subId);
+  };
+
+  const handleOpenStore = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    playTactileClick();
+    openSmartStoreLink(deal.url, deal.store || 'Store', asin || undefined, false, subId);
+  };
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -170,7 +200,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
       className="deal-card-premium group"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4 }}
+      whileHover={{ y: -2 }}
       transition={{
         duration: 0.25,
         ease: 'easeOut',
@@ -183,12 +213,17 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
         overflow: 'visible',
         cursor: 'pointer',
         position: 'relative',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--bg-surface-card)',
         zIndex: shareOpen ? 30 : 1,
       }}
     >
-      {/* ── Top Bar: Store Pill + Time + Save Heart ── */}
-      <div
+      <MobileDealCardContent deal={deal} title={displayTitle} image={cleanImageUrl} store={storeBadge.name}
+        price={price} mrp={mrp} discount={discount} expired={isExpired} saved={isSaved} comparing={isComparing}
+        time={relativeTime} onSave={handleToggleFavorite} onDetails={handleCardClick}
+        onCompare={onToggleCompare ? () => onToggleCompare(deal) : undefined} onToast={onShowToast} />
+      <div className="desktop-deal-card">
+      {/* Store, time and saved state */}
+      <div className="premium-card-header"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -300,14 +335,14 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
         </div>
       </div>
 
-      {/* ── Product Media Stage (4:3 Ratio with Zoom on Hover) ── */}
-      <div
+      {/* Product media */}
+      <div className="premium-card-media"
         style={{
           position: 'relative',
           aspectRatio: '4 / 3',
-          backgroundColor: '#F8FAFC',
-          borderTop: '1px solid #F1F5F9',
-          borderBottom: '1px solid #F1F5F9',
+          backgroundColor: 'var(--surface-2)',
+          borderTop: '1px solid var(--border-subtle)',
+          borderBottom: '1px solid var(--border-subtle)',
           padding: '16px',
           display: 'flex',
           alignItems: 'center',
@@ -396,14 +431,14 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
       </div>
 
       {/* ── Content Body ── */}
-      <div
+      <div className="premium-card-body"
         style={{
           padding: '14px 16px 16px',
           display: 'flex',
           flexDirection: 'column',
           flex: 1,
           gap: '10px',
-          backgroundColor: '#FFFFFF',
+          backgroundColor: 'var(--bg-surface-card)',
         }}
       >
         {/* Title */}
@@ -415,7 +450,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             fontSize: '14px',
             fontWeight: 700,
             lineHeight: 1.4,
-            color: '#0F172A',
+            color: 'var(--text-primary)',
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
@@ -429,12 +464,12 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
         {/* Pricing Row */}
         <div style={{ marginTop: 'auto', paddingTop: '4px' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
-            <span
+            <span className="premium-card-price"
               style={{
                 fontFamily: 'var(--font-mono)',
                 fontSize: '20px',
                 fontWeight: 800,
-                color: '#0F172A',
+                color: 'var(--text-primary)',
                 lineHeight: 1,
                 letterSpacing: '-0.02em',
               }}
@@ -487,7 +522,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
               gap: '6px',
               marginTop: '10px',
               paddingTop: '8px',
-              borderTop: '1px solid #F1F5F9',
+              borderTop: '1px solid var(--border-subtle)',
             }}
           >
             {/* Price trend indicator — only shows when real MRP data confirms a discount */}
@@ -573,7 +608,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
                         right: 0,
                         bottom: 'calc(100% + 6px)',
                         minWidth: '148px',
-                        backgroundColor: '#FFFFFF',
+                        backgroundColor: 'var(--bg-surface-card)',
                         borderRadius: '12px',
                         boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.1)',
                         border: '1px solid #E2E8F0',
@@ -721,48 +756,147 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           </div>
         </div>
 
-        {/* Apple Museum Gallery Primary Action Pill */}
-        <motion.a
-          href={deal.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => {
-            e.stopPropagation();
-            playTactileClick();
-          }}
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.98 }}
-          aria-label={`Get deal for ${displayTitle} on ${deal.store}`}
-          style={{
-            height: '38px',
-            width: '100%',
-            borderRadius: '9999px',
-            fontSize: '13px',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px',
-            textDecoration: 'none',
-            marginTop: '10px',
-            cursor: 'pointer',
-            backgroundColor: '#0066CC',
-            color: '#FFFFFF',
-            boxShadow: '0 1px 2px rgba(0, 102, 204, 0.2)',
-            transition: 'background-color 0.15s ease',
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#0071E3';
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#0066CC';
-          }}
-        >
-          <span>Get Deal on {storeBadge.name}</span>
-          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M2 10L10 2M10 2H4M10 2V8" />
-          </svg>
-        </motion.a>
+        {/* Multi-ASIN Accessory Bundle Toggle for Amazon Products */}
+        {asin && bundle && (
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setIncludeBundle(!includeBundle);
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '6px',
+              padding: '6px 10px',
+              borderRadius: '8px',
+              backgroundColor: includeBundle ? '#FEF08A' : '#FEFCE8',
+              border: `1px solid ${includeBundle ? '#EAB308' : '#FEF08A'}`,
+              fontSize: '11px',
+              color: '#854D0E',
+              cursor: 'pointer',
+              marginTop: '8px',
+              userSelect: 'none',
+              transition: 'all 0.15s ease',
+            }}
+            title="Add high-commission accessory / delivery fee saver to Amazon cart"
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '12px' }}>{includeBundle ? '☑️' : '◻️'}</span>
+              <span style={{ fontWeight: includeBundle ? 700 : 500 }}>
+                {bundle.badge}: +{bundle.name.slice(0, 22)}... (+₹{bundle.price})
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Dual-Action Desktop CTA Area: 90-Day Cart Lock + Store App */}
+        {asin ? (
+          <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+            <motion.button
+              type="button"
+              onClick={handleLockInCart}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              title="Locks price and attribution in Amazon Cart for up to 90 days"
+              style={{
+                flex: 1,
+                height: '38px',
+                borderRadius: '9999px',
+                fontSize: '12.5px',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                backgroundColor: '#F59E0B',
+                color: '#FFFFFF',
+                border: 'none',
+                boxShadow: '0 2px 6px rgba(245, 158, 11, 0.25)',
+                cursor: 'pointer',
+                transition: 'background-color 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#D97706';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F59E0B';
+              }}
+            >
+              <span>🛒 {includeBundle ? 'Lock Bundle (90d)' : 'Lock in Cart (90d)'}</span>
+            </motion.button>
+
+            <motion.button
+              type="button"
+              onClick={handleOpenStore}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              title="View product on Amazon in new tab"
+              style={{
+                height: '38px',
+                padding: '0 14px',
+                borderRadius: '9999px',
+                fontSize: '12px',
+                fontWeight: 650,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
+                backgroundColor: 'var(--surface-2)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-strong)',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F1F5F9';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F8FAFC';
+              }}
+            >
+              <span>View on Amazon ↗</span>
+            </motion.button>
+          </div>
+        ) : (
+          <motion.button
+            type="button"
+            onClick={handleOpenStore}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            aria-label={`Get deal for ${displayTitle} on ${deal.store}`}
+            style={{
+              height: '38px',
+              width: '100%',
+              borderRadius: '9999px',
+              fontSize: '13px',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              marginTop: '10px',
+              cursor: 'pointer',
+              border: 'none',
+              backgroundColor: '#0066CC',
+              color: '#FFFFFF',
+              boxShadow: '0 1px 2px rgba(0, 102, 204, 0.2)',
+              transition: 'background-color 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#0071E3';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#0066CC';
+            }}
+          >
+            <span>⚡ View Deal on {storeBadge.name} ↗</span>
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 10L10 2M10 2H4M10 2V8" />
+            </svg>
+          </motion.button>
+        )}
+      </div>
       </div>
     </motion.article>
   );

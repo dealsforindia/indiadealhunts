@@ -71,10 +71,10 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
   onClose,
   deal,
 }) => {
-  if (!isOpen || !deal) return null;
-
   const [selectedCardId, setSelectedCardId] = useState<string>('hdfc_cc');
   const [emiTenure, setEmiTenure] = useState<number>(3); // 3, 6, 9, 12 months
+
+  if (!isOpen || !deal) return null;
 
   const card = BANK_CARDS.find((c) => c.id === selectedCardId) || BANK_CARDS[0];
 
@@ -101,16 +101,16 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
+          className="relative w-full max-w-xl bg-white dark:bg-[#0D1527] rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/80">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/80 dark:bg-[#070A11]/80">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-lg font-bold shadow-sm">
                 💳
               </div>
               <div>
-                <h2 className="text-lg font-bold text-slate-900">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-[#F1F5F9]">
                   Bank Card & EMI Simulator
                 </h2>
                 <p className="text-xs text-slate-500">
@@ -122,7 +122,7 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer"
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#1E293B]/60 dark:bg-[#172440]/60 transition-colors cursor-pointer"
             >
               ✕
             </button>
@@ -130,8 +130,8 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
 
           <div className="p-6 space-y-6">
             {/* Product Snapshot */}
-            <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
-              <div className="w-16 h-16 rounded-xl bg-white border border-slate-200 p-1 flex items-center justify-center overflow-hidden shrink-0">
+            <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-[#070A11] border border-slate-200/80 dark:border-white/10">
+              <div className="w-16 h-16 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 p-1 flex items-center justify-center overflow-hidden shrink-0">
                 {deal.image ? (
                   <img src={deal.image} alt={deal.title} className="w-full h-full object-contain" />
                 ) : (
@@ -139,9 +139,9 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold text-slate-900 line-clamp-1">{deal.title}</p>
+                <p className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] line-clamp-1">{deal.title}</p>
                 <div className="flex items-baseline gap-2 mt-1">
-                  <span className="text-base font-black text-slate-900">₹{deal.price.toLocaleString('en-IN')}</span>
+                  <span className="text-base font-black text-slate-900 dark:text-[#F1F5F9]">₹{deal.price.toLocaleString('en-IN')}</span>
                   {deal.mrp && deal.mrp > deal.price && (
                     <span className="text-xs text-slate-400 line-through">₹{deal.mrp.toLocaleString('en-IN')}</span>
                   )}
@@ -170,10 +170,10 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
                       className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                         isSelected
                           ? 'bg-blue-50 border-blue-400 ring-2 ring-blue-100 shadow-2xs'
-                          : 'bg-white border-slate-200 hover:bg-slate-50'
+                          : 'bg-white dark:bg-[#0D1527] border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:bg-[#070A11]'
                       }`}
                     >
-                      <span className="text-xs font-bold text-slate-900">{c.name}</span>
+                      <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9]">{c.name}</span>
                       <span className="text-[11px] font-semibold text-emerald-700 mt-1">{c.badge}</span>
                     </button>
                   );
@@ -196,7 +196,7 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
                       className={`py-2 px-3 rounded-xl text-center border transition-all cursor-pointer ${
                         emiTenure === months
                           ? 'bg-slate-900 text-white font-bold border-slate-900 shadow-xs'
-                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-transparent font-medium text-xs'
+                          : 'bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-700 dark:text-slate-200 border-transparent font-medium text-xs'
                       }`}
                     >
                       <span className="block text-sm font-bold">{months}M</span>
@@ -219,7 +219,7 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
 
             {/* Price Breakdown Calculation Card */}
             <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50 via-teal-50/50 to-white border border-emerald-200/80 shadow-xs space-y-2">
-              <div className="flex justify-between text-xs text-slate-600">
+              <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400">
                 <span>Original Deal Price:</span>
                 <span>₹{deal.price.toLocaleString('en-IN')}</span>
               </div>
@@ -229,7 +229,7 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
               </div>
               <div className="pt-2 border-t border-emerald-200/60 flex items-baseline justify-between">
                 <div>
-                  <span className="text-xs font-bold text-slate-900 block">Final Net Price:</span>
+                  <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] block">Final Net Price:</span>
                   <span className="text-[11px] text-slate-500">
                     {deal.price >= 3000 ? `Payable in ${emiTenure} installments` : 'Single payment with instant savings'}
                   </span>
@@ -239,7 +239,7 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
                     ₹{priceAfterCard.toLocaleString('en-IN')}
                   </span>
                   {deal.price >= 3000 ? (
-                    <span className="block text-xs font-bold text-slate-600">
+                    <span className="block text-xs font-bold text-slate-600 dark:text-slate-400">
                       Just ₹{monthlyEmi.toLocaleString('en-IN')} / month
                     </span>
                   ) : (

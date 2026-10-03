@@ -147,11 +147,11 @@ Generated via IndiaDealHunts GST Engine`;
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Tool Header Banner */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-[#0D1527] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xl">🧾</span>
-            <h3 className="font-heading font-extrabold text-base sm:text-lg text-slate-900 m-0">
+            <h3 className="font-heading font-extrabold text-base sm:text-lg text-slate-900 dark:text-[#F1F5F9] m-0">
               GST Business Invoice &amp; Input Tax Credit (ITC) Engine
             </h3>
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -176,7 +176,7 @@ Generated via IndiaDealHunts GST Engine`;
         {/* Left Config Column */}
         <div className="lg:col-span-6 space-y-5">
           {/* 1. Listed Price Input */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+          <div className="bg-white dark:bg-[#0D1527] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm space-y-4">
             <label className="block">
               <span className="text-xs font-mono uppercase font-bold text-slate-500">
                 Item Listed Price on Store (Inclusive of GST)
@@ -192,7 +192,7 @@ Generated via IndiaDealHunts GST Engine`;
                   value={invoiceAmount || ''}
                   onChange={(e) => setInvoiceAmount(Number(e.target.value))}
                   placeholder="e.g. 64999"
-                  className="w-full h-11 pl-9 pr-4 rounded-xl border border-slate-300 text-base font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
+                  className="w-full h-11 pl-9 pr-4 rounded-xl border border-slate-300 dark:border-white/20 text-base font-mono font-bold text-slate-900 dark:text-[#F1F5F9] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
                 />
               </div>
             </label>
@@ -207,7 +207,7 @@ Generated via IndiaDealHunts GST Engine`;
                   className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-colors cursor-pointer border ${
                     invoiceAmount === amt
                       ? 'bg-blue-50 text-blue-700 border-blue-200 font-bold'
-                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                      : 'bg-slate-50 dark:bg-[#070A11] text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:bg-[#111C33]'
                   }`}
                 >
                   ₹{amt.toLocaleString('en-IN')}
@@ -217,7 +217,7 @@ Generated via IndiaDealHunts GST Engine`;
           </div>
 
           {/* 2. HSN Category Slabs */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
+          <div className="bg-white dark:bg-[#0D1527] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono uppercase font-bold text-slate-500">
                 Select HSN Product Category
@@ -242,7 +242,7 @@ Generated via IndiaDealHunts GST Engine`;
                       className={`flex-1 py-2.5 rounded-xl border text-xs font-mono font-bold transition-all cursor-pointer ${
                         customRate === rate
                           ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                          : 'bg-slate-50 dark:bg-[#070A11] text-slate-700 dark:text-slate-200 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:bg-[#111C33]'
                       }`}
                     >
                       {rate}% GST
@@ -262,16 +262,16 @@ Generated via IndiaDealHunts GST Engine`;
                       className={`w-full p-2.5 rounded-xl border text-left transition-all flex items-start gap-2.5 cursor-pointer ${
                         isSelected
                           ? 'bg-blue-50/80 border-blue-300 shadow-2xs'
-                          : 'bg-white border-slate-200 hover:border-slate-300'
+                          : 'bg-white dark:bg-[#0D1527] border-slate-200 dark:border-white/10 hover:border-slate-300 dark:border-white/20'
                       }`}
                     >
                       <span className="text-lg mt-0.5">{preset.icon}</span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-slate-900 truncate">
+                          <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] truncate">
                             {preset.name}
                           </span>
-                          <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
+                          <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#111C33] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 shrink-0">
                             {preset.rate}% GST
                           </span>
                         </div>
@@ -287,7 +287,7 @@ Generated via IndiaDealHunts GST Engine`;
           </div>
 
           {/* 3. Business Context & Tax Parameters */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+          <div className="bg-white dark:bg-[#0D1527] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm space-y-4">
             <span className="text-xs font-mono uppercase font-bold text-slate-500 block">
               Business &amp; Tax Configuration
             </span>
@@ -300,7 +300,7 @@ Generated via IndiaDealHunts GST Engine`;
                 className={`p-2.5 rounded-xl border text-xs font-semibold text-center transition-all cursor-pointer ${
                   isInterState
                     ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
-                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                    : 'bg-slate-50 dark:bg-[#070A11] text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:bg-[#111C33]'
                 }`}
               >
                 Inter-State (IGST 100%)
@@ -311,7 +311,7 @@ Generated via IndiaDealHunts GST Engine`;
                 className={`p-2.5 rounded-xl border text-xs font-semibold text-center transition-all cursor-pointer ${
                   !isInterState
                     ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
-                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                    : 'bg-slate-50 dark:bg-[#070A11] text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:bg-[#111C33]'
                 }`}
               >
                 Intra-State (CGST + SGST)
@@ -319,9 +319,9 @@ Generated via IndiaDealHunts GST Engine`;
             </div>
 
             {/* Income Tax Depreciation Checkbox */}
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+            <div className="pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
               <div>
-                <span className="text-xs font-bold text-slate-800 block">
+                <span className="text-xs font-bold text-slate-800 dark:text-[#F8FAFC] block">
                   Add Year-1 Income Tax Depreciation (Sec 32)
                 </span>
                 <span className="text-[11px] text-slate-500">
@@ -338,7 +338,7 @@ Generated via IndiaDealHunts GST Engine`;
 
             {claimDepreciation && (
               <div className="flex items-center justify-between pt-1">
-                <span className="text-xs text-slate-600">Your Income Tax Slab:</span>
+                <span className="text-xs text-slate-600 dark:text-slate-400">Your Income Tax Slab:</span>
                 <div className="flex items-center gap-1.5">
                   {[22, 25, 30].map((s) => (
                     <button
@@ -348,7 +348,7 @@ Generated via IndiaDealHunts GST Engine`;
                       className={`px-2 py-1 rounded-lg text-xs font-mono font-bold border transition-colors cursor-pointer ${
                         taxSlab === s
                           ? 'bg-blue-50 text-blue-700 border-blue-200'
-                          : 'bg-slate-50 text-slate-500 border-slate-200'
+                          : 'bg-slate-50 dark:bg-[#070A11] text-slate-500 border-slate-200 dark:border-white/10'
                       }`}
                     >
                       {s}%
@@ -427,22 +427,22 @@ Generated via IndiaDealHunts GST Engine`;
           </div>
 
           {/* Breakdown Matrix Table */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
-            <span className="text-xs font-mono uppercase font-bold text-slate-500 block pb-1 border-b border-slate-100">
+          <div className="bg-white dark:bg-[#0D1527] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm space-y-3">
+            <span className="text-xs font-mono uppercase font-bold text-slate-500 block pb-1 border-b border-slate-100 dark:border-white/5">
               Official Tax Invoice Reconciliation
             </span>
 
             <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between py-1 text-slate-600">
+              <div className="flex items-center justify-between py-1 text-slate-600 dark:text-slate-400">
                 <span>Gross Retail Invoice Amount:</span>
-                <span className="font-mono font-bold text-slate-900">
+                <span className="font-mono font-bold text-slate-900 dark:text-[#F1F5F9]">
                   ₹{breakdown.total.toLocaleString('en-IN')}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between py-1 text-slate-600">
+              <div className="flex items-center justify-between py-1 text-slate-600 dark:text-slate-400">
                 <span>Base Asset Cost (Tax Exclusive):</span>
-                <span className="font-mono font-bold text-slate-800">
+                <span className="font-mono font-bold text-slate-800 dark:text-[#F8FAFC]">
                   ₹{breakdown.basePrice.toLocaleString('en-IN')}
                 </span>
               </div>
@@ -469,7 +469,7 @@ Generated via IndiaDealHunts GST Engine`;
                 </div>
               )}
 
-              <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-slate-900 font-bold text-sm">
+              <div className="pt-2 border-t border-slate-200 dark:border-white/10 flex items-center justify-between text-slate-900 dark:text-[#F1F5F9] font-bold text-sm">
                 <span>Net Out-of-Pocket Expense:</span>
                 <span className="font-mono text-base text-blue-700">
                   ₹{breakdown.netEffectiveOutflow.toLocaleString('en-IN')}

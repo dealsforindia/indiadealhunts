@@ -18,19 +18,19 @@ export const HowWeVerify: React.FC<HowWeVerifyProps> = ({ onBackToHome }) => {
           Home
         </button>
         <span>/</span>
-        <span className="text-slate-800 font-semibold">Verification Pipeline</span>
+        <span className="text-slate-800 dark:text-[#F8FAFC] font-semibold">Understanding offer evidence</span>
       </div>
 
       {/* Header */}
       <div className="flex flex-col gap-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-mono text-[11px] font-bold w-fit">
-          <span>🛡️ ZERO-TOLERANCE FRAUD FILTER</span>
+          <span>🛡️ KNOW WHAT YOU ARE BUYING</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-heading font-black tracking-tight text-slate-900 leading-tight">
+        <h1 className="text-3xl sm:text-4xl font-heading font-black tracking-tight text-slate-900 dark:text-[#F1F5F9] leading-tight">
           How Deals Are Verified
         </h1>
-        <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl">
-          Every deal listed on IndiaDealHunts passes through our automated multi-layer verification pipeline. From live merchant scraping and 90-day price benchmarking to link sanitization, we verify that only genuine discounts reach the feed.
+        <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed max-w-2xl">
+          Use source labels, recorded prices and merchant links to assess an offer. Directory inclusion is different from a confirmed historical low, and evidence coverage varies by product.
         </p>
       </div>
 
@@ -39,52 +39,52 @@ export const HowWeVerify: React.FC<HowWeVerifyProps> = ({ onBackToHome }) => {
         {[
           {
             num: '01',
-            title: 'Canonical Link Resolution & Sanitization',
+            title: 'Merchant product links',
             tag: 'Link Layer',
-            desc: 'When a deal URL enters our ingestion workers, we follow all redirect hops (such as fpkrt.cc or amzn.to) to unpack the canonical merchant product ID (ASIN on Amazon, pid/itm on Flipkart). We sanitize tracking tokens to guarantee safe, direct merchant landing.',
+            desc: 'Open the merchant page and check the exact product and variant. Some links redirect through an affiliate service; a category or collection page does not identify a single product for price history.',
           },
           {
             num: '02',
-            title: '90-Day Historical Price Benchmarking',
+            title: 'Recorded price observations',
             tag: 'Price Audit',
-            desc: 'Sellers frequently raise list prices immediately before promotional sales. Our workers cross-reference current live prices against 90-day median pricing to verify whether a discount is historically meaningful.',
+            desc: 'Where price observations are supplied, the inspector shows the recorded low, median and high, with dates. Missing history stays missing; MRP alone cannot establish a genuine bargain.',
           },
           {
             num: '03',
             title: 'Multi-Source Signal Consensus',
             tag: 'Consensus',
-            desc: 'When an extraordinary price drop occurs, our system checks if multiple independent channels are reporting the same drop simultaneously. High consensus indicates a verified clearance or flash sale event.',
+            desc: 'Multiple source sightings can be useful context. They do not establish independent verification, seller reliability or that a price is still available.',
           },
           {
             num: '04',
-            title: 'Live Stock & Merchant Availability',
-            tag: 'Telemetry',
-            desc: 'Scrapers poll product detail pages to check if items are in-stock, fulfilled by reputable sellers, and eligible for delivery. Expired promotions are automatically labeled as Sold Out to prevent wasted clicks.',
+            title: 'Availability and freshness',
+            tag: 'Availability',
+            desc: 'The inspector shows stock status and check timestamps when the source supplies them. Unknown stock stays unconfirmed. Verify seller, delivery location and final price on the store before buying.',
           },
           {
             num: '05',
             title: 'Clean Affiliate Transformation',
             tag: 'Monetization',
-            desc: 'Clean URLs are transformed with transparent affiliate tags for Amazon Associates and Flipkart/EarnKaro networks. This sustains our free service with zero price impact on the buyer.',
+            desc: 'Supported merchant links may be transformed into affiliate links. Conversion is labelled when confirmed by the source. An affiliate link may earn us commission; it does not guarantee an extra discount.',
           },
         ].map((step) => (
           <div
             key={step.num}
-            className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row gap-4 sm:items-start"
+            className="p-5 rounded-2xl bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 hover:border-slate-300 dark:border-white/20 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row gap-4 sm:items-start"
           >
             <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center font-mono font-bold text-blue-600 text-sm flex-shrink-0">
               {step.num}
             </div>
             <div className="flex-1 flex flex-col gap-1.5">
               <div className="flex items-center gap-2.5">
-                <h3 className="text-sm font-bold font-heading text-slate-900">
+                <h3 className="text-sm font-bold font-heading text-slate-900 dark:text-[#F1F5F9]">
                   {step.title}
                 </h3>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 font-semibold">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-100 dark:bg-[#111C33] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 font-semibold">
                   {step.tag}
                 </span>
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 {step.desc}
               </p>
             </div>
@@ -93,13 +93,13 @@ export const HowWeVerify: React.FC<HowWeVerifyProps> = ({ onBackToHome }) => {
       </div>
 
       {/* Try Tool Banner */}
-      <div className="p-6 rounded-2xl bg-white border border-slate-200/90 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow">
+      <div className="p-6 rounded-2xl bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow">
         <div>
-          <h3 className="text-base font-bold font-heading text-slate-900">
+          <h3 className="text-base font-bold font-heading text-slate-900 dark:text-[#F1F5F9]">
             Want to test a product link yourself?
           </h3>
           <p className="text-xs text-slate-500 mt-1 max-w-xl">
-            Use our interactive Price Lookup tool to paste any Amazon, Flipkart, or Myntra link and inspect live metrics right now.
+            Use our interactive Price Lookup tool to paste a specific Amazon, Flipkart, or Myntra product link and inspect available evidence.
           </p>
         </div>
         <button

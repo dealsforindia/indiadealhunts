@@ -161,13 +161,13 @@ export const ApplianceEnergyCostCalculatorTool: React.FC = () => {
   }, [appliance, dailyHours, electricityRate, threeStarPrice, fiveStarPrice]);
 
   return (
-    <div className="w-full bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 md:p-7 text-slate-800">
+    <div className="w-full bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-sm p-5 md:p-7 text-slate-800 dark:text-[#F8FAFC]">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100 dark:border-white/5">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xl">⚡</span>
-            <h3 className="font-heading font-extrabold text-lg sm:text-xl text-slate-900 tracking-tight">
+            <h3 className="font-heading font-extrabold text-lg sm:text-xl text-slate-900 dark:text-[#F1F5F9] tracking-tight">
               Appliance 5-Year Electricity &amp; BEE Star Payback
             </h3>
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -190,11 +190,11 @@ export const ApplianceEnergyCostCalculatorTool: React.FC = () => {
             className={`p-3 rounded-xl border text-left transition-all ${
               selectedApplianceId === p.id
                 ? 'bg-blue-50/60 border-blue-400 ring-2 ring-blue-400/20 shadow-xs'
-                : 'bg-slate-50/50 border-slate-200 hover:bg-slate-100'
+                : 'bg-slate-50/50 dark:bg-[#070A11]/50 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:bg-[#111C33]'
             }`}
           >
             <div className="text-lg mb-1">{p.icon}</div>
-            <div className="text-xs font-bold text-slate-900 leading-tight">{p.name}</div>
+            <div className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] leading-tight">{p.name}</div>
           </button>
         ))}
       </div>
@@ -205,8 +205,8 @@ export const ApplianceEnergyCostCalculatorTool: React.FC = () => {
         <div className="lg:col-span-7 flex flex-col gap-4">
           {/* Price Comparison */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/40">
-              <label className="text-xs font-bold text-slate-700 block mb-1">
+            <div className="p-3.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/40 dark:bg-[#070A11]/40">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-200 block mb-1">
                 3-Star {appliance.name} Price
               </label>
               <div className="relative">
@@ -216,7 +216,7 @@ export const ApplianceEnergyCostCalculatorTool: React.FC = () => {
                   step="500"
                   value={threeStarPrice}
                   onChange={(e) => setThreeStarPrice(Number(e.target.value))}
-                  className="w-full h-9 pl-6 pr-2 rounded-lg border border-slate-200 bg-white text-xs font-mono font-bold text-slate-900"
+                  className="w-full h-9 pl-6 pr-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-xs font-mono font-bold text-slate-900 dark:text-[#F1F5F9]"
                 />
               </div>
             </div>
@@ -232,7 +232,7 @@ export const ApplianceEnergyCostCalculatorTool: React.FC = () => {
                   step="500"
                   value={fiveStarPrice}
                   onChange={(e) => setFiveStarPrice(Number(e.target.value))}
-                  className="w-full h-9 pl-6 pr-2 rounded-lg border border-slate-200 bg-white text-xs font-mono font-bold text-emerald-800"
+                  className="w-full h-9 pl-6 pr-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-xs font-mono font-bold text-emerald-800"
                 />
               </div>
             </div>
@@ -241,10 +241,10 @@ export const ApplianceEnergyCostCalculatorTool: React.FC = () => {
           {/* Daily Usage Slider */}
           <div>
             <div className="flex justify-between items-center mb-1.5">
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">
                 Daily Usage Hours
               </label>
-              <span className="text-sm font-extrabold font-mono text-slate-900">
+              <span className="text-sm font-extrabold font-mono text-slate-900 dark:text-[#F1F5F9]">
                 {dailyHours} Hours / Day
               </span>
             </div>
@@ -255,7 +255,7 @@ export const ApplianceEnergyCostCalculatorTool: React.FC = () => {
               step="0.5"
               value={dailyHours}
               onChange={(e) => setDailyHours(Number(e.target.value))}
-              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              className="w-full h-2 bg-slate-200 dark:bg-[#172440] rounded-lg appearance-none cursor-pointer accent-blue-600"
             />
             <div className="flex justify-between text-[10px] text-slate-400 font-mono mt-1">
               <span>Light (2-4 hrs)</span>
@@ -267,13 +267,13 @@ export const ApplianceEnergyCostCalculatorTool: React.FC = () => {
           {/* State Electricity Board */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1.5">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide block mb-1.5">
                 Your State Discom Rate
               </label>
               <select
                 value={selectedDiscomId}
                 onChange={(e) => handleDiscomChange(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-800"
+                className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-xs font-medium text-slate-800 dark:text-[#F8FAFC]"
               >
                 {INDIAN_DISCOMS.map((d) => (
                   <option key={d.id} value={d.id}>
@@ -284,7 +284,7 @@ export const ApplianceEnergyCostCalculatorTool: React.FC = () => {
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1.5">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide block mb-1.5">
                 Tariff (₹ / kWh Unit)
               </label>
               <div className="relative">
@@ -299,7 +299,7 @@ export const ApplianceEnergyCostCalculatorTool: React.FC = () => {
                     setCustomRateEnabled(true);
                     setElectricityRate(Number(e.target.value));
                   }}
-                  className="w-full h-10 pl-7 pr-3 rounded-xl border border-slate-200 bg-white text-xs font-mono font-bold text-slate-900"
+                  className="w-full h-10 pl-7 pr-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-xs font-mono font-bold text-slate-900 dark:text-[#F1F5F9]"
                 />
               </div>
             </div>
@@ -307,7 +307,7 @@ export const ApplianceEnergyCostCalculatorTool: React.FC = () => {
         </div>
 
         {/* Right Output: Verdict & 5-Year TCO (5 cols) */}
-        <div className="lg:col-span-5 bg-slate-50/80 rounded-2xl border border-slate-200/80 p-5 flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-slate-50/80 dark:bg-[#070A11]/80 rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 flex flex-col justify-between">
           <div>
             <span className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider block mb-1">
               Break-Even Payback Period
@@ -324,10 +324,10 @@ export const ApplianceEnergyCostCalculatorTool: React.FC = () => {
             </div>
 
             {/* 5-Year Total Cost Comparison */}
-            <div className="mt-4 pt-4 border-t border-slate-200/80 flex flex-col gap-2.5 text-xs">
-              <div className="flex justify-between items-center text-slate-600">
+            <div className="mt-4 pt-4 border-t border-slate-200/80 dark:border-white/10 flex flex-col gap-2.5 text-xs">
+              <div className="flex justify-between items-center text-slate-600 dark:text-slate-400">
                 <span>Annual Electricity (3-Star)</span>
-                <span className="font-mono font-bold text-slate-900">
+                <span className="font-mono font-bold text-slate-900 dark:text-[#F1F5F9]">
                   ₹{analysis.annualBill3Star.toLocaleString('en-IN')} / yr ({analysis.annualUnits3Star} units)
                 </span>
               </div>
@@ -345,15 +345,15 @@ export const ApplianceEnergyCostCalculatorTool: React.FC = () => {
               </div>
 
               {/* 5-Year Total Cost of Ownership */}
-              <div className="pt-2 border-t border-slate-200 flex justify-between items-center text-slate-700">
+              <div className="pt-2 border-t border-slate-200 dark:border-white/10 flex justify-between items-center text-slate-700 dark:text-slate-200">
                 <span>5-Yr Total Outflow (3-Star)</span>
                 <span className="font-mono font-bold">₹{analysis.fiveYearTco3Star.toLocaleString('en-IN')}</span>
               </div>
-              <div className="flex justify-between items-center text-slate-700">
+              <div className="flex justify-between items-center text-slate-700 dark:text-slate-200">
                 <span>5-Yr Total Outflow (5-Star)</span>
                 <span className="font-mono font-bold">₹{analysis.fiveYearTco5Star.toLocaleString('en-IN')}</span>
               </div>
-              <div className="flex justify-between items-center text-sm font-extrabold text-slate-900 pt-1 border-t border-slate-300">
+              <div className="flex justify-between items-center text-sm font-extrabold text-slate-900 dark:text-[#F1F5F9] pt-1 border-t border-slate-300 dark:border-white/20">
                 <span>5-Year Net Pocket Savings</span>
                 <span className={`font-mono text-base ${analysis.netFiveYearSavings >= 0 ? 'text-emerald-700' : 'text-rose-600'}`}>
                   {analysis.netFiveYearSavings >= 0 ? '+' : ''}₹{analysis.netFiveYearSavings.toLocaleString('en-IN')}
@@ -363,8 +363,8 @@ export const ApplianceEnergyCostCalculatorTool: React.FC = () => {
           </div>
 
           {/* Verdict Box */}
-          <div className="mt-5 p-3 rounded-xl bg-white border border-slate-200 text-xs">
-            <div className="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
+          <div className="mt-5 p-3 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 text-xs">
+            <div className="font-bold text-slate-900 dark:text-[#F1F5F9] mb-1 flex items-center gap-1.5">
               <span>{analysis.isWorthBuying5Star ? '✅ 5-Star Recommended:' : '⚠️ 3-Star May Be Sufficient:'}</span>
             </div>
             <p className="text-[11px] text-slate-500 leading-relaxed">

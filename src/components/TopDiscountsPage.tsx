@@ -67,16 +67,16 @@ export const TopDiscountsPage: React.FC<TopDiscountsPageProps> = ({
           <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
           <span>STEEPEST PRICE DROPS</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-[#F1F5F9] tracking-tight">
           Top Discounts & Flash Loots
         </h1>
-        <p className="mt-2 text-sm sm:text-base text-slate-600 max-w-2xl leading-relaxed">
-          Verified drops ranked by discount depth. Every single deal has been validated against real historical price baselines.
+        <p className="mt-2 text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
+          Offers ranked by their listed discount from MRP. Inspect recorded history where available and confirm the price at checkout.
         </p>
       </div>
 
       {/* ── Filters & Controls Toolbar ── */}
-      <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/90 p-4 mb-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-white/80 dark:bg-[#0D1527]/80 backdrop-blur-md rounded-2xl border border-slate-200/90 dark:border-white/10 p-4 mb-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         {/* Left: Discount Threshold Pills */}
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">
@@ -94,7 +94,7 @@ export const TopDiscountsPage: React.FC<TopDiscountsPageProps> = ({
               className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 discountThreshold === tier.value
                   ? 'bg-rose-600 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70 hover:text-slate-900'
+                  : 'bg-slate-100 dark:bg-[#111C33] text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#1E293B]/70 dark:bg-[#172440]/70 hover:text-slate-900 dark:text-[#F1F5F9]'
               }`}
             >
               {tier.label}
@@ -109,13 +109,13 @@ export const TopDiscountsPage: React.FC<TopDiscountsPageProps> = ({
             placeholder="Filter discounts..."
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
-            className="px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white w-full sm:w-44 transition-all"
+            className="px-3.5 py-1.5 rounded-full bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-800 dark:text-[#F8FAFC] focus:outline-none focus:border-blue-500 focus:bg-white dark:bg-[#0D1527] w-full sm:w-44 transition-all"
           />
 
           <select
             value={selectedStore}
             onChange={(e) => setSelectedStore(e.target.value)}
-            className="px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-500 capitalize cursor-pointer"
+            className="px-3 py-1.5 rounded-full bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 capitalize cursor-pointer"
           >
             {STORES.map((s) => (
               <option key={s} value={s}>
@@ -124,11 +124,11 @@ export const TopDiscountsPage: React.FC<TopDiscountsPageProps> = ({
             ))}
           </select>
 
-          <div className="hidden sm:flex items-center rounded-full bg-slate-100 p-0.5 border border-slate-200">
+          <div className="hidden sm:flex items-center rounded-full bg-slate-100 dark:bg-[#111C33] p-0.5 border border-slate-200 dark:border-white/10">
             <button
               onClick={() => onViewModeChange('grid')}
               className={`p-1.5 rounded-full transition-colors ${
-                viewMode === 'grid' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                viewMode === 'grid' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-2xs' : 'text-slate-500 hover:text-slate-800 dark:text-[#F8FAFC]'
               }`}
               title="Grid View"
             >
@@ -142,7 +142,7 @@ export const TopDiscountsPage: React.FC<TopDiscountsPageProps> = ({
             <button
               onClick={() => onViewModeChange('list')}
               className={`p-1.5 rounded-full transition-colors ${
-                viewMode === 'list' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                viewMode === 'list' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-2xs' : 'text-slate-500 hover:text-slate-800 dark:text-[#F8FAFC]'
               }`}
               title="List View"
             >
@@ -162,7 +162,7 @@ export const TopDiscountsPage: React.FC<TopDiscountsPageProps> = ({
       {/* ── Status Bar ── */}
       <div className="flex items-center justify-between text-xs text-slate-500 mb-4 px-1">
         <span>
-          Showing <strong className="text-slate-800 font-semibold">{sortedDeals.length}</strong> verified drops
+          Showing <strong className="text-slate-800 dark:text-[#F8FAFC] font-semibold">{sortedDeals.length}</strong> verified drops
           {discountThreshold > 0 && <span> with &ge;{discountThreshold}% off</span>}
         </span>
         <span className="text-[11px] font-mono text-emerald-600 font-semibold">
@@ -197,9 +197,9 @@ export const TopDiscountsPage: React.FC<TopDiscountsPageProps> = ({
           ))}
         </motion.div>
       ) : (
-        <div className="text-center py-16 px-4 bg-white rounded-2xl border border-slate-200">
+        <div className="text-center py-16 px-4 bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-white/10">
           <div className="text-4xl mb-3">🏷️</div>
-          <h3 className="text-base font-bold text-slate-800">No deals match this discount filter</h3>
+          <h3 className="text-base font-bold text-slate-800 dark:text-[#F8FAFC]">No deals match this discount filter</h3>
           <p className="text-xs text-slate-500 mt-1">Try lowering the minimum discount threshold or selecting All Stores.</p>
           <button
             onClick={() => {

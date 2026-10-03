@@ -7,6 +7,15 @@ import { SignaturePriceGraph } from './SignaturePriceGraph';
 import { analyzeArbitrage } from '../utils/arbitrage';
 import { shareToWhatsApp, shareToTelegram, copyDealLink } from '../utils/shareDeal';
 import { isDealSaved, toggleSavedDealId } from '../utils/savedDeals';
+import {
+  extractAmazonAsin,
+  buildAmazonCartUrl,
+  buildMultiAsinCartUrl,
+  generateSubId,
+  openSmartStoreLink,
+  getRecommendedBundle,
+  useIsMobile,
+} from '../utils/affiliateEngine';
 
 interface DealDetailModalProps {
   deal: PublicDeal | null;
@@ -29,31 +38,6 @@ function getStoreDisplayName(store?: string): string {
   return store || 'Store';
 }
 
-function AnimatedSavings({ value }: { value: number }) {
-  const [displayVal, setDisplayVal] = useState(0);
-
-  useEffect(() => {
-    if (!value || value <= 0) return;
-    let start = 0;
-    const duration = 400; // ms
-    const steps = 10;
-    const stepTime = duration / steps;
-    const increment = value / steps;
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= value) {
-        setDisplayVal(value);
-        clearInterval(timer);
-      } else {
-        setDisplayVal(Math.round(start));
-      }
-    }, stepTime);
-    return () => clearInterval(timer);
-  }, [value]);
-
-  return <span>₹{displayVal.toLocaleString('en-IN')}</span>;
-}
-
 export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   deal,
   onClose,
@@ -62,11 +46,33 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   onToggleSave,
   onOpenTool,
 }) => {
+  const dialogRef = React.useRef<HTMLDivElement>(null);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [copiedCoupon, setCopiedCoupon] = useState(false);
   const [copyLink, setCopyLink] = useState(false);
   const [reportSent, setReportSent] = useState(false);
+  const [includeBundle, setIncludeBundle] = useState(false);
+
+  const isAmazon = (deal?.store || '').toLowerCase().includes('amazon');
+  const asin = isAmazon && deal ? extractAmazonAsin(deal.url || deal.id) : null;
+  const subId = deal ? generateSubId('modal', deal.id) : '';
+  const bundle = asin && deal ? getRecommendedBundle(deal.category, deal.price || 0) : null;
+
+  const handleLockInCart = () => {
+    if (!asin || !deal) return;
+    const cartUrl = includeBundle && bundle
+      ? buildMultiAsinCartUrl(asin, bundle.asin, undefined, subId)
+      : buildAmazonCartUrl(asin, undefined, subId);
+    openSmartStoreLink(cartUrl, 'amazon', asin, true, subId);
+  };
+
+  const handleOpenStore = () => {
+    if (!deal) return;
+    openSmartStoreLink(deal.url, deal.store || 'Store', asin || undefined, false, subId);
+  };
+  const isMobile = useIsMobile();
+
   const [visible, setVisible] = useState(false);
   const [saved, setSaved] = useState(() => (deal ? isDealSaved(deal.id) : false));
 
@@ -91,6 +97,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
     if (!deal) return;
     if (onToggleSave) {
       onToggleSave(deal);
+      setSaved(isDealSaved(deal.id));
     } else {
       const { isSaved: next } = toggleSavedDealId(deal.id);
       setSaved(next);
@@ -116,6 +123,24 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
     };
   }, [deal, handleClose]);
 
+  // Keep keyboard focus inside the sheet and return it to the tapped card.
+  useEffect(() => {
+    if (!deal) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const panel = dialogRef.current;
+    panel?.querySelector<HTMLButtonElement>('[aria-label="Close deal details"]')?.focus({ preventScroll: true });
+    const trap = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab' || !panel) return;
+      const items = [...panel.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], input, select, [tabindex="0"]')].filter(el => el.getClientRects().length > 0);
+      const first = items[0], last = items[items.length - 1];
+      if (!first || !last) return;
+      if (event.shiftKey && (document.activeElement === first || !panel.contains(document.activeElement))) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && (document.activeElement === last || !panel.contains(document.activeElement))) { event.preventDefault(); first.focus(); }
+    };
+    document.addEventListener('keydown', trap);
+    return () => { document.removeEventListener('keydown', trap); if (previous?.isConnected) previous.focus({ preventScroll: true }); };
+  }, [deal?.id]);
+
   if (!deal) return null;
 
   const cleanImage = getCleanImageUrl(deal.image);
@@ -138,14 +163,15 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   const isB2BEligible = isTechOrAppliance && price >= 1500;
   const isFashion = catLower.includes('fashion') || /\b(shoes|sneakers|shirt|t-shirt|jeans|dress|saree|kurta|trousers|sandals|handbag|jacket)\b/i.test(titleLower);
   const isGroceryBeauty = catLower.includes('grocery') || catLower.includes('beauty') || /\b(face wash|cream|shampoo|soap|atta|oil|tea|coffee|biscuit|dry fruits)\b/i.test(titleLower);
-  const bestCardSavings = useMemo(() => {
+  // This cheap calculation must not add a hook after the closed-state return.
+  const bestCardSavings = (() => {
     if (!price || price <= 0) return null;
     const instant10 = Math.max(0, Math.min(1500, price * 0.1) - 117);
     const cashback5 = price * 0.05;
     const bestRoute = price > 30000 ? '5% Unlimited Cashback' : '10% Instant Bank Card';
     const bestAmount = Math.round(Math.max(instant10, cashback5));
     return { bestRoute, bestAmount, instant10: Math.round(instant10), cashback5: Math.round(cashback5) };
-  }, [price]);
+  })();
 
   const handleCopyCoupon = () => {
     if (!deal.coupon) return;
@@ -176,6 +202,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
 
   return createPortal(
     <div
+      className="deal-detail-overlay"
       role="dialog"
       aria-modal="true"
       aria-label={`Deal details: ${deal.title}`}
@@ -195,7 +222,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
       }}
     >
       <motion.div
-        className="pro-card"
+        ref={dialogRef}
+        className="pro-card deal-detail-sheet"
         initial={{ opacity: 0, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 10, scale: 0.98 }}
@@ -207,21 +235,21 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
           overflowY: 'auto',
           overscrollBehavior: 'contain',
           borderRadius: '16px',
-          backgroundColor: '#FFFFFF',
-          border: '1px solid #E2E8F0',
+          backgroundColor: 'var(--bg-surface-card)',
+          border: '1px solid var(--border-subtle)',
           display: 'flex',
           flexDirection: 'column',
           boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25)',
         }}
       >
         {/* Header */}
-        <div style={{
+        <div className="deal-detail-sheet-head" style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '14px 18px',
-          borderBottom: '1px solid #F1F5F9',
-          backgroundColor: '#F8FAFC',
+          borderBottom: '1px solid var(--border-subtle)',
+          backgroundColor: 'var(--surface-2)',
           flexShrink: 0,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -269,7 +297,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   transition={{ duration: 0.35, ease: 'easeOut' }}
                 />
               </svg>
-              Verified Loot
+              Directory offer
             </span>
           </div>
 
@@ -278,7 +306,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               type="button"
               onClick={handleToggleFavorite}
               title={saved ? 'Saved in Loot Bookmarks' : 'Save deal'}
-              aria-label="Save deal to bookmarks"
+              aria-label={saved ? "Remove from bookmarks" : "Save deal to bookmarks"}
+              aria-pressed={saved}
               style={{
                 width: '32px',
                 height: '32px',
@@ -313,8 +342,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #E2E8F0',
+                backgroundColor: 'var(--bg-surface-card)',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '8px',
                 color: '#64748B',
                 cursor: 'pointer',
@@ -340,7 +369,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
         </div>
 
         {/* Body: Two-column */}
-        <div style={{
+        <div className="deal-detail-layout" style={{
           display: 'grid',
           gridTemplateColumns: 'minmax(160px, 260px) 1fr',
           gap: '0',
@@ -349,13 +378,14 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
           {/* Left: Image */}
           <button
             onClick={() => onOpenImage && onOpenImage(deal)}
-            aria-label="Click to zoom"
+            className="deal-detail-media"
+            aria-label={onOpenImage ? "Click to zoom" : "Product image"}
             style={{
               aspectRatio: '4 / 3',
               alignSelf: 'start',
-              backgroundColor: '#F8FAFC',
+              backgroundColor: 'var(--surface-2)',
               border: 'none',
-              borderRight: '1px solid #F1F5F9',
+              borderRight: '1px solid var(--border-subtle)',
               cursor: onOpenImage ? 'zoom-in' : 'default',
               display: 'flex',
               alignItems: 'center',
@@ -407,7 +437,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               fontSize: '16px',
               fontWeight: 700,
               lineHeight: 1.4,
-              color: '#0F172A',
+              color: 'var(--text-primary)',
               margin: 0,
             }}>
               {deal.title}
@@ -421,7 +451,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   fontVariantNumeric: 'tabular-nums',
                   fontSize: '26px',
                   fontWeight: 800,
-                  color: '#0F172A',
+                  color: 'var(--text-primary)',
                   lineHeight: 1,
                 }}>
                   ₹{price.toLocaleString('en-IN')}
@@ -459,7 +489,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   fontWeight: 600,
                   color: '#059669',
                 }}>
-                  Total Savings: <AnimatedSavings value={savings} />
+                  Savings vs MRP: ₹{savings.toLocaleString('en-IN')}
                 </span>
               )}
             </div>
@@ -531,12 +561,12 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                 gap: '8px',
                 padding: '12px',
                 borderRadius: '12px',
-                backgroundColor: '#F8FAFC',
-                border: '1px solid #E2E8F0',
+                backgroundColor: 'var(--surface-2)',
+                border: '1px solid var(--border-subtle)',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontFamily: 'var(--font-heading)', fontSize: '12px', fontWeight: 800, color: '#0F172A' }}>
-                    ⚡ Multi-Store Real-Time Price Verification
+                    Compare store listings
                   </span>
                   <span style={{
                     fontFamily: 'var(--font-mono)',
@@ -658,7 +688,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                     fontWeight: 700,
                   }}>✓</span>
                   <span style={{ fontFamily: 'var(--font-heading)', fontSize: '13px', fontWeight: 700, color: '#1D1D1F' }}>
-                    Authentic Verified Deal
+                    Check before buying
                   </span>
                 </div>
                 <span style={{
@@ -679,11 +709,11 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               }}>
                 {savings > 0 ? (
                   <span>
-                    You save <strong style={{ color: '#0066CC' }}>₹{savings.toLocaleString('en-IN')}</strong> ({discount}% below MRP). Cross-referenced against 90-day merchant price history.
+                    You save <strong style={{ color: '#0066CC' }}>₹{savings.toLocaleString('en-IN')}</strong> ({discount}% below MRP). MRP is a merchant reference; inspect recorded history separately.
                   </span>
                 ) : (
                   <span>
-                    Price checked against live merchant catalog. Verified affiliate-direct link without redirects.
+                    This directory offer links to the merchant. Confirm price and availability before buying.
                   </span>
                 )}
               </div>
@@ -696,13 +726,10 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               color: '#64748B',
               lineHeight: 1.5,
               margin: 0,
-              borderTop: '1px solid #F1F5F9',
+              borderTop: '1px solid var(--border-subtle)',
               paddingTop: '10px',
             }}>
-              Verified via official {storeName} product feed.
-              {deal.cluster_count && deal.cluster_count > 1
-                ? ` Confirmed across ${deal.cluster_count} independent sources.`
-                : ' Price checked against live merchant data.'}
+              Source-reported offer from {storeName}. Prices, stock and delivery costs may change.
             </p>
           </div>
         </div>
@@ -713,45 +740,134 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
           alignItems: 'center',
           gap: '8px',
           padding: '14px 18px',
-          borderTop: '1px solid #F1F5F9',
-          backgroundColor: '#F8FAFC',
+          borderTop: '1px solid var(--border-subtle)',
+          backgroundColor: 'var(--surface-2)',
           flexWrap: 'wrap',
           flexShrink: 0,
         }}>
-          <a
-            href={deal.url}
-            target="_blank"
-            rel="noopener noreferrer sponsored"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '0 24px',
-              height: '42px',
-              fontFamily: 'var(--font-heading)',
-              fontSize: '13px',
-              fontWeight: 600,
-              textDecoration: 'none',
-              borderRadius: '9999px',
-              flexShrink: 0,
-              backgroundColor: '#0066CC',
-              color: '#FFFFFF',
-              boxShadow: '0 1px 3px rgba(0, 102, 204, 0.25)',
-              transition: 'all 0.15s ease',
-              cursor: 'pointer',
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#0071E3';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#0066CC';
-            }}
-          >
-            <span>Get Deal on {storeName}</span>
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M2 10L10 2M10 2H4M10 2V8" />
-            </svg>
-          </a>
+          {asin ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              {bundle && (
+                <button
+                  type="button"
+                  onClick={() => setIncludeBundle(!includeBundle)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '0 12px',
+                    height: '42px',
+                    backgroundColor: includeBundle ? '#FEF08A' : '#FEFCE8',
+                    border: `1px solid ${includeBundle ? '#EAB308' : '#FEF08A'}`,
+                    borderRadius: '9999px',
+                    color: '#854D0E',
+                    fontSize: '11.5px',
+                    fontWeight: includeBundle ? 700 : 500,
+                    cursor: 'pointer',
+                  }}
+                  title="Add accessory bundle or delivery saver"
+                >
+                  <span>{includeBundle ? '☑️' : '◻️'}</span>
+                  <span>{bundle.badge}: +₹{bundle.price}</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={handleLockInCart}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '0 20px',
+                  height: '42px',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  borderRadius: '9999px',
+                  backgroundColor: '#F59E0B',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  boxShadow: '0 2px 6px rgba(245, 158, 11, 0.3)',
+                  transition: 'all 0.15s ease',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#D97706';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F59E0B';
+                }}
+                title="Locks this item and price into your Amazon Cart for up to 90 days"
+              >
+                <span>🛒 {includeBundle ? 'Lock Bundle (90d)' : 'Lock in Cart (90 Days)'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleOpenStore}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '0 16px',
+                  height: '42px',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '12.5px',
+                  fontWeight: 650,
+                  borderRadius: '9999px',
+                  backgroundColor: 'var(--surface-2)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-strong)',
+                  transition: 'all 0.15s ease',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F1F5F9';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F8FAFC';
+                }}
+              >
+                <span>{isMobile ? "⚡ Open App" : "View on Amazon ↗"}</span>
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 10L10 2M10 2H4M10 2V8" />
+                </svg>
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={handleOpenStore}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '0 24px',
+                height: '42px',
+                fontFamily: 'var(--font-heading)',
+                fontSize: '13px',
+                fontWeight: 600,
+                borderRadius: '9999px',
+                flexShrink: 0,
+                backgroundColor: '#0066CC',
+                color: '#FFFFFF',
+                border: 'none',
+                boxShadow: '0 1px 3px rgba(0, 102, 204, 0.25)',
+                transition: 'all 0.15s ease',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#0071E3';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#0066CC';
+              }}
+            >
+              <span>{isMobile ? `⚡ Open in ${storeName} App` : `⚡ View Deal on ${storeName} ↗`}</span>
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 10L10 2M10 2H4M10 2V8" />
+              </svg>
+            </button>
+          )}
 
           <button
             type="button"
@@ -815,8 +931,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               gap: '5px',
               padding: '0 14px',
               height: '42px',
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #E2E8F0',
+              backgroundColor: 'var(--bg-surface-card)',
+              border: '1px solid var(--border-subtle)',
               borderRadius: '9999px',
               color: copyLink ? '#059669' : '#475569',
               fontFamily: 'var(--font-body)',
@@ -845,8 +961,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               gap: '5px',
               padding: '0 14px',
               height: '42px',
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #E2E8F0',
+              backgroundColor: 'var(--bg-surface-card)',
+              border: '1px solid var(--border-subtle)',
               borderRadius: '9999px',
               color: reportSent ? '#94A3B8' : '#64748B',
               fontFamily: 'var(--font-body)',

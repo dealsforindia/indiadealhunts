@@ -44,7 +44,7 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 50, opacity: 0 }}
-        className="fixed bottom-[calc(68px+env(safe-area-inset-bottom,0px))] md:bottom-6 left-1/2 -translate-x-1/2 z-[45] bg-slate-900 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-xl flex items-center gap-2 sm:gap-3 border border-slate-700 max-w-[calc(100vw-1.5rem)]"
+        className="phone-compare-dock fixed bottom-[calc(68px+env(safe-area-inset-bottom,0px))] md:bottom-6 left-1/2 -translate-x-1/2 z-[45] bg-slate-900 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-xl flex items-center gap-2 sm:gap-3 border border-slate-700 max-w-[calc(100vw-1.5rem)]"
       >
         <div className="flex items-center gap-2">
           <span className="text-base">⚖️</span>
@@ -57,7 +57,7 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
           {compareDeals.map((d) => (
             <div
               key={d.id}
-              className="relative w-7 h-7 rounded-lg bg-white overflow-hidden border border-slate-600 flex items-center justify-center p-0.5"
+              className="relative w-7 h-7 rounded-lg bg-white dark:bg-[#0D1527] overflow-hidden border border-slate-600 flex items-center justify-center p-0.5"
             >
               {d.image ? (
                 <img src={getCleanImageUrl(d.image) || ''} alt={d.title} className="w-full h-full object-contain" />
@@ -68,6 +68,7 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
                 type="button"
                 onClick={() => onRemoveDeal(d.id)}
                 className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-rose-600 text-white rounded-full text-[8px] flex items-center justify-center cursor-pointer"
+                aria-label={`Remove ${d.title} from comparison`}
                 title="Remove"
               >
                 ✕
@@ -104,15 +105,15 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
-              className="w-full max-w-4xl bg-white rounded-2xl border border-slate-200 shadow-2xl p-4 sm:p-6 overflow-hidden flex flex-col max-h-[calc(100dvh-2rem)] overscroll-contain"
+              className="w-full max-w-4xl bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl p-4 sm:p-6 overflow-hidden flex flex-col max-h-[calc(100dvh-2rem)] overscroll-contain"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-white/10">
                 <div className="flex items-center gap-2">
                   <span className="text-xl">⚖️</span>
                   <div>
-                    <h3 className="font-heading text-lg font-black text-slate-900 m-0">
+                    <h3 className="font-heading text-lg font-black text-slate-900 dark:text-[#F1F5F9] m-0">
                       Side-by-Side Deal Comparison
                     </h3>
                     <span className="text-xs text-slate-500 font-mono">
@@ -124,7 +125,7 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
                 <button
                   type="button"
                   onClick={onCloseModal}
-                  className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer"
+                  className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-600 dark:text-slate-400 flex items-center justify-center cursor-pointer"
                 >
                   ✕
                 </button>
@@ -134,21 +135,21 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
               <div className="overflow-x-auto py-4">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-200">
+                    <tr className="border-b border-slate-200 dark:border-white/10">
                       <th className="py-3 px-3 text-xs font-mono font-bold text-slate-400 uppercase w-32">
                         Product
                       </th>
                       {compareDeals.map((d) => (
                         <th key={d.id} className="py-3 px-3 min-w-[200px]">
                           <div className="flex flex-col gap-1.5">
-                            <div className="w-20 h-20 rounded-xl bg-slate-50 border border-slate-200 p-2 flex items-center justify-center mx-auto">
+                            <div className="w-20 h-20 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 p-2 flex items-center justify-center mx-auto">
                               <img
                                 src={getCleanImageUrl(d.image) || ''}
                                 alt={d.title}
                                 className="w-full h-full object-contain"
                               />
                             </div>
-                            <span className="text-xs font-bold text-slate-900 line-clamp-2 text-center">
+                            <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] line-clamp-2 text-center">
                               {d.title}
                             </span>
                           </div>
@@ -162,7 +163,7 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
                     <tr>
                       <td className="py-3 px-3 font-semibold text-slate-500 font-mono">Deal Price</td>
                       {compareDeals.map((d) => (
-                        <td key={d.id} className="py-3 px-3 font-mono font-black text-slate-900 text-base text-center">
+                        <td key={d.id} className="py-3 px-3 font-mono font-black text-slate-900 dark:text-[#F1F5F9] text-base text-center">
                           ₹{d.price ? Number(d.price).toLocaleString('en-IN') : 'Check Store'}
                         </td>
                       ))}
@@ -197,7 +198,7 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
                     <tr>
                       <td className="py-3 px-3 font-semibold text-slate-500 font-mono">Merchant</td>
                       {compareDeals.map((d) => (
-                        <td key={d.id} className="py-3 px-3 text-center font-bold text-slate-800">
+                        <td key={d.id} className="py-3 px-3 text-center font-bold text-slate-800 dark:text-[#F8FAFC]">
                           {d.store}
                         </td>
                       ))}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PublicDeal } from '../types';
 
@@ -17,16 +17,24 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
   deal,
   onSuccessToast,
 }) => {
-  if (!isOpen || !deal) return null;
-
   const [targetPrice, setTargetPrice] = useState<string>(
-    Math.round(deal.price * 0.85).toString()
+    deal?.price ? Math.round(deal.price * 0.85).toString() : ''
   );
   const [contact, setContact] = useState<string>('');
   const [contactType, setContactType] = useState<'telegram' | 'email'>('telegram');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen && deal) {
+      setTargetPrice(deal.price ? Math.round(deal.price * 0.85).toString() : '');
+      setSuccess(false);
+      setErrorMsg(null);
+    }
+  }, [isOpen, deal?.id]);
+
+  if (!isOpen || !deal) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +71,11 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
         throw new Error(`Server returned status ${res.status}`);
       }
 
+      const confirmation = await res.json();
+      if (confirmation.success !== true || !confirmation.alert_id) {
+        throw new Error('Alert registration was not confirmed');
+      }
+
       setSuccess(true);
       if (onSuccessToast) {
         onSuccessToast(`🎯 Price alert set! We will notify you if ${deal.title.slice(0, 25)} drops to ₹${tPrice}.`);
@@ -72,16 +85,7 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
         setSuccess(false);
       }, 1800);
     } catch (err: any) {
-      console.warn('Alert submission note:', err);
-      // Fallback: save to local target alert list
-      setSuccess(true);
-      if (onSuccessToast) {
-        onSuccessToast(`🎯 Price alert armed locally! Alert active for ₹${tPrice}.`);
-      }
-      setTimeout(() => {
-        onClose();
-        setSuccess(false);
-      }, 1800);
+      setErrorMsg('The alert could not be registered. Please retry. No notification has been scheduled.');
     } finally {
       setLoading(false);
     }
@@ -94,16 +98,16 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
+          className="relative w-full max-w-md bg-white dark:bg-[#0D1527] rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/80">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/80 dark:bg-[#070A11]/80">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-lg font-bold shadow-sm">
                 🔔
               </div>
               <div>
-                <h2 className="text-lg font-bold text-slate-900">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-[#F1F5F9]">
                   Price Drop Radar Alert
                 </h2>
                 <p className="text-xs text-slate-500">
@@ -115,7 +119,7 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer"
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#1E293B]/60 dark:bg-[#172440]/60 transition-colors cursor-pointer"
             >
               ✕
             </button>
@@ -127,16 +131,16 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                 <div className="w-14 h-14 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl">
                   ✓
                 </div>
-                <h3 className="text-lg font-bold text-slate-900">Alert Armed Successfully!</h3>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-[#F1F5F9]">Alert Armed Successfully!</h3>
                 <p className="text-xs text-slate-500">
-                  Our 24/7 background listeners will ping you the second this product drops to or below ₹{targetPrice}.
+                  Your target of ₹{targetPrice} has been registered. Notifications depend on the monitoring service detecting a qualifying price.
                 </p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Product Pill */}
-                <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-200">
-                  <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 p-1 flex items-center justify-center overflow-hidden shrink-0">
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10">
+                  <div className="w-12 h-12 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 p-1 flex items-center justify-center overflow-hidden shrink-0">
                     {deal.image ? (
                       <img src={deal.image} alt={deal.title} className="w-full h-full object-contain" />
                     ) : (
@@ -144,9 +148,9 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold text-slate-900 truncate">{deal.title}</p>
+                    <p className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] truncate">{deal.title}</p>
                     <p className="text-xs text-slate-500">
-                      Current Price: <span className="font-bold text-slate-800">₹{deal.price.toLocaleString('en-IN')}</span>
+                      Current Price: <span className="font-bold text-slate-800 dark:text-[#F8FAFC]">₹{deal.price.toLocaleString('en-IN')}</span>
                     </p>
                   </div>
                 </div>
@@ -162,7 +166,7 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                       type="number"
                       value={targetPrice}
                       onChange={(e) => setTargetPrice(e.target.value)}
-                      className="w-full pl-8 pr-4 py-2.5 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-3 focus:ring-blue-100 outline-none text-base font-bold text-slate-900"
+                      className="w-full pl-8 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-white/20 focus:border-blue-500 focus:ring-3 focus:ring-blue-100 outline-none text-base font-bold text-slate-900 dark:text-[#F1F5F9]"
                       placeholder="e.g. 19999"
                       required
                     />
@@ -175,7 +179,7 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                           key={pct}
                           type="button"
                           onClick={() => setTargetPrice(quickVal.toString())}
-                          className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
+                          className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-600 dark:text-slate-400 transition-colors"
                         >
                           {Math.round((1 - pct) * 100)}% Drop (₹{quickVal.toLocaleString('en-IN')})
                         </button>
@@ -212,7 +216,7 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                     type="text"
                     value={contact}
                     onChange={(e) => setContact(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-3 focus:ring-blue-100 outline-none text-sm text-slate-900"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-white/20 focus:border-blue-500 focus:ring-3 focus:ring-blue-100 outline-none text-sm text-slate-900 dark:text-[#F1F5F9]"
                     placeholder={contactType === 'telegram' ? '@your_telegram_username' : 'you@example.com'}
                     required
                   />

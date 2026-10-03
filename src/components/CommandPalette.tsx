@@ -193,6 +193,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' && e.target !== inputRef.current) return;
       if (e.key === 'Escape') {
         onClose();
       } else if (e.key === 'ArrowDown') {
@@ -225,7 +226,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex items-start justify-center pt-12 sm:pt-20 px-3 sm:px-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-150"
+      className="phone-command-overlay fixed inset-0 z-[100] flex items-start justify-center pt-12 sm:pt-20 px-3 sm:px-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-150"
       onClick={onClose}
     >
       <motion.div
@@ -233,16 +234,18 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.97, y: -10 }}
         transition={{ duration: 0.15, ease: 'easeOut' }}
-        className="w-full max-w-2xl bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[calc(100dvh-3rem)] overscroll-contain"
+        role="dialog" aria-modal="true" aria-label="Search deals and shopping tools"
+        className="phone-command-panel w-full max-w-2xl bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[calc(100dvh-3rem)] overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Bar Input */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-200 bg-slate-50/60">
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-200 dark:border-white/10 bg-slate-50/60 dark:bg-[#070A11]/60">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.2">
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
           <input
+            aria-label="Search deals and tools"
             ref={inputRef}
             type="text"
             value={query}
@@ -251,25 +254,27 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               setSelectedIndex(0);
             }}
             placeholder="Search deals, products, or utilities (e.g. iPhone, GST, Blinkit, EMI)..."
-            className="flex-1 bg-transparent border-none text-slate-900 placeholder:text-slate-400 text-sm sm:text-base focus:outline-none font-medium"
+            className="min-w-0 flex-1 bg-transparent border-none text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-sm sm:text-base focus:outline-none font-medium"
           />
           {query && (
             <button
               type="button"
               onClick={() => setQuery('')}
-              className="text-xs text-slate-400 hover:text-slate-600 px-1.5 py-0.5 rounded cursor-pointer"
+              className="text-xs text-slate-400 hover:text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded cursor-pointer"
             >
               Clear
             </button>
           )}
-          <span className="text-[10px] font-mono font-bold text-slate-400 border border-slate-200 bg-white px-1.5 py-0.5 rounded shadow-2xs hidden sm:inline-block">
+          <button type="button" className="phone-command-close" aria-label="Close search" onClick={onClose}>×</button>
+          <span className="text-[10px] font-mono font-bold text-slate-400 border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] px-1.5 py-0.5 rounded shadow-2xs hidden sm:inline-block">
             ESC
           </span>
         </div>
 
+        {query.trim() && <button type="button" className="phone-search-all" onClick={() => { onSearchSubmit(query.trim()); onClose(); }}>Search all stores for “{query.trim()}” <span aria-hidden="true">→</span></button>}
         {/* Quick Tools Match Section if query matches any utility */}
         {matchingTools.length > 0 && onOpenTool && (
-          <div className="p-2 border-b border-slate-100 bg-slate-50/70">
+          <div className="p-2 border-b border-slate-100 dark:border-white/5 bg-slate-50/70 dark:bg-[#070A11]/70">
             <div className="px-2 py-1 text-[10.5px] font-mono font-bold text-slate-400 uppercase tracking-wider">
               Shopping Utility Engines
             </div>
@@ -281,13 +286,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                     onOpenTool(tool.id);
                     onClose();
                   }}
-                  className="flex items-center justify-between p-2.5 rounded-xl bg-white hover:bg-slate-100/90 border border-slate-200/80 cursor-pointer transition-colors"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-[#0D1527] hover:bg-slate-100 dark:hover:bg-[#172440]/90 dark:bg-[#111C33]/90 border border-slate-200/80 dark:border-white/10 cursor-pointer transition-colors"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span className="text-xl shrink-0">{tool.icon}</span>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-bold text-slate-900 truncate">
+                        <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] truncate">
                           {tool.name}
                         </span>
                         <span className="text-[9.5px] font-mono font-bold px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
@@ -309,7 +314,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         )}
 
         {/* Quick Store Filter Pills */}
-        <div className="flex items-center gap-1.5 px-4 py-2 border-b border-slate-100 bg-white overflow-x-auto text-xs">
+        <div className="flex items-center gap-1.5 px-4 py-2 border-b border-slate-100 dark:border-white/5 bg-white dark:bg-[#0D1527] overflow-x-auto text-xs">
           <span className="text-[10.5px] font-mono font-bold text-slate-400 uppercase mr-1">
             Store:
           </span>
@@ -321,7 +326,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
                 selectedStore === s
                   ? 'bg-slate-900 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                  : 'bg-slate-100 dark:bg-[#111C33] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-[#F1F5F9] hover:bg-slate-200 dark:bg-[#172440]'
               }`}
             >
               {s === 'all' ? 'All Stores' : s}
@@ -344,11 +349,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   }}
                   onMouseEnter={() => setSelectedIndex(idx)}
                   className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors ${
-                    isHighlighted ? 'bg-slate-100' : 'hover:bg-slate-50'
+                    isHighlighted ? 'bg-slate-100 dark:bg-[#111C33]' : 'hover:bg-slate-50 dark:bg-[#070A11]'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0 pr-3">
-                    <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-lg bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 overflow-hidden flex items-center justify-center shrink-0">
                       {imgUrl ? (
                         <img src={imgUrl} alt={deal.title} className="w-full h-full object-contain p-1" />
                       ) : (
@@ -366,14 +371,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                           </span>
                         )}
                       </div>
-                      <span className="text-xs font-bold text-slate-900 truncate mt-0.5">
+                      <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] truncate mt-0.5">
                         {deal.title}
                       </span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="font-mono text-sm font-extrabold text-slate-900">
+                    <span className="font-mono text-sm font-extrabold text-slate-900 dark:text-[#F1F5F9]">
                       ₹{deal.price ? Number(deal.price).toLocaleString('en-IN') : 'Deal'}
                     </span>
                     <span className="text-xs text-blue-600 font-bold hidden sm:inline">
@@ -391,7 +396,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         </div>
 
         {/* Trending Searches & Utilities Footer */}
-        <div className="px-4 py-3 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="px-4 py-3 bg-slate-50 dark:bg-[#070A11] border-t border-slate-200 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-[10.5px] font-mono font-bold text-slate-400 uppercase">
               Trending:
@@ -405,7 +410,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   onSearchSubmit(kw);
                   onClose();
                 }}
-                className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 hover:text-blue-600 hover:border-blue-300 font-medium cursor-pointer transition-colors text-[11px]"
+                className="px-2 py-0.5 rounded-md bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:text-blue-600 hover:border-blue-300 font-medium cursor-pointer transition-colors text-[11px]"
               >
                 {kw}
               </button>

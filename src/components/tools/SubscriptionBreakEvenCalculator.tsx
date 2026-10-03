@@ -252,12 +252,12 @@ Generated via IndiaDealHunts Subscription Lab`;
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-xs">
+      <div className="bg-white dark:bg-[#0D1527] p-5 sm:p-6 rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="text-xl">💳</span>
-              <h3 className="font-heading font-black text-lg text-slate-900 tracking-tight">
+              <h3 className="font-heading font-black text-lg text-slate-900 dark:text-[#F1F5F9] tracking-tight">
                 Subscription ROI &amp; Break-Even Math Sentinel
               </h3>
               <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -294,7 +294,7 @@ Generated via IndiaDealHunts Subscription Lab`;
               className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                 isSelected
                   ? 'border-emerald-600 bg-emerald-50/50 shadow-xs ring-1 ring-emerald-500/20'
-                  : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 bg-white'
+                  : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:border-white/20 hover:bg-slate-50 dark:bg-[#070A11] bg-white dark:bg-[#0D1527]'
               }`}
             >
               <div>
@@ -304,12 +304,12 @@ Generated via IndiaDealHunts Subscription Lab`;
                     ₹{plan.annualFee}/yr
                   </span>
                 </div>
-                <div className="font-bold text-xs text-slate-900 line-clamp-1">{plan.name}</div>
+                <div className="font-bold text-xs text-slate-900 dark:text-[#F1F5F9] line-clamp-1">{plan.name}</div>
                 <div className="text-[10px] text-slate-500 font-medium">{plan.provider}</div>
               </div>
 
-              <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                <span className="text-[10px] font-mono font-bold text-slate-600">
+              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px]">
+                <span className="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-400">
                   {plan.category}
                 </span>
                 {isSelected && (
@@ -322,13 +322,13 @@ Generated via IndiaDealHunts Subscription Lab`;
       </div>
 
       {/* Selected Plan Perks Card */}
-      <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+      <div className="bg-slate-50 dark:bg-[#070A11] p-4 rounded-2xl border border-slate-200/80 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
         <div className="space-y-1">
-          <div className="font-bold text-slate-900 flex items-center gap-2">
+          <div className="font-bold text-slate-900 dark:text-[#F1F5F9] flex items-center gap-2">
             <span>{activePlan.icon}</span>
             <span>{activePlan.name} Membership Features:</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-[11.5px] text-slate-600">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-[11.5px] text-slate-600 dark:text-slate-400">
             {activePlan.corePerks.map((perk, i) => (
               <div key={i} className="flex items-center gap-1.5">
                 <span className="text-emerald-600 font-bold">✓</span>
@@ -338,9 +338,9 @@ Generated via IndiaDealHunts Subscription Lab`;
           </div>
         </div>
 
-        <div className="sm:border-l sm:border-slate-200 sm:pl-4 flex-shrink-0 text-right">
+        <div className="sm:border-l sm:border-slate-200 dark:border-white/10 sm:pl-4 flex-shrink-0 text-right">
           <div className="text-[10px] text-slate-400 uppercase font-mono font-bold">Annual Fee</div>
-          <div className="text-base font-black font-mono text-slate-900">
+          <div className="text-base font-black font-mono text-slate-900 dark:text-[#F1F5F9]">
             ₹{activePlan.annualFee}
           </div>
           <div className="text-[10px] text-slate-500 font-mono">
@@ -353,8 +353,8 @@ Generated via IndiaDealHunts Subscription Lab`;
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Form: Habit Adjusters */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
-            <div className="font-bold text-sm text-slate-800 flex items-center gap-2">
+          <div className="bg-white dark:bg-[#0D1527] p-5 rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-xs space-y-4">
+            <div className="font-bold text-sm text-slate-800 dark:text-[#F8FAFC] flex items-center gap-2">
               <span>📊</span>
               <span>Your Genuine Monthly Usage Habits</span>
             </div>
@@ -363,7 +363,7 @@ Generated via IndiaDealHunts Subscription Lab`;
             {(activePlan.id === 'amazon_prime' || activePlan.id === 'flipkart_vip') && (
               <>
                 <div>
-                  <div className="flex justify-between items-center text-xs font-bold text-slate-700 mb-1.5">
+                  <div className="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">
                     <span>Monthly Shopping Spend on Store</span>
                     <span className="font-mono text-emerald-700 font-extrabold text-sm">
                       ₹{monthlyEcommerceSpend.toLocaleString('en-IN')}
@@ -386,9 +386,9 @@ Generated via IndiaDealHunts Subscription Lab`;
                 </div>
 
                 <div>
-                  <div className="flex justify-between items-center text-xs font-bold text-slate-700 mb-1.5">
+                  <div className="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">
                     <span>Small Orders per Month (under ₹500 free threshold)</span>
-                    <span className="font-mono text-slate-800 font-bold">
+                    <span className="font-mono text-slate-800 dark:text-[#F8FAFC] font-bold">
                       {monthlySmallDeliveriesCount} orders/mo
                     </span>
                   </div>
@@ -406,8 +406,8 @@ Generated via IndiaDealHunts Subscription Lab`;
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-slate-100">
-                  <label className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer">
+                <div className="pt-2 border-t border-slate-100 dark:border-white/5">
+                  <label className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-200 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={hasCoBrandedCard}
@@ -424,8 +424,8 @@ Generated via IndiaDealHunts Subscription Lab`;
                 </div>
 
                 {activePlan.id === 'amazon_prime' && (
-                  <div className="pt-2 border-t border-slate-100">
-                    <label className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer">
+                  <div className="pt-2 border-t border-slate-100 dark:border-white/5">
+                    <label className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-200 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={valuesStreaming}
@@ -445,7 +445,7 @@ Generated via IndiaDealHunts Subscription Lab`;
             {(activePlan.id === 'swiggy_one' || activePlan.id === 'zomato_gold') && (
               <>
                 <div>
-                  <div className="flex justify-between items-center text-xs font-bold text-slate-700 mb-1.5">
+                  <div className="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">
                     <span>Restaurant Food Orders per Month</span>
                     <span className="font-mono text-emerald-700 font-extrabold text-sm">
                       {monthlyFoodOrdersCount} orders/mo
@@ -464,7 +464,7 @@ Generated via IndiaDealHunts Subscription Lab`;
 
                 {activePlan.id === 'swiggy_one' && (
                   <div>
-                    <div className="flex justify-between items-center text-xs font-bold text-slate-700 mb-1.5">
+                    <div className="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">
                       <span>Instamart Grocery Orders per Month</span>
                       <span className="font-mono text-emerald-700 font-extrabold text-sm">
                         {monthlyInstamartOrdersCount} orders/mo
@@ -572,12 +572,12 @@ Generated via IndiaDealHunts Subscription Lab`;
       </div>
 
       {/* Pro Advice Note */}
-      <div className="bg-slate-100 p-4 rounded-2xl text-xs space-y-1 text-slate-700 border border-slate-200">
-        <div className="font-bold flex items-center gap-2 text-slate-900">
+      <div className="bg-slate-100 dark:bg-[#111C33] p-4 rounded-2xl text-xs space-y-1 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10">
+        <div className="font-bold flex items-center gap-2 text-slate-900 dark:text-[#F1F5F9]">
           <span>💡</span>
           <span>Pro Shopping Tip</span>
         </div>
-        <p className="text-slate-600 text-[11.5px] leading-relaxed">
+        <p className="text-slate-600 dark:text-slate-400 text-[11.5px] leading-relaxed">
           {activePlan.notes}
         </p>
       </div>

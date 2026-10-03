@@ -111,7 +111,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
           Home
         </button>
         <span>/</span>
-        <span className="text-slate-800 font-semibold">Submit a Deal</span>
+        <span className="text-slate-800 dark:text-[#F8FAFC] font-semibold">Submit a Deal</span>
       </div>
 
       {/* Header */}
@@ -119,20 +119,20 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-mono text-[11px] font-bold w-fit">
           <span>⚡ COMMUNITY SUBMISSIONS</span>
         </div>
-        <h1 className="text-3xl font-heading font-black tracking-tight text-slate-900">
+        <h1 className="text-3xl font-heading font-black tracking-tight text-slate-900 dark:text-[#F1F5F9]">
           Submit a Deal or Loot Drop
         </h1>
-        <p className="text-slate-600 text-sm leading-relaxed">
+        <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
           Found an insane price drop, flash error, or promo code? Share it with the community. Our AI pipeline verifies live pricing and credits fast contributors.
         </p>
       </div>
 
       {submitted ? (
-        <div className="p-8 rounded-2xl bg-white border border-emerald-200 flex flex-col gap-3 items-center text-center shadow-sm">
+        <div className="p-8 rounded-2xl bg-white dark:bg-[#0D1527] border border-emerald-200 flex flex-col gap-3 items-center text-center shadow-sm">
           <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 text-xl font-bold shadow-xs">
             ✓
           </div>
-          <h3 className="text-lg font-bold font-heading text-slate-900">
+          <h3 className="text-lg font-bold font-heading text-slate-900 dark:text-[#F1F5F9]">
             Deal Submitted for Review!
           </h3>
           <p className="text-xs text-slate-500 max-w-md leading-relaxed">
@@ -147,14 +147,14 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
             </button>
             <button
               onClick={onBackToHome}
-              className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 text-xs font-semibold border border-slate-300 cursor-pointer transition-colors"
+              className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-900 dark:text-[#F1F5F9] text-xs font-semibold border border-slate-300 dark:border-white/20 cursor-pointer transition-colors"
             >
               Back to Home
             </button>
           </div>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="p-6 sm:p-8 rounded-2xl bg-white border border-slate-200/90 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow">
+        <form onSubmit={handleSubmit} className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow">
           {error && (
             <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs">
               {error}
@@ -170,7 +170,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://www.amazon.in/dp/..."
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
             />
           </div>
 
@@ -182,7 +182,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
               <select
                 value={store}
                 onChange={(e) => setStore(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
               >
                 <option value="Amazon">Amazon</option>
                 <option value="Flipkart">Flipkart</option>
@@ -203,7 +203,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 placeholder="899"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
               />
             </div>
 
@@ -216,7 +216,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
                 value={mrp}
                 onChange={(e) => setMrp(e.target.value)}
                 placeholder="2499"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
               />
             </div>
           </div>
@@ -230,7 +230,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
               value={tip}
               onChange={(e) => setTip(e.target.value)}
               placeholder="e.g. Apply 10% coupon checkbox + ₹200 ICICI card discount"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
             />
           </div>
 
@@ -243,7 +243,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="hunter@gmail.com"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
             />
           </div>
 

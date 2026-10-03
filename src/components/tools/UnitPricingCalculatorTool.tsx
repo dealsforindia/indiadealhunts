@@ -146,13 +146,13 @@ export const UnitPricingCalculatorTool: React.FC = () => {
   }, [oldWeight, newWeight, oldPrice, newPrice]);
 
   return (
-    <div className="w-full bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 md:p-7 text-slate-800">
+    <div className="w-full bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-sm p-5 md:p-7 text-slate-800 dark:text-[#F8FAFC]">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100 dark:border-white/5">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xl">⚖️</span>
-            <h3 className="font-heading font-extrabold text-lg sm:text-xl text-slate-900 tracking-tight">
+            <h3 className="font-heading font-extrabold text-lg sm:text-xl text-slate-900 dark:text-[#F1F5F9] tracking-tight">
               Grocery Unit Price &amp; Shrinkflation Analyzer
             </h3>
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
@@ -165,12 +165,12 @@ export const UnitPricingCalculatorTool: React.FC = () => {
         </div>
 
         {/* Tab switch */}
-        <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl self-start sm:self-auto">
+        <div className="flex items-center gap-2 bg-slate-100 dark:bg-[#111C33] p-1 rounded-xl self-start sm:self-auto">
           <button
             type="button"
             onClick={() => setActiveTab('compare')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              activeTab === 'compare' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+              activeTab === 'compare' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-xs' : 'text-slate-500 hover:text-slate-800 dark:text-[#F8FAFC]'
             }`}
           >
             Pack Comparison
@@ -179,7 +179,7 @@ export const UnitPricingCalculatorTool: React.FC = () => {
             type="button"
             onClick={() => setActiveTab('shrinkflation')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              activeTab === 'shrinkflation' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+              activeTab === 'shrinkflation' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-xs' : 'text-slate-500 hover:text-slate-800 dark:text-[#F8FAFC]'
             }`}
           >
             Shrinkflation Detective
@@ -201,7 +201,7 @@ export const UnitPricingCalculatorTool: React.FC = () => {
                 <div>
                   <div className="flex items-center gap-2 font-bold text-sm">
                     <span>Best Value: Option {comparison.winner.id} ({comparison.winner.name})</span>
-                    <span className="text-xs font-mono font-extrabold px-2 py-0.5 rounded-full bg-white border border-current shadow-2xs">
+                    <span className="text-xs font-mono font-extrabold px-2 py-0.5 rounded-full bg-white dark:bg-[#0D1527] border border-current shadow-2xs">
                       {comparison.percentageSavings}% CHEAPER
                     </span>
                   </div>
@@ -215,7 +215,7 @@ export const UnitPricingCalculatorTool: React.FC = () => {
 
               <div className="text-right sm:self-auto self-end font-mono">
                 <span className="text-[10px] uppercase font-bold text-slate-500 block">True Unit Rate</span>
-                <span className="text-lg font-black text-slate-900">{comparison.winner.displayRate}</span>
+                <span className="text-lg font-black text-slate-900 dark:text-[#F1F5F9]">{comparison.winner.displayRate}</span>
                 <span className="text-[10px] text-slate-500"> / {comparison.winner.standardLabel}</span>
               </div>
             </div>
@@ -235,12 +235,12 @@ export const UnitPricingCalculatorTool: React.FC = () => {
                   className={`p-4 rounded-2xl border transition-all flex flex-col justify-between ${
                     isWinner
                       ? 'bg-emerald-50/30 border-emerald-400 ring-2 ring-emerald-400/20'
-                      : 'bg-slate-50/50 border-slate-200'
+                      : 'bg-slate-50/50 dark:bg-[#070A11]/50 border-slate-200 dark:border-white/10'
                   }`}
                 >
                   <div>
                     <div className="flex justify-between items-center mb-3">
-                      <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700">
+                      <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-md bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200">
                         {label}
                       </span>
                       {isWinner && (
@@ -254,7 +254,7 @@ export const UnitPricingCalculatorTool: React.FC = () => {
                       type="text"
                       value={opt.name}
                       onChange={(e) => setter({ ...opt, name: e.target.value })}
-                      className="w-full text-xs font-bold text-slate-900 bg-transparent border-0 border-b border-slate-200 pb-1 mb-3 focus:outline-none focus:border-blue-500"
+                      className="w-full text-xs font-bold text-slate-900 dark:text-[#F1F5F9] bg-transparent border-0 border-b border-slate-200 dark:border-white/10 pb-1 mb-3 focus:outline-none focus:border-blue-500"
                     />
 
                     {/* Inputs */}
@@ -270,7 +270,7 @@ export const UnitPricingCalculatorTool: React.FC = () => {
                             min="1"
                             value={opt.price || ''}
                             onChange={(e) => setter({ ...opt, price: Number(e.target.value) })}
-                            className="w-full h-8 pl-6 pr-2 rounded-lg border border-slate-200 bg-white text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="w-full h-8 pl-6 pr-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-xs font-mono font-bold text-slate-800 dark:text-[#F8FAFC] focus:outline-none focus:ring-1 focus:ring-blue-500"
                           />
                         </div>
                       </div>
@@ -285,7 +285,7 @@ export const UnitPricingCalculatorTool: React.FC = () => {
                             min="1"
                             value={opt.quantity || ''}
                             onChange={(e) => setter({ ...opt, quantity: Number(e.target.value) })}
-                            className="w-full h-8 px-2 rounded-lg border border-slate-200 bg-white text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-xs font-mono font-bold text-slate-800 dark:text-[#F8FAFC] focus:outline-none focus:ring-1 focus:ring-blue-500"
                           />
                         </div>
                         <div>
@@ -295,7 +295,7 @@ export const UnitPricingCalculatorTool: React.FC = () => {
                           <select
                             value={opt.unit}
                             onChange={(e) => setter({ ...opt, unit: e.target.value as UnitType })}
-                            className="w-full h-8 px-2 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-xs font-medium text-slate-800 dark:text-[#F8FAFC] focus:outline-none focus:ring-1 focus:ring-blue-500"
                           >
                             <option value="g">Grams (g)</option>
                             <option value="kg">Kilograms (kg)</option>
@@ -316,19 +316,19 @@ export const UnitPricingCalculatorTool: React.FC = () => {
                           max="24"
                           value={opt.packCount || 1}
                           onChange={(e) => setter({ ...opt, packCount: Math.max(1, Number(e.target.value)) })}
-                          className="w-full h-8 px-2 rounded-lg border border-slate-200 bg-white text-xs font-mono text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-xs font-mono text-slate-800 dark:text-[#F8FAFC] focus:outline-none focus:ring-1 focus:ring-blue-500"
                         />
                       </div>
                     </div>
                   </div>
 
                   {/* Calculated Rate Box */}
-                  <div className="mt-4 pt-3 border-t border-slate-200/80 bg-white p-2.5 rounded-xl border">
+                  <div className="mt-4 pt-3 border-t border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0D1527] p-2.5 rounded-xl border">
                     <span className="text-[10px] font-mono font-bold text-slate-400 uppercase block">
                       Effective Unit Price
                     </span>
                     <div className="flex items-baseline justify-between mt-0.5">
-                      <span className="text-base font-extrabold font-mono text-slate-900">
+                      <span className="text-base font-extrabold font-mono text-slate-900 dark:text-[#F1F5F9]">
                         {rate?.displayRate || '₹0'}
                       </span>
                       <span className="text-[11px] font-semibold text-slate-500">
@@ -354,8 +354,8 @@ export const UnitPricingCalculatorTool: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-4">
               {/* Old Packaging */}
-              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
-                <span className="text-xs font-bold text-slate-700 block mb-3">📦 Old / Original Pack</span>
+              <div className="p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#070A11]/50">
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block mb-3">📦 Old / Original Pack</span>
                 <div className="flex flex-col gap-3">
                   <div>
                     <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">
@@ -365,7 +365,7 @@ export const UnitPricingCalculatorTool: React.FC = () => {
                       type="number"
                       value={oldWeight}
                       onChange={(e) => setOldWeight(Number(e.target.value))}
-                      className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-mono font-bold text-slate-900"
+                      className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-xs font-mono font-bold text-slate-900 dark:text-[#F1F5F9]"
                     />
                   </div>
                   <div>
@@ -376,7 +376,7 @@ export const UnitPricingCalculatorTool: React.FC = () => {
                       type="number"
                       value={oldPrice}
                       onChange={(e) => setOldPrice(Number(e.target.value))}
-                      className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-mono font-bold text-slate-900"
+                      className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-xs font-mono font-bold text-slate-900 dark:text-[#F1F5F9]"
                     />
                   </div>
                 </div>
@@ -394,7 +394,7 @@ export const UnitPricingCalculatorTool: React.FC = () => {
                       type="number"
                       value={newWeight}
                       onChange={(e) => setNewWeight(Number(e.target.value))}
-                      className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-mono font-bold text-rose-700"
+                      className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-xs font-mono font-bold text-rose-700"
                     />
                   </div>
                   <div>
@@ -405,7 +405,7 @@ export const UnitPricingCalculatorTool: React.FC = () => {
                       type="number"
                       value={newPrice}
                       onChange={(e) => setNewPrice(Number(e.target.value))}
-                      className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-mono font-bold text-rose-700"
+                      className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-xs font-mono font-bold text-rose-700"
                     />
                   </div>
                 </div>
@@ -414,7 +414,7 @@ export const UnitPricingCalculatorTool: React.FC = () => {
           </div>
 
           {/* Shrinkflation Verdict */}
-          <div className="lg:col-span-5 bg-slate-50 rounded-2xl border border-slate-200 p-5 flex flex-col justify-between">
+          <div className="lg:col-span-5 bg-slate-50 dark:bg-[#070A11] rounded-2xl border border-slate-200 dark:border-white/10 p-5 flex flex-col justify-between">
             {shrinkflationAnalysis ? (
               <div>
                 <span className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider block mb-1">
@@ -430,32 +430,32 @@ export const UnitPricingCalculatorTool: React.FC = () => {
                   <span className="text-xs text-slate-500 font-semibold">effective increase</span>
                 </div>
 
-                <div className="mt-5 space-y-2 text-xs border-t border-slate-200 pt-4">
+                <div className="mt-5 space-y-2 text-xs border-t border-slate-200 dark:border-white/10 pt-4">
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Weight Reduction</span>
+                    <span className="text-slate-600 dark:text-slate-400">Weight Reduction</span>
                     <span className="font-mono font-bold text-rose-600">
                       -{shrinkflationAnalysis.weightReductionPct}%
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Sticker Price Change</span>
-                    <span className="font-mono font-bold text-slate-900">
+                    <span className="text-slate-600 dark:text-slate-400">Sticker Price Change</span>
+                    <span className="font-mono font-bold text-slate-900 dark:text-[#F1F5F9]">
                       {shrinkflationAnalysis.priceChangePct >= 0 ? '+' : ''}{shrinkflationAnalysis.priceChangePct}%
                     </span>
                   </div>
-                  <div className="flex justify-between pt-2 border-t border-slate-200">
-                    <span className="text-slate-600">Old Rate per 100g</span>
+                  <div className="flex justify-between pt-2 border-t border-slate-200 dark:border-white/10">
+                    <span className="text-slate-600 dark:text-slate-400">Old Rate per 100g</span>
                     <span className="font-mono">₹{(shrinkflationAnalysis.oldRatePerGram * 100).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">New Rate per 100g</span>
+                    <span className="text-slate-600 dark:text-slate-400">New Rate per 100g</span>
                     <span className="font-mono font-bold text-rose-600">₹{(shrinkflationAnalysis.newRatePerGram * 100).toFixed(2)}</span>
                   </div>
                 </div>
               </div>
             ) : null}
 
-            <div className="mt-5 p-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-500 leading-relaxed">
+            <div className="mt-5 p-3 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 text-xs text-slate-500 leading-relaxed">
               💡 <strong>Shopper Tip:</strong> When quick-commerce apps run sales, compare the grammage. A 15% discount on an item that has quietly downsized by 20% is still 5% more expensive than last year&apos;s regular stock.
             </div>
           </div>

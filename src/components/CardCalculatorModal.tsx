@@ -64,13 +64,13 @@ export const CardCalculatorModal: React.FC<CardCalculatorModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 max-h-[calc(100dvh-2rem)] overflow-y-auto shadow-2xl overscroll-contain"
+        className="relative w-full max-w-2xl rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] p-6 sm:p-7 max-h-[calc(100dvh-2rem)] overflow-y-auto shadow-2xl overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center transition cursor-pointer"
+          className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-500 hover:text-slate-900 dark:text-[#F1F5F9] flex items-center justify-center transition cursor-pointer"
           aria-label="Close modal"
         >
           <X className="w-4 h-4" aria-hidden="true" />
@@ -82,17 +82,17 @@ export const CardCalculatorModal: React.FC<CardCalculatorModalProps> = ({
             <Sparkles className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
             <span>CREDIT CARD CASHBACK ENGINE</span>
           </div>
-          <h2 id="card-modal-title" className="text-2xl sm:text-3xl font-heading font-black text-slate-900 tracking-tight mb-2">
+          <h2 id="card-modal-title" className="text-2xl sm:text-3xl font-heading font-black text-slate-900 dark:text-[#F1F5F9] tracking-tight mb-2">
             Select Your Active Credit Cards
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
             Select the shopping cards in your wallet. We'll automatically compute your exclusive <strong className="text-blue-700">"Effective Card Price"</strong> with 5% to 10% extra cashback on verified loot drops!
           </p>
         </div>
 
         {/* Quick Bulk Action Buttons */}
-        <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-200">
-          <span className="text-xs font-mono font-semibold text-slate-600">
+        <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-200 dark:border-white/10">
+          <span className="text-xs font-mono font-semibold text-slate-600 dark:text-slate-400">
             {selectedCards.length} of {SUPPORTED_CREDIT_CARDS.length} cards active
           </span>
           <div className="flex items-center gap-2">
@@ -104,7 +104,7 @@ export const CardCalculatorModal: React.FC<CardCalculatorModalProps> = ({
             </button>
             <button
               onClick={handleClearAll}
-              className="text-xs text-slate-600 hover:text-slate-900 font-medium px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 transition cursor-pointer"
+              className="text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-[#F1F5F9] font-medium px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] transition cursor-pointer"
             >
               Clear
             </button>
@@ -122,7 +122,7 @@ export const CardCalculatorModal: React.FC<CardCalculatorModalProps> = ({
                 className={`relative p-4 rounded-xl border transition-all cursor-pointer select-none flex flex-col justify-between min-h-[110px] ${
                   isSelected
                     ? 'bg-blue-50/60 border-blue-400 ring-2 ring-blue-200 shadow-sm'
-                    : 'bg-slate-50/60 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                    : 'bg-slate-50/60 dark:bg-[#070A11]/60 border-slate-200 dark:border-white/10 hover:border-slate-300 dark:border-white/20 hover:bg-slate-50 dark:bg-[#070A11]'
                 }`}
               >
                 {/* Card Top: Bank & Checkbox */}
@@ -138,7 +138,7 @@ export const CardCalculatorModal: React.FC<CardCalculatorModalProps> = ({
                     className={`w-5 h-5 rounded-md flex items-center justify-center border transition-colors ${
                       isSelected
                         ? 'bg-blue-600 border-blue-600 text-white'
-                        : 'border-slate-300 bg-white'
+                        : 'border-slate-300 dark:border-white/20 bg-white dark:bg-[#0D1527]'
                     }`}
                   >
                     {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
@@ -146,12 +146,12 @@ export const CardCalculatorModal: React.FC<CardCalculatorModalProps> = ({
                 </div>
 
                 {/* Card Name */}
-                <div className="font-heading font-extrabold text-slate-900 text-sm leading-tight mb-1">
+                <div className="font-heading font-extrabold text-slate-900 dark:text-[#F1F5F9] text-sm leading-tight mb-1">
                   {card.name}
                 </div>
 
                 {/* Reward Highlight */}
-                <div className="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
+                <div className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 flex items-center gap-1">
                   <Zap className={`w-3 h-3 ${isSelected ? 'text-amber-500' : 'text-slate-400'}`} />
                   <span>{card.rewardText}</span>
                 </div>

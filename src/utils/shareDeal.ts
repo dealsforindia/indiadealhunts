@@ -19,7 +19,18 @@ export function shareToWhatsApp(deal: PublicDeal): void {
   const text = formatDealShareText(deal);
   const encoded = encodeURIComponent(text);
   const url = `https://api.whatsapp.com/send?text=${encoded}`;
-  window.open(url, '_blank', 'noopener,noreferrer');
+  
+  try {
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch {
+    window.open(url, '_blank');
+  }
 }
 
 export function shareToTelegram(deal: PublicDeal): void {
@@ -27,7 +38,18 @@ export function shareToTelegram(deal: PublicDeal): void {
   const encodedText = encodeURIComponent(text);
   const encodedUrl = encodeURIComponent(deal.url);
   const url = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
-  window.open(url, '_blank', 'noopener,noreferrer');
+  
+  try {
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch {
+    window.open(url, '_blank');
+  }
 }
 
 export async function copyDealLink(deal: PublicDeal): Promise<boolean> {

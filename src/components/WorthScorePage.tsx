@@ -67,16 +67,16 @@ export const WorthScorePage: React.FC<WorthScorePageProps> = ({
           <span className="w-2 h-2 rounded-full bg-blue-500" />
           <span>ALGORITHMIC VALUE LEADERBOARD</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-[#F1F5F9] tracking-tight">
           Highest Worth Score Deals
         </h1>
-        <p className="mt-2 text-sm sm:text-base text-slate-600 max-w-2xl leading-relaxed">
+        <p className="mt-2 text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
           Deals rated by our Worth Score engine (0–100). We evaluate genuine discount depth, historic floor prices, seller credibility, and product authenticity.
         </p>
       </div>
 
       {/* ── Filters & Controls Toolbar ── */}
-      <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/90 p-4 mb-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-white/80 dark:bg-[#0D1527]/80 backdrop-blur-md rounded-2xl border border-slate-200/90 dark:border-white/10 p-4 mb-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         {/* Left: Worth Score Tier Pills */}
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">
@@ -94,7 +94,7 @@ export const WorthScorePage: React.FC<WorthScorePageProps> = ({
               className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 minScore === tier.value
                   ? 'bg-blue-600 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70 hover:text-slate-900'
+                  : 'bg-slate-100 dark:bg-[#111C33] text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#1E293B]/70 dark:bg-[#172440]/70 hover:text-slate-900 dark:text-[#F1F5F9]'
               }`}
             >
               {tier.label}
@@ -109,13 +109,13 @@ export const WorthScorePage: React.FC<WorthScorePageProps> = ({
             placeholder="Search deals..."
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
-            className="px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white w-full sm:w-44 transition-all"
+            className="px-3.5 py-1.5 rounded-full bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-800 dark:text-[#F8FAFC] focus:outline-none focus:border-blue-500 focus:bg-white dark:bg-[#0D1527] w-full sm:w-44 transition-all"
           />
 
           <select
             value={selectedStore}
             onChange={(e) => setSelectedStore(e.target.value)}
-            className="px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-500 capitalize cursor-pointer"
+            className="px-3 py-1.5 rounded-full bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 capitalize cursor-pointer"
           >
             {STORES.map((s) => (
               <option key={s} value={s}>
@@ -124,11 +124,11 @@ export const WorthScorePage: React.FC<WorthScorePageProps> = ({
             ))}
           </select>
 
-          <div className="hidden sm:flex items-center rounded-full bg-slate-100 p-0.5 border border-slate-200">
+          <div className="hidden sm:flex items-center rounded-full bg-slate-100 dark:bg-[#111C33] p-0.5 border border-slate-200 dark:border-white/10">
             <button
               onClick={() => onViewModeChange('grid')}
               className={`p-1.5 rounded-full transition-colors ${
-                viewMode === 'grid' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                viewMode === 'grid' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-2xs' : 'text-slate-500 hover:text-slate-800 dark:text-[#F8FAFC]'
               }`}
               title="Grid View"
             >
@@ -142,7 +142,7 @@ export const WorthScorePage: React.FC<WorthScorePageProps> = ({
             <button
               onClick={() => onViewModeChange('list')}
               className={`p-1.5 rounded-full transition-colors ${
-                viewMode === 'list' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                viewMode === 'list' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-2xs' : 'text-slate-500 hover:text-slate-800 dark:text-[#F8FAFC]'
               }`}
               title="List View"
             >
@@ -162,7 +162,7 @@ export const WorthScorePage: React.FC<WorthScorePageProps> = ({
       {/* ── Status Bar ── */}
       <div className="flex items-center justify-between text-xs text-slate-500 mb-4 px-1">
         <span>
-          Showing <strong className="text-slate-800 font-semibold">{sortedDeals.length}</strong> top-rated deals
+          Showing <strong className="text-slate-800 dark:text-[#F8FAFC] font-semibold">{sortedDeals.length}</strong> top-rated deals
           {minScore > 0 && <span> with Worth Score &ge;{minScore}</span>}
         </span>
         <span className="text-[11px] font-mono text-blue-600 font-semibold">
@@ -197,9 +197,9 @@ export const WorthScorePage: React.FC<WorthScorePageProps> = ({
           ))}
         </motion.div>
       ) : (
-        <div className="text-center py-16 px-4 bg-white rounded-2xl border border-slate-200">
+        <div className="text-center py-16 px-4 bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-white/10">
           <div className="text-4xl mb-3">💎</div>
-          <h3 className="text-base font-bold text-slate-800">No deals match this score tier</h3>
+          <h3 className="text-base font-bold text-slate-800 dark:text-[#F8FAFC]">No deals match this score tier</h3>
           <p className="text-xs text-slate-500 mt-1">Try selecting All Scores or a different store filter.</p>
           <button
             onClick={() => {

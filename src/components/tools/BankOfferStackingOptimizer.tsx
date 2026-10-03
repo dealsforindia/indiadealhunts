@@ -179,11 +179,11 @@ export const BankOfferStackingOptimizer: React.FC = () => {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Header Banner */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-[#0D1527] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xl">💳</span>
-            <h3 className="font-heading font-extrabold text-base sm:text-lg text-slate-900 m-0">
+            <h3 className="font-heading font-extrabold text-base sm:text-lg text-slate-900 dark:text-[#F1F5F9] m-0">
               Bank Offer &amp; Credit Card Stacking Optimizer
             </h3>
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
@@ -196,7 +196,7 @@ export const BankOfferStackingOptimizer: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <label className="flex items-center gap-1.5 text-xs text-slate-700 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 cursor-pointer">
+          <label className="flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-[#070A11] px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 cursor-pointer">
             <input
               type="checkbox"
               checked={hasPrime}
@@ -209,7 +209,7 @@ export const BankOfferStackingOptimizer: React.FC = () => {
       </div>
 
       {/* Cart Size & Target Store Selector */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+      <div className="bg-white dark:bg-[#0D1527] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
           <div className="md:col-span-6">
             <span className="text-xs font-mono uppercase font-bold text-slate-500 block mb-1.5">
@@ -226,7 +226,7 @@ export const BankOfferStackingOptimizer: React.FC = () => {
                 value={cartAmount || ''}
                 onChange={(e) => setCartAmount(Number(e.target.value))}
                 placeholder="e.g. 32999"
-                className="w-full h-11 pl-9 pr-4 rounded-xl border border-slate-300 text-base font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
+                className="w-full h-11 pl-9 pr-4 rounded-xl border border-slate-300 dark:border-white/20 text-base font-mono font-bold text-slate-900 dark:text-[#F1F5F9] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
               />
             </div>
           </div>
@@ -244,7 +244,7 @@ export const BankOfferStackingOptimizer: React.FC = () => {
                   className={`px-2.5 py-1.5 rounded-lg text-xs font-mono border transition-all cursor-pointer ${
                     cartAmount === val
                       ? 'bg-blue-50 text-blue-700 border-blue-300 font-bold'
-                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                      : 'bg-slate-50 dark:bg-[#070A11] text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:bg-[#111C33]'
                   }`}
                 >
                   ₹{val.toLocaleString('en-IN')}
@@ -260,7 +260,7 @@ export const BankOfferStackingOptimizer: React.FC = () => {
         <div className="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-3xl p-6 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-5 relative overflow-hidden">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white font-mono font-bold text-[11px] uppercase tracking-wider backdrop-blur-xs">
+              <span className="px-2.5 py-0.5 rounded-full bg-white/20 dark:bg-[#0D1527]/20 text-white font-mono font-bold text-[11px] uppercase tracking-wider backdrop-blur-xs">
                 🏆 #1 HIGHEST SAVINGS PAYMENT METHOD
               </span>
               <span className="text-xs font-mono text-emerald-200">
@@ -277,13 +277,13 @@ export const BankOfferStackingOptimizer: React.FC = () => {
             </p>
 
             {deltaSavings > 0 && (
-              <span className="inline-block text-[11px] font-mono text-emerald-100 bg-white/10 px-2 py-0.5 rounded-lg">
+              <span className="inline-block text-[11px] font-mono text-emerald-100 bg-white/10 dark:bg-[#0D1527]/10 px-2 py-0.5 rounded-lg">
                 Beats the 2nd best card ({secondBestOffer?.name}) by ₹{deltaSavings.toLocaleString('en-IN')}!
               </span>
             )}
           </div>
 
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 flex flex-col items-center justify-center shrink-0 min-w-[190px]">
+          <div className="bg-white/10 dark:bg-[#0D1527]/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 flex flex-col items-center justify-center shrink-0 min-w-[190px]">
             <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-200">
               FINAL PAYABLE AMOUNT
             </span>
@@ -298,8 +298,8 @@ export const BankOfferStackingOptimizer: React.FC = () => {
       )}
 
       {/* Comprehensive Ranked Matrix */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
-        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+      <div className="bg-white dark:bg-[#0D1527] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm space-y-3">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/5">
           <span className="text-xs font-mono uppercase font-bold text-slate-500">
             All Available Card &amp; Voucher Routes (Ranked by Net Rupees Saved)
           </span>
@@ -318,18 +318,18 @@ export const BankOfferStackingOptimizer: React.FC = () => {
                   isWinner
                     ? 'bg-emerald-50/70 border-emerald-300 shadow-xs'
                     : offer.isEligible
-                    ? 'bg-white border-slate-200 hover:border-slate-300'
-                    : 'bg-slate-50/70 border-slate-200 opacity-60'
+                    ? 'bg-white dark:bg-[#0D1527] border-slate-200 dark:border-white/10 hover:border-slate-300 dark:border-white/20'
+                    : 'bg-slate-50/70 dark:bg-[#070A11]/70 border-slate-200 dark:border-white/10 opacity-60'
                 }`}
               >
                 <div className="flex items-start gap-3">
                   <span className="text-2xl mt-0.5">{offer.icon}</span>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-slate-900">
+                      <span className="text-sm font-bold text-slate-900 dark:text-[#F1F5F9]">
                         {offer.name}
                       </span>
-                      <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#111C33] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10">
                         {offer.badge}
                       </span>
                       {isWinner && (
@@ -349,12 +349,12 @@ export const BankOfferStackingOptimizer: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
+                <div className="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100 dark:border-white/5">
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-xs text-slate-400">Total Savings:</span>
                     <span
                       className={`text-base font-mono font-bold ${
-                        isWinner ? 'text-emerald-700' : offer.isEligible ? 'text-slate-900' : 'text-slate-400'
+                        isWinner ? 'text-emerald-700' : offer.isEligible ? 'text-slate-900 dark:text-[#F1F5F9]' : 'text-slate-400'
                       }`}
                     >
                       {offer.isEligible ? `₹${offer.netSavings.toLocaleString('en-IN')}` : '₹0'}

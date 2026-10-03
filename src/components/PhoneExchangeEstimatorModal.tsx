@@ -41,10 +41,10 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
   onClose,
   deal,
 }) => {
-  if (!isOpen || !deal) return null;
-
   const [selectedModel, setSelectedModel] = useState<string>(POPULAR_OLD_PHONES[1].name);
   const [selectedCondition, setSelectedCondition] = useState<string>('good');
+
+  if (!isOpen || !deal) return null;
 
   const modelObj = POPULAR_OLD_PHONES.find((m) => m.name === selectedModel) || POPULAR_OLD_PHONES[1];
   const condObj = CONDITIONS.find((c) => c.id === selectedCondition) || CONDITIONS[1];
@@ -62,16 +62,16 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
+          className="relative w-full max-w-xl bg-white dark:bg-[#0D1527] rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/80">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/80 dark:bg-[#070A11]/80">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-lg font-bold shadow-sm">
                 🔄
               </div>
               <div>
-                <h2 className="text-lg font-bold text-slate-900">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-[#F1F5F9]">
                   Old Phone Trade-In & Exchange Estimator
                 </h2>
                 <p className="text-xs text-slate-500">
@@ -83,7 +83,7 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
             <button
               type="button"
               onClick={onClose}
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer"
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#1E293B]/60 dark:bg-[#172440]/60 transition-colors cursor-pointer"
             >
               ✕
             </button>
@@ -91,8 +91,8 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
 
           <div className="p-6 space-y-6">
             {/* Target New Product */}
-            <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-              <div className="w-16 h-16 rounded-xl bg-white border border-slate-200 p-1 flex items-center justify-center overflow-hidden shrink-0">
+            <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10">
+              <div className="w-16 h-16 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 p-1 flex items-center justify-center overflow-hidden shrink-0">
                 {deal.image ? (
                   <img src={deal.image} alt={deal.title} className="w-full h-full object-contain" />
                 ) : (
@@ -101,8 +101,8 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
               </div>
               <div className="min-w-0 flex-1">
                 <span className="text-[10px] font-mono font-bold text-indigo-700 uppercase tracking-wider">New Device Target:</span>
-                <p className="text-xs font-bold text-slate-900 truncate">{deal.title}</p>
-                <p className="text-base font-black text-slate-900 mt-0.5">₹{deal.price.toLocaleString('en-IN')}</p>
+                <p className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] truncate">{deal.title}</p>
+                <p className="text-base font-black text-slate-900 dark:text-[#F1F5F9] mt-0.5">₹{deal.price.toLocaleString('en-IN')}</p>
               </div>
             </div>
 
@@ -114,7 +114,7 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
               <select
                 value={selectedModel}
                 onChange={(e) => setSelectedModel(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-slate-800 bg-white focus:border-indigo-500 focus:ring-3 focus:ring-indigo-100 outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-white/20 text-sm font-semibold text-slate-800 dark:text-[#F8FAFC] bg-white dark:bg-[#0D1527] focus:border-indigo-500 focus:ring-3 focus:ring-indigo-100 outline-none"
               >
                 {POPULAR_OLD_PHONES.map((m) => (
                   <option key={m.name} value={m.name}>
@@ -140,10 +140,10 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
                       className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                         isSel
                           ? 'bg-indigo-50 border-indigo-400 ring-2 ring-indigo-100 shadow-2xs'
-                          : 'bg-white border-slate-200 hover:bg-slate-50'
+                          : 'bg-white dark:bg-[#0D1527] border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:bg-[#070A11]'
                       }`}
                     >
-                      <span className="block text-xs font-bold text-slate-900">{c.label}</span>
+                      <span className="block text-xs font-bold text-slate-900 dark:text-[#F1F5F9]">{c.label}</span>
                       <span className="block text-[11px] text-slate-500 mt-0.5 line-clamp-1">{c.desc}</span>
                     </button>
                   );
@@ -153,7 +153,7 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
 
             {/* Price Upgrade Summary */}
             <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50 via-purple-50/40 to-white border border-indigo-200 shadow-xs space-y-2">
-              <div className="flex justify-between text-xs text-slate-600">
+              <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400">
                 <span>New Phone Deal Price:</span>
                 <span>₹{deal.price.toLocaleString('en-IN')}</span>
               </div>
@@ -167,7 +167,7 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
               </div>
               <div className="pt-2 border-t border-indigo-200 flex items-baseline justify-between">
                 <div>
-                  <span className="text-xs font-bold text-slate-900 block">Net Upgrade Cost:</span>
+                  <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] block">Net Upgrade Cost:</span>
                   <span className="text-[11px] text-slate-500">You save ₹{totalExchangeSavings.toLocaleString('en-IN')} total</span>
                 </div>
                 <div className="text-right">

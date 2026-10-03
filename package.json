@@ -4,8 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "test:intelligence": "node --test tests/shopping-intelligence.test.mjs tests/checkout.test.mjs",
+    "test:ui": "node --test tests/modal-hooks.test.mjs",
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build --emptyOutDir false",
     "check": "node ./node_modules/typescript/bin/tsc -b",
     "preview": "vite preview"
   },

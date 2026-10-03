@@ -58,10 +58,10 @@ export const SavedLootPage: React.FC<SavedLootPageProps> = ({
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-[#F1F5F9] tracking-tight">
               Your Bookmarked Deals
             </h1>
-            <p className="mt-2 text-sm sm:text-base text-slate-600 max-w-xl leading-relaxed">
+            <p className="mt-2 text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed">
               Quickly compare, monitor, and claim the deals you've saved. Bookmarks are stored locally on your device.
             </p>
           </div>
@@ -90,27 +90,27 @@ export const SavedLootPage: React.FC<SavedLootPageProps> = ({
       {savedDeals.length > 0 ? (
         <>
           {/* ── Filter & View Toolbar ── */}
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/90 p-4 mb-6 shadow-xs flex items-center justify-between gap-4">
+          <div className="bg-white/80 dark:bg-[#0D1527]/80 backdrop-blur-md rounded-2xl border border-slate-200/90 dark:border-white/10 p-4 mb-6 shadow-xs flex items-center justify-between gap-4">
             <div className="flex items-center gap-2 flex-1 max-w-sm">
               <input
                 type="text"
                 placeholder="Search saved deals..."
                 value={searchFilter}
                 onChange={(e) => setSearchFilter(e.target.value)}
-                className="px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white w-full transition-all"
+                className="px-3.5 py-1.5 rounded-full bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-800 dark:text-[#F8FAFC] focus:outline-none focus:border-blue-500 focus:bg-white dark:bg-[#0D1527] w-full transition-all"
               />
             </div>
 
             <div className="flex items-center gap-3">
               <span className="text-xs text-slate-500">
-                <strong className="text-slate-800 font-semibold">{savedDeals.length}</strong> deal{savedDeals.length === 1 ? '' : 's'} saved
+                <strong className="text-slate-800 dark:text-[#F8FAFC] font-semibold">{savedDeals.length}</strong> deal{savedDeals.length === 1 ? '' : 's'} saved
               </span>
 
-              <div className="hidden sm:flex items-center rounded-full bg-slate-100 p-0.5 border border-slate-200">
+              <div className="hidden sm:flex items-center rounded-full bg-slate-100 dark:bg-[#111C33] p-0.5 border border-slate-200 dark:border-white/10">
                 <button
                   onClick={() => onViewModeChange('grid')}
                   className={`p-1.5 rounded-full transition-colors ${
-                    viewMode === 'grid' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                    viewMode === 'grid' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-2xs' : 'text-slate-500 hover:text-slate-800 dark:text-[#F8FAFC]'
                   }`}
                   title="Grid View"
                 >
@@ -124,7 +124,7 @@ export const SavedLootPage: React.FC<SavedLootPageProps> = ({
                 <button
                   onClick={() => onViewModeChange('list')}
                   className={`p-1.5 rounded-full transition-colors ${
-                    viewMode === 'list' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                    viewMode === 'list' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-2xs' : 'text-slate-500 hover:text-slate-800 dark:text-[#F8FAFC]'
                   }`}
                   title="List View"
                 >
@@ -167,11 +167,11 @@ export const SavedLootPage: React.FC<SavedLootPageProps> = ({
         </>
       ) : (
         /* ── Empty State (Apple / Mobbin Design Language) ── */
-        <div className="max-w-md mx-auto my-12 text-center p-8 sm:p-10 rounded-3xl bg-white border border-slate-200/90 shadow-sm">
+        <div className="max-w-md mx-auto my-12 text-center p-8 sm:p-10 rounded-3xl bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 shadow-sm">
           <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-3xl mx-auto mb-4 border border-amber-200/60 shadow-2xs">
             ❤️
           </div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">Your Loot Vault is Empty</h2>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">Your Loot Vault is Empty</h2>
           <p className="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
             Click the heart icon on any deal card to save it here for instant comparison and price tracking.
           </p>

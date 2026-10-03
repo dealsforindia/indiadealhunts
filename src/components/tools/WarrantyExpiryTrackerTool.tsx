@@ -164,13 +164,13 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
   };
 
   return (
-    <div className="w-full bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 md:p-7 text-slate-800">
+    <div className="w-full bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-sm p-5 md:p-7 text-slate-800 dark:text-[#F8FAFC]">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100 dark:border-white/5">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xl">🛡️</span>
-            <h3 className="font-heading font-extrabold text-lg sm:text-xl text-slate-900 tracking-tight">
+            <h3 className="font-heading font-extrabold text-lg sm:text-xl text-slate-900 dark:text-[#F1F5F9] tracking-tight">
               Gadget &amp; Appliance Warranty Vault
             </h3>
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -187,7 +187,7 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
             type="button"
             onClick={handleExportJson}
             title="Download JSON backup"
-            className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition-colors"
+            className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] hover:bg-slate-50 dark:bg-[#070A11] text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
           >
             💾 Export
           </button>
@@ -203,14 +203,14 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
 
       {/* Filter Tabs & Search */}
       <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl w-full sm:w-auto">
+        <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-[#111C33] p-1 rounded-xl w-full sm:w-auto">
           {(['all', 'active', 'expiring', 'expired'] as const).map((st) => (
             <button
               key={st}
               type="button"
               onClick={() => setFilterStatus(st)}
               className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${
-                filterStatus === st ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                filterStatus === st ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-xs' : 'text-slate-500 hover:text-slate-800 dark:text-[#F8FAFC]'
               }`}
             >
               {st === 'expiring' ? 'Expiring (<30d)' : st}
@@ -224,7 +224,7 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
             placeholder="Search gear or brand..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-9 pl-8 pr-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full h-9 pl-8 pr-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-xs text-slate-800 dark:text-[#F8FAFC] focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
           <span className="absolute left-2.5 top-2.5 text-xs text-slate-400">🔍</span>
         </div>
@@ -233,15 +233,15 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
       {/* Add Product Modal Overlay */}
       {isAddOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 max-w-md w-full shadow-xl">
+          <div className="bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-white/10 p-6 max-w-md w-full shadow-xl">
             <div className="flex justify-between items-center mb-4">
-              <h4 className="font-heading font-extrabold text-base text-slate-900">
+              <h4 className="font-heading font-extrabold text-base text-slate-900 dark:text-[#F1F5F9]">
                 Log New Gear Warranty
               </h4>
               <button
                 type="button"
                 onClick={() => setIsAddOpen(false)}
-                className="text-slate-400 hover:text-slate-700"
+                className="text-slate-400 hover:text-slate-700 dark:text-slate-200"
               >
                 ✕
               </button>
@@ -249,24 +249,24 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
 
             <form onSubmit={handleAddItem} className="flex flex-col gap-3 text-xs">
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Product Title</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200 block mb-1">Product Title</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. MacBook Air M3, iPad Pro, Sony TV"
                   value={newProduct}
                   onChange={(e) => setNewProduct(e.target.value)}
-                  className="w-full h-9 px-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Brand</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200 block mb-1">Brand</label>
                   <select
                     value={newBrand}
                     onChange={(e) => setNewBrand(e.target.value)}
-                    className="w-full h-9 px-2 rounded-xl border border-slate-200 bg-white"
+                    className="w-full h-9 px-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527]"
                   >
                     {Object.keys(BRAND_DIRECTORY).map((b) => (
                       <option key={b} value={b}>{b}</option>
@@ -275,33 +275,33 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Store / Retailer</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200 block mb-1">Store / Retailer</label>
                   <input
                     type="text"
                     value={newStore}
                     onChange={(e) => setNewStore(e.target.value)}
-                    className="w-full h-9 px-3 rounded-xl border border-slate-200"
+                    className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-white/10"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Purchase Date</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200 block mb-1">Purchase Date</label>
                   <input
                     type="date"
                     required
                     value={newPurchaseDate}
                     onChange={(e) => setNewPurchaseDate(e.target.value)}
-                    className="w-full h-9 px-2 rounded-xl border border-slate-200"
+                    className="w-full h-9 px-2 rounded-xl border border-slate-200 dark:border-white/10"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Standard Warranty</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200 block mb-1">Standard Warranty</label>
                   <select
                     value={newWarrantyMonths}
                     onChange={(e) => setNewWarrantyMonths(Number(e.target.value))}
-                    className="w-full h-9 px-2 rounded-xl border border-slate-200 bg-white"
+                    className="w-full h-9 px-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527]"
                   >
                     <option value={6}>6 Months</option>
                     <option value={12}>1 Year (12M)</option>
@@ -317,20 +317,20 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
                   id="ext-warr"
                   checked={newExtended}
                   onChange={(e) => setNewExtended(e.target.checked)}
-                  className="rounded border-slate-300 text-blue-600"
+                  className="rounded border-slate-300 dark:border-white/20 text-blue-600"
                 />
-                <label htmlFor="ext-warr" className="font-medium text-slate-700">
+                <label htmlFor="ext-warr" className="font-medium text-slate-700 dark:text-slate-200">
                   Bought Extended Warranty (e.g. AppleCare+, OneAssist)
                 </label>
               </div>
 
               {newExtended && (
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Extended Duration</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200 block mb-1">Extended Duration</label>
                   <select
                     value={newExtendedMonths}
                     onChange={(e) => setNewExtendedMonths(Number(e.target.value))}
-                    className="w-full h-9 px-2 rounded-xl border border-slate-200 bg-white"
+                    className="w-full h-9 px-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527]"
                   >
                     <option value={12}>+1 Year (12M)</option>
                     <option value={24}>+2 Years (24M)</option>
@@ -340,21 +340,21 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
               )}
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Invoice / Order # (Optional)</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200 block mb-1">Invoice / Order # (Optional)</label>
                 <input
                   type="text"
                   placeholder="e.g. INV-2024-00129"
                   value={newInvoice}
                   onChange={(e) => setNewInvoice(e.target.value)}
-                  className="w-full h-9 px-3 rounded-xl border border-slate-200"
+                  className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-white/10"
                 />
               </div>
 
-              <div className="flex gap-2 justify-end pt-3 border-t border-slate-100">
+              <div className="flex gap-2 justify-end pt-3 border-t border-slate-100 dark:border-white/5">
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold"
+                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 font-bold"
                 >
                   Cancel
                 </button>
@@ -373,26 +373,26 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
       {/* Items List */}
       <div className="mt-5 flex flex-col gap-3">
         {filteredItems.length === 0 ? (
-          <div className="py-12 text-center text-xs text-slate-400 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+          <div className="py-12 text-center text-xs text-slate-400 bg-slate-50/50 dark:bg-[#070A11]/50 rounded-2xl border border-dashed border-slate-200 dark:border-white/10">
             No warranty records matching your criteria. Tap &ldquo;+ Add Product&rdquo; to log your first appliance or gadget.
           </div>
         ) : (
           filteredItems.map((item) => (
             <div
               key={item.id}
-              className="p-4 rounded-2xl border border-slate-200/90 bg-white hover:border-slate-300 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              className="p-4 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white dark:bg-[#0D1527] hover:border-slate-300 dark:border-white/20 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
             >
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-lg flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-[#111C33] flex items-center justify-center text-lg flex-shrink-0">
                   {item.category === 'Appliances' ? '🧊' : '📱'}
                 </div>
 
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-heading font-bold text-sm text-slate-900">
+                    <span className="font-heading font-bold text-sm text-slate-900 dark:text-[#F1F5F9]">
                       {item.productName}
                     </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 font-semibold">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#111C33] text-slate-600 dark:text-slate-400 font-semibold">
                       {item.brand}
                     </span>
                     {item.hasExtendedWarranty && (
@@ -435,7 +435,7 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     title={`Call ${item.brand} support: ${item.brandInfo.tollFree}`}
-                    className="h-8 px-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-medium flex items-center gap-1"
+                    className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#070A11] hover:bg-slate-100 dark:bg-[#111C33] text-slate-700 dark:text-slate-200 text-xs font-medium flex items-center gap-1"
                   >
                     <span>Support</span>
                     <span className="text-[10px]">↗</span>

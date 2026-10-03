@@ -66,13 +66,13 @@ export function analyzeArbitrage(deal: Partial<PublicDeal>): ArbitrageAnalysis {
 
   quotes.push({
     store: sourceDisplayName,
-    price: currentPrice,
+    price: currentPrice > 0 ? currentPrice : undefined,
     mrp: mrp > 0 ? mrp : undefined,
-    isVerifiedDeal: true,
-    statusText: 'Verified Deal Price',
+    isVerifiedDeal: currentPrice > 0,
+    statusText: currentPrice > 0 ? 'Source-reported price' : 'Price not confirmed',
     url: deal.url || '#',
-    badge: '🏆 Active Verified Loot',
-    actionText: 'Claim Deal',
+    badge: 'Source listing',
+    actionText: 'Open store',
   });
 
   // 2. Competitor Check 1: Amazon (if source is not Amazon)
@@ -139,9 +139,9 @@ export function analyzeArbitrage(deal: Partial<PublicDeal>): ArbitrageAnalysis {
     });
   }
 
-  const verdict = discountPct > 0
-    ? `Active verified price on ${sourceDisplayName} is ₹${currentPrice.toLocaleString('en-IN')}${mrp > 0 ? ` (${discountPct}% below ₹${mrp.toLocaleString('en-IN')} MRP)` : ''}. Real-time comparison available across alternative stores.`
-    : `Verified deal listed on ${sourceDisplayName} at ₹${currentPrice.toLocaleString('en-IN')}. Verify alternative store pricing with live links below.`;
+  const verdict = currentPrice <= 0 ? 'Current merchant price is not confirmed. Open the store listing to check it.' : discountPct > 0
+    ? `Source-reported price on ${sourceDisplayName} is ₹${currentPrice.toLocaleString('en-IN')}${mrp > 0 ? ` (${discountPct}% below ₹${mrp.toLocaleString('en-IN')} MRP)` : ''}. The links below search alternative stores; exact matching prices are not supplied.`
+    : `Source listing on ${sourceDisplayName} at ₹${currentPrice.toLocaleString('en-IN')}. Inspect alternative store listings using the search links below.`;
 
   return {
     sourceStore: sourceDisplayName,

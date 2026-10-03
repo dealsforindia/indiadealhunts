@@ -123,9 +123,9 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
 
   return (
     <>
-      <div className="max-w-[1340px] mx-auto px-4 md:px-6 pt-5 pb-3 flex items-center justify-between gap-3 w-full">
+      <div className="deal-toolbar max-w-[1340px] mx-auto px-4 md:px-6 pt-5 pb-3 flex items-center justify-between gap-3 w-full">
         {/* ── Desktop: Left Filter Popovers ── */}
-        <div className="hidden sm:flex items-center gap-2.5 flex-wrap">
+        <div className="hidden md:flex items-center gap-2.5 flex-wrap">
           {/* Store Dropdown */}
           <div ref={storeRef} className="relative">
             <button
@@ -135,7 +135,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
               className={`h-8.5 px-4 rounded-full text-[12.5px] font-medium flex items-center gap-2 border transition-all cursor-pointer ${
                 selectedStore !== 'all'
                   ? 'bg-[#0066cc]/10 text-[#0066cc] border-[#0066cc]/30 font-semibold shadow-xs'
-                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200/90 hover:border-slate-300 shadow-2xs'
+                  : 'bg-white dark:bg-[#0D1527] hover:bg-slate-50 dark:bg-[#070A11] text-slate-700 dark:text-slate-200 border-slate-200/90 dark:border-white/10 hover:border-slate-300 dark:border-white/20 shadow-2xs'
               }`}
             >
               <span>{desktopStoreLabel}</span>
@@ -151,7 +151,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 6, scale: 0.98 }}
                   transition={{ duration: 0.12 }}
-                  className="absolute top-full left-0 mt-2 w-44 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/80 p-1.5 shadow-xl z-50"
+                  className="absolute top-full left-0 mt-2 w-44 rounded-2xl bg-white/95 dark:bg-[#0D1527]/95 backdrop-blur-md border border-slate-200/80 dark:border-white/10 p-1.5 shadow-xl z-50"
                 >
                   {STORES.map((s) => (
                     <button
@@ -160,7 +160,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                       className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-colors text-left ${
                         selectedStore === s.id
                           ? 'bg-[#0066cc]/10 text-[#0066cc] font-semibold'
-                          : 'text-slate-700 hover:bg-slate-50'
+                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-[#070A11]'
                       }`}
                     >
                       <span>{s.label}</span>
@@ -181,7 +181,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
               className={`h-8.5 px-4 rounded-full text-[12.5px] font-medium flex items-center gap-2 border transition-all cursor-pointer ${
                 selectedCategory !== 'all'
                   ? 'bg-[#0066cc]/10 text-[#0066cc] border-[#0066cc]/30 font-semibold shadow-xs'
-                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200/90 hover:border-slate-300 shadow-2xs'
+                  : 'bg-white dark:bg-[#0D1527] hover:bg-slate-50 dark:bg-[#070A11] text-slate-700 dark:text-slate-200 border-slate-200/90 dark:border-white/10 hover:border-slate-300 dark:border-white/20 shadow-2xs'
               }`}
             >
               <span>{desktopCatLabel}</span>
@@ -197,7 +197,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 6, scale: 0.98 }}
                   transition={{ duration: 0.12 }}
-                  className="absolute top-full left-0 mt-2 w-48 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/80 p-1.5 shadow-xl z-50"
+                  className="absolute top-full left-0 mt-2 w-48 rounded-2xl bg-white/95 dark:bg-[#0D1527]/95 backdrop-blur-md border border-slate-200/80 dark:border-white/10 p-1.5 shadow-xl z-50"
                 >
                   {CATEGORIES.map((c) => (
                     <button
@@ -206,7 +206,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                       className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-colors text-left ${
                         selectedCategory === c.id
                           ? 'bg-[#0066cc]/10 text-[#0066cc] font-semibold'
-                          : 'text-slate-700 hover:bg-slate-50'
+                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-[#070A11]'
                       }`}
                     >
                       <span>{c.label}</span>
@@ -227,7 +227,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
               className={`h-8.5 px-4 rounded-full text-[12.5px] font-medium flex items-center gap-2 border transition-all cursor-pointer ${
                 sortBy !== 'newest'
                   ? 'bg-[#0066cc]/10 text-[#0066cc] border-[#0066cc]/30 font-semibold shadow-xs'
-                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200/90 hover:border-slate-300 shadow-2xs'
+                  : 'bg-white dark:bg-[#0D1527] hover:bg-slate-50 dark:bg-[#070A11] text-slate-700 dark:text-slate-200 border-slate-200/90 dark:border-white/10 hover:border-slate-300 dark:border-white/20 shadow-2xs'
               }`}
             >
               <span>{desktopSortLabel}</span>
@@ -243,7 +243,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 6, scale: 0.98 }}
                   transition={{ duration: 0.12 }}
-                  className="absolute top-full left-0 mt-2 w-56 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/80 p-1.5 shadow-xl z-50"
+                  className="absolute top-full left-0 mt-2 w-56 rounded-2xl bg-white/95 dark:bg-[#0D1527]/95 backdrop-blur-md border border-slate-200/80 dark:border-white/10 p-1.5 shadow-xl z-50"
                 >
                   {SORT_OPTIONS.map((o) => (
                     <button
@@ -252,7 +252,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                       className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-colors text-left ${
                         sortBy === o.value
                           ? 'bg-[#0066cc]/10 text-[#0066cc] font-semibold'
-                          : 'text-slate-700 hover:bg-slate-50'
+                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-[#070A11]'
                       }`}
                     >
                       <span>{o.label}</span>
@@ -266,11 +266,11 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
         </div>
 
         {/* ── Mobile: Filter & Sort Button ── */}
-        <div className="flex sm:hidden items-center justify-between w-full">
+        <div className="flex md:hidden items-center justify-between w-full">
           <button
             type="button"
             onClick={openMobileDrawer}
-            className="h-9 px-3.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-800 flex items-center gap-2 cursor-pointer shadow-2xs"
+            className="h-9 px-3.5 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-800 dark:text-[#F8FAFC] flex items-center gap-2 cursor-pointer shadow-2xs"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="4" y1="21" x2="4" y2="14" />
@@ -290,20 +290,20 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
         </div>
 
         {/* ── Desktop Right: Deals Count & View Grid/List Toggles ── */}
-        <div className="hidden sm:flex items-center gap-3.5 ml-auto">
+        <div className="hidden md:flex items-center gap-3.5 ml-auto">
           <span className="font-mono text-xs font-semibold text-slate-500">
             {totalDeals.toLocaleString('en-IN')} live drops
           </span>
 
           {onViewModeChange && (
-            <div className="flex items-center bg-slate-100 rounded-xl p-0.5 gap-0.5 border border-slate-200">
+            <div className="flex items-center bg-slate-100 dark:bg-[#111C33] rounded-xl p-0.5 gap-0.5 border border-slate-200 dark:border-white/10">
               <button
                 type="button"
                 onClick={() => onViewModeChange('grid')}
                 title="Grid view"
                 aria-label="Grid view"
                 className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors cursor-pointer ${
-                  viewMode === 'grid' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-900'
+                  viewMode === 'grid' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-2xs' : 'text-slate-500 hover:text-slate-900 dark:text-[#F1F5F9]'
                 }`}
               >
                 <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
@@ -320,7 +320,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                 title="List view"
                 aria-label="List view"
                 className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors cursor-pointer ${
-                  viewMode === 'list' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-900'
+                  viewMode === 'list' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-2xs' : 'text-slate-500 hover:text-slate-900 dark:text-[#F1F5F9]'
                 }`}
               >
                 <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -351,16 +351,17 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-              className="relative bg-white border-t border-slate-200 rounded-t-3xl max-h-[85vh] sm:max-h-[calc(100dvh-3rem)] overflow-y-auto overscroll-contain p-5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] flex flex-col gap-4 z-10 shadow-2xl"
+              className="relative bg-white dark:bg-[#0D1527] border-t border-slate-200 dark:border-white/10 rounded-t-3xl max-h-[85vh] sm:max-h-[calc(100dvh-3rem)] overflow-y-auto overscroll-contain p-5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] flex flex-col gap-4 z-10 shadow-2xl"
             >
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h3 className="font-heading font-extrabold text-base text-slate-900">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-white/5">
+                <h3 className="font-heading font-extrabold text-base text-slate-900 dark:text-[#F1F5F9]">
                   Filter & Sort Drops
                 </h3>
                 <button
                   type="button"
                   onClick={() => setMobileDrawerOpen(false)}
-                  className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center text-sm cursor-pointer"
+                  aria-label="Close filters"
+                  className="w-11 h-11 rounded-full bg-slate-100 dark:bg-[#111C33] text-slate-500 hover:text-slate-900 dark:text-[#F1F5F9] flex items-center justify-center text-sm cursor-pointer"
                 >
                   ✕
                 </button>
@@ -380,7 +381,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                       className={`p-2.5 rounded-xl text-xs font-semibold text-left border transition-all cursor-pointer ${
                         draftStore === s.id
                           ? 'bg-blue-50 text-blue-700 border-blue-300 font-bold'
-                          : 'bg-slate-50 text-slate-700 border-slate-200'
+                          : 'bg-slate-50 dark:bg-[#070A11] text-slate-700 dark:text-slate-200 border-slate-200 dark:border-white/10'
                       }`}
                     >
                       {s.label}
@@ -403,7 +404,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                       className={`p-2.5 rounded-xl text-xs font-semibold flex items-center justify-between border transition-all cursor-pointer ${
                         draftSort === o.value
                           ? 'bg-blue-50 text-blue-700 border-blue-300 font-bold'
-                          : 'bg-slate-50 text-slate-700 border-slate-200'
+                          : 'bg-slate-50 dark:bg-[#070A11] text-slate-700 dark:text-slate-200 border-slate-200 dark:border-white/10'
                       }`}
                     >
                       <span>{o.label}</span>
