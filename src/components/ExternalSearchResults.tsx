@@ -36,6 +36,7 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
   const [pastedUrl, setPastedUrl] = useState('');
 
   const [storeFilter, setStoreFilter] = useState<'all' | 'lowest' | 'flipkart' | 'amazon' | 'google_shopping'>('all');
+  const [viewMode, setViewMode] = useState<'matrix' | 'cards'>('matrix');
 
   // Find lowest price deal across all stores
   const { minPriceDeal, maxPriceDeal, priceSpread } = useMemo(() => {
@@ -131,9 +132,10 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
         </div>
       )}
 
-      {/* ── Filter Pills: All / Lowest Price / Flipkart / Amazon / Google Shopping ── */}
+      {/* ── View Mode & Filter Controls ── */}
       {deals.length > 0 && (
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-y border-slate-100 py-3">
+          <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setStoreFilter('all')}
@@ -199,6 +201,33 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
               <span>Google Shopping & More ({deals.filter((d) => !d.store?.toLowerCase().includes('flipkart') && !d.store?.toLowerCase().includes('amazon')).length})</span>
             </button>
           )}
+          </div>
+
+          {/* View Toggle */}
+          <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1">
+            <button
+              type="button"
+              onClick={() => setViewMode('matrix')}
+              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
+                viewMode === 'matrix' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+              }`}
+              title="Side-by-side merchant price comparison table"
+            >
+              <span>📊</span>
+              <span>Store Comparison Table</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('cards')}
+              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
+                viewMode === 'cards' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+              }`}
+              title="Grid of product cards"
+            >
+              <span>🖼️</span>
+              <span>Product Cards</span>
+            </button>
+          </div>
         </div>
       )}
 
@@ -207,7 +236,7 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" aria-label="Loading live store matches">
           {Array.from({ length: 4 }).map((_, index) => <div key={index} className="h-56 animate-pulse rounded-2xl bg-slate-100" />)}
         </div>
-      ) : filteredDeals.length > 0 ? (
+      ) : filteredDeals.length > 0 && viewMode === 'cards' ? (
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {filteredDeals.map((deal) => {
             const isLowest = Boolean(deal.is_lowest_price || (minPriceDeal && deal.id === minPriceDeal.id));
