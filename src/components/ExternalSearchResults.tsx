@@ -35,6 +35,8 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
   const cleanQuery = query.trim();
   const [pastedUrl, setPastedUrl] = useState('');
 
+  const [storeFilter, setStoreFilter] = useState<'all' | 'lowest' | 'flipkart' | 'amazon' | 'google_shopping'>('all');
+
   // Find lowest price deal across all stores
   const { minPriceDeal, maxPriceDeal, priceSpread } = useMemo(() => {
     const valid = deals.filter((d) => d.price && d.price > 0);
@@ -48,6 +50,23 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
       priceSpread: Math.max(0, (max.price || 0) - (min.price || 0)),
     };
   }, [deals]);
+
+  // Filtered deals based on store pill
+  const filteredDeals = useMemo(() => {
+    if (storeFilter === 'lowest') {
+      return deals.filter((d) => d.is_lowest_price || (minPriceDeal && d.id === minPriceDeal.id));
+    }
+    if (storeFilter === 'flipkart') {
+      return deals.filter((d) => d.store?.toLowerCase().includes('flipkart'));
+    }
+    if (storeFilter === 'amazon') {
+      return deals.filter((d) => d.store?.toLowerCase().includes('amazon'));
+    }
+    if (storeFilter === 'google_shopping') {
+      return deals.filter((d) => !d.store?.toLowerCase().includes('flipkart') && !d.store?.toLowerCase().includes('amazon'));
+    }
+    return deals;
+  }, [deals, storeFilter, minPriceDeal]);
 
   const handlePasteSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,14 +85,14 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
         <div>
           <div className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <h2 className="font-heading text-lg sm:text-xl font-black text-slate-900">Multi-Store Search & Arbitrage Radar</h2>
+            <h2 className="font-heading text-lg sm:text-xl font-black text-slate-900">Unified Multi-Store & Google Shopping Radar</h2>
             <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-mono font-bold text-emerald-700">LIVE COMPARISON</span>
           </div>
           <p className="mt-1 text-xs text-slate-500">
-            Real-time cross-store price comparison for “{cleanQuery}”. We scan our directory, Google Shopping, Amazon & Flipkart to guarantee you get the lowest price with affiliate cash reward.
+            Real-time price comparison across Our Verified Directory, Google Shopping, Amazon & Flipkart for “{cleanQuery}”. We find the absolute lowest price with direct affiliate cash savings so you never need to search anywhere else.
           </p>
         </div>
-        {deals.length > 0 && <span className="font-mono text-xs font-bold text-slate-500">{deals.length} stores checked</span>}
+        {deals.length > 0 && <span className="font-mono text-xs font-bold text-slate-500">{deals.length} offers verified</span>}
       </div>
 
       {/* ── Cross-Store Lowest Price Arbitrage Banner ── */}
@@ -85,7 +104,7 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800">Absolute Lowest Price</span>
+                <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800">Absolute Lowest Price Detected</span>
                 <span className="rounded-full bg-emerald-200/80 px-2 py-0.2 text-[10px] font-bold text-emerald-900">
                   {minPriceDeal.store}
                 </span>
@@ -93,7 +112,7 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
               <p className="text-xs font-bold text-slate-800">
                 Found for <span className="font-black text-emerald-700">{money(minPriceDeal.price)}</span>
                 {priceSpread > 0 && (
-                  <span className="text-slate-600"> — save up to <span className="font-black text-emerald-700">₹{Math.round(priceSpread).toLocaleString('en-IN')}</span> vs other stores!</span>
+                  <span className="text-slate-600"> — save up to <span className="font-black text-emerald-700">₹{Math.round(priceSpread).toLocaleString('en-IN')}</span> vs other store prices!</span>
                 )}
               </p>
             </div>
@@ -105,9 +124,80 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-xs font-bold text-white transition shadow-xs"
             >
-              <span>Get Lowest Price</span>
+              <span>Get Lowest Price ({money(minPriceDeal.price)})</span>
               <span>↗</span>
             </a>
+          )}
+        </div>
+      )}
+
+      {/* ── Filter Pills: All / Lowest Price / Flipkart / Amazon / Google Shopping ── */}
+      {deals.length > 0 && (
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setStoreFilter('all')}
+            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+              storeFilter === 'all'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+            }`}
+          >
+            All Offers ({deals.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setStoreFilter('lowest')}
+            className={`flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+              storeFilter === 'lowest'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+            }`}
+          >
+            <span>🏆</span>
+            <span>Lowest Price Deals</span>
+          </button>
+          {deals.some((d) => d.store?.toLowerCase().includes('flipkart')) && (
+            <button
+              type="button"
+              onClick={() => setStoreFilter('flipkart')}
+              className={`flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                storeFilter === 'flipkart'
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'border border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100'
+              }`}
+            >
+              <span>🛍️</span>
+              <span>Flipkart ({deals.filter((d) => d.store?.toLowerCase().includes('flipkart')).length})</span>
+            </button>
+          )}
+          {deals.some((d) => d.store?.toLowerCase().includes('amazon')) && (
+            <button
+              type="button"
+              onClick={() => setStoreFilter('amazon')}
+              className={`flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                storeFilter === 'amazon'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'border border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100'
+              }`}
+            >
+              <span>📦</span>
+              <span>Amazon ({deals.filter((d) => d.store?.toLowerCase().includes('amazon')).length})</span>
+            </button>
+          )}
+          {deals.some((d) => !d.store?.toLowerCase().includes('flipkart') && !d.store?.toLowerCase().includes('amazon')) && (
+            <button
+              type="button"
+              onClick={() => setStoreFilter('google_shopping')}
+              className={`flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                storeFilter === 'google_shopping'
+                  ? 'bg-purple-600 text-white shadow-xs'
+                  : 'border border-purple-200 bg-purple-50 text-purple-800 hover:bg-purple-100'
+              }`}
+            >
+              <span>🌐</span>
+              <span>Google Shopping & More ({deals.filter((d) => !d.store?.toLowerCase().includes('flipkart') && !d.store?.toLowerCase().includes('amazon')).length})</span>
+            </button>
           )}
         </div>
       )}
@@ -117,16 +207,27 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" aria-label="Loading live store matches">
           {Array.from({ length: 4 }).map((_, index) => <div key={index} className="h-56 animate-pulse rounded-2xl bg-slate-100" />)}
         </div>
-      ) : deals.length > 0 ? (
+      ) : filteredDeals.length > 0 ? (
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {deals.map((deal) => {
+          {filteredDeals.map((deal) => {
             const isLowest = Boolean(deal.is_lowest_price || (minPriceDeal && deal.id === minPriceDeal.id));
-            const isFk = deal.store?.toLowerCase().includes('flipkart');
-            const isAmz = deal.store?.toLowerCase().includes('amazon');
+            const sLower = deal.store?.toLowerCase() || '';
+            const isFk = sLower.includes('flipkart');
+            const isAmz = sLower.includes('amazon');
+            const isGShop = sLower.includes('google');
+            const isJio = sLower.includes('jio');
+            const isCroma = sLower.includes('croma');
+            
             const storeBadgeClass = isFk
               ? 'bg-blue-50 text-blue-700 border-blue-200'
               : isAmz
               ? 'bg-amber-50 text-amber-800 border-amber-200'
+              : isGShop
+              ? 'bg-purple-50 text-purple-700 border-purple-200'
+              : isJio
+              ? 'bg-teal-50 text-teal-700 border-teal-200'
+              : isCroma
+              ? 'bg-cyan-50 text-cyan-700 border-cyan-200'
               : 'bg-slate-50 text-slate-700 border-slate-200';
 
             return (
