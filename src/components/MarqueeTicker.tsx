@@ -10,77 +10,6 @@ interface MarqueeTickerProps {
 const EDGE_API = import.meta.env.VITE_EDGE_API_URL || 'https://dealflow-edge.pottemasshippo.workers.dev';
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
 
-// High-confidence fallback ticker items to ensure immediate zero-latency render
-const FALLBACK_TICKER_ITEMS: TickerItem[] = [
-  {
-    id: 'ticker-fb-1',
-    title: 'Zepto Mega Grocery & Grooming Haul (Multiple Pincodes)',
-    price: 19,
-    mrp: 399,
-    discount_pct: 95,
-    store: 'Zepto',
-    badge: '⚡ 95% LOOT',
-    relative_time: 'Just now',
-    url: '/',
-    consensus_count: 3,
-  },
-  {
-    id: 'ticker-fb-2',
-    title: "POPWINGS Women's Dresses & Crop Tops @ Up to 89% Off",
-    price: 149,
-    mrp: 1299,
-    discount_pct: 89,
-    store: 'Amazon',
-    badge: '🔥 89% OFF',
-    relative_time: '2m ago',
-    url: '/',
-  },
-  {
-    id: 'ticker-fb-3',
-    title: 'Kamiliant by American Tourister Hard Body Luggage',
-    price: 3899,
-    mrp: 14999,
-    discount_pct: 74,
-    store: 'Flipkart',
-    badge: '💎 74% OFF',
-    relative_time: '5m ago',
-    url: '/',
-  },
-  {
-    id: 'ticker-fb-4',
-    title: 'boAt Airdopes 141 ANC True Wireless Earbuds',
-    price: 899,
-    mrp: 3990,
-    discount_pct: 77,
-    store: 'Amazon',
-    badge: '⚡ FLASH LOOT',
-    relative_time: '8m ago',
-    url: '/',
-  },
-  {
-    id: 'ticker-fb-5',
-    title: 'Cello 27-Pcs Opalware Dinner Set (Scratch Resistant)',
-    price: 999,
-    mrp: 2999,
-    discount_pct: 67,
-    store: 'DesiDime',
-    badge: '🔥 3 CHANNELS',
-    relative_time: '12m ago',
-    url: '/',
-  },
-  {
-    id: 'ticker-fb-6',
-    title: 'Noise ColorFit Pulse 3 Smartwatch (1.96" TFT Display)',
-    price: 1199,
-    mrp: 4999,
-    discount_pct: 76,
-    store: 'Myntra',
-    badge: '⚡ 76% OFF',
-    relative_time: '14m ago',
-    url: '/',
-  },
-];
-
 const STORE_THEME: Record<string, { bg: string; text: string; border: string }> = {
   Amazon: { bg: '#FEF3C7', text: '#92400E', border: '#FDE68A' },
   Flipkart: { bg: '#EFF6FF', text: '#1D4ED8', border: '#BFDBFE' },
@@ -127,12 +56,8 @@ export const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ onSelectDeal, onOp
     return () => clearInterval(interval);
   }, [fetchTicker]);
 
-  const items = (tickerData?.items && tickerData.items.length > 0)
-    ? tickerData.items
-    : FALLBACK_TICKER_ITEMS;
-
-  const totalDeals = tickerData?.stats?.total_live_deals || 3288;
-  const todayDrops = tickerData?.stats?.today_drops || 122;
+  const items = tickerData?.items ?? [];
+  const totalDeals = tickerData?.stats?.total_live_deals;
 
   const handleCardClick = (item: TickerItem) => {
     if (onSelectDeal) {
@@ -168,7 +93,7 @@ export const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ onSelectDeal, onOp
             Live Radar
           </span>
           <span className="text-[10px] sm:text-[11px] font-mono px-2 py-0.5 rounded-full bg-white text-slate-700 font-semibold border border-slate-200 shadow-2xs">
-            {totalDeals.toLocaleString()}+ drops
+            {totalDeals ? `${totalDeals.toLocaleString()} live drops` : 'Live data pending'}
           </span>
         </div>
 
@@ -179,7 +104,9 @@ export const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ onSelectDeal, onOp
           onMouseLeave={() => setIsHovered(false)}
         >
           <div className="animate-marquee-drift flex items-center gap-2.5">
-            {[...items, ...items].map((item, idx) => {
+            {items.length === 0 ? (
+              <span className="text-[11px] text-slate-500 px-3">Waiting for live radar data…</span>
+            ) : [...items, ...items].map((item, idx) => {
               const theme = STORE_THEME[item.store] || {
                 bg: '#F1F5F9',
                 text: '#334155',

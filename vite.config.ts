@@ -35,6 +35,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/ws': {
+        target: 'ws://74.225.250.0:8000',
+        ws: true,
+        changeOrigin: true,
+      },
     },
   },
 })

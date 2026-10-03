@@ -25,6 +25,27 @@ interface PriceWatch {
 const STORAGE_WATCHES_KEY = 'dealflow_price_watches_v1';
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
 
+const getLookupError = (targetUrl: string) => {
+  try {
+    const parsed = new URL(targetUrl);
+    const host = parsed.hostname.toLowerCase();
+    const path = parsed.pathname.toLowerCase();
+
+    if (host.includes('myntra.com') && !/\/buy(?:\/|$)/.test(path) && !/\/\d{5,}(?:\/|$)/.test(path)) {
+      return 'This is a Myntra catalog or search page, not a product page. Paste a product link that ends in /buy, or search for the item in the storefront.';
+    }
+
+    if ((host.includes('amazon.') && !/\/dp\/[a-z0-9]{10}/i.test(path)) ||
+        ((host.includes('flipkart.com') || host.includes('shopsy.in')) && !/\/p\/itm/i.test(path))) {
+      return 'This is a store listing page, not a product page. Paste the specific Amazon or Flipkart product link, or search for the item in the storefront.';
+    }
+  } catch {
+    return 'Please paste a full Amazon, Flipkart, or Myntra product URL.';
+  }
+
+  return 'Could not analyze this product link right now. Confirm it is an active Amazon, Flipkart, or Myntra product URL and try again.';
+};
+
 export const DealLookupModal: React.FC<DealLookupModalProps> = ({
   initialUrl = '',
   isOpen = true,
@@ -139,7 +160,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
         };
         setResult(fallbackData);
       } else {
-        throw new Error('Could not analyze product link. Please check that the URL is an active Amazon, Flipkart, or Myntra link.');
+        throw new Error(getLookupError(targetUrl));
       }
     } catch (err: unknown) {
       clearTimeout(timeoutId);

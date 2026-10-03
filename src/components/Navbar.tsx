@@ -15,6 +15,7 @@ interface NavbarProps {
   isAudioEnabled?: boolean;
   onToggleAudio?: () => void;
   savedCount?: number;
+  feedStatus?: 'live' | 'loading' | 'offline';
 }
 
 const TELEGRAM_URL = 'https://t.me/dealsforindiachannel';
@@ -42,6 +43,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   isAudioEnabled = true,
   onToggleAudio,
   savedCount = 0,
+  feedStatus = 'live',
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
@@ -87,10 +89,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-50 h-16 w-full backdrop-blur-xl bg-white/90 border-b border-slate-200/80 transition-all">
-      <div className="max-w-[1340px] mx-auto px-4 md:px-6 h-full flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 h-16 w-full backdrop-blur-xl bg-white/95 border-b border-slate-200/80 transition-all">
+      <div className="max-w-[1480px] mx-auto px-3 sm:px-4 lg:px-6 h-full flex items-center justify-between gap-2.5 lg:gap-4">
         {/* ── Left: Mobile Toggle + Apple-Style Brand Logo ── */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 min-w-0 shrink-0">
           <button
             className="flex md:hidden items-center justify-center w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -113,7 +115,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             aria-label="IndiaDealHunts Home"
-            className="flex items-center gap-2.5 bg-transparent border-0 cursor-pointer p-0 text-left group"
+            className="flex items-center gap-2 bg-transparent border-0 cursor-pointer p-0 text-left group min-w-0 md:w-[176px]"
           >
             <div className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-slate-900 text-white font-black flex-shrink-0 group-hover:bg-blue-600 transition-colors shadow-sm">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -125,17 +127,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               </span>
             </div>
 
-            <div className="flex flex-col">
+            <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="font-heading font-extrabold text-[17px] tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
-                  INDIA DEAL HUNTS
+                <span className="font-heading font-extrabold text-[14px] sm:text-[16px] leading-[0.95] tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
+                  INDIA DEAL<br />HUNTS
                 </span>
                 <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 hidden sm:inline-block">
                   LIVE
                 </span>
               </div>
-              <span className="text-[9.5px] font-mono font-semibold tracking-wider text-slate-500 uppercase">
-                Verified Retail Price Drops
+              <span className="text-[8px] sm:text-[9px] font-mono font-semibold tracking-[0.08em] text-slate-500 uppercase whitespace-nowrap">
+                Verified price drops
               </span>
             </div>
           </button>
@@ -143,7 +145,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* ── Center: Clean Navigation Tabs ── */}
         <nav
-          className="hidden md:flex items-center gap-1 h-full"
+          className="hidden md:flex flex-1 min-w-0 items-center justify-center gap-0.5 h-full"
           aria-label="Primary navigation"
         >
           {[
@@ -158,7 +160,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id as NavTab)}
-                className={`relative px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-150 cursor-pointer ${
+                className={`relative px-2.5 lg:px-3 py-1.5 rounded-full text-[11px] lg:text-xs font-semibold tracking-tight transition-all duration-150 cursor-pointer whitespace-nowrap ${
                   isActive
                     ? 'text-white bg-slate-900 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -171,68 +173,36 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={onOpenLookup}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer"
+            aria-label="Price Lookup"
+            title="Price Lookup"
+            className="flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-full text-[11px] lg:text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer whitespace-nowrap"
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <span>Price Lookup</span>
+            <span className="hidden 2xl:inline">Price Lookup</span>
           </button>
 
 
-          {/* Categories Popover */}
-          <div ref={categoriesRef} className="relative">
-            <button
-              onClick={() => setCategoriesOpen(!categoriesOpen)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                categoriesOpen
-                  ? 'text-slate-900 bg-slate-100'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <span>Explore</span>
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 12 12"
-                fill="none"
-                className={`transition-transform duration-200 ${categoriesOpen ? 'rotate-180' : ''}`}
-              >
-                <path d="M2.5 4.5l3.5 3.5 3.5-3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-
-            <AnimatePresence>
-              {categoriesOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 6, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 6, scale: 0.98 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute top-full left-0 mt-2 w-56 rounded-2xl bg-white border border-slate-200 p-1.5 shadow-xl z-50"
-                >
-                  <div className="px-2.5 py-1 text-[10px] font-mono uppercase font-bold text-slate-400 tracking-wider">
-                    Categories
-                  </div>
-                  {CATEGORIES.map((cat) => (
-                    <button
-                      key={cat.id}
-                      onClick={() => handleCategoryClick(cat.id)}
-                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition-colors text-left"
-                    >
-                      <span className="text-sm">{cat.icon}</span>
-                      <span>{cat.label}</span>
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
         </nav>
 
-        {/* ── Right: Search Trigger, Audio, Submit, Telegram CTA ── */}
-        <div className="flex items-center gap-2">
+        {/* ── Right: public feed status, search, audio, submit, Telegram CTA ── */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span
+            className={`hidden xl:inline-flex items-center gap-1.5 h-8 px-2.5 rounded-full border text-[10px] font-mono font-bold whitespace-nowrap ${
+              feedStatus === 'live'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                : feedStatus === 'loading'
+                  ? 'bg-amber-50 border-amber-200 text-amber-700'
+                  : 'bg-slate-100 border-slate-200 text-slate-500'
+            }`}
+            title="Public storefront feed status"
+          >
+            <span className={`h-1.5 w-1.5 rounded-full ${feedStatus === 'live' ? 'bg-emerald-500' : feedStatus === 'loading' ? 'bg-amber-500 animate-pulse' : 'bg-slate-400'}`} />
+            {feedStatus === 'live' ? 'Public feed live' : feedStatus === 'loading' ? 'Loading feed' : 'Feed offline'}
+          </span>
+
           {(onOpenCommandPalette || onFocusSearch) && (
             <button
               onClick={() => {
@@ -241,13 +211,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               }}
               title="Search drops (⌘K / Ctrl+K / /)"
               aria-label="Search drops"
-              className="flex items-center gap-2 h-9 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-all text-xs"
+              className="flex items-center gap-2 h-8.5 px-3.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-all text-xs cursor-pointer"
             >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
                 <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.8" />
                 <path d="M11 11l3.5 3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
               </svg>
-              <span className="hidden xl:inline text-slate-500 font-mono text-[11px]">Quick Search</span>
+              <span className="hidden 2xl:inline text-slate-500 font-mono text-[11px]">Quick Search</span>
               <kbd className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] font-mono bg-white border border-slate-200 text-slate-500 shadow-2xs font-semibold">
                 ⌘K
               </kbd>
@@ -259,7 +229,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={onToggleAudio}
               title={isAudioEnabled ? 'Tactile sound active (click to mute)' : 'Sound muted (click to enable)'}
               aria-label="Toggle sound effects"
-              className={`flex items-center justify-center w-9 h-9 rounded-lg border text-xs transition-all ${
+              className={`flex items-center justify-center w-8.5 h-8.5 rounded-full border text-xs transition-all cursor-pointer ${
                 isAudioEnabled
                   ? 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200'
                   : 'bg-white border-slate-200 text-slate-400 hover:text-slate-600'
@@ -271,7 +241,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={onOpenSubmit}
-            className="hidden lg:inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition-all text-xs font-semibold"
+            className="hidden lg:inline-flex items-center gap-1.5 h-8.5 px-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition-all text-[11px] font-semibold cursor-pointer whitespace-nowrap"
           >
             <span>+ Submit</span>
           </button>
@@ -281,9 +251,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             target="_blank"
             rel="noopener noreferrer"
             title="Join 45,000+ Hunters on Telegram"
-            className="inline-flex items-center gap-2 h-9 px-3.5 sm:px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm shadow-blue-500/20 active:scale-95 transition-all"
+            className="inline-flex items-center gap-2 h-8.5 px-4 rounded-full bg-[#0066cc] hover:bg-[#0071e3] text-white font-semibold text-xs shadow-xs active:scale-95 transition-all"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.63 3.73-.53.36-1.02.54-1.45.53-.48-.01-1.4-.27-2.09-.49-.84-.27-1.51-.42-1.45-.88.03-.24.37-.49 1.02-.75 4-1.74 6.68-2.88 8.03-3.44 3.82-1.59 4.62-1.87 5.14-1.88.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.16-.04.29z" />
             </svg>
             <span className="hidden sm:inline">Join Telegram</span>
@@ -357,6 +327,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 ✍️ Submit a Deal
               </button>
+
+              <div className="px-3 py-2 rounded-lg text-[11px] font-medium text-slate-500 bg-slate-50 border border-slate-200">
+                Public storefront feed • admin tools stay private
+              </div>
             </div>
 
             <div className="pt-2 border-t border-slate-200">

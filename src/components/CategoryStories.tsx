@@ -196,14 +196,20 @@ const FALLBACK_STORIES: CategoryStoryCollection[] = [
 ];
 
 export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCategoryFilter, deals }) => {
-  const [collections, setCollections] = useState<CategoryStoryCollection[]>(FALLBACK_STORIES);
+  // Keep the rail honest: render only stories returned by the API or built from
+  // the current live deal feed. The old hardcoded fallback made the storefront
+  // look populated when the feed was unavailable.
+  const [collections, setCollections] = useState<CategoryStoryCollection[]>([]);
   const [selectedStoryIndex, setSelectedStoryIndex] = useState<number | null>(null);
   const [viewedStoryIds, setViewedStoryIds] = useState<Set<string>>(new Set());
   const railRef = useRef<HTMLDivElement>(null);
 
   // Automatically construct live stories from active deals if available
   useEffect(() => {
-    if (!deals || deals.length === 0) return;
+    if (!deals || deals.length === 0) {
+      setCollections([]);
+      return;
+    }
 
     const liveSteals = deals.filter((d) => d.discount_pct && d.discount_pct >= 60 && d.image && d.price > 0).slice(0, 6);
     const liveBudget = deals.filter((d) => d.price > 0 && d.price <= 499 && d.image).slice(0, 6);
@@ -454,17 +460,19 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
                       }`}
                     >
                       <div className="w-full h-full rounded-full bg-white p-[2px] flex items-center justify-center overflow-hidden relative shadow-2xs">
-                        {previewImg ? (
+                        <div className="absolute inset-0 w-full h-full rounded-full bg-slate-100 flex items-center justify-center text-2xl">
+                          {story.emoji}
+                        </div>
+                        {previewImg && (
                           <img
                             src={previewImg}
                             alt={story.title}
-                            className="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-300"
+                            className="relative z-10 w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-300"
                             loading="lazy"
+                            onError={(event) => {
+                              event.currentTarget.classList.add('hidden');
+                            }}
                           />
-                        ) : (
-                          <div className="w-full h-full rounded-full bg-slate-100 flex items-center justify-center text-2xl">
-                            {story.emoji}
-                          </div>
                         )}
 
                         {/* Centered Emoji Overlay Badge */}

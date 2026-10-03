@@ -132,14 +132,14 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
               type="button"
               onClick={() => { setStoreOpen(!storeOpen); setCatOpen(false); setSortOpen(false); }}
               aria-expanded={storeOpen}
-              className={`h-9 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-2 border transition-all cursor-pointer shadow-2xs ${
+              className={`h-8.5 px-4 rounded-full text-[12.5px] font-medium flex items-center gap-2 border transition-all cursor-pointer ${
                 selectedStore !== 'all'
-                  ? 'bg-blue-50 text-blue-700 border-blue-200 font-bold'
-                  : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                  ? 'bg-[#0066cc]/10 text-[#0066cc] border-[#0066cc]/30 font-semibold shadow-xs'
+                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200/90 hover:border-slate-300 shadow-2xs'
               }`}
             >
               <span>{desktopStoreLabel}</span>
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className={`transition-transform ${storeOpen ? 'rotate-180' : ''}`}>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className={`transition-transform duration-150 ${storeOpen ? 'rotate-180' : ''}`}>
                 <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
@@ -151,20 +151,20 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 6, scale: 0.98 }}
                   transition={{ duration: 0.12 }}
-                  className="absolute top-full left-0 mt-2 w-44 rounded-2xl bg-white border border-slate-200 p-1.5 shadow-xl z-50"
+                  className="absolute top-full left-0 mt-2 w-44 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/80 p-1.5 shadow-xl z-50"
                 >
                   {STORES.map((s) => (
                     <button
                       key={s.id}
                       onClick={() => { onSelectStore(s.id); setStoreOpen(false); }}
-                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-medium transition-colors text-left ${
+                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-colors text-left ${
                         selectedStore === s.id
-                          ? 'bg-blue-50 text-blue-700 font-bold'
+                          ? 'bg-[#0066cc]/10 text-[#0066cc] font-semibold'
                           : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
                       <span>{s.label}</span>
-                      {selectedStore === s.id && <span className="text-blue-600">✓</span>}
+                      {selectedStore === s.id && <span className="text-[#0066cc]">✓</span>}
                     </button>
                   ))}
                 </motion.div>
@@ -178,14 +178,14 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
               type="button"
               onClick={() => { setCatOpen(!catOpen); setStoreOpen(false); setSortOpen(false); }}
               aria-expanded={catOpen}
-              className={`h-9 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-2 border transition-all cursor-pointer shadow-2xs ${
+              className={`h-8.5 px-4 rounded-full text-[12.5px] font-medium flex items-center gap-2 border transition-all cursor-pointer ${
                 selectedCategory !== 'all'
-                  ? 'bg-blue-50 text-blue-700 border-blue-200 font-bold'
-                  : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                  ? 'bg-[#0066cc]/10 text-[#0066cc] border-[#0066cc]/30 font-semibold shadow-xs'
+                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200/90 hover:border-slate-300 shadow-2xs'
               }`}
             >
               <span>{desktopCatLabel}</span>
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className={`transition-transform ${catOpen ? 'rotate-180' : ''}`}>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className={`transition-transform duration-150 ${catOpen ? 'rotate-180' : ''}`}>
                 <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
@@ -197,20 +197,20 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 6, scale: 0.98 }}
                   transition={{ duration: 0.12 }}
-                  className="absolute top-full left-0 mt-2 w-48 rounded-2xl bg-white border border-slate-200 p-1.5 shadow-xl z-50"
+                  className="absolute top-full left-0 mt-2 w-48 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/80 p-1.5 shadow-xl z-50"
                 >
                   {CATEGORIES.map((c) => (
                     <button
                       key={c.id}
                       onClick={() => { onSelectCategory(c.id); setCatOpen(false); }}
-                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-medium transition-colors text-left ${
+                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-colors text-left ${
                         selectedCategory === c.id
-                          ? 'bg-blue-50 text-blue-700 font-bold'
+                          ? 'bg-[#0066cc]/10 text-[#0066cc] font-semibold'
                           : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
                       <span>{c.label}</span>
-                      {selectedCategory === c.id && <span className="text-blue-600">✓</span>}
+                      {selectedCategory === c.id && <span className="text-[#0066cc]">✓</span>}
                     </button>
                   ))}
                 </motion.div>
@@ -224,14 +224,14 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
               type="button"
               onClick={() => { setSortOpen(!sortOpen); setStoreOpen(false); setCatOpen(false); }}
               aria-expanded={sortOpen}
-              className={`h-9 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-2 border transition-all cursor-pointer shadow-2xs ${
+              className={`h-8.5 px-4 rounded-full text-[12.5px] font-medium flex items-center gap-2 border transition-all cursor-pointer ${
                 sortBy !== 'newest'
-                  ? 'bg-blue-50 text-blue-700 border-blue-200 font-bold'
-                  : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                  ? 'bg-[#0066cc]/10 text-[#0066cc] border-[#0066cc]/30 font-semibold shadow-xs'
+                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200/90 hover:border-slate-300 shadow-2xs'
               }`}
             >
               <span>{desktopSortLabel}</span>
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className={`transition-transform ${sortOpen ? 'rotate-180' : ''}`}>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className={`transition-transform duration-150 ${sortOpen ? 'rotate-180' : ''}`}>
                 <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
@@ -243,20 +243,20 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 6, scale: 0.98 }}
                   transition={{ duration: 0.12 }}
-                  className="absolute top-full left-0 mt-2 w-56 rounded-2xl bg-white border border-slate-200 p-1.5 shadow-xl z-50"
+                  className="absolute top-full left-0 mt-2 w-56 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/80 p-1.5 shadow-xl z-50"
                 >
                   {SORT_OPTIONS.map((o) => (
                     <button
                       key={o.value}
                       onClick={() => { onSortChange(o.value); setSortOpen(false); }}
-                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-medium transition-colors text-left ${
+                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-colors text-left ${
                         sortBy === o.value
-                          ? 'bg-blue-50 text-blue-700 font-bold'
+                          ? 'bg-[#0066cc]/10 text-[#0066cc] font-semibold'
                           : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
                       <span>{o.label}</span>
-                      {sortBy === o.value && <span className="text-blue-600">✓</span>}
+                      {sortBy === o.value && <span className="text-[#0066cc]">✓</span>}
                     </button>
                   ))}
                 </motion.div>

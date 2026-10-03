@@ -633,275 +633,59 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               </div>
             )}
 
-            {/* ── Real-Time Shopping Intelligence & Protections ── */}
+            {/* ── Apple Verified Deal Authenticity Card ── */}
             <div style={{
               display: 'flex',
               flexDirection: 'column',
               gap: '10px',
-              padding: '14px',
+              padding: '16px',
               borderRadius: '16px',
-              backgroundColor: '#F8FAFC',
-              border: '1px solid #E2E8F0',
+              backgroundColor: '#F5F5F7',
+              border: '1px solid #E5E5E7',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '14px' }}>🛡️</span>
-                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: '12px', fontWeight: 800, color: '#0F172A' }}>
-                    Deal Intelligence &amp; Buyer Protections
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '50%',
+                    backgroundColor: '#0066CC',
+                    color: '#FFFFFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                  }}>✓</span>
+                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: '13px', fontWeight: 700, color: '#1D1D1F' }}>
+                    Authentic Verified Deal
                   </span>
                 </div>
+                <span style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: '#0066CC',
+                }}>
+                  {storeName}
+                </span>
               </div>
 
-              {/* 3 Value Pillars for this Deal (Strictly Category-Aware) */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '8px' }}>
-                {/* 1. Category Pillar: GST ITC for Tech/Appliances, Authenticity for Fashion, Freshness for Grocery */}
-                {isB2BEligible ? (
-                  <div style={{
-                    padding: '10px 12px',
-                    borderRadius: '10px',
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid #E2E8F0',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '2px',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#64748B', fontWeight: 700 }}>
-                        🧾 GST ITC SHIELD
-                      </span>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 800, color: '#059669' }}>
-                        Save ₹{gstItcAmount.toLocaleString('en-IN')}
-                      </span>
-                    </div>
-                    <span style={{ fontSize: '11px', color: '#334155', fontWeight: 600 }}>
-                      Net B2B: ₹{Math.round(price - gstItcAmount).toLocaleString('en-IN')}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => { onClose(); onOpenTool?.('gst'); }}
-                      style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '9.5px',
-                        color: '#2563EB',
-                        textAlign: 'left',
-                        marginTop: '4px',
-                        cursor: 'pointer',
-                        border: 'none',
-                        background: 'none',
-                        padding: 0,
-                        fontWeight: 700,
-                      }}
-                    >
-                      Calculate 40% Dep. →
-                    </button>
-                  </div>
-                ) : isFashion ? (
-                  <div style={{
-                    padding: '10px 12px',
-                    borderRadius: '10px',
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid #E2E8F0',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '2px',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#64748B', fontWeight: 700 }}>
-                        👗 SIZE &amp; AUTHENTICITY
-                      </span>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 800, color: '#7C3AED' }}>
-                        100% Brand Stock
-                      </span>
-                    </div>
-                    <span style={{ fontSize: '11px', color: '#334155', fontWeight: 600 }}>
-                      Doorstep size replacement if tags intact
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => { onClose(); onOpenTool?.('returns'); }}
-                      style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '9.5px',
-                        color: '#2563EB',
-                        textAlign: 'left',
-                        marginTop: '4px',
-                        cursor: 'pointer',
-                        border: 'none',
-                        background: 'none',
-                        padding: 0,
-                        fontWeight: 700,
-                      }}
-                    >
-                      Return Rules Checklist →
-                    </button>
-                  </div>
-                ) : isGroceryBeauty ? (
-                  <div style={{
-                    padding: '10px 12px',
-                    borderRadius: '10px',
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid #E2E8F0',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '2px',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#64748B', fontWeight: 700 }}>
-                        🌿 FRESHNESS &amp; BATCH
-                      </span>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 800, color: '#059669' }}>
-                        Sealed Pack
-                      </span>
-                    </div>
-                    <span style={{ fontSize: '11px', color: '#334155', fontWeight: 600 }}>
-                      Direct manufacturer batch &amp; shelf-life check
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => { onClose(); onOpenTool?.('unit_price'); }}
-                      style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '9.5px',
-                        color: '#2563EB',
-                        textAlign: 'left',
-                        marginTop: '4px',
-                        cursor: 'pointer',
-                        border: 'none',
-                        background: 'none',
-                        padding: 0,
-                        fontWeight: 700,
-                      }}
-                    >
-                      Unit Price / Gram Math →
-                    </button>
-                  </div>
-                ) : (
-                  <div style={{
-                    padding: '10px 12px',
-                    borderRadius: '10px',
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid #E2E8F0',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '2px',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#64748B', fontWeight: 700 }}>
-                        🛡️ BUYER GUARANTEE
-                      </span>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 800, color: '#0284C7' }}>
-                        Verified Store
-                      </span>
-                    </div>
-                    <span style={{ fontSize: '11px', color: '#334155', fontWeight: 600 }}>
-                      Authentic merchant billing &amp; transit cover
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => { onClose(); onOpenTool?.('returns'); }}
-                      style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '9.5px',
-                        color: '#2563EB',
-                        textAlign: 'left',
-                        marginTop: '4px',
-                        cursor: 'pointer',
-                        border: 'none',
-                        background: 'none',
-                        padding: 0,
-                        fontWeight: 700,
-                      }}
-                    >
-                      Delivery &amp; Return Safety →
-                    </button>
-                  </div>
-                )}
-
-                {/* 2. Card Optimizer */}
-                {bestCardSavings && (
-                  <div style={{
-                    padding: '10px 12px',
-                    borderRadius: '10px',
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid #E2E8F0',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '2px',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#64748B', fontWeight: 700 }}>
-                        💳 BEST PAYMENT
-                      </span>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 800, color: '#0284C7' }}>
-                        +₹{bestCardSavings.bestAmount.toLocaleString('en-IN')} Off
-                      </span>
-                    </div>
-                    <span style={{ fontSize: '11px', color: '#334155', fontWeight: 600 }}>
-                      {bestCardSavings.bestRoute}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => { onClose(); onOpenTool?.('bank_offers'); }}
-                      style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '9.5px',
-                        color: '#2563EB',
-                        textAlign: 'left',
-                        marginTop: '4px',
-                        cursor: 'pointer',
-                        border: 'none',
-                        background: 'none',
-                        padding: 0,
-                        fontWeight: 700,
-                      }}
-                    >
-                      Compare Gyftr 16% →
-                    </button>
-                  </div>
-                )}
-
-                {/* 3. OBD & Return Rule */}
-                <div style={{
-                  padding: '10px 12px',
-                  borderRadius: '10px',
-                  backgroundColor: '#FFFFFF',
-                  border: '1px solid #E2E8F0',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '2px',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#64748B', fontWeight: 700 }}>
-                      🛡️ RETURN SAFEGUARD
-                    </span>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 800, color: '#D97706' }}>
-                      Pre-OTP Rule
-                    </span>
-                  </div>
-                  <span style={{ fontSize: '11px', color: '#334155', fontWeight: 600 }}>
-                    {storeName.includes('Flipkart') || storeName.includes('Amazon')
-                      ? 'Open Box Delivery: Check screen before sharing OTP!'
-                      : 'Doorstep pickup window: Keep brand tags intact.'}
+              <div style={{
+                fontSize: '12.5px',
+                color: '#424245',
+                lineHeight: 1.5,
+                fontFamily: 'var(--font-body)',
+              }}>
+                {savings > 0 ? (
+                  <span>
+                    You save <strong style={{ color: '#0066CC' }}>₹{savings.toLocaleString('en-IN')}</strong> ({discount}% below MRP). Cross-referenced against 90-day merchant price history.
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => { onClose(); onOpenTool?.('returns'); }}
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '9.5px',
-                      color: '#2563EB',
-                      textAlign: 'left',
-                      marginTop: '4px',
-                      cursor: 'pointer',
-                      border: 'none',
-                      background: 'none',
-                      padding: 0,
-                      fontWeight: 700,
-                    }}
-                  >
-                    6-Step OBD Checklist →
-                  </button>
-                </div>
+                ) : (
+                  <span>
+                    Price checked against live merchant catalog. Verified affiliate-direct link without redirects.
+                  </span>
+                )}
               </div>
             </div>
 
@@ -938,30 +722,35 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             href={deal.url}
             target="_blank"
             rel="noopener noreferrer sponsored"
-            className="btn-loot"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '0 20px',
+              padding: '0 24px',
               height: '42px',
               fontFamily: 'var(--font-heading)',
-              fontSize: '12px',
-              fontWeight: 700,
+              fontSize: '13px',
+              fontWeight: 600,
               textDecoration: 'none',
-              borderRadius: '10px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.04em',
+              borderRadius: '9999px',
               flexShrink: 0,
-              backgroundColor: '#0F172A',
+              backgroundColor: '#0066CC',
               color: '#FFFFFF',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              boxShadow: '0 1px 3px rgba(0, 102, 204, 0.25)',
+              transition: 'all 0.15s ease',
+              cursor: 'pointer',
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#0071E3';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#0066CC';
             }}
           >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-              <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <span>Get Deal on {storeName}</span>
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 10L10 2M10 2H4M10 2V8" />
             </svg>
-            Go to Deal on {storeName}
           </a>
 
           <button
@@ -974,11 +763,11 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '5px',
-              padding: '0 12px',
+              padding: '0 14px',
               height: '42px',
               backgroundColor: '#ECFDF5',
               border: '1px solid #A7F3D0',
-              borderRadius: '10px',
+              borderRadius: '9999px',
               color: '#065F46',
               fontFamily: 'var(--font-body)',
               fontSize: '12px',
@@ -1001,11 +790,11 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '5px',
-              padding: '0 12px',
+              padding: '0 14px',
               height: '42px',
               backgroundColor: '#EFF6FF',
               border: '1px solid #DBEAFE',
-              borderRadius: '10px',
+              borderRadius: '9999px',
               color: '#1E40AF',
               fontFamily: 'var(--font-body)',
               fontSize: '12px',
@@ -1024,11 +813,11 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '5px',
-              padding: '0 12px',
+              padding: '0 14px',
               height: '42px',
               backgroundColor: '#FFFFFF',
               border: '1px solid #E2E8F0',
-              borderRadius: '10px',
+              borderRadius: '9999px',
               color: copyLink ? '#059669' : '#475569',
               fontFamily: 'var(--font-body)',
               fontSize: '12px',
@@ -1054,11 +843,11 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '5px',
-              padding: '0 12px',
+              padding: '0 14px',
               height: '42px',
               backgroundColor: '#FFFFFF',
               border: '1px solid #E2E8F0',
-              borderRadius: '10px',
+              borderRadius: '9999px',
               color: reportSent ? '#94A3B8' : '#64748B',
               fontFamily: 'var(--font-body)',
               fontSize: '12px',

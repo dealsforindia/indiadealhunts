@@ -32,10 +32,11 @@ import { ToolsHubModal, ToolId } from './components/tools/ToolsHubModal';
 import { TopDiscountsPage } from './components/TopDiscountsPage';
 import { WorthScorePage } from './components/WorthScorePage';
 import { SavedLootPage } from './components/SavedLootPage';
+import { ExternalSearchResults, ExternalSearchDeal } from './components/ExternalSearchResults';
+import { SearchResultsHeader } from './components/SearchResultsHeader';
 import type { PublicDeal, PublicDealsResponse, SortOption, NavTab } from './types';
 import { calculateWorthScore } from './utils/worthScore';
 import { searchDealsClient } from './utils/semanticSearch';
-import { INITIAL_VERIFIED_DEALS } from './data/mockDeals';
 import { getSavedDealIds, toggleSavedDealId, subscribeSavedDeals, clearAllSavedDealIds } from './utils/savedDeals';
 import { getSavedCards } from './utils/cardSavings';
 import { isAudioEnabled, setAudioEnabled, playTactileClick } from './utils/audio';
@@ -59,6 +60,9 @@ export const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [debouncedSearch, setDebouncedSearch] = useState<string>('');
   const [searchMode, setSearchMode] = useState<'db' | 'live'>('db');
+  const [externalSearchDeals, setExternalSearchDeals] = useState<ExternalSearchDeal[]>([]);
+  const [externalSearchLoading, setExternalSearchLoading] = useState(false);
+  const [externalSearchError, setExternalSearchError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
@@ -69,6 +73,60 @@ export const App: React.FC = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);
+
+  // When the verified feed has no exact match, also query the public live-store
+  // search endpoint so shoppers can still find the product without treating it
+  // as a verified DealFlow drop.
+  useEffect(() => {
+    const query = debouncedSearch.trim();
+    if (!query) {
+      setExternalSearchDeals([]);
+      setExternalSearchError(null);
+      setExternalSearchLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    setExternalSearchLoading(true);
+    setExternalSearchError(null);
+
+    fetch(`${API_BASE}/api/v1/deals/external-search?q=${encodeURIComponent(query)}&limit=24`, { signal: controller.signal })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`Live store search returned ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        const toNumber = (value: unknown) => {
+          const number = typeof value === 'number' ? value : Number(value);
+          return Number.isFinite(number) && number > 0 ? number : null;
+        };
+        const normalized: ExternalSearchDeal[] = Array.isArray(data?.deals)
+          ? data.deals.map((deal: any, index: number) => ({
+              id: String(deal.id || deal._id || `external-${index}-${query}`),
+              title: String(deal.title || deal.product_name || deal.name || 'Store product match'),
+              price: toNumber(deal.price ?? deal.sale_price ?? deal.current_price),
+              mrp: toNumber(deal.mrp ?? deal.regular_price ?? deal.original_price),
+              discount_pct: toNumber(deal.discount_pct ?? deal.discount),
+              store: String(deal.store || deal.source || deal.source_type || 'Store'),
+              image: deal.image || deal.image_url || deal.thumbnail || deal.img_url || null,
+              url: String(deal.url || deal.link || deal.buy_url || ''),
+              raw_url: String(deal.raw_url || deal.canonical_url || deal.url || ''),
+              has_price_history: Boolean(deal.has_price_history ?? true),
+            }))
+          : [];
+        setExternalSearchDeals(normalized);
+      })
+      .catch((err: unknown) => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        setExternalSearchDeals([]);
+        setExternalSearchError('The live store search is unavailable right now. Direct store searches are still available below.');
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setExternalSearchLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [debouncedSearch]);
 
   // Pagination
   const [totalDeals, setTotalDeals] = useState<number>(0);
@@ -241,7 +299,7 @@ export const App: React.FC = () => {
           }
         }
 
-        // Mode 2: 9,400+ Verified Deals Database (MongoDB)
+        // Mode 2: verified deals database (MongoDB)
         const params = new URLSearchParams({
           limit: (debouncedSearch ? 80 : PAGE_SIZE).toString(),
           skip: currentSkip.toString(),
@@ -298,9 +356,13 @@ export const App: React.FC = () => {
         setSkip(currentSkip);
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : 'Failed to fetch deals';
-        console.warn('Live API sync notice, serving verified catalog:', msg);
-        setDeals((prev) => (prev.length === 0 ? INITIAL_VERIFIED_DEALS : prev));
-        setTotalDeals((prev) => (prev === 0 ? INITIAL_VERIFIED_DEALS.length : prev));
+        console.warn('Live deal feed unavailable:', msg);
+        setError('The verified deal feed is temporarily unavailable. Retry to load live data.');
+        if (!isAppend) {
+          setDeals([]);
+          setTotalDeals(0);
+          setHasMore(false);
+        }
       } finally {
         setLoading(false);
         setLoadingMore(false);
@@ -328,7 +390,9 @@ export const App: React.FC = () => {
     // Search query filtering: Rank / filter locally while preserving server results
     if (searchQuery.trim()) {
       const clientFiltered = searchDealsClient(result, searchQuery).deals;
-      result = clientFiltered.length > 0 ? clientFiltered : result;
+      // An empty semantic match is meaningful: show the cross-store search state
+      // instead of silently returning unrelated deals for the user's query.
+      result = clientFiltered;
     }
 
     // Category filtering
@@ -384,12 +448,24 @@ export const App: React.FC = () => {
   }, [deals]);
 
   const handleFocusSearch = () => {
-    const inputEl = document.getElementById('hero-search-input') as HTMLInputElement | null;
+    const inputEl = (document.getElementById('search-results-input') || document.getElementById('hero-search-input')) as HTMLInputElement | null;
     if (inputEl) {
       inputEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
       setTimeout(() => inputEl.focus(), 250);
     }
   };
+
+  const handleNavTabChange = (tab: NavTab) => {
+    setActiveTab(tab);
+    if (tab === 'home') {
+      setSelectedStore('all');
+      setSelectedCategory('all');
+      setSearchQuery('');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const searchFullScreen = searchQuery.trim().length > 0;
 
   return (
     <div
@@ -426,14 +502,7 @@ export const App: React.FC = () => {
       {/* ── 1. Header (Navbar) ── */}
       <Navbar
         activeTab={activeTab}
-        onTabChange={(tab) => {
-          setActiveTab(tab);
-          if (tab === 'home') {
-            setSelectedStore('all');
-            setSelectedCategory('all');
-            setSearchQuery('');
-          }
-        }}
+        onTabChange={handleNavTabChange}
         onSelectCategory={(cat) => setSelectedCategory(cat)}
         onOpenLookup={() => {
           setLookupUrl('');
@@ -445,6 +514,7 @@ export const App: React.FC = () => {
         isAudioEnabled={isAudioActive}
         onToggleAudio={handleToggleAudio}
         savedCount={savedDealIds.length}
+        feedStatus={loading ? 'loading' : error && deals.length === 0 ? 'offline' : 'live'}
       />
 
       {/* ── Real-Time Loot Radar Marquee Ticker ── */}
@@ -532,41 +602,53 @@ export const App: React.FC = () => {
           ) : (
             /* ── Homepage Main Flow ── */
             <div className="w-full flex-1">
-          {/* ── 2. Hero Section & Decoupled Search ── */}
-          <HeroBanner
-            searchQuery={searchQuery}
-            onSearch={(q) => setSearchQuery(q)}
-            searchMode={searchMode}
-            onSearchModeChange={(mode) => {
-              setSearchMode(mode);
-              showToast(mode === 'live' ? '🌐 Live Multi-Store Crawler Active' : '⚡ 9,400+ Verified Loot Drops Active');
-            }}
-            onOpenLookup={(url) => {
-              setLookupUrl(url || '');
-              setIsLookupOpen(true);
-            }}
-            highDiscountCount={flashLootCount}
-            onFilterFlashLoot={handleFilterFlashLoot}
-            spotlightDeal={spotlightDeal}
-          />
+          {searchFullScreen ? (
+            <SearchResultsHeader
+              query={searchQuery}
+              onQueryChange={setSearchQuery}
+              onSubmit={() => setSearchQuery((current) => current.trim())}
+              onClear={() => setSearchQuery('')}
+              verifiedCount={filteredDeals.length}
+            />
+          ) : (
+            <>
+              {/* ── 2. Hero Section & Decoupled Search ── */}
+              <HeroBanner
+                searchQuery={searchQuery}
+                onSearch={(q) => setSearchQuery(q)}
+                searchMode={searchMode}
+                onSearchModeChange={(mode) => {
+                  setSearchMode(mode);
+                  showToast(mode === 'live' ? '🌐 Live Multi-Store Crawler Active' : '⚡ Verified Deals Database Active');
+                }}
+                onOpenLookup={(url) => {
+                  setLookupUrl(url || '');
+                  setIsLookupOpen(true);
+                }}
+                highDiscountCount={flashLootCount}
+                onFilterFlashLoot={handleFilterFlashLoot}
+                spotlightDeal={spotlightDeal}
+              />
 
-          {/* ── 2.5 Flash Category Stories Rail (Instagram-style) ── */}
-          <CategoryStories
-            deals={deals}
-            onSelectCategoryFilter={(cat) => {
-              setSelectedCategory(cat);
-              const dealGrid = document.getElementById('deals-section');
-              if (dealGrid) {
-                dealGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }
-            }}
-          />
+              {/* ── 2.5 Flash Category Stories Rail (live deals only) ── */}
+              <CategoryStories
+                deals={deals}
+                onSelectCategoryFilter={(cat) => {
+                  setSelectedCategory(cat);
+                  const dealGrid = document.getElementById('deals-section');
+                  if (dealGrid) {
+                    dealGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }}
+              />
 
-          {/* ── 3. Category Rail (Sticky below header) ── */}
-          <CategoryRail
-            selectedCategory={selectedCategory}
-            onSelectCategory={(cat) => setSelectedCategory(cat)}
-          />
+              {/* ── 3. Category Rail (Sticky below header) ── */}
+              <CategoryRail
+                selectedCategory={selectedCategory}
+                onSelectCategory={(cat) => setSelectedCategory(cat)}
+              />
+            </>
+          )}
 
           {/* ── 4. Deal Toolbar (Store, Category, Sort, Deal Count, View Toggle) ── */}
           <DealToolbar
@@ -587,7 +669,7 @@ export const App: React.FC = () => {
             className="max-w-[1340px] mx-auto px-4 md:px-6 pt-4 pb-10 w-full"
           >
             {/* ── Active Search Intelligence Telemetry Strip ── */}
-            {searchQuery.trim() && (
+            {searchQuery.trim() && !searchFullScreen && (
               <motion.div
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -600,7 +682,7 @@ export const App: React.FC = () => {
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-xs sm:text-sm font-bold text-slate-900 font-heading">
-                        {searchMode === 'live' ? 'Live Web Crawler Active' : '9,400+ Verified Deals Database'}
+                        {searchMode === 'live' ? 'Live Web Crawler Active' : 'Verified Deals Database'}
                       </span>
                       <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-300">
                         {filteredDeals.length} Verified Match{filteredDeals.length === 1 ? '' : 'es'}
@@ -609,7 +691,7 @@ export const App: React.FC = () => {
                     <p className="text-[11px] text-slate-600 m-0 mt-0.5">
                       Query: <span className="font-semibold text-blue-900 font-mono">"{searchQuery}"</span>
                       {searchMode === 'db'
-                        ? ' • Natural Language budget & device matcher across 9,400 historical & live drops'
+                        ? ' • Natural language budget and device matching across verified drops'
                         : ' • Crawling real-time Amazon, Flipkart & Myntra storefronts via stealth proxy'}
                     </p>
                   </div>
@@ -621,11 +703,11 @@ export const App: React.FC = () => {
                     onClick={() => {
                       const next = searchMode === 'db' ? 'live' : 'db';
                       setSearchMode(next);
-                      showToast(next === 'live' ? '🌐 Live Multi-Store Crawler Active' : '⚡ 9,400+ Verified Loot Drops Active');
+                      showToast(next === 'live' ? '🌐 Live Multi-Store Crawler Active' : '⚡ Verified Deals Database Active');
                     }}
                     className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-bold cursor-pointer transition-colors shadow-2xs"
                   >
-                    {searchMode === 'db' ? '🌐 Switch to Live Crawler' : '⚡ Switch to 9.4k Database'}
+                    {searchMode === 'db' ? '🌐 Switch to Live Crawler' : '⚡ Switch to Verified Database'}
                   </button>
                   <button
                     type="button"
@@ -661,7 +743,11 @@ export const App: React.FC = () => {
 
               {/* Deal count */}
               <span className="font-mono text-xs sm:text-sm text-slate-500 font-semibold">
-                {totalDeals ? `${totalDeals.toLocaleString('en-IN')} drops` : '3,350+ drops'}
+                    {totalDeals
+                      ? `${totalDeals.toLocaleString('en-IN')} drops`
+                      : loading
+                        ? 'Loading drops…'
+                        : 'No verified drops loaded'}
               </span>
             </div>
 
@@ -671,38 +757,64 @@ export const App: React.FC = () => {
                 <DealSkeletonGrid count={8} />
               </div>
             ) : error && deals.length === 0 ? (
-              <div className="py-12 px-6 text-center max-w-md mx-auto rounded-2xl border border-rose-200 bg-white shadow-sm">
-                <h3 className="font-heading font-bold text-slate-900 mb-2">
-                  Could not load deals
-                </h3>
-                <p className="text-xs text-rose-600 mb-4">
-                  {error}
-                </p>
-                <button
-                  onClick={() => fetchDeals(0, false)}
-                  className="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl cursor-pointer shadow-sm"
-                >
-                  Retry Connection
-                </button>
+              <div className="space-y-4">
+                {searchFullScreen && (
+                  <ExternalSearchResults
+                    query={searchQuery}
+                    deals={externalSearchDeals}
+                    loading={externalSearchLoading}
+                    error={externalSearchError}
+                    onCheckHistory={(targetUrl) => {
+                      setLookupUrl(targetUrl);
+                      setIsLookupOpen(true);
+                    }}
+                  />
+                )}
+                <div className="py-12 px-6 text-center max-w-md mx-auto rounded-2xl border border-rose-200 bg-white shadow-sm">
+                  <h3 className="font-heading font-bold text-slate-900 mb-2">
+                    Could not load verified deals
+                  </h3>
+                  <p className="text-xs text-rose-600 mb-4">{error}</p>
+                  <button
+                    onClick={() => fetchDeals(0, false)}
+                    className="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl cursor-pointer shadow-sm"
+                  >
+                    Retry Connection
+                  </button>
+                </div>
               </div>
             ) : filteredDeals.length === 0 ? (
-              <div className="py-14 px-6 text-center max-w-md mx-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-                <h3 className="font-heading font-bold text-slate-900 mb-2">
-                  No deals found
-                </h3>
-                <p className="text-xs text-slate-500 mb-4">
-                  Try adjusting your filters or search terms.
-                </p>
-                <button
-                  onClick={() => {
-                    setSelectedStore('all');
-                    setSelectedCategory('all');
-                    setSearchQuery('');
-                  }}
-                  className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold text-xs rounded-xl border border-slate-300 cursor-pointer transition-colors"
-                >
-                  Clear Filters
-                </button>
+              <div className="space-y-4">
+                {searchFullScreen && (
+                  <ExternalSearchResults
+                    query={searchQuery}
+                    deals={externalSearchDeals}
+                    loading={externalSearchLoading}
+                    error={externalSearchError}
+                    onCheckHistory={(targetUrl) => {
+                      setLookupUrl(targetUrl);
+                      setIsLookupOpen(true);
+                    }}
+                  />
+                )}
+                <div className="py-10 px-6 text-center max-w-md mx-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+                  <h3 className="font-heading font-bold text-slate-900 mb-2">
+                    No verified deals found
+                  </h3>
+                  <p className="text-xs text-slate-500 mb-4">
+                    Try a broader product name, clear a filter, or search the stores above.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSelectedStore('all');
+                      setSelectedCategory('all');
+                      setSearchQuery('');
+                    }}
+                    className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold text-xs rounded-xl border border-slate-300 cursor-pointer transition-colors"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
               </div>
             ) : (
               <>
@@ -739,6 +851,19 @@ export const App: React.FC = () => {
                     ))}
                   </AnimatePresence>
                 </div>
+
+                {searchFullScreen && (
+                  <ExternalSearchResults
+                    query={searchQuery}
+                    deals={externalSearchDeals}
+                    loading={externalSearchLoading}
+                    error={externalSearchError}
+                    onCheckHistory={(targetUrl) => {
+                      setLookupUrl(targetUrl);
+                      setIsLookupOpen(true);
+                    }}
+                  />
+                )}
 
                 {/* Load More Button */}
                 {hasMore && filteredDeals.length > 0 && (

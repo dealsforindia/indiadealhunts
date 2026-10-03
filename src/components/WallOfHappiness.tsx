@@ -11,93 +11,9 @@ interface WallOfHappinessProps {
 const EDGE_API = import.meta.env.VITE_EDGE_API_URL || 'https://dealflow-edge.pottemasshippo.workers.dev';
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
 
-const DEFAULT_STATS: WallStats = {
-  total_saved_inr: 19025923,
-  formatted_savings: '₹1.90 Cr',
-  active_deals_count: 2566,
-  verified_shoppers_count: 24890,
-  satisfaction_rate: '99.4%',
-  updated_at: Date.now(),
-};
-
-const DEFAULT_BRAGS: CommunityBrag[] = [
-  {
-    id: 'brag-1',
-    name: 'Vikram Sharma',
-    city: 'Bengaluru',
-    product: 'Sony WH-1000XM4 Wireless Noise Cancelling Headphones',
-    store: 'Amazon',
-    sale_price: 17990,
-    saved_amount: 12000,
-    comment: 'The 90-day price checker confirmed this was an all-time low. Arrived in 24 hours!',
-    relative_time: '2h ago',
-    avatar_bg: 'from-amber-500 to-orange-600',
-  },
-  {
-    id: 'brag-2',
-    name: 'Neha Rawat',
-    city: 'Mumbai',
-    product: 'Cello 27-Pc Opalware Scratch Resistant Dinner Set',
-    store: 'DesiDime',
-    sale_price: 999,
-    saved_amount: 2000,
-    comment: 'Saw the 3-channel consensus badge on IndiaDealHunts and bought immediately. Genuine loot!',
-    relative_time: '3h ago',
-    avatar_bg: 'from-purple-500 to-indigo-600',
-  },
-  {
-    id: 'brag-3',
-    name: 'Aman Khan',
-    city: 'Delhi NCR',
-    product: 'Kamiliant by American Tourister Hard Body Trolley Set',
-    store: 'Flipkart',
-    sale_price: 3899,
-    saved_amount: 11100,
-    comment: '74% flat discount. The unshortened link redirected cleanly to Flipkart checkout.',
-    relative_time: '5h ago',
-    avatar_bg: 'from-blue-500 to-cyan-600',
-  },
-  {
-    id: 'brag-4',
-    name: 'Sneha Kulkarni',
-    city: 'Pune',
-    product: 'POPWINGS Floral Maxi Dress & Tops',
-    store: 'Amazon',
-    sale_price: 149,
-    saved_amount: 1150,
-    comment: 'Under ₹199 steal! High quality cotton fabric and free Prime delivery.',
-    relative_time: '6h ago',
-    avatar_bg: 'from-pink-500 to-rose-600',
-  },
-  {
-    id: 'brag-5',
-    name: 'Rohan Deshmukh',
-    city: 'Hyderabad',
-    product: 'Zepto Mega Dark Store Grocery Haul',
-    store: 'Zepto',
-    sale_price: 49,
-    saved_amount: 420,
-    comment: 'Used the pincode finder for Hyderabad Saket. Delivered in 8 minutes flat!',
-    relative_time: '7h ago',
-    avatar_bg: 'from-emerald-500 to-green-600',
-  },
-  {
-    id: 'brag-6',
-    name: 'Priya Iyer',
-    city: 'Chennai',
-    product: 'boAt Airdopes 141 ANC with 42H Playback',
-    store: 'Amazon',
-    sale_price: 899,
-    saved_amount: 3091,
-    comment: '77% off deal spotted at 2 AM. Grabbed 2 pairs for gifting!',
-    relative_time: '9h ago',
-    avatar_bg: 'from-teal-500 to-emerald-700',
-  },
-];
-
 export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }) => {
-  const [stats, setStats] = useState<WallStats>(DEFAULT_STATS);
-  const [brags, setBrags] = useState<CommunityBrag[]>(DEFAULT_BRAGS);
+  const [stats, setStats] = useState<WallStats | null>(null);
+  const [brags, setBrags] = useState<CommunityBrag[]>([]);
   const [filterStore, setFilterStore] = useState<string>('all');
 
   // Savings Simulator State
@@ -262,10 +178,12 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
                 Live Platform Total Verified Savings
               </div>
               <div className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 font-mono tracking-tight mt-1">
-                {stats.formatted_savings}
-                <span className="text-base sm:text-xl text-slate-500 font-sans font-normal ml-2">
-                  (₹{stats.total_saved_inr.toLocaleString('en-IN')})
-                </span>
+                {stats?.formatted_savings ?? 'Live data unavailable'}
+                {stats && (
+                  <span className="text-base sm:text-xl text-slate-500 font-sans font-normal ml-2">
+                    (₹{stats.total_saved_inr.toLocaleString('en-IN')})
+                  </span>
+                )}
               </div>
             </div>
 
@@ -283,28 +201,28 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
             <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
               <div className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Active Loot Deals</div>
               <div className="text-xl font-bold text-slate-900 font-mono mt-1">
-                {stats.active_deals_count.toLocaleString('en-IN')}
+                {stats?.active_deals_count?.toLocaleString('en-IN') ?? '—'}
               </div>
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
               <div className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Community Shoppers</div>
               <div className="text-xl font-bold text-blue-600 font-mono mt-1">
-                {stats.verified_shoppers_count.toLocaleString('en-IN')}+
+                {stats?.verified_shoppers_count?.toLocaleString('en-IN') ?? '—'}{stats ? '+' : ''}
               </div>
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
               <div className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Average Discount</div>
               <div className="text-xl font-bold text-emerald-600 font-mono mt-1">
-                58% OFF
+                —
               </div>
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
               <div className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Verified Genuine Rate</div>
               <div className="text-xl font-bold text-slate-900 font-mono mt-1">
-                {stats.satisfaction_rate}
+                {stats?.satisfaction_rate ?? '—'}
               </div>
             </div>
           </div>
@@ -407,7 +325,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
 
         {/* Brag Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredBrags.map((brag) => (
+          {filteredBrags.length > 0 ? filteredBrags.map((brag) => (
             <motion.div
               key={brag.id}
               initial={{ opacity: 0, y: 10 }}
@@ -467,7 +385,12 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
                 <span>IndiaDealHunts Drop</span>
               </div>
             </motion.div>
-          ))}
+          )) : (
+            <div className="md:col-span-2 lg:col-span-3 rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
+              <p className="text-sm font-semibold text-slate-700">Live community brags will appear here.</p>
+              <p className="text-xs text-slate-500 mt-1">No testimonial data is shown until it is returned by the community feed.</p>
+            </div>
+          )}
         </div>
       </div>
 

@@ -38,7 +38,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
         }}
         aria-label="Home deals feed"
         className={`flex flex-col items-center justify-center gap-1 h-full cursor-pointer transition-colors ${
-          activeTab === 'home' ? 'text-blue-600 font-bold' : 'text-slate-400 hover:text-slate-800'
+          activeTab === 'home' ? 'text-[#0066cc] font-bold' : 'text-slate-400 hover:text-slate-800'
         }`}
       >
         <svg width="19" height="19" viewBox="0 0 24 24" fill={activeTab === 'home' ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
@@ -46,34 +46,52 @@ export const MobileNav: React.FC<MobileNavProps> = ({
           <polyline points="9 22 9 12 15 12 15 22" />
         </svg>
         <span className="text-[9.5px] font-heading">
-          Home
+          Deals
         </span>
       </button>
 
-      {/* 2. Search */}
+      {/* 2. Top Discounts */}
       <button
         type="button"
         onClick={() => {
-          onFocusSearch();
-          const searchEl = document.getElementById('hero-search-input');
-          if (searchEl) {
-            searchEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            setTimeout(() => searchEl.focus(), 300);
-          }
+          onTabChange('ending_soon');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
-        aria-label="Search deals"
-        className="flex flex-col items-center justify-center gap-1 h-full text-slate-400 hover:text-slate-800 cursor-pointer transition-colors"
+        aria-label="Top Discounts"
+        className={`flex flex-col items-center justify-center gap-1 h-full cursor-pointer transition-colors ${
+          activeTab === 'ending_soon' ? 'text-[#0066cc] font-bold' : 'text-slate-400 hover:text-slate-800'
+        }`}
       >
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          <path d="M12 2c0 4-4 6-4 10a6 6 0 0 0 12 0c0-6-6-8-6-10z" />
         </svg>
         <span className="text-[9.5px] font-heading">
-          Search
+          Discounts
         </span>
       </button>
 
-      {/* 3. Saved Loot */}
+      {/* 3. Worth Score */}
+      <button
+        type="button"
+        onClick={() => {
+          onTabChange('best_worth');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        aria-label="Top Worth Score Deals"
+        className={`flex flex-col items-center justify-center gap-1 h-full cursor-pointer transition-colors ${
+          activeTab === 'best_worth' ? 'text-[#0066cc] font-bold' : 'text-slate-400 hover:text-slate-800'
+        }`}
+      >
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="8" r="6" />
+          <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+        </svg>
+        <span className="text-[9.5px] font-heading">
+          Worth
+        </span>
+      </button>
+
+      {/* 4. Saved Loot */}
       <button
         type="button"
         onClick={() => onTabChange('saved')}
@@ -97,35 +115,26 @@ export const MobileNav: React.FC<MobileNavProps> = ({
         </span>
       </button>
 
-      {/* 4. Price Lookup */}
+      {/* 5. Search / Track */}
       <button
         type="button"
-        onClick={onOpenLookup}
-        aria-label="Price Lookup Tool"
+        onClick={() => {
+          onFocusSearch();
+          const searchEl = document.getElementById('hero-search-input');
+          if (searchEl) {
+            searchEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => searchEl.focus(), 300);
+          }
+        }}
+        aria-label="Search deals"
         className="flex flex-col items-center justify-center gap-1 h-full text-slate-400 hover:text-slate-800 cursor-pointer transition-colors"
       >
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M3 3v18h18" />
-          <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
         <span className="text-[9.5px] font-heading">
-          Price Track
-        </span>
-      </button>
-
-      {/* 5. Submit */}
-      <button
-        type="button"
-        onClick={onOpenSubmit}
-        aria-label="Submit a deal"
-        className="flex flex-col items-center justify-center gap-1 h-full text-slate-400 hover:text-slate-800 cursor-pointer transition-colors"
-      >
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-        <span className="text-[9.5px] font-heading">
-          Submit
+          Search
         </span>
       </button>
     </nav>

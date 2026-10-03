@@ -35,10 +35,12 @@ export const PriceLookupStrip: React.FC<PriceLookupStripProps> = ({ onOpenLookup
         <button
           type="button"
           onClick={onOpenLookup}
-          className="h-11 px-6 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs sm:text-sm tracking-wide shadow-sm hover:shadow-md active:scale-95 transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap self-stretch sm:self-auto justify-center"
+          className="h-10 px-6 rounded-full bg-[#0066cc] hover:bg-[#0071e3] text-white font-semibold text-xs sm:text-sm tracking-tight shadow-xs active:scale-98 transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap self-stretch sm:self-auto justify-center"
         >
           <span>Analyze Any Product Link</span>
-          <span>→</span>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2 10L10 2M10 2H4M10 2V8" />
+          </svg>
         </button>
       </div>
     </div>

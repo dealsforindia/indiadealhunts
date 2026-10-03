@@ -474,111 +474,9 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             )}
           </div>
 
-          {/* Verified MRP Discount Callout */}
-          {savings > 200 && mrp && (
-            <div
-              style={{
-                marginTop: '6px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px',
-                padding: '2px 8px',
-                borderRadius: '6px',
-                backgroundColor: '#EFF6FF',
-                border: '1px solid #DBEAFE',
-                fontSize: '10.5px',
-                fontFamily: 'var(--font-mono)',
-                fontWeight: 600,
-                color: '#1D4ED8',
-              }}
-            >
-              <span>⚡</span>
-              <span>Verified drop: ₹{savings.toLocaleString('en-IN')} below MRP ({discount}% off)</span>
-            </div>
-          )}
 
-          {/* Credit Card Cashback Effective Price */}
-          {cardSavings && (
-            <div
-              style={{
-                marginTop: '5px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px',
-                padding: '2px 8px',
-                borderRadius: '6px',
-                backgroundColor: '#F0FDF4',
-                border: '1px solid #BBF7D0',
-                fontSize: '10.5px',
-                fontFamily: 'var(--font-mono)',
-                fontWeight: 700,
-                color: '#15803D',
-              }}
-            >
-              <span>💳</span>
-              <span>₹{cardSavings.effectivePrice.toLocaleString('en-IN')} with {cardSavings.cardName}</span>
-            </div>
-          )}
 
-          {/* Quick Commerce & Retail Intelligence Badges */}
-          {price >= 1500 && Boolean(
-            (deal.category || '').toLowerCase().includes('electron') ||
-            (deal.category || '').toLowerCase().includes('mobile') ||
-            (deal.category || '').toLowerCase().includes('laptop') ||
-            (deal.category || '').toLowerCase().includes('appliance')
-          ) && (
-            <div
-              style={{
-                marginTop: '5px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                flexWrap: 'wrap',
-              }}
-            >
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '3px',
-                  padding: '1px 6px',
-                  borderRadius: '5px',
-                  backgroundColor: '#F8FAFC',
-                  border: '1px solid #E2E8F0',
-                  fontSize: '10px',
-                  fontFamily: 'var(--font-mono)',
-                  fontWeight: 600,
-                  color: '#475569',
-                }}
-                title="Input Tax Credit claimable on GST Business Invoice (18% slab)"
-              >
-                <span>🧾</span>
-                <span>GST ITC: -₹{Math.round(price - price / 1.18).toLocaleString('en-IN')}</span>
-              </span>
 
-              {!cardSavings && (
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '3px',
-                    padding: '1px 6px',
-                    borderRadius: '5px',
-                    backgroundColor: '#F0FDF4',
-                    border: '1px solid #DCFCE7',
-                    fontSize: '10px',
-                    fontFamily: 'var(--font-mono)',
-                    fontWeight: 600,
-                    color: '#166534',
-                  }}
-                  title="5% Cashback on Amazon Pay ICICI / Flipkart Axis"
-                >
-                  <span>💳</span>
-                  <span>5% Card: -₹{Math.round(price * 0.05).toLocaleString('en-IN')}</span>
-                </span>
-              )}
-            </div>
-          )}
 
           {/* Sparkline Vector & Action Links (Breakdown + Share) */}
           <div
@@ -823,154 +721,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
           </div>
         </div>
 
-        {/* Quick Shopping Utilities Bar (Contextual & Product-Specific) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', paddingTop: '6px', paddingBottom: '2px', overflowX: 'auto' }}>
-          {onOpenCardEmi && deal.price >= 3000 && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenCardEmi(deal);
-              }}
-              style={{
-                padding: '4px 8px',
-                borderRadius: '6px',
-                backgroundColor: '#ECFDF5',
-                color: '#065F46',
-                fontSize: '11px',
-                fontWeight: 600,
-                border: '1px solid #A7F3D0',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                whiteSpace: 'nowrap',
-              }}
-              title="Calculate Bank Card Discount & No-Cost EMI"
-            >
-              <span>💳</span>
-              <span>Cards & EMI</span>
-            </button>
-          )}
-
-          {onOpenCardEmi && deal.price < 3000 && deal.price >= 400 && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenCardEmi(deal);
-              }}
-              style={{
-                padding: '4px 8px',
-                borderRadius: '6px',
-                backgroundColor: '#F0FDF4',
-                color: '#166534',
-                fontSize: '11px',
-                fontWeight: 600,
-                border: '1px solid #BBF7D0',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                whiteSpace: 'nowrap',
-              }}
-              title="Calculate 5% Card Cashback"
-            >
-              <span>💳</span>
-              <span>5% Card</span>
-            </button>
-          )}
-
-          {onOpenPriceAlert && deal.price >= 150 && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenPriceAlert(deal);
-              }}
-              style={{
-                padding: '4px 8px',
-                borderRadius: '6px',
-                backgroundColor: '#FFFBEB',
-                color: '#92400E',
-                fontSize: '11px',
-                fontWeight: 600,
-                border: '1px solid #FDE68A',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                whiteSpace: 'nowrap',
-              }}
-              title="Set Target Price Drop Alert"
-            >
-              <span>🔔</span>
-              <span>Alert</span>
-            </button>
-          )}
-
-          {onOpenExchange && (
-            (deal.category || '').toLowerCase().includes('mobile') ||
-            (deal.category || '').toLowerCase().includes('phone') ||
-            /\b(smartphone|smartphones|phone|iphone|galaxy|oneplus|realme|redmi|poco|iqoo|pixel|motorola|laptop|macbook)\b/i.test(deal.title || '')
-          ) && deal.price >= 4000 && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenExchange(deal);
-              }}
-              style={{
-                padding: '4px 8px',
-                borderRadius: '6px',
-                backgroundColor: '#EEF2FF',
-                color: '#3730A3',
-                fontSize: '11px',
-                fontWeight: 600,
-                border: '1px solid #C7D2FE',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                whiteSpace: 'nowrap',
-              }}
-              title="Estimate Old Phone Trade-in / Exchange Value"
-            >
-              <span>🔄</span>
-              <span>Trade-in</span>
-            </button>
-          )}
-
-          {onToggleCompare && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleCompare(deal);
-              }}
-              style={{
-                padding: '4px 8px',
-                borderRadius: '6px',
-                backgroundColor: isComparing ? '#2563EB' : '#F8FAFC',
-                color: isComparing ? '#FFFFFF' : '#334155',
-                fontSize: '11px',
-                fontWeight: 600,
-                border: isComparing ? '1px solid #2563EB' : '1px solid #E2E8F0',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                whiteSpace: 'nowrap',
-              }}
-              title="Compare side by side"
-            >
-              <span>⚖️</span>
-              <span>{isComparing ? 'Comparing' : 'Compare'}</span>
-            </button>
-          )}
-        </div>
-
-        {/* Primary Action Button: ⚡ GRAB DEAL → */}
+        {/* Apple Museum Gallery Primary Action Pill */}
         <motion.a
           href={deal.url}
           target="_blank"
@@ -979,26 +730,38 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({
             e.stopPropagation();
             playTactileClick();
           }}
-          className="btn-loot"
-          whileTap={{ scale: 0.97 }}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.98 }}
           aria-label={`Get deal for ${displayTitle} on ${deal.store}`}
           style={{
-            height: '40px',
+            height: '38px',
             width: '100%',
-            borderRadius: '10px',
+            borderRadius: '9999px',
             fontSize: '13px',
-            textTransform: 'uppercase',
+            fontWeight: 600,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '8px',
+            gap: '6px',
             textDecoration: 'none',
-            marginTop: '8px',
+            marginTop: '10px',
             cursor: 'pointer',
+            backgroundColor: '#0066CC',
+            color: '#FFFFFF',
+            boxShadow: '0 1px 2px rgba(0, 102, 204, 0.2)',
+            transition: 'background-color 0.15s ease',
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#0071E3';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#0066CC';
           }}
         >
-          <span>⚡ Grab Deal</span>
-          <span>→</span>
+          <span>Get Deal on {storeBadge.name}</span>
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2 10L10 2M10 2H4M10 2V8" />
+          </svg>
         </motion.a>
       </div>
     </motion.article>

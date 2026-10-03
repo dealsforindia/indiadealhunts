@@ -8,8 +8,8 @@ const TRUST_POINTS = [
         <polyline points="22 4 12 14.01 9 11.01" />
       </svg>
     ),
-    title: 'Multi-Channel Vetted',
-    description: 'Deals validated across 27+ curation channels to purge duplicate spam.',
+    title: 'Multi-Source Vetted',
+    description: 'Deals validated across India’s top curation networks to eliminate spam & duplicates.',
   },
   {
     icon: (
@@ -18,16 +18,16 @@ const TRUST_POINTS = [
       </svg>
     ),
     title: 'Real Discounts Only',
-    description: 'Tested against 90-day price trends to eliminate artificial MRP inflation.',
+    description: 'Tested against 90-day price trends to eliminate fake MRP price hikes.',
   },
   {
     icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0066CC" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M13 2L3 14h8l-2 8 10-12h-8l2-8z" />
       </svg>
     ),
     title: 'Sub-Minute Drops',
-    description: 'Instant Telethon stream catches lightning flash deals before stock ends.',
+    description: '24/7 real-time radar catches lightning price errors and flash loots before stock ends.',
   },
   {
     icon: (
@@ -36,8 +36,8 @@ const TRUST_POINTS = [
         <path d="M12 8v4l3 3" />
       </svg>
     ),
-    title: '100% Safe Redirects',
-    description: 'Deep unshortened direct canonical links to official stores.',
+    title: 'Direct Store Links',
+    description: 'Verified direct destination links straight to Amazon, Flipkart, Myntra & Swiggy.',
   },
 ];
 
