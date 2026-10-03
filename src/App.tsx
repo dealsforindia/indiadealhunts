@@ -112,6 +112,7 @@ export const App: React.FC = () => {
               url: String(deal.url || deal.link || deal.buy_url || ''),
               raw_url: String(deal.raw_url || deal.canonical_url || deal.url || ''),
               has_price_history: Boolean(deal.has_price_history ?? true),
+              is_lowest_price: Boolean(deal.is_lowest_price),
             }))
           : [];
         setExternalSearchDeals(normalized);

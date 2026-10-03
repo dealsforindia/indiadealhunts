@@ -27,7 +27,17 @@ const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
 
 const getLookupError = (targetUrl: string) => {
   try {
-    const parsed = new URL(targetUrl);
+    let clean = targetUrl.trim();
+    if (clean.includes('google.') && (clean.includes('/url?') || clean.includes('url=') || clean.includes('q='))) {
+      try {
+        const u = new URL(clean);
+        const unwrapped = u.searchParams.get('url') || u.searchParams.get('q');
+        if (unwrapped && unwrapped.startsWith('http')) {
+          clean = unwrapped;
+        }
+      } catch {}
+    }
+    const parsed = new URL(clean);
     const host = parsed.hostname.toLowerCase();
     const path = parsed.pathname.toLowerCase();
 
@@ -40,10 +50,10 @@ const getLookupError = (targetUrl: string) => {
       return 'This is a store listing page, not a product page. Paste the specific Amazon or Flipkart product link, or search for the item in the storefront.';
     }
   } catch {
-    return 'Please paste a full Amazon, Flipkart, or Myntra product URL.';
+    return 'Please paste a full Amazon, Flipkart, Myntra, or Google Shopping product URL.';
   }
 
-  return 'Could not analyze this product link right now. Confirm it is an active Amazon, Flipkart, or Myntra product URL and try again.';
+  return null;
 };
 
 export const DealLookupModal: React.FC<DealLookupModalProps> = ({
@@ -102,8 +112,19 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
   }, [result]);
 
   const handleLookup = async (inputUrl: string) => {
-    const targetUrl = (inputUrl || url).trim();
+    let targetUrl = (inputUrl || url).trim();
     if (!targetUrl) return;
+
+    if (targetUrl.includes('google.') && (targetUrl.includes('/url?') || targetUrl.includes('url=') || targetUrl.includes('q=http'))) {
+      try {
+        const u = new URL(targetUrl);
+        const unwrapped = u.searchParams.get('url') || u.searchParams.get('q');
+        if (unwrapped && unwrapped.startsWith('http')) {
+          targetUrl = unwrapped;
+          setUrl(unwrapped);
+        }
+      } catch {}
+    }
 
     setLoading(true);
     setError(null);
