@@ -1,14 +1,13 @@
 import { useModalSurface } from '../utils/useModalSurface';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowUpRight, Bell, Bookmark, Check, Copy, Image, Layers, MoreHorizontal, Repeat2, ShoppingCart, X } from 'lucide-react';
+import { ArrowUpRight, Bell, Bookmark, Check, Copy, Image, Layers, MoreHorizontal, Repeat2, Share2, ShoppingCart, X } from 'lucide-react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { isDealSaved, toggleSavedDealId } from '../utils/savedDeals';
-import { shareToWhatsApp, shareToTelegram, copyDealLink } from '../utils/shareDeal';
+import { shareDeal, copyDealLink } from '../utils/shareDeal';
 import { playTactileClick, playSuccessChime } from '../utils/audio';
 import { extractAmazonAsin, buildAmazonCartUrl, buildMultiAsinCartUrl, generateSubId, openSmartStoreLink, getRecommendedBundle } from '../utils/affiliateEngine';
-import { TelegramIcon } from './TelegramIcon';
 interface PublicDealCardProps {
   deal: PublicDeal; index?: number; isSaved?: boolean; isComparing?: boolean; 
   onOpenImage?: (deal: PublicDeal) => void; onSelectDeal?: (deal: PublicDeal) => void;
@@ -22,7 +21,7 @@ function relativeTime(timestamp?: number) {
   return minutes < 1 ? 'Just added' : minutes < 60 ? `${minutes}m ago` : minutes < 1440 ? `${Math.floor(minutes / 60)}h ago` : `${Math.floor(minutes / 1440)}d ago`;
 }
 const money = (value: number) => `₹${value.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
-export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, isSaved: suppliedSaved, isComparing = false, onOpenImage, onSelectDeal, onToggleSave, onToggleCompare, onOpenPriceAlert, onOpenExchange, onShowToast }) => {
+export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0, isSaved: suppliedSaved, isComparing = false, onOpenImage, onSelectDeal, onToggleSave, onToggleCompare, onOpenPriceAlert, onOpenExchange, onShowToast }) => {
   const [imageFailed, setImageFailed] = useState(false);
   const [localSaved, setLocalSaved] = useState(() => isDealSaved(deal.id));
   const [menuOpen, setMenuOpen] = useState(false);
@@ -45,7 +44,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, isSaved: s
   function save() {
     playTactileClick();
     if (onToggleSave) onToggleSave(deal);
-    else { const next = toggleSavedDealId(deal.id).isSaved; setLocalSaved(next); if (next) playSuccessChime(); onShowToast?.(next ? 'Saved to your shortlist' : 'Removed from saved deals'); }
+    else { const next = toggleSavedDealId(deal.id, deal).isSaved; setLocalSaved(next); if (next) playSuccessChime(); onShowToast?.(next ? 'Saved to your shortlist' : 'Removed from saved deals'); }
   }
   const details = () => { playTactileClick(); (onSelectDeal || onOpenImage)?.(deal); };
   const action = (callback: () => void) => { setMenuOpen(false); callback(); };
@@ -55,16 +54,9 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, isSaved: s
     openSmartStoreLink(url, 'amazon', asin, true, subId);
   }
   const handleViewDeal = () => {
-    const text = deal.original_text || deal.aff_text || '';
-    const couponMatch = text.match(/\b([A-Z0-9]{5,12})\b/g);
-    const possibleCoupon = couponMatch ? couponMatch.find(c => c.length >= 5 && !/^\d+$/.test(c) && !['HTTP', 'HTTPS', 'PRICE', 'DISCOUNT'].includes(c)) : null;
-    if (possibleCoupon && navigator.clipboard) {
-      navigator.clipboard.writeText(possibleCoupon).catch(() => {});
-      if (onShowToast) onShowToast(`Copied '${possibleCoupon}' to clipboard! Paste at checkout.`);
-    }
     openSmartStoreLink(deal.url, store, asin || undefined, false, subId);
   };
-  return <article className={`commerce-card${expired ? ' is-expired' : ''}${isComparing ? ' is-comparing' : ''}`}>
+  return <article style={{ '--card-delay': `${Math.min(index % 40, 7) * 35}ms` } as React.CSSProperties} className={`commerce-card commerce-card-reveal${expired ? ' is-expired' : ''}${isComparing ? ' is-comparing' : ''}`}>
     <div className="commerce-card-photo">
       <button type="button" className="commerce-photo-button" onClick={details} aria-label={`View details for ${title}`}>
         {photo && !imageFailed ? <img src={photo} alt={title} loading="lazy" decoding="async" onError={() => setImageFailed(true)} /> : <span className="commerce-image-fallback"><Image size={30} strokeWidth={1.2} /><span>Image unavailable</span></span>}
@@ -76,7 +68,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, isSaved: s
     <div className="commerce-card-body">
       <button type="button" className="commerce-card-title" onClick={details}>{title}</button>
       <div className="commerce-card-price"><strong>{price > 0 ? money(price) : 'Check price'}</strong>{mrp && <s>{money(mrp)}</s>}</div>
-      <p className="commerce-card-note">{expired ? 'This offer has ended' : mrp ? `${money(mrp - price)} less than listed MRP` : 'Confirm current price at store'}</p>
+      <p className="commerce-card-note">{expired ? 'This offer has ended' : 'Confirm price at checkout'}</p>
       <div className="commerce-card-actions"><button type="button" className="commerce-store-button" onClick={handleViewDeal} disabled={expired || !deal.url}><span>View at {store}</span><ArrowUpRight size={16} /></button><button ref={trigger} type="button" className="commerce-card-more" aria-label={`More options for ${title}`} aria-haspopup="dialog" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}><MoreHorizontal size={20} /></button></div>
       <div className="commerce-card-meta"><span>Listed {relativeTime(deal.display_ts || deal.posted_at)}</span><button type="button" onClick={details}>Details <span aria-hidden="true">↗</span></button></div>
     </div>
@@ -92,7 +84,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, isSaved: s
         {asin && !expired && <button type="button" onClick={() => action(cart)}><ShoppingCart size={19} /><span>Open Amazon cart{includeBundle ? ' with add-on' : ''}</span><ArrowUpRight size={16} /></button>}
       </div>
       {bundle && <label className="commerce-bundle"><input type="checkbox" checked={includeBundle} onChange={event => setIncludeBundle(event.target.checked)} /><span>Optional add-on: {bundle.name}<small>Estimate {money(bundle.price)} · confirm final price at Amazon</small></span></label>}
-      <div className="commerce-share-row"><button type="button" onClick={() => action(() => shareToWhatsApp(deal))}>WhatsApp</button><button type="button" onClick={() => action(() => shareToTelegram(deal))}><TelegramIcon width={17} height={17} />Telegram</button><button type="button" onClick={() => action(() => { copyDealLink(deal); onShowToast?.('Deal link copied'); })}><Copy size={16} />Copy link</button></div>
+      <div className="commerce-share-row"><button type="button" onClick={() => action(async () => { const result = await shareDeal(deal); if (result === 'copied') onShowToast?.('Deal link copied — paste it anywhere'); if (result === 'failed') onShowToast?.('Could not share this link. Please try again.'); })}><Share2 size={17} />Share</button><button type="button" onClick={() => action(async () => { const copied = await copyDealLink(deal); onShowToast?.(copied ? 'Deal link copied' : 'Could not copy this link'); })}><Copy size={16} />Copy link</button></div>
     </div></div>, document.body)}
   </article>;
 };

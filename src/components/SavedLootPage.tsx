@@ -32,6 +32,7 @@ export const SavedLootPage: React.FC<SavedLootPageProps> = ({
   onShowToast,
 }) => {
   const [searchFilter, setSearchFilter] = useState<string>('');
+  const availableSavedCount = deals.filter(deal => savedDealIds.includes(deal.id)).length;
 
   const savedDeals = useMemo(() => {
     let list = deals.filter((d) => savedDealIds.includes(d.id));
@@ -67,7 +68,7 @@ export const SavedLootPage: React.FC<SavedLootPageProps> = ({
             </p>
           </div>
 
-          {savedDeals.length > 0 && (
+          {savedDealIds.length > 0 && (
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -88,7 +89,7 @@ export const SavedLootPage: React.FC<SavedLootPageProps> = ({
         </div>
       </div>
 
-      {savedDeals.length > 0 ? (
+      {availableSavedCount > 0 ? (
         <>
           {/* ── Filter & View Toolbar ── */}
           <div className="bg-white/80 dark:bg-[#0D1527]/80 backdrop-blur-md rounded-2xl border border-slate-200/90 dark:border-white/10 p-4 mb-6 shadow-xs flex items-center justify-between gap-4">
@@ -148,7 +149,7 @@ export const SavedLootPage: React.FC<SavedLootPageProps> = ({
             className={
               viewMode === 'grid'
                 ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5'
-                : 'flex flex-col gap-3'
+                : 'commerce-deal-list flex flex-col gap-3'
             }
           >
             {savedDeals.map((deal, idx) => (
@@ -165,14 +166,15 @@ export const SavedLootPage: React.FC<SavedLootPageProps> = ({
               />
             ))}
           </motion.div>
+          {savedDeals.length === 0 && <div className="commerce-feed-status" role="status"><span>No saved offers match your search.</span><button type="button" onClick={() => setSearchFilter('')}>Clear search</button></div>}
         </>
       ) : (
         /* ── Empty State (Apple / Mobbin Design Language) ── */
         <div className="max-w-md mx-auto my-12 text-center p-8 sm:p-10 rounded-3xl bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 shadow-sm">
           <ShoppingArtwork className="shopping-artwork-empty" />
-          <h2 className="text-xl font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">Your Loot Vault is Empty</h2>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">{savedDealIds.length ? 'Your earlier bookmarks are still saved' : 'Your Loot Vault is Empty'}</h2>
           <p className="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
-            Save a deal with the bookmark icon to revisit and compare it here. Saved prices are snapshots; confirm them before buying.
+            {savedDealIds.length ? 'These older bookmarks contain IDs only. Load their original offers again to recover the product cards. New bookmarks now retain their product details.' : 'Save a deal with the bookmark icon to revisit and compare it here. Saved prices are snapshots; confirm them before buying.'}
           </p>
           <button
             type="button"

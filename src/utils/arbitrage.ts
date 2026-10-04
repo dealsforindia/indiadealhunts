@@ -135,7 +135,7 @@ export function analyzeArbitrage(deal: Partial<PublicDeal>): ArbitrageAnalysis {
       statusText: 'Pan-India Multi-Merchant Check',
       url: `https://www.google.com/search?tbm=shop&q=${query}`,
       badge: '🌐 Multi-Store Index',
-      actionText: 'Compare Pan-India ↗',
+      actionText: 'Pan-India Radar (In-App)',
     });
   }
 

@@ -7,6 +7,8 @@ import { resolveStoreRedirect, unavailableOfferPage } from './server/storeRedire
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
+const BACKEND_URL = process.env.VITE_BACKEND_URL || 'http://74.225.250.0:8000'
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -42,7 +44,7 @@ export default defineConfig({
     },
     proxy: {
       '/deal-images': {
-        target: 'https://api.rudranil.me',
+        target: BACKEND_URL,
         changeOrigin: true,
         secure: false,
         rewrite: path => path.replace(/^\/deal-images/, '/images'),
@@ -53,12 +55,12 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/feed-fallback/, ''),
       },
       '/api': {
-        target: 'https://api.rudranil.me',
+        target: BACKEND_URL,
         changeOrigin: true,
         secure: false,
       },
       '/images': {
-        target: 'https://api.rudranil.me',
+        target: BACKEND_URL,
         changeOrigin: true,
         secure: false,
       },

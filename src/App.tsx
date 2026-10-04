@@ -1,5 +1,6 @@
 import { RecoveryBoundary } from './components/RecoveryBoundary';
-import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicDeal, publicStoreUrl } from './utils/publicLinks';
+import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicDeal, publicStoreUrl, isDisplayableOffer } from './utils/publicLinks';
+import { ArrowDown, LoaderCircle } from 'lucide-react';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Navbar } from './components/Navbar';
 import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
@@ -35,13 +36,15 @@ import { TopDiscountsPage } from './components/TopDiscountsPage';
 import { WorthScorePage } from './components/WorthScorePage';
 import { SavedLootPage } from './components/SavedLootPage';
 import { ExternalSearchResults, ExternalSearchDeal } from './components/ExternalSearchResults';
+import { GoogleShoppingDiscoveryModal } from './components/GoogleShoppingDiscoveryModal';
+import { openGoogleShoppingModal } from './utils/googleShopping';
 import { SearchResultsHeader } from './components/SearchResultsHeader';
 import { IntelligenceWorkspace } from './components/IntelligenceWorkspace';
 import { ExitIntentCartDrawer } from './components/ExitIntentCartDrawer';
 import type { PublicDeal, PublicDealsResponse, SortOption, NavTab } from './types';
 import { calculateWorthScore } from './utils/worthScore';
 import { searchDealsClient } from './utils/semanticSearch';
-import { getSavedDealIds, toggleSavedDealId, subscribeSavedDeals, clearAllSavedDealIds } from './utils/savedDeals';
+import { getSavedDealIds, getSavedDealSnapshots, rememberSavedDeals, toggleSavedDealId, subscribeSavedDeals, clearAllSavedDealIds } from './utils/savedDeals';
 import { isAudioEnabled, setAudioEnabled, playTactileClick } from './utils/audio';
 import { useTheme } from './utils/themeManager';
 
@@ -58,6 +61,7 @@ export const App: React.FC = () => {
 
   // Deals State (Starts empty with skeleton shimmer until live drops load from API)
   const [deals, setDeals] = useState<PublicDeal[]>([]);
+  const [discoveryDeals, setDiscoveryDeals] = useState<PublicDeal[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -74,6 +78,25 @@ export const App: React.FC = () => {
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
+  // Google Shopping In-App Radar Modal State
+  const [isGoogleShoppingOpen, setIsGoogleShoppingOpen] = useState<boolean>(false);
+  const [googleShoppingQuery, setGoogleShoppingQuery] = useState<string>('');
+
+  useEffect(() => {
+    const handleGoogleShoppingEvent = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      setGoogleShoppingQuery(detail?.query || '');
+      setIsGoogleShoppingOpen(true);
+    };
+    window.addEventListener('open-google-shopping', handleGoogleShoppingEvent);
+    return () => window.removeEventListener('open-google-shopping', handleGoogleShoppingEvent);
+  }, []);
+
+  const handleOpenGoogleShopping = useCallback((q: string) => {
+    setGoogleShoppingQuery(q);
+    setIsGoogleShoppingOpen(true);
+  }, []);
+
   const topAmazonDeal = useMemo(() => {
     return deals.find((d) => (d.store || '').toLowerCase().includes('amazon') && (d.price || 0) > 0) || null;
   }, [deals]);
@@ -86,9 +109,8 @@ export const App: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // When the verified feed has no exact match, also query the public live-store
-  // search endpoint so shoppers can still find the product without treating it
-  // as a verified DealFlow drop.
+  // When searching, query server-side Google Shopping discovery and live-store search
+  // so shoppers get rich Pan-India results without ever being bounced to google.com.
   useEffect(() => {
     const query = debouncedSearch.trim();
     if (!query) {
@@ -105,52 +127,83 @@ export const App: React.FC = () => {
     setExternalSearchLoading(true);
     setExternalSearchError(null);
 
-    fetch(`${API_BASE}/api/v1/search/external?q=${encodeURIComponent(query)}&limit=24`, { signal: controller.signal, cache: 'no-store' })
-      .then(async (res) => {
-        if (!res.ok) throw new Error(`Live store search returned ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        if (controller.signal.aborted) return;
-        const toNumber = (value: unknown) => {
-          const number = typeof value === 'number' ? value : Number(value);
-          return Number.isFinite(number) && number > 0 ? number : null;
-        };
-        const rawDeals = data?.deals || data?.results || [];
-        const normalized: ExternalSearchDeal[] = Array.isArray(rawDeals)
-          ? rawDeals.map((deal: any, index: number) => ({
-              id: String(deal.id || deal._id || `external-${index}-${query}`),
-              title: String(deal.title || deal.product_name || deal.name || 'Store product match'),
-              price: toNumber(deal.price ?? deal.sale_price ?? deal.current_price),
-              mrp: toNumber(deal.mrp ?? deal.regular_price ?? deal.original_price),
-              discount_pct: toNumber(deal.discount_pct ?? deal.discount),
-              store: String(deal.store || deal.source || deal.source_type || 'Store'),
-              image: deal.image || deal.image_url || deal.thumbnail || deal.img_url || null,
-              url: publicStoreUrl(String(deal.url || deal.link || deal.buy_url || '')),
-              raw_url: String(deal.raw_url || deal.canonical_url || deal.url || ''),
-              // Missing history metadata must stay unverified. The backend only
-              // sets this flag when it has authentic points to show.
-              has_price_history: Boolean(deal.has_price_history),
-              history_badge: deal.history_badge ? String(deal.history_badge) : undefined,
-              verdict: deal.verdict ? String(deal.verdict) : undefined,
-              is_lowest_price: false,
-              affiliate_applied: Boolean(deal.affiliate_applied),
-              source_type: String(deal.source_type || 'live_store_search'),
-              history: Array.isArray(deal.history) ? deal.history : [],
-              in_stock: typeof deal.in_stock === 'boolean' ? deal.in_stock : undefined,
-              last_checked_at: Number(deal.last_checked_at) || undefined,
-              price_verified: deal.price_verified === true,
-              price_source: typeof deal.price_source === 'string' ? deal.price_source : undefined,
-              product_id: deal.product_id,
-              gtin: typeof deal.gtin === 'string' ? deal.gtin : undefined,
-              effective_price: toNumber(deal.effective_price),
-              coupon: deal.coupon,
-              coupon_discount: toNumber(deal.coupon_discount),
-              regular_price: toNumber(deal.regular_price),
-            }))
-          : [];
-        setExternalSearchDeals(normalized);
-      })
+    const executeSearch = async () => {
+      let rawDeals: any[] = [];
+      let searchResponded = false;
+      const toNumber = (value: unknown) => {
+        const number = typeof value === 'number' ? value : Number(value);
+        return Number.isFinite(number) && number > 0 ? number : null;
+      };
+
+      try {
+        // 1. First attempt: Server-Side Google Shopping Index
+        const res = await fetch(`${API_BASE}/api/v1/search/external?q=${encodeURIComponent(query)}&limit=24`, {
+          signal: controller.signal,
+          cache: 'no-store'
+        });
+        if (res.ok) {
+          const data = await res.json();
+          searchResponded = true;
+          rawDeals = Array.isArray(data?.results) ? data.results : Array.isArray(data?.deals) ? data.deals : [];
+        }
+      } catch (e) {
+        // Fallback below
+      }
+
+      // 2. Fallback / supplementary multi-store live search if empty
+      if (!rawDeals.length && !controller.signal.aborted) {
+        try {
+          const extRes = await fetch(`${API_BASE}/api/v1/deals/external-search?q=${encodeURIComponent(query)}&limit=24`, {
+            signal: controller.signal,
+            cache: 'no-store'
+          });
+          if (extRes.ok) {
+            const extData = await extRes.json();
+            searchResponded = true;
+            rawDeals = Array.isArray(extData?.deals) ? extData.deals : Array.isArray(extData?.results) ? extData.results : [];
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      if (!active) return;
+      if (controller.signal.aborted) throw new Error('Store search timed out');
+      if (!searchResponded) throw new Error('Store search unavailable');
+
+      const normalized: ExternalSearchDeal[] = rawDeals.map((deal: any, index: number) => ({
+        id: String(deal.id || deal._id || `external-${index}-${query}`),
+        title: String(deal.title || deal.product_name || deal.name || 'Store product match'),
+        price: toNumber(deal.price ?? deal.sale_price ?? deal.current_price),
+        mrp: toNumber(deal.mrp ?? deal.regular_price ?? deal.original_price),
+        discount_pct: toNumber(deal.discount_pct ?? deal.discount),
+        store: String(deal.store || deal.source || deal.source_type || 'Store'),
+        image: deal.image || deal.image_url || deal.thumbnail || deal.img_url || null,
+        url: publicStoreUrl(String(deal.url || deal.link || deal.buy_url || '')),
+        raw_url: String(deal.raw_url || deal.canonical_url || deal.url || ''),
+        has_price_history: Boolean(deal.has_price_history),
+        history_badge: deal.history_badge ? String(deal.history_badge) : undefined,
+        verdict: deal.verdict ? String(deal.verdict) : undefined,
+        is_lowest_price: false,
+        affiliate_applied: Boolean(deal.affiliate_applied),
+        source_type: String(deal.source_type || 'live_store_search'),
+        history: Array.isArray(deal.history) ? deal.history : [],
+        in_stock: typeof deal.in_stock === 'boolean' ? deal.in_stock : undefined,
+        last_checked_at: Number(deal.last_checked_at) || undefined,
+        price_verified: deal.price_verified === true,
+        price_source: typeof deal.price_source === 'string' ? deal.price_source : undefined,
+        product_id: deal.product_id,
+        gtin: typeof deal.gtin === 'string' ? deal.gtin : undefined,
+        effective_price: toNumber(deal.effective_price),
+        coupon: deal.coupon,
+        coupon_discount: toNumber(deal.coupon_discount),
+        regular_price: toNumber(deal.regular_price),
+      }));
+
+      setExternalSearchDeals(normalized.filter(isDisplayableOffer));
+    };
+
+    executeSearch()
       .catch((err: unknown) => {
         if (!active) return;
         setExternalSearchDeals([]);
@@ -197,10 +250,15 @@ export const App: React.FC = () => {
 
   // Saved Deals (Favorites) State
   const [savedDealIds, setSavedDealIds] = useState<string[]>(() => getSavedDealIds());
+  const [savedOffers, setSavedOffers] = useState<PublicDeal[]>(() => getSavedDealSnapshots());
 
   useEffect(() => {
-    return subscribeSavedDeals((ids) => setSavedDealIds(ids));
+    return subscribeSavedDeals((ids) => { setSavedDealIds(ids); });
   }, []);
+  useEffect(() => {
+    rememberSavedDeals(deals);
+    setSavedOffers(getSavedDealSnapshots());
+  }, [deals, savedDealIds]);
 
   const showToast = useCallback((msg: string) => {
     setToastMessage(msg);
@@ -290,7 +348,7 @@ export const App: React.FC = () => {
 
 
   const handleToggleSaveDeal = useCallback((deal: PublicDeal) => {
-    const { isSaved, list } = toggleSavedDealId(deal.id);
+    const { isSaved, list } = toggleSavedDealId(deal.id, deal);
     setSavedDealIds(list);
     showToast(isSaved ? 'Saved to your Loot Bookmarks!' : 'Removed from saved deals');
   }, [showToast]);
@@ -337,7 +395,6 @@ export const App: React.FC = () => {
         setLoadingMore(true);
       } else {
         setLoading(true);
-        setDeals([]);
       }
       setError(null);
 
@@ -350,7 +407,7 @@ export const App: React.FC = () => {
               const extData = await extRes.json();
               if (controller.signal.aborted) { if (timedOut) throw new Error('Request timed out'); return; }
               if (extData && Array.isArray(extData.deals)) {
-                const incomingDeals: PublicDeal[] = extData.deals.map((deal: any) => {
+                const incomingDeals: PublicDeal[] = extData.deals.filter(isDisplayableOffer).map((deal: any) => {
                   const score = typeof deal.worth_score === 'number' ? deal.worth_score : calculateWorthScore(deal).score;
                   return {
                     ...publicDeal(deal),
@@ -406,7 +463,7 @@ export const App: React.FC = () => {
 
         const data: PublicDealsResponse = await res.json();
         if (controller.signal.aborted) { if (timedOut) throw new Error('Request timed out'); return; }
-        const incomingDeals: PublicDeal[] = (data.deals || []).map((deal: PublicDeal) => {
+        const incomingDeals: PublicDeal[] = (data.deals || []).filter(isDisplayableOffer).map((deal: PublicDeal) => {
           const score = typeof deal.worth_score === 'number' ? deal.worth_score : calculateWorthScore(deal).score;
           return {
             ...publicDeal(deal),
@@ -424,18 +481,22 @@ export const App: React.FC = () => {
         } else {
           setDeals(incomingDeals);
         }
+        if (!debouncedSearch && selectedStore === 'all' && selectedCategory === 'all') {
+          setDiscoveryDeals(prev => isAppend
+            ? [...prev, ...incomingDeals.filter(deal => !prev.some(existing => existing.id === deal.id))]
+            : incomingDeals);
+        }
 
         setTotalDeals(data.total || incomingDeals.length);
-        setHasMore(data.has_more ?? incomingDeals.length === PAGE_SIZE);
+        setHasMore(data.has_more ?? (data.deals || []).length === (debouncedSearch ? 80 : PAGE_SIZE));
         setSkip(currentSkip);
       } catch (err: unknown) {
+        if (feedRequest.current !== controller) return;
         if (controller.signal.aborted && !timedOut) return;
         const msg = err instanceof Error ? err.message : 'Failed to fetch deals';
         console.warn('Live deal feed unavailable:', msg);
         setError('The deal directory is temporarily unavailable. Retry to load offers.');
         if (!isAppend) {
-          setDeals([]);
-          setTotalDeals(0);
           setHasMore(false);
         }
       } finally {
@@ -456,8 +517,8 @@ export const App: React.FC = () => {
 
   // Load More Handler
   const handleLoadMore = () => {
-    if (loadingMore || !hasMore) return;
-    const nextSkip = skip + PAGE_SIZE;
+    if (loading || loadingMore || !hasMore) return;
+    const nextSkip = skip + (debouncedSearch ? 80 : PAGE_SIZE);
     fetchDeals(nextSkip, true);
   };
 
@@ -495,6 +556,13 @@ export const App: React.FC = () => {
             /\b(laptop|notebook|macbook|thinkpad|ideapad|vivobook|zenbook|tuf|victus|pavilion|inspiron)\b/i.test(dt)
           );
         }
+        if (catLower === 'electronics') {
+          return /electron|mobile|phone|laptop|computer|audio|gaming/.test(dc)
+            || /\b(cpu|processor|motherboard|ram|ssd|gpu|keyboard|mouse|monitor|earbuds|headphone|speaker|smartwatch|laptop|phone|tablet)\b/i.test(dt);
+        }
+        if (catLower === 'home') return /home|kitchen|appliance|furniture/.test(dc) || /\b(cookware|casserole|stove|fan|washing machine|refrigerator|vacuum|mattress)\b/i.test(dt);
+        if (catLower === 'travel') return /travel|luggage/.test(dc) || /\b(luggage|suitcase|trolley|backpack|travel bag)\b/i.test(dt);
+        if (catLower === 'sports') return /sport|fitness/.test(dc) || /\b(dumbbell|treadmill|yoga|gym|cricket|football)\b/i.test(dt);
 
         return dc.includes(catLower) || dc.includes(catStem) || dt.includes(catLower) || dt.includes(catStem);
       });
@@ -516,14 +584,26 @@ export const App: React.FC = () => {
       // Top Value
       result = [...result].sort((a, b) => (b.worth_score || 0) - (a.worth_score || 0));
     }
+    if (activeTab === 'home') {
+      result = [...result];
+      if (sortBy === 'discount') result.sort((a, b) => (b.discount_pct || 0) - (a.discount_pct || 0));
+      if (sortBy === 'worth') result.sort((a, b) => (b.worth_score || 0) - (a.worth_score || 0));
+      if (sortBy === 'price_low' || sortBy === 'price_high') result.sort((a, b) => {
+        const left = a.price && a.price > 0 ? a.price : null;
+        const right = b.price && b.price > 0 ? b.price : null;
+        if (left == null) return right == null ? 0 : 1;
+        if (right == null) return -1;
+        return sortBy === 'price_low' ? left - right : right - left;
+      });
+    }
 
     return result;
-  }, [deals, searchQuery, selectedCategory, selectedStore, activeTab, savedDealIds]);
+  }, [deals, searchQuery, selectedCategory, selectedStore, activeTab, savedDealIds, sortBy]);
 
   const spotlightDeal = useMemo(() => {
-    if (!deals || deals.length === 0) return null;
-    return deals.find((d) => d.discount_pct && d.discount_pct >= 50 && d.price > 200 && d.image) || deals[0];
-  }, [deals]);
+    if (!discoveryDeals.length) return null;
+    return discoveryDeals.find((d) => d.discount_pct && d.discount_pct >= 50 && d.price > 200 && d.image) || discoveryDeals[0];
+  }, [discoveryDeals]);
 
   const handleFocusSearch = () => {
     const inputEl = (document.getElementById('search-results-input') || document.getElementById('hero-search-input')) as HTMLInputElement | null;
@@ -651,7 +731,7 @@ export const App: React.FC = () => {
             />
           ) : activeTab === 'saved' ? (
             <SavedLootPage
-              deals={deals}
+              deals={[...deals, ...savedOffers.filter(saved => !deals.some(deal => deal.id === saved.id))]}
               savedDealIds={savedDealIds}
               onSelectDeal={(d) => setSelectedDetailDeal(d)}
               onToggleSaveDeal={handleToggleSaveDeal}
@@ -715,12 +795,12 @@ export const App: React.FC = () => {
                 highDiscountCount={flashLootCount}
                 onFilterFlashLoot={handleFilterFlashLoot}
                 spotlightDeal={spotlightDeal}
-                spotlightAlternatives={deals}
+                spotlightAlternatives={discoveryDeals}
               />
 
               {/* ── 2.5 Flash Category Stories Rail (live deals only) ── */}
               <CategoryStories
-                deals={deals}
+                deals={discoveryDeals}
                 onSelectCategoryFilter={(cat) => {
                   setSelectedCategory(cat);
                   const dealGrid = document.getElementById('deals-section');
@@ -864,6 +944,8 @@ export const App: React.FC = () => {
             </div>
 
             {/* Cards Grid / Empty States */}
+            {loading && deals.length > 0 && <div className="commerce-feed-status" role="status"><LoaderCircle size={16} className="commerce-spinner" />Updating offers…</div>}
+            {error && deals.length > 0 && <div className="commerce-feed-status is-error" role="status"><span>{error} Previously loaded offers remain available.</span><button type="button" onClick={() => fetchDeals(0, false)}>Retry</button></div>}
             {loading && deals.length === 0 ? (
               <div className="py-8">
                 <DealSkeletonGrid count={8} />
@@ -880,6 +962,7 @@ export const App: React.FC = () => {
                       setLookupUrl(targetUrl);
                       setIsLookupOpen(true);
                     }}
+                    onOpenGoogleShopping={handleOpenGoogleShopping}
                   />
                 )}
                 <div className="py-12 px-6 text-center max-w-md mx-auto rounded-2xl border border-rose-200 bg-white dark:bg-[#0D1527] shadow-sm">
@@ -908,15 +991,16 @@ export const App: React.FC = () => {
                       setLookupUrl(targetUrl);
                       setIsLookupOpen(true);
                     }}
+                    onOpenGoogleShopping={handleOpenGoogleShopping}
                   />
                 )}
 
                 <div className="py-10 px-6 text-center max-w-md mx-auto rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] shadow-sm">
                   <h3 className="font-heading font-bold text-slate-900 dark:text-[#F1F5F9] mb-2">
-                    No directory deals found
+                    {loading ? 'Finding matching offers…' : 'No directory deals found'}
                   </h3>
                   <p className="text-xs text-slate-500 mb-4">
-                    Try a broader product name, clear a filter, or search the stores above.
+                    {loading ? 'Your filters are applied. Matching products are on their way.' : 'Try a broader product name, clear a filter, or search the stores above.'}
                   </p>
                   <button
                     onClick={() => {
@@ -944,6 +1028,7 @@ export const App: React.FC = () => {
                         setLookupUrl(targetUrl);
                         setIsLookupOpen(true);
                       }}
+                      onOpenGoogleShopping={handleOpenGoogleShopping}
                     />
                     <div className="mt-8 mb-4 flex items-center justify-between border-t border-slate-200/80 dark:border-white/10 pt-6">
                       <div className="flex items-center gap-2">
@@ -959,9 +1044,9 @@ export const App: React.FC = () => {
 
                 {/* Responsive Grid: 4 columns desktop, 2 columns mobile */}
                 <div
-                  className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5"
+                  aria-busy={loading}
+                  className={viewMode === 'list' ? 'commerce-deal-list grid grid-cols-1 gap-3' : 'grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5'}
                 >
-                  <AnimatePresence mode="popLayout">
                     {filteredDeals.map((deal, idx) => (
                       <PublicDealCard
                         key={deal.id}
@@ -984,7 +1069,6 @@ export const App: React.FC = () => {
                         }}
                       />
                     ))}
-                  </AnimatePresence>
                 </div>
 
 
@@ -994,10 +1078,12 @@ export const App: React.FC = () => {
                   <div className="text-center mt-10">
                     <button
                       onClick={handleLoadMore}
-                      disabled={loadingMore}
-                      className="h-11 px-7 rounded-xl bg-white dark:bg-[#0D1527] hover:bg-slate-50 dark:bg-[#070A11] border border-slate-300 dark:border-white/20 hover:border-slate-400 text-slate-800 dark:text-[#F8FAFC] hover:text-slate-900 dark:text-[#F1F5F9] font-bold text-xs sm:text-sm transition-all cursor-pointer inline-flex items-center gap-2 shadow-sm hover:shadow-md active:scale-95"
+                      disabled={loading || loadingMore}
+                      className="commerce-load-more"
+                      aria-busy={loadingMore}
                     >
-                      {loadingMore ? 'Loading More Drops...' : '⚡ Load More Drops ↓'}
+                      {loadingMore ? <LoaderCircle size={18} className="commerce-spinner" /> : <ArrowDown size={18} />}
+                      {loadingMore ? 'Loading more finds…' : 'Discover more deals'}
                     </button>
                   </div>
                 )}
@@ -1067,6 +1153,18 @@ export const App: React.FC = () => {
         isOpen={isLookupOpen}
         onClose={() => setIsLookupOpen(false)}
         initialUrl={lookupUrl}
+      />
+
+      {/* ── Google Shopping & Pan-India Discovery Radar Modal (In-App) ── */}
+      <GoogleShoppingDiscoveryModal
+        isOpen={isGoogleShoppingOpen}
+        initialQuery={googleShoppingQuery || searchQuery || debouncedSearch}
+        onClose={() => setIsGoogleShoppingOpen(false)}
+        onOpenLookup={(url) => {
+          setLookupUrl(url);
+          setIsLookupOpen(true);
+        }}
+        onShowToast={showToast}
       />
 
       {/* ── Legal / Terms Modal ── */}

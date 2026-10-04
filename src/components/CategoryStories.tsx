@@ -1,4 +1,4 @@
-import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicStoreUrl, lookupTargetUrl } from '../utils/publicLinks';
+import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicStoreUrl, lookupTargetUrl, isDisplayableOffer } from '../utils/publicLinks';
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { TrendingDown, Tag, Headphones, Shirt, ShoppingBasket, House } from 'lucide-react';
@@ -210,11 +210,10 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
   // Automatically construct live stories from active deals if available
   useEffect(() => {
     if (!deals || deals.length === 0) {
-      setCollections([]);
       return;
     }
 
-    const availableDeals = deals.filter(d => !d.is_expired && !d.is_over && !!publicStoreUrl(d.url));
+    const availableDeals = deals.filter(d => !d.is_expired && !d.is_over && isDisplayableOffer(d));
     const liveSteals = availableDeals.filter((d) => d.discount_pct && d.discount_pct >= 70 && d.image && d.price > 0 && !d.is_expired && !d.is_over).slice(0, 6);
     const liveBudget = availableDeals.filter((d) => d.price > 0 && d.price <= 499 && d.image).slice(0, 6);
     const liveTech = availableDeals.filter((d) => {
@@ -228,9 +227,8 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
       return (c.includes('fashion') || /\b(shoes|sneakers|shirt|kurti|dress|saree)\b/i.test(t)) && d.image;
     }).slice(0, 6);
     const liveGrocery = availableDeals.filter((d) => {
-      const c = (d.category || '').toLowerCase();
       const s = (d.store || '').toLowerCase();
-      return (c.includes('grocery') || c.includes('beauty') || s.includes('blinkit') || s.includes('swiggy') || s.includes('zepto')) && d.image;
+      return (s.includes('blinkit') || s.includes('swiggy') || s.includes('zepto')) && d.image;
     }).slice(0, 6);
 
     const dynamicStories: CategoryStoryCollection[] = [];
@@ -317,7 +315,7 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
           const data: StoriesResponse = await res.json();
           if (isMounted && data.stories && data.stories.length > 0) {
             // Filter collections that actually have deals
-            const validStories = data.stories.map(s => ({ ...s, badge: s.badge === 'ALL-TIME LOW' ? 'TECH' : s.badge === 'CLEARANCE' ? 'STYLE' : s.badge, items: (s.items || []).map(item => ({ ...item, url: publicStoreUrl(item.url) })).filter(item => item.url && !item.is_expired && !item.is_over) })).filter(s => s.items.length > 0);
+            const validStories = data.stories.map(s => ({ ...s, badge: s.badge === 'ALL-TIME LOW' ? 'TECH' : s.badge === 'CLEARANCE' ? 'STYLE' : s.badge, items: (s.items || []).map(item => ({ ...item, url: publicStoreUrl(item.url) })).filter(item => isDisplayableOffer(item) && !item.is_expired && !item.is_over) })).filter(s => s.items.length > 0);
             if (validStories.length > 0) {
               setCollections(validStories);
             }

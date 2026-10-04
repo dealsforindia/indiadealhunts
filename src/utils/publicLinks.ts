@@ -41,10 +41,18 @@ export function publicShareUrl(value: string): string {
   return link.startsWith('/') ? `${typeof window === 'undefined' ? 'https://indiadealhunts.vercel.app' : window.location.origin}${link}` : link;
 }
 
+/** Hide unfinished template records without inventing replacement product data. */
+export function isDisplayableOffer(deal: Pick<PublicDeal, 'title' | 'url' | 'status'>): boolean {
+  const title = typeof deal.title === 'string' ? deal.title.trim() : '';
+  return !!title && !/\{\{?\s*(?:title|product(?:_name)?|name)\s*\}?\}|^\s*(?:undefined|null|test (?:deal|product)|sample product|placeholder)\s*$/i.test(title)
+    && !['rejected', 'pending', 'pending_approval'].includes(deal.status || '')
+    && !!publicStoreUrl(deal.url);
+}
+
 export function selectTickerDeals(deals: PublicDeal[] = []): PublicDeal[] {
   const seen = new Set<string>();
   return deals.filter(deal => {
-    if (!deal.id || seen.has(deal.id) || !deal.title?.trim() || !Number.isFinite(deal.price) || !(Number(deal.price) > 0) || deal.is_expired || deal.is_over || ['expired', 'rejected', 'pending', 'pending_approval'].includes(deal.status || '') || !publicStoreUrl(deal.url)) return false;
+    if (!deal.id || seen.has(deal.id) || !isDisplayableOffer(deal) || !Number.isFinite(deal.price) || !(Number(deal.price) > 0) || deal.is_expired || deal.is_over || deal.status === 'expired') return false;
     seen.add(deal.id);
     return true;
   }).slice(0, 12);

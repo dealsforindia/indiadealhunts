@@ -3,6 +3,7 @@ import { normalizeLookup, priceFreshness } from '../utils/priceEvidence';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowUpRight, Bookmark, Check, ChevronRight, Clock3, Eye, Layers3, Search, ShieldCheck, Sparkles, TrendingDown, X, Bell, GitCompareArrows, Share2, RefreshCw } from 'lucide-react';
 import { cleanHistory, decisionFor, groupProducts, IntelligenceOffer, parseMission, offerIdentity, readWatchlist, rupees, writeWatchlist, shoppingMatch } from '../utils/shoppingIntelligence';
+import { openGoogleShoppingModal } from '../utils/googleShopping';
 import './intelligence.css';
 import { CheckoutPlanner } from './CheckoutPlanner';
 
@@ -94,8 +95,14 @@ export function IntelligenceWorkspace({ query, offers, loading, onSearch, onLook
       ['Amazon', `https://www.amazon.in/s?k=${encodeURIComponent(mission.product || query)}`],
       ['Flipkart', `https://www.flipkart.com/search?q=${encodeURIComponent(mission.product || query)}`],
       ['Myntra', `https://www.myntra.com/search?q=${encodeURIComponent(mission.product || query)}`],
-      ['Google Shopping', `https://www.google.com/search?tbm=shop&q=${encodeURIComponent(mission.product || query)}`],
-    ].map(([name, url]) => <a key={name} href={url} target="_blank" rel="noopener noreferrer">Search {name}<ArrowUpRight size={13} /></a>)}</div></div></div>}
+      ['Google Shopping', 'in-app-radar'],
+    ].map(([name, url]) => name === 'Google Shopping' ? (
+      <button key={name} type="button" onClick={() => openGoogleShoppingModal(mission.product || query)} className="mine-store-btn inline-flex items-center gap-1 font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+        <span>🛍️ Google Shopping Radar (In-App)</span>
+      </button>
+    ) : (
+      <a key={name} href={url} target="_blank" rel="noopener noreferrer">Search {name}<ArrowUpRight size={13} /></a>
+    ))}</div></div></div>}
     {tab === 'mine' && saved.length > 0 && <div className="mine-briefing"><Bookmark size={20} /><div><strong>Your shopping shortlist · {rupees(watchTotal)}</strong><p>{savedPriced.length} priced offers saved across {new Set(saved.map(o => o.store)).size} stores. This is a snapshot total, excluding delivery and checkout-specific offers.</p></div></div>}
     {tab === 'discover' && lows.length > 0 && <div className="mine-briefing"><TrendingDown size={20} /><div><strong>{lows.length} offers at their recorded low</strong><p>Based on supplied historical observations. Open a product to inspect the dates and evidence.</p></div></div>}
     <div className="mine-pulse">

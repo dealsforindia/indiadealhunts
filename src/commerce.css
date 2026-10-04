@@ -49,3 +49,79 @@ html.dark .commerce-product-sheet,html.dark .commerce-menu-panel,html.dark .mine
 }
 @media(hover:hover){.commerce-store-button:hover{box-shadow:0 3px 9px #264e8a12}.commerce-telegram:hover{box-shadow:0 4px 12px #264e8a22}}
 @media(prefers-reduced-motion:reduce){.commerce-store-button,.commerce-card-more,.commerce-telegram,.commerce-filter-footer button{transition:none}.commerce-store-button:active,.commerce-card-more:active,.commerce-telegram:active,.commerce-filter-footer button:active{transform:none}}
+
+/* Repair the existing retail UI without replacing its visual direction. */
+.commerce-card-note,.commerce-card-meta{color:#596d87;font-size:11px;line-height:1.5}
+.commerce-card-note{height:auto;min-height:17px;white-space:normal;margin-bottom:12px}
+.commerce-card-price s{color:#64748b;font-size:11px}
+.commerce-card-meta button{color:#41618c;font-size:11px}
+.commerce-image-fallback{color:#61728a;font-size:11px}
+.commerce-discount{color:#276146;font-size:10px}
+.flash-stories h3{color:#526780!important}
+.commerce-brand small,.mobile-desk-toggle small{color:#586d88}
+.premium-story-tile:focus-visible,.premium-popular button:focus-visible,.commerce-load-more:focus-visible{outline:3px solid #88afea;outline-offset:3px}
+.commerce-feed-status{display:flex;align-items:center;gap:9px;min-height:44px;padding:10px 14px;margin-bottom:14px;background:#edf3fc;border:1px solid #d5e2f6;border-radius:12px;color:#315dab;font-size:12px;line-height:1.5}
+.commerce-feed-status.is-error{background:#fff6ec;border-color:#f3d3ab;color:#874719}
+.commerce-feed-status button{margin-left:auto;min-height:44px;padding:0 14px;border-radius:9px;font-weight:650;cursor:pointer}
+.commerce-load-more{min-height:48px;padding:0 24px;display:inline-flex;align-items:center;justify-content:center;gap:10px;border:1px solid #bfcfea;border-radius:14px;background:linear-gradient(180deg,#fff,#f0f5fd);color:#294f91;font-size:13px;font-weight:650;box-shadow:inset 0 1px #fff,0 4px 12px #193e7010;cursor:pointer;transition:transform .18s,box-shadow .18s}
+.commerce-load-more:hover{box-shadow:inset 0 1px #fff,0 6px 18px #193e701c}
+.commerce-load-more:active{transform:translateY(1px)}
+.commerce-load-more:disabled{cursor:wait;opacity:.7}
+.commerce-card-reveal{animation:commerce-card-arrive .36s ease-out both;animation-delay:var(--card-delay,0ms)}
+@keyframes commerce-card-arrive{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.commerce-spinner{animation:commerce-spin 1s linear infinite;flex-shrink:0}
+@keyframes commerce-spin{to{transform:rotate(360deg)}}
+.commerce-deal-list .commerce-card{display:grid;grid-template-columns:170px minmax(0,1fr);align-items:stretch}
+.commerce-deal-list .commerce-card-photo{height:auto;min-height:170px;margin:8px}
+.commerce-deal-list .commerce-card-title{height:auto;min-height:40px}
+.commerce-deal-list .commerce-card-actions{max-width:360px}
+.commerce-deal-list .commerce-card-meta{max-width:360px}
+.commerce-price-history{margin-top:14px;padding:16px;border:1px solid var(--border-subtle);border-radius:14px;background:var(--surface-2);color:var(--text-primary);min-width:0}
+.commerce-price-history>header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.commerce-price-history h3{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:650}
+.commerce-history-source{display:block;font-size:11px;color:var(--text-secondary);margin-top:5px}
+.commerce-price-history>header>button{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--border-subtle);border-radius:10px;cursor:pointer}
+.commerce-price-history>header>button:disabled{opacity:.5;cursor:wait}
+.commerce-history-periods{display:flex;flex-wrap:wrap;gap:5px;margin:14px 0}
+.commerce-history-periods button{min-height:44px;flex:1;padding:0 8px;border:1px solid var(--border-subtle);border-radius:10px;font-size:11px;color:var(--text-secondary);cursor:pointer}
+.commerce-history-periods button[aria-pressed=true]{background:#edf3fc;border-color:#b9cfee;color:#315dab;font-weight:650}
+.commerce-price-history>svg{display:block;width:100%;color:#3d70cd}
+.commerce-history-grid{fill:none;stroke:var(--border-subtle);stroke-width:1}
+.commerce-history-line{fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.commerce-history-area{fill:#3d70cd13}
+.commerce-history-dates{display:flex;justify-content:space-between;font-size:10px;color:var(--text-secondary);gap:8px}
+.commerce-history-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:16px 0}
+.commerce-history-stats span{font-size:10px;color:var(--text-secondary)}
+.commerce-history-stats strong{display:block;margin-top:5px;color:var(--text-primary);font-size:13px;overflow-wrap:anywhere}
+.commerce-history-status,.commerce-history-empty{display:flex;align-items:center;justify-content:center;gap:10px;min-height:120px;color:var(--text-secondary);font-size:12px;line-height:1.6;text-align:center}
+.commerce-history-empty{flex-direction:column;padding:14px}
+.commerce-price-history>small{display:block;color:var(--text-secondary);font-size:11px;line-height:1.6;margin-top:12px}
+html.dark .commerce-card-note,html.dark .commerce-card-meta{color:#b4c5de}
+html.dark .commerce-card-price s{color:#a8bbd6}
+html.dark .commerce-card-meta button{color:#b2cef6}
+html.dark .flash-stories h3{color:#b2c3dc!important}
+html.dark .commerce-brand small,html.dark .mobile-desk-toggle small{color:#b2c3dc}
+html.dark .commerce-feed-status{background:#203551;border-color:#355477;color:#bdd5fa}
+html.dark .commerce-feed-status.is-error{background:#372b20;border-color:#6b4f32;color:#f3c89d}
+html.dark .commerce-load-more{background:linear-gradient(180deg,#233956,#1b2d46);color:#c6dafa;border-color:#3d597e;box-shadow:inset 0 1px #ffffff0d,0 4px 12px #0002}
+html.dark .commerce-history-periods button[aria-pressed=true]{background:#243b5f;border-color:#476998;color:#c6dafa}
+html.dark .commerce-price-history>svg{color:#91b5ff}
+html.dark .commerce-history-area{fill:#91b5ff16}
+html.dark .deal-detail-sheet-head{background:var(--surface-2)!important}
+@media(max-width:767px){
+  .commerce-card-price{flex-wrap:wrap;gap:4px 7px}
+  .commerce-card-price strong{font-size:21px}
+  .commerce-card-price s{font-size:10px}
+  .commerce-card-note,.commerce-card-meta,.commerce-card-meta button{font-size:10px}
+  .commerce-discount{font-size:9px}
+  .commerce-store{font-size:9px}
+  .commerce-store-button{font-size:10px}
+  .premium-hero-description{font-size:13px}
+  .premium-popular button{font-size:11px}
+  .premium-story-title{font-size:12px}
+  .commerce-deal-list .commerce-card{grid-template-columns:115px minmax(0,1fr)}
+  .commerce-deal-list .commerce-card-photo{min-height:155px}
+  .commerce-deal-list .commerce-card-body{padding:12px 10px 8px}
+  .deal-detail-sheet-head>div:first-child{flex-wrap:wrap;gap:4px!important}
+}
+@media(prefers-reduced-motion:reduce){.commerce-card-reveal,.commerce-spinner{animation:none}.commerce-load-more{transition:none}.commerce-load-more:active{transform:none}}

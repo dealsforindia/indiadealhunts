@@ -7,6 +7,7 @@ import {
   openSmartStoreLink,
   useIsMobile,
 } from '../utils/affiliateEngine';
+import { openGoogleShoppingModal } from '../utils/googleShopping';
 
 export interface ExternalSearchDeal extends IntelligenceOffer {
   id: string;
@@ -32,6 +33,7 @@ interface ExternalSearchResultsProps {
   loading: boolean;
   error?: string | null;
   onCheckHistory?: (url: string) => void;
+  onOpenGoogleShopping?: (query: string) => void;
 }
 
 const STORE_LINKS = [
@@ -54,7 +56,7 @@ const sc = (store: string) => {
   return { badge: 'bg-slate-50 dark:bg-[#070A11] text-slate-700 dark:text-slate-200 border-slate-200 dark:border-white/10', btn: 'bg-slate-800 hover:bg-slate-900 focus:ring-slate-400' };
 };
 
-export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ query, deals, loading, error, onCheckHistory }) => {
+export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ query, deals, loading, error, onCheckHistory, onOpenGoogleShopping }) => {
   const isMobile = useIsMobile();
   const cleanQuery = query.trim();
   const [pastedUrl, setPastedUrl] = useState('');
@@ -109,12 +111,22 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
             Offers returned from the deal directory and external store search for &ldquo;<span className="font-semibold text-slate-700 dark:text-slate-200">{cleanQuery}</span>&rdquo;. Check matching models, history and checkout eligibility before buying.
           </p>
         </div>
-        {hasDeals && (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#070A11] px-3 py-1 text-xs font-mono font-bold text-slate-700 dark:text-slate-200 shadow-2xs">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            {deals.length} offers · {new Set(deals.map(d => d.store)).size} stores
-          </span>
-        )}
+        <div className="flex items-center gap-2 flex-wrap">
+          {hasDeals && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#070A11] px-3 py-1 text-xs font-mono font-bold text-slate-700 dark:text-slate-200 shadow-2xs">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              {deals.length} offers · {new Set(deals.map(d => d.store)).size} stores
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={() => (onOpenGoogleShopping ? onOpenGoogleShopping(cleanQuery) : openGoogleShoppingModal(cleanQuery))}
+            className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs px-3.5 py-1.5 shadow-sm hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer"
+          >
+            <span>🛍️ Google Shopping Radar</span>
+            <span className="rounded-full bg-white/20 px-1.5 py-0.2 text-[9px] font-mono">IN-APP</span>
+          </button>
+        </div>
       </div>
 
       {/* Lowest Price Spotlight Hero Callout */}
@@ -562,14 +574,14 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
               </p>
             </div>
           </div>
-          <a
-            href={`https://www.google.com/search?q=${encodeURIComponent(cleanQuery)}&udm=28#ip=1`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 rounded-xl border border-slate-300 dark:border-white/20 bg-white dark:bg-[#0D1527] px-3 py-1.5 text-[11px] font-bold text-slate-800 dark:text-[#F8FAFC] hover:bg-slate-100 dark:bg-[#111C33] transition shadow-2xs"
+          <button
+            type="button"
+            onClick={() => (onOpenGoogleShopping ? onOpenGoogleShopping(cleanQuery) : openGoogleShoppingModal(cleanQuery))}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-indigo-700 px-3.5 py-1.5 text-[11px] font-bold text-white transition shadow-sm hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
-            Scan Google Shopping Live ↗
-          </a>
+            <span>🛍️ Scan Google Shopping Radar</span>
+            <span className="rounded-full bg-white/20 px-1.5 py-0.2 text-[9px] font-mono">IN-APP</span>
+          </button>
         </div>
         <form onSubmit={handlePasteSubmit} className="mt-3 flex gap-2">
           <input
@@ -591,21 +603,39 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
 
       {/* Direct Store Link Badges */}
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {STORE_LINKS.map((store) => (
-          <a
-            key={store.name}
-            href={store.url(cleanQuery)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`flex items-center justify-between rounded-xl border px-3 py-2.5 text-xs font-bold transition ${store.tone}`}
-          >
-            <span className="truncate flex items-center gap-1.5">
-              <span>{store.icon}</span>
-              <span>{store.name}</span>
-            </span>
-            <span aria-hidden="true">↗</span>
-          </a>
-        ))}
+        {STORE_LINKS.map((store) => {
+          if (store.name === 'Google Shopping') {
+            return (
+              <button
+                key={store.name}
+                type="button"
+                onClick={() => (onOpenGoogleShopping ? onOpenGoogleShopping(cleanQuery) : openGoogleShoppingModal(cleanQuery))}
+                className={`flex items-center justify-between rounded-xl border px-3 py-2.5 text-xs font-bold transition cursor-pointer ${store.tone}`}
+              >
+                <span className="truncate flex items-center gap-1.5">
+                  <span>{store.icon}</span>
+                  <span>{store.name}</span>
+                </span>
+                <span className="shrink-0 text-[9px] font-mono font-bold bg-white/20 px-1.5 py-0.5 rounded">IN-APP ⚡</span>
+              </button>
+            );
+          }
+          return (
+            <a
+              key={store.name}
+              href={store.url(cleanQuery)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center justify-between rounded-xl border px-3 py-2.5 text-xs font-bold transition ${store.tone}`}
+            >
+              <span className="truncate flex items-center gap-1.5">
+                <span>{store.icon}</span>
+                <span>{store.name}</span>
+              </span>
+              <span aria-hidden="true">↗</span>
+            </a>
+          );
+        })}
       </div>
     </section>
   );

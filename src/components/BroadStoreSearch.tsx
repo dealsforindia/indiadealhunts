@@ -1,4 +1,5 @@
 import React from 'react';
+import { openGoogleShoppingModal } from '../utils/googleShopping';
 
 interface BroadStoreSearchProps {
   query: string;
@@ -56,19 +57,39 @@ export const BroadStoreSearch: React.FC<BroadStoreSearchProps> = ({ query, compa
       </div>
 
       <div className={`mt-4 grid gap-2 ${compact ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'}`}>
-        {STORE_SEARCHES.map((store) => (
-          <a
-            key={store.name}
-            href={store.buildUrl(cleanQuery)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`flex items-center justify-between gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition-colors ${store.tone}`}
-          >
-            <span className="min-w-0 truncate">{store.name}</span>
-            <span aria-hidden="true" className="shrink-0 text-[11px]">↗</span>
-            <span className="sr-only">{store.label}</span>
-          </a>
-        ))}
+        {STORE_SEARCHES.map((store) => {
+          if (store.name === 'Google Shopping') {
+            return (
+              <button
+                key={store.name}
+                type="button"
+                onClick={() => openGoogleShoppingModal(cleanQuery)}
+                className={`flex items-center justify-between gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition-colors cursor-pointer ${store.tone}`}
+              >
+                <span className="min-w-0 truncate flex items-center gap-1.5">
+                  <span>🛍️</span>
+                  <span>Google Shopping</span>
+                </span>
+                <span className="shrink-0 text-[10px] font-mono font-bold bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded">
+                  IN-APP
+                </span>
+              </button>
+            );
+          }
+          return (
+            <a
+              key={store.name}
+              href={store.buildUrl(cleanQuery)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center justify-between gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition-colors ${store.tone}`}
+            >
+              <span className="min-w-0 truncate">{store.name}</span>
+              <span aria-hidden="true" className="shrink-0 text-[11px]">↗</span>
+              <span className="sr-only">{store.label}</span>
+            </a>
+          );
+        })}
       </div>
     </section>
   );

@@ -53,6 +53,21 @@ export function shareToTelegram(deal: PublicDeal): void {
   }
 }
 
+/** Opens the device share chooser; unsupported browsers fall back to copying. */
+export async function shareDeal(deal: PublicDeal): Promise<'shared' | 'copied' | 'cancelled' | 'failed'> {
+  const url = publicShareUrl(deal.url);
+  if (!url) return 'failed';
+  if (typeof navigator.share === 'function') {
+    try {
+      await navigator.share({ title: deal.title || 'IndiaDealHunts find', text: 'Found on IndiaDealHunts. Confirm price and availability at the store.', url });
+      return 'shared';
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') return 'cancelled';
+    }
+  }
+  return await copyDealLink(deal) ? 'copied' : 'failed';
+}
+
 export async function copyDealLink(deal: PublicDeal): Promise<boolean> {
   try {
     const link = publicShareUrl(deal.url);

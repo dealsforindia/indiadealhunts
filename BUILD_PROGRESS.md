@@ -141,3 +141,25 @@ Status means implemented locally, partial, existing (not fully audited), or plan
 - Stopped further browser tours and test suites at the owner's request to prioritize implementation. Performed only the final production build and Python source compilation for the latest changes. Earlier browser and regression checks apply to the state at the time they ran, not every latest edit.
 - Local development preview runs at http://127.0.0.1:5180/. Backend changes are local and not deployed: the VM rejected the supplied SSH access. Accurate live lookup still requires deploying the public backend changes with working access. Do not interpret local implementation as a successful production rollout.
 - No files deleted by this work. Private DealFlow ingestion, admin workflows, tg-setup and private history/scraper modules remain untouched. Roadmap features requiring additional merchant/provider data or a verified notification worker remain pending; no fabricated substitutes were added.
+
+### Recent redesign reverted — 2026-10-04
+
+- Restored the pre-redesign hero, storefront styles, cards, footer, product details, discovery behavior and proxy configuration at the owner's request.
+- Preserved the earlier device-native Share action and copy fallback in the card menu.
+- Reversed only the latest local public history timeout and history_source metadata changes; earlier backend work remains intact.
+- Saved the replaced sources in a local rollback snapshot. Generated artwork and new source files remain on disk, inactive; no files deleted.
+- This rollback is local. No Vercel or VM deployment performed.
+
+### Storefront bug and UI repair — 4 October 2026
+
+- Preserved the restored visual direction. Kept existing hero artwork inactive and all original files on disk.
+- Stopped clearing cards during filter refresh; discovery collections and featured offers use an unfiltered feed snapshot. Superseded request errors cannot overwrite newer requests. Loading and retained-feed failures now have explicit feedback.
+- Cancelled interrupted category indicator motion; removed ineffective card presence wrapping. Added bounded card entrance and Load More feedback with reduced-motion support.
+- Enabled real horizontal list cards on Discover, Discounts, Worth and Saved pages. Corrected search pagination from 40 to 80 per fetched search page, immediate local price sorting and broader category matching.
+- Filtered unfinished template titles from feed/search/stories/ticker without fabricating replacements. Quick-delivery stories now derive from quick-commerce merchants, not arbitrary beauty offers.
+- Persisted saved product snapshots alongside existing bookmark IDs; earlier IDs are retained. Saved search no longer hides its controls and falsely reports an empty vault.
+- Removed guessing/copying coupon codes from capitalized product text. Coupon activation instructions are separate from code-shaped fields; coupon_discount no longer implies a percentage.
+- Connected recorded product history to the existing detail dialog and added shopper-only Vercel search/history rewrites. Missing evidence and timeouts remain explicit; source prices are not relabelled as live checkout quotes.
+- Improved mobile/light/dark card metadata contrast, price wrapping, sheet header wrapping, touch controls and history chart styling. Fixed an undefined lookup variable that blocked compilation while preserving other ongoing edits.
+- Mobile filter drawer opened, applied Electronics + price sorting, dismissed and restored scrolling; discovery collection labels remained present. Saved mobile preview: tests/artifacts/ui-fixes-mobile.png.
+- TypeScript check passed; production build passed in a separate output folder after the usual output folder reported a Windows file lock. No automated test suites run. Local preview is port 5180; no production deployment or private DealFlow changes performed by this repair.

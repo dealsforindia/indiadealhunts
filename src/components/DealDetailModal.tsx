@@ -7,7 +7,10 @@ import { motion } from 'motion/react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { SignaturePriceGraph } from './SignaturePriceGraph';
+import { ProductPriceHistory } from './ProductPriceHistory';
+import { couponOffer } from '../utils/couponOffer';
 import { analyzeArbitrage } from '../utils/arbitrage';
+import { openGoogleShoppingModal } from '../utils/googleShopping';
 import { shareToWhatsApp, shareToTelegram, copyDealLink } from '../utils/shareDeal';
 import { isDealSaved, toggleSavedDealId } from '../utils/savedDeals';
 import {
@@ -71,13 +74,6 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
 
   const handleOpenStore = () => {
     if (!deal) return;
-    const text = deal.original_text || deal.aff_text || '';
-    const couponMatch = text.match(/\b([A-Z0-9]{5,12})\b/g);
-    const possibleCoupon = couponMatch ? couponMatch.find(c => c.length >= 5 && !/^\d+$/.test(c) && !['HTTP', 'HTTPS', 'PRICE', 'DISCOUNT'].includes(c)) : null;
-    if (possibleCoupon && navigator.clipboard) {
-      navigator.clipboard.writeText(possibleCoupon).catch(() => {});
-      if (onShowToast) onShowToast(`Copied '${possibleCoupon}' to clipboard!`);
-    }
     openSmartStoreLink(deal.url, deal.store || 'Store', asin || undefined, false, subId);
   };
   const isMobile = useIsMobile();
@@ -108,7 +104,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
       onToggleSave(deal);
       setSaved(isDealSaved(deal.id));
     } else {
-      const { isSaved: next } = toggleSavedDealId(deal.id);
+      const { isSaved: next } = toggleSavedDealId(deal.id, deal);
       setSaved(next);
       onShowToast?.(next ? 'Saved to Loot Bookmarks!' : 'Removed from saved deals');
     }
@@ -129,6 +125,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   const discount = deal.discount_pct || 0;
   const savings = mrp ? mrp - price : 0;
   const storeName = getStoreDisplayName(deal.store);
+  const coupon = couponOffer(deal);
 
   const gstItcAmount = price > 0 ? Math.round(price - price / 1.18) : 0;
 
@@ -154,12 +151,13 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   })();
 
   const handleCopyCoupon = () => {
-    if (!deal.coupon) return;
-    navigator.clipboard.writeText(deal.coupon).then(() => {
+    if (coupon?.kind !== 'code') return;
+    if (!navigator.clipboard?.writeText) { onShowToast?.('Clipboard unavailable. Select and copy the code.'); return; }
+    navigator.clipboard.writeText(coupon.code).then(() => {
       setCopiedCoupon(true);
       setTimeout(() => setCopiedCoupon(false), 2000);
       onShowToast?.('Coupon copied!');
-    }).catch(() => {});
+    }).catch(() => onShowToast?.('Could not copy the coupon. Select and copy the code.'));
   };
 
   const handleShare = () => {
@@ -475,10 +473,10 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             </div>
 
             {/* Coupon code */}
-            {deal.coupon && (
+            {coupon && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
-                  PROMO CODE
+                  {coupon.kind === 'code' ? 'PROMO CODE' : 'STORE COUPON'}
                 </span>
                 <div style={{
                   display: 'inline-flex',
@@ -497,9 +495,9 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                     color: '#1D4ED8',
                     letterSpacing: '0.08em',
                   }}>
-                    {deal.coupon}
+                    {coupon.label}
                   </span>
-                  <button
+                  {coupon.kind === 'code' && <button
                     onClick={handleCopyCoupon}
                     aria-label={`Copy coupon ${deal.coupon}`}
                     style={{
@@ -516,13 +514,11 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                     }}
                   >
                     {copiedCoupon ? 'COPIED ✓' : 'COPY CODE'}
-                  </button>
+                  </button>}
                 </div>
-                {deal.coupon_discount && (
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-secondary)' }}>
-                    {deal.coupon_discount}% off with this code
-                  </span>
-                )}
+                <span style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                  {coupon.kind === 'activation' ? 'Collect or apply the coupon on the product page. Confirm eligibility and the final price at checkout.' : 'Apply this code at checkout. Confirm its terms and the final price at the store.'}
+                </span>
               </div>
             )}
 
@@ -532,6 +528,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               regularPrice={deal.regular_price || deal.usually_price || undefined}
               mrp={mrp}
             />
+            <ProductPriceHistory url={deal.url} dealId={deal.fp_hash || deal.id} />
 
             {/* Multi-Store Real-Time Live Check Matrix */}
             {arbitrage && (
@@ -608,25 +605,49 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                             ₹{q.price.toLocaleString('en-IN')}
                           </span>
                         ) : null}
-                        <a
-                          href={publicStoreUrl(q.url) || undefined}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{
-                            fontFamily: 'var(--font-mono)',
-                            fontSize: '10.5px',
-                            fontWeight: 700,
-                            color: q.isVerifiedDeal ? '#059669' : '#2563EB',
-                            textDecoration: 'none',
-                            backgroundColor: q.isVerifiedDeal ? '#F0FDF4' : '#EFF6FF',
-                            border: `1px solid ${q.isVerifiedDeal ? '#BBF7D0' : '#DBEAFE'}`,
-                            padding: '3px 8px',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          {q.actionText}
-                        </a>
+                        {q.store === 'Google Shopping' ? (
+                          <button
+                            type="button"
+                            onClick={() => openGoogleShoppingModal(deal?.title || '')}
+                            style={{
+                              fontFamily: 'var(--font-mono)',
+                              fontSize: '10.5px',
+                              fontWeight: 700,
+                              color: '#2563EB',
+                              backgroundColor: '#EFF6FF',
+                              border: '1px solid #DBEAFE',
+                              padding: '3px 8px',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                            }}
+                          >
+                            <span>{q.actionText}</span>
+                            <span style={{ fontSize: '9px', backgroundColor: '#DBEAFE', padding: '1px 4px', borderRadius: '4px' }}>IN-APP</span>
+                          </button>
+                        ) : (
+                          <a
+                            href={publicStoreUrl(q.url) || undefined}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              fontFamily: 'var(--font-mono)',
+                              fontSize: '10.5px',
+                              fontWeight: 700,
+                              color: q.isVerifiedDeal ? '#059669' : '#2563EB',
+                              textDecoration: 'none',
+                              backgroundColor: q.isVerifiedDeal ? '#F0FDF4' : '#EFF6FF',
+                              border: `1px solid ${q.isVerifiedDeal ? '#BBF7D0' : '#DBEAFE'}`,
+                              padding: '3px 8px',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            {q.actionText}
+                          </a>
+                        )}
                       </div>
                     </div>
                   ))}
