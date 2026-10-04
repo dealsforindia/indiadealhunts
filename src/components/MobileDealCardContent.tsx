@@ -14,7 +14,7 @@ import {
 interface Props {
   deal: PublicDeal; title: string; image?: string | null; store: string;
   price: number; mrp?: number; discount: number; expired: boolean;
-  saved: boolean; comparing: boolean; time: string; cardSavings?: number;
+  saved: boolean; comparing: boolean; time: string; 
   onSave: (event: React.MouseEvent) => void; onDetails: () => void;
   onCompare?: () => void; onToast?: (text: string) => void;
 }
@@ -54,6 +54,13 @@ export function MobileDealCardContent(props: Props) {
 
   const handleOpenInApp = (e: React.MouseEvent) => {
     e.stopPropagation();
+    const text = deal.original_text || deal.aff_text || '';
+    const couponMatch = text.match(/\b([A-Z0-9]{5,12})\b/g);
+    const possibleCoupon = couponMatch ? couponMatch.find(c => c.length >= 5 && !/^\d+$/.test(c) && !['HTTP', 'HTTPS', 'PRICE', 'DISCOUNT'].includes(c)) : null;
+    if (possibleCoupon && navigator.clipboard) {
+      navigator.clipboard.writeText(possibleCoupon).catch(() => {});
+      if (onToast) onToast(`Copied '${possibleCoupon}' to clipboard! Paste at checkout.`);
+    }
     openSmartStoreLink(deal.url, store, asin || undefined, false, subId);
   };
 
@@ -65,13 +72,12 @@ export function MobileDealCardContent(props: Props) {
     </div>
     <button type="button" className="phone-card-image" onClick={onDetails} aria-label={`Open details for ${title}`}>
       {image && !imageFailed ? <img src={image} alt={title} loading="lazy" onError={() => setImageFailed(true)} /> : <div className="phone-image-missing"><ShoppingBag size={30} /><span>Image unavailable</span></div>}
-      {expired ? <span className="phone-discount is-expired">Expired</span> : discount > 0 && <span className="phone-discount">{discount}% off MRP</span>}
+      {expired ? <span className="phone-discount is-expired">Expired</span> : deal.sellout_prediction?.urgency_label ? <span className="phone-discount is-urgent">{deal.sellout_prediction.urgency_label}</span> : discount > 0 && <span className="phone-discount">{discount}% off MRP</span>}
     </button>
     <div className="phone-card-body">
       <button type="button" className="phone-card-title" onClick={onDetails}>{title}</button>
       <div className="phone-price">{price > 0 ? money(price) : 'Check price'}{mrp && <s>{money(mrp)}</s>}</div>
       <p className="phone-card-note">{mrp && price > 0 ? `Save ${money(mrp - price)} vs MRP` : 'Confirm price at store'}</p>
-      {props.cardSavings != null && props.cardSavings > 0 && <p className="phone-card-note">Potential card saving {money(props.cardSavings)}</p>}
       <div className="phone-card-actions">
         <button type="button" className="phone-details" onClick={onDetails}>Details <ChevronRight size={15} /></button>
         <div className="phone-card-menu" ref={menuRef}>

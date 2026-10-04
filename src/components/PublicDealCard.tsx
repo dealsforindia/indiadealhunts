@@ -1,20 +1,19 @@
 import { useModalSurface } from '../utils/useModalSurface';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowUpRight, Bell, Bookmark, Check, Copy, CreditCard, Image, Layers, MoreHorizontal, Repeat2, ShoppingCart, X } from 'lucide-react';
+import { ArrowUpRight, Bell, Bookmark, Check, Copy, Image, Layers, MoreHorizontal, Repeat2, ShoppingCart, X } from 'lucide-react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { isDealSaved, toggleSavedDealId } from '../utils/savedDeals';
 import { shareToWhatsApp, shareToTelegram, copyDealLink } from '../utils/shareDeal';
-import { calculateBestCardSavings } from '../utils/cardSavings';
 import { playTactileClick, playSuccessChime } from '../utils/audio';
 import { extractAmazonAsin, buildAmazonCartUrl, buildMultiAsinCartUrl, generateSubId, openSmartStoreLink, getRecommendedBundle } from '../utils/affiliateEngine';
 import { TelegramIcon } from './TelegramIcon';
 interface PublicDealCardProps {
-  deal: PublicDeal; index?: number; isSaved?: boolean; isComparing?: boolean; activeCardIds?: string[];
+  deal: PublicDeal; index?: number; isSaved?: boolean; isComparing?: boolean; 
   onOpenImage?: (deal: PublicDeal) => void; onSelectDeal?: (deal: PublicDeal) => void;
   onToggleSave?: (deal: PublicDeal) => void; onToggleCompare?: (deal: PublicDeal) => void;
-  onOpenCardEmi?: (deal: PublicDeal) => void; onOpenPriceAlert?: (deal: PublicDeal) => void;
+  onOpenPriceAlert?: (deal: PublicDeal) => void;
   onOpenExchange?: (deal: PublicDeal) => void; onShowToast?: (msg: string) => void;
 }
 function relativeTime(timestamp?: number) {
@@ -23,7 +22,7 @@ function relativeTime(timestamp?: number) {
   return minutes < 1 ? 'Just added' : minutes < 60 ? `${minutes}m ago` : minutes < 1440 ? `${Math.floor(minutes / 60)}h ago` : `${Math.floor(minutes / 1440)}d ago`;
 }
 const money = (value: number) => `₹${value.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
-export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, isSaved: suppliedSaved, isComparing = false, activeCardIds, onOpenImage, onSelectDeal, onToggleSave, onToggleCompare, onOpenCardEmi, onOpenPriceAlert, onOpenExchange, onShowToast }) => {
+export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, isSaved: suppliedSaved, isComparing = false, onOpenImage, onSelectDeal, onToggleSave, onToggleCompare, onOpenPriceAlert, onOpenExchange, onShowToast }) => {
   const [imageFailed, setImageFailed] = useState(false);
   const [localSaved, setLocalSaved] = useState(() => isDealSaved(deal.id));
   const [menuOpen, setMenuOpen] = useState(false);
@@ -42,7 +41,6 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, isSaved: s
   const asin = /amazon/i.test(store) ? extractAmazonAsin(deal.url || deal.id) : null;
   const subId = generateSubId('card', deal.id);
   const bundle = asin ? getRecommendedBundle(deal.category, price) : null;
-  const cardSavings = useMemo(() => activeCardIds?.length ? calculateBestCardSavings(deal, activeCardIds) : null, [deal, activeCardIds]);
   useEffect(() => { setImageFailed(false); }, [photo]);
   function save() {
     playTactileClick();
@@ -56,6 +54,16 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, isSaved: s
     const url = includeBundle && bundle ? buildMultiAsinCartUrl(asin, bundle.asin, undefined, subId) : buildAmazonCartUrl(asin, undefined, subId);
     openSmartStoreLink(url, 'amazon', asin, true, subId);
   }
+  const handleViewDeal = () => {
+    const text = deal.original_text || deal.aff_text || '';
+    const couponMatch = text.match(/\b([A-Z0-9]{5,12})\b/g);
+    const possibleCoupon = couponMatch ? couponMatch.find(c => c.length >= 5 && !/^\d+$/.test(c) && !['HTTP', 'HTTPS', 'PRICE', 'DISCOUNT'].includes(c)) : null;
+    if (possibleCoupon && navigator.clipboard) {
+      navigator.clipboard.writeText(possibleCoupon).catch(() => {});
+      if (onShowToast) onShowToast(`Copied '${possibleCoupon}' to clipboard! Paste at checkout.`);
+    }
+    openSmartStoreLink(deal.url, store, asin || undefined, false, subId);
+  };
   return <article className={`commerce-card${expired ? ' is-expired' : ''}${isComparing ? ' is-comparing' : ''}`}>
     <div className="commerce-card-photo">
       <button type="button" className="commerce-photo-button" onClick={details} aria-label={`View details for ${title}`}>
@@ -63,13 +71,13 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, isSaved: s
       </button>
       <span className={`commerce-store commerce-store-${store.toLowerCase().replace(/[^a-z]/g, '')}`}>{store}</span>
       <button type="button" className={`commerce-card-save${saved ? ' is-saved' : ''}`} aria-label={`${saved ? 'Unsave' : 'Save'} ${title}`} aria-pressed={saved} onClick={save}><Bookmark size={18} fill={saved ? 'currentColor' : 'none'} /></button>
-      {expired ? <span className="commerce-discount">Ended</span> : discount != null && discount > 0 && <span className="commerce-discount">{discount}% below MRP</span>}
+      {expired ? <span className="commerce-discount">Ended</span> : deal.sellout_prediction?.urgency_label ? <span className="commerce-discount is-urgent">{deal.sellout_prediction.urgency_label}</span> : discount != null && discount > 0 && <span className="commerce-discount">{discount}% below MRP</span>}
     </div>
     <div className="commerce-card-body">
       <button type="button" className="commerce-card-title" onClick={details}>{title}</button>
       <div className="commerce-card-price"><strong>{price > 0 ? money(price) : 'Check price'}</strong>{mrp && <s>{money(mrp)}</s>}</div>
       <p className="commerce-card-note">{expired ? 'This offer has ended' : mrp ? `${money(mrp - price)} less than listed MRP` : 'Confirm current price at store'}</p>
-      <div className="commerce-card-actions"><button type="button" className="commerce-store-button" onClick={() => openSmartStoreLink(deal.url, store, asin || undefined, false, subId)} disabled={expired || !deal.url}><span>View at {store}</span><ArrowUpRight size={16} /></button><button ref={trigger} type="button" className="commerce-card-more" aria-label={`More options for ${title}`} aria-haspopup="dialog" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}><MoreHorizontal size={20} /></button></div>
+      <div className="commerce-card-actions"><button type="button" className="commerce-store-button" onClick={handleViewDeal} disabled={expired || !deal.url}><span>View at {store}</span><ArrowUpRight size={16} /></button><button ref={trigger} type="button" className="commerce-card-more" aria-label={`More options for ${title}`} aria-haspopup="dialog" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}><MoreHorizontal size={20} /></button></div>
       <div className="commerce-card-meta"><span>Listed {relativeTime(deal.display_ts || deal.posted_at)}</span><button type="button" onClick={details}>Details <span aria-hidden="true">↗</span></button></div>
     </div>
     {menuOpen && createPortal(<div className="commerce-sheet-backdrop" onClick={() => setMenuOpen(false)}><div ref={sheet} className="commerce-product-sheet" role="dialog" aria-modal="true" aria-label={`Shopping options for ${title}`} onClick={event => event.stopPropagation()}>
@@ -79,13 +87,11 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, isSaved: s
         <button type="button" onClick={() => action(details)}><Layers size={19} /><span>Details & price evidence</span><ArrowUpRight size={16} /></button>
         {onToggleCompare && <button type="button" onClick={() => action(() => onToggleCompare(deal))}>{isComparing ? <Check size={19} /> : <Layers size={19} />}<span>{isComparing ? 'Remove from comparison' : 'Add to comparison'}</span></button>}
         {onOpenPriceAlert && <button type="button" onClick={() => action(() => onOpenPriceAlert(deal))}><Bell size={19} /><span>Set a price alert</span></button>}
-        {onOpenCardEmi && <button type="button" onClick={() => action(() => onOpenCardEmi(deal))}><CreditCard size={19} /><span>Card offers & EMI</span></button>}
         {onOpenExchange && <button type="button" onClick={() => action(() => onOpenExchange(deal))}><Repeat2 size={19} /><span>Exchange calculator</span></button>}
         {onOpenImage && <button type="button" onClick={() => action(() => onOpenImage(deal))}><Image size={19} /><span>View product photo</span></button>}
         {asin && !expired && <button type="button" onClick={() => action(cart)}><ShoppingCart size={19} /><span>Open Amazon cart{includeBundle ? ' with add-on' : ''}</span><ArrowUpRight size={16} /></button>}
       </div>
       {bundle && <label className="commerce-bundle"><input type="checkbox" checked={includeBundle} onChange={event => setIncludeBundle(event.target.checked)} /><span>Optional add-on: {bundle.name}<small>Estimate {money(bundle.price)} · confirm final price at Amazon</small></span></label>}
-      {cardSavings && <p className="commerce-cashback">Estimated {money(cardSavings.cashbackAmount)} cashback with {cardSavings.cardName}. Check eligibility and bank terms.</p>}
       <div className="commerce-share-row"><button type="button" onClick={() => action(() => shareToWhatsApp(deal))}>WhatsApp</button><button type="button" onClick={() => action(() => shareToTelegram(deal))}><TelegramIcon width={17} height={17} />Telegram</button><button type="button" onClick={() => action(() => { copyDealLink(deal); onShowToast?.('Deal link copied'); })}><Copy size={16} />Copy link</button></div>
     </div></div>, document.body)}
   </article>;

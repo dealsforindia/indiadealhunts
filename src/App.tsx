@@ -25,10 +25,8 @@ import { MarqueeTicker } from './components/MarqueeTicker';
 import { HowDealsWorkModal } from './components/HowDealsWorkModal';
 import { CategoryStories } from './components/CategoryStories';
 import { CommandPalette } from './components/CommandPalette';
-import { CardCalculatorModal } from './components/CardCalculatorModal';
 import { CompareDrawer } from './components/CompareDrawer';
 import { ProductSpecCompareModal } from './components/ProductSpecCompareModal';
-import { CardEmiSimulatorModal } from './components/CardEmiSimulatorModal';
 import { PriceDropAlertModal } from './components/PriceDropAlertModal';
 import { PhoneExchangeEstimatorModal } from './components/PhoneExchangeEstimatorModal';
 import type { ToolId } from './components/tools/ToolsHubModal';
@@ -44,7 +42,6 @@ import type { PublicDeal, PublicDealsResponse, SortOption, NavTab } from './type
 import { calculateWorthScore } from './utils/worthScore';
 import { searchDealsClient } from './utils/semanticSearch';
 import { getSavedDealIds, toggleSavedDealId, subscribeSavedDeals, clearAllSavedDealIds } from './utils/savedDeals';
-import { getSavedCards } from './utils/cardSavings';
 import { isAudioEnabled, setAudioEnabled, playTactileClick } from './utils/audio';
 import { useTheme } from './utils/themeManager';
 
@@ -177,7 +174,6 @@ export const App: React.FC = () => {
   const [selectedDetailDeal, setSelectedDetailDeal] = useState<PublicDeal | null>(null);
   const [selectedPhotoDeal, setSelectedPhotoDeal] = useState<PublicDeal | null>(null);
   const [activeFeatureDeal, setActiveFeatureDeal] = useState<PublicDeal | null>(null);
-  const [isCardEmiOpen, setIsCardEmiOpen] = useState<boolean>(false);
   const [isPriceAlertOpen, setIsPriceAlertOpen] = useState<boolean>(false);
   const [isTradeInOpen, setIsTradeInOpen] = useState<boolean>(false);
   const [isLookupOpen, setIsLookupOpen] = useState<boolean>(false);
@@ -185,14 +181,12 @@ export const App: React.FC = () => {
   const [isSubmitOpen, setIsSubmitOpen] = useState<boolean>(false);
   const [activeLegal, setActiveLegal] = useState<LegalDocType>(null);
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState<boolean>(false);
-  const [isCardsModalOpen, setIsCardsModalOpen] = useState<boolean>(false);
   const [isToolsHubOpen, setIsToolsHubOpen] = useState<boolean>(false);
   const [activeToolId, setActiveToolId] = useState<ToolId>('gst');
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState<boolean>(false);
   const [isSpecCompareOpen, setIsSpecCompareOpen] = useState(false);
   const [compareDeals, setCompareDeals] = useState<PublicDeal[]>([]);
-  const [activeCardIds, setActiveCardIds] = useState<string[]>(() => getSavedCards());
   const [isAudioActive, setIsAudioActive] = useState<boolean>(() => isAudioEnabled());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -603,7 +597,6 @@ export const App: React.FC = () => {
         onOpenSubmit={() => { setIsSubmitOpen(true); setActiveTab('submit_deal'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
         onFocusSearch={handleFocusSearch}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-        onOpenCardsModal={() => setIsCardsModalOpen(true)}
         onOpenToolsHub={() => handleOpenToolsHub()}
         isAudioEnabled={isAudioActive}
         onToggleAudio={handleToggleAudio}
@@ -976,16 +969,11 @@ export const App: React.FC = () => {
                         index={idx}
                         isSaved={savedDealIds.includes(deal.id)}
                         isComparing={compareDeals.some((d) => d.id === deal.id)}
-                        activeCardIds={activeCardIds}
                         onToggleSave={handleToggleSaveDeal}
                         onToggleCompare={handleToggleCompare}
                         onShowToast={showToast}
                         onSelectDeal={(d) => setSelectedDetailDeal(d)}
                         onOpenImage={setSelectedPhotoDeal}
-                        onOpenCardEmi={(d) => {
-                          setActiveFeatureDeal(d);
-                          setIsCardEmiOpen(true);
-                        }}
                         onOpenPriceAlert={(d) => {
                           setActiveFeatureDeal(d);
                           setIsPriceAlertOpen(true);
@@ -1097,15 +1085,7 @@ export const App: React.FC = () => {
         }}
       />
 
-      {/* ── Credit Card Savings Calculator Modal ── */}
-      <CardCalculatorModal
-        isOpen={isCardsModalOpen}
-        onClose={() => setIsCardsModalOpen(false)}
-        onCardsUpdated={(cards) => {
-          setActiveCardIds(cards);
-          showToast('Credit card preferences updated!');
-        }}
-      />
+      
 
       {/* ── Apple Spotlight / Command Palette ── */}
       <CommandPalette
@@ -1140,12 +1120,7 @@ export const App: React.FC = () => {
         onClearAll={handleClearCompareAll}
       />
 
-      {/* ── Bank Cards & EMI Simulator Modal (HDFC, ICICI, SBI, Axis, Amazon Pay + No-Cost EMI) ── */}
-      <CardEmiSimulatorModal
-        isOpen={isCardEmiOpen}
-        onClose={() => setIsCardEmiOpen(false)}
-        deal={activeFeatureDeal}
-      />
+      
 
       {/* ── Target Price Drop Alert Modal (Wired to MongoDB PriceAlerts) ── */}
       <PriceDropAlertModal

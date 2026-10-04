@@ -102,14 +102,21 @@ export const LiveDropNotification: React.FC<LiveDropNotificationProps> = ({
           >
             View Loot Details
           </button>
-          <a
-            href={deal.url}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={() => {
+              const text = deal.original_text || deal.aff_text || '';
+              const couponMatch = text.match(/\b([A-Z0-9]{5,12})\b/g);
+              const possibleCoupon = couponMatch ? couponMatch.find(c => c.length >= 5 && !/^\d+$/.test(c) && !['HTTP', 'HTTPS', 'PRICE', 'DISCOUNT'].includes(c)) : null;
+              if (possibleCoupon && navigator.clipboard) {
+                navigator.clipboard.writeText(possibleCoupon).catch(() => {});
+              }
+              window.open(`https://api.rudranil.me/r/${deal.fp_hash || deal.id}`, '_blank', 'noopener,noreferrer');
+              onClose();
+            }}
             className="py-1.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition-colors text-center"
           >
             Open Store ↗
-          </a>
+          </button>
         </div>
       </motion.div>
     </AnimatePresence>

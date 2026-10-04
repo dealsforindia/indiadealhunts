@@ -71,6 +71,13 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
 
   const handleOpenStore = () => {
     if (!deal) return;
+    const text = deal.original_text || deal.aff_text || '';
+    const couponMatch = text.match(/\b([A-Z0-9]{5,12})\b/g);
+    const possibleCoupon = couponMatch ? couponMatch.find(c => c.length >= 5 && !/^\d+$/.test(c) && !['HTTP', 'HTTPS', 'PRICE', 'DISCOUNT'].includes(c)) : null;
+    if (possibleCoupon && navigator.clipboard) {
+      navigator.clipboard.writeText(possibleCoupon).catch(() => {});
+      if (onShowToast) onShowToast(`Copied '${possibleCoupon}' to clipboard!`);
+    }
     openSmartStoreLink(deal.url, deal.store || 'Store', asin || undefined, false, subId);
   };
   const isMobile = useIsMobile();

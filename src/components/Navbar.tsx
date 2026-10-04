@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Bookmark, ChevronDown, CreditCard, Heart, Menu, Plus, Search, SlidersHorizontal, TrendingDown, Volume2, VolumeX, X } from 'lucide-react';
+import { Bookmark, ChevronDown, Heart, Menu, Plus, Search, SlidersHorizontal, TrendingDown, Volume2, VolumeX, X } from 'lucide-react';
 import { NavTab } from '../types';
 import { BrandMark } from './BrandMark';
 import { ThemeToggle } from './ThemeToggle';
@@ -7,10 +7,10 @@ import { TelegramIcon } from './TelegramIcon';
 interface NavbarProps {
   activeTab: NavTab; onTabChange: (tab: NavTab) => void; onSelectCategory?: (category: string) => void;
   onOpenLookup: () => void; onOpenSubmit: () => void; onFocusSearch?: () => void;
-  onOpenCardsModal?: () => void; onOpenToolsHub?: () => void; onOpenCommandPalette?: () => void;
+  onOpenToolsHub?: () => void; onOpenCommandPalette?: () => void;
   isAudioEnabled?: boolean; onToggleAudio?: () => void; savedCount?: number;
 }
-export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, onSelectCategory, onOpenLookup, onOpenSubmit, onFocusSearch, onOpenCardsModal, onOpenToolsHub, onOpenCommandPalette, isAudioEnabled = true, onToggleAudio, savedCount = 0 }) => {
+export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, onSelectCategory, onOpenLookup, onOpenSubmit, onFocusSearch, onOpenToolsHub, onOpenCommandPalette, isAudioEnabled = true, onToggleAudio, savedCount = 0 }) => {
   const [open, setOpen] = useState(false);
   const container = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -40,7 +40,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, onSelect
             <button type="button" onClick={() => go('best_worth')}><TrendingDown size={18} />Worth score</button>
             <button type="button" onClick={() => go('wall_of_happiness')}><Heart size={18} />Wall of happiness</button>
             <button type="button" onClick={() => run(onOpenLookup)}><Search size={18} />Price lookup</button>
-            {onOpenCardsModal && <button type="button" onClick={() => run(onOpenCardsModal)}><CreditCard size={18} />My cards & cashback</button>}
             {onOpenToolsHub && <button type="button" onClick={() => run(onOpenToolsHub)}><SlidersHorizontal size={18} />Shopping tools</button>}
             <button type="button" onClick={() => run(onOpenSubmit)}><Plus size={18} />Submit a deal</button>
             {onToggleAudio && <button type="button" aria-pressed={isAudioEnabled} onClick={onToggleAudio}>{isAudioEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}Sounds <small>{isAudioEnabled ? 'On' : 'Off'}</small></button>}

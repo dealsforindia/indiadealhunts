@@ -1,4 +1,7 @@
 export interface PublicDeal {
+  fp_hash?: string | null;
+  original_text?: string | null;
+  aff_text?: string | null;
   id: string;
   title: string;
   price: number | null;
@@ -53,6 +56,32 @@ export interface PublicDeal {
     winnerStore: string;
     savingsVsOthers: number;
     stores: Array<{ store: string; price: number; inStock: boolean; url?: string }>;
+  } | null;
+  sellout_prediction?: {
+    predicted_remaining_hours: number;
+    survival_probability: number;
+    urgency_level: 'critical' | 'high' | 'moderate' | 'low';
+    urgency_label: string;
+    hazard_rate: number;
+    confidence: number;
+    discount_band: string;
+    hours_alive: number;
+    clicks_per_hour: number;
+  } | null;
+  consensus?: {
+    channels_spotted: number;
+    consensus_velocity: number;
+    is_viral: boolean;
+    viral_label: string | null;
+  } | null;
+  price_position?: {
+    percentile: number;
+    is_all_time_low: boolean;
+    vs_average: number;
+    lowest_ever: number | null;
+    highest_ever: number | null;
+    avg_price: number | null;
+    price_label: string;
   } | null;
 }
 
