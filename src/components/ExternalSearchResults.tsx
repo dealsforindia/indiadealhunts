@@ -22,6 +22,8 @@ export interface ExternalSearchDeal extends IntelligenceOffer {
   is_lowest_price?: boolean;
   affiliate_applied?: boolean;
   source_type?: string;
+  history_badge?: string;
+  verdict?: string;
 }
 
 interface ExternalSearchResultsProps {
@@ -67,7 +69,7 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
   }, [deals]);
 
   const filteredDeals = useMemo(() => {
-    if (storeFilter === 'lowest') return deals.filter((d) => d.is_lowest_price || (minPriceDeal && d.id === minPriceDeal.id));
+    if (storeFilter === 'lowest') return deals.filter((d) => minPriceDeal && d.id === minPriceDeal.id);
     if (storeFilter === 'flipkart') return deals.filter((d) => d.store?.toLowerCase().includes('flipkart'));
     if (storeFilter === 'amazon') return deals.filter((d) => d.store?.toLowerCase().includes('amazon'));
     if (storeFilter === 'other') return deals.filter((d) => !d.store?.toLowerCase().includes('flipkart') && !d.store?.toLowerCase().includes('amazon'));
@@ -155,9 +157,9 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                       openSmartStoreLink(cartUrl, 'amazon', asin, true, subId);
                     }}
                     className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 px-3.5 py-2.5 text-xs font-bold text-white transition shadow-sm hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                    title="Locks this lowest price in your Amazon Cart for up to 90 days"
+                    title="Add to Amazon cart; confirm the final price there"
                   >
-                    🛒 Lock in Cart (90d)
+                    🛒 Add to Amazon cart
                   </button>
                 )}
                 <button
@@ -179,7 +181,7 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
           <div className="flex flex-wrap items-center gap-2">
             {[
               { key: 'all', label: `All Offers (${deals.length})`, cls: 'bg-slate-900 text-white', inactiveCls: 'border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-[#070A11]' },
-              { key: 'lowest', label: '🏆 Lowest Price Only', cls: 'bg-emerald-600 text-white', inactiveCls: 'border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100' },
+              { key: 'lowest', label: '🏆 Lowest Listed Price', cls: 'bg-emerald-600 text-white', inactiveCls: 'border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100' },
             ].map(({ key, label, cls, inactiveCls }) => (
               <button
                 key={key}
@@ -258,7 +260,7 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
         <div className="mt-5 space-y-3">
           <div className="flex items-center justify-center gap-2 py-4 text-xs font-bold text-slate-500">
             <span className="h-3 w-3 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
-            Scanning Verified Telegram Drops, Google Shopping, Amazon &amp; Flipkart live...
+            Requesting available directory and external shopping results...
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -297,7 +299,7 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
             </thead>
             <tbody>
               {filteredDeals.map((deal, idx) => {
-                const isLowest = Boolean(deal.is_lowest_price || (minPriceDeal && deal.id === minPriceDeal.id));
+                const isLowest = Boolean(minPriceDeal && deal.id === minPriceDeal.id);
                 const colors = sc(deal.store || '');
                 return (
                   <tr
@@ -325,15 +327,20 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                           <div className="mt-0.5 flex items-center gap-1.5">
                             {isLowest && (
                               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-black text-emerald-700">
-                                🏆 LOWEST PRICE
+                                LOWEST LISTED
                               </span>
                             )}
                             {deal.source_type === 'database_verified' && (
                               <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-1.5 py-0.5 text-[10px] font-bold text-indigo-700 border border-indigo-100">
-                                ✓ Verified Loot Drop
+                                Directory offer
                               </span>
                             )}
                           </div>
+                          {deal.verdict && (
+                            <p className="mt-1 text-[10px] leading-tight text-slate-500 max-w-xs">
+                              {deal.verdict}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -378,9 +385,9 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                                     openSmartStoreLink(cartUrl, 'amazon', asin, true, subId);
                                   }}
                                   className="rounded-lg px-2.5 py-1 text-[10px] font-bold text-white bg-amber-500 hover:bg-amber-600 transition shadow-2xs cursor-pointer"
-                                  title="Locks in Amazon cart for 90 days"
+                                  title="Add to Amazon cart; confirm the final price there"
                                 >
-                                  🛒 Lock Cart (90d)
+                                  🛒 Add to Amazon cart
                                 </button>
                               ) : null}
                               <button
@@ -416,7 +423,7 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
         /* Product Cards Grid View */
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {filteredDeals.map((deal) => {
-            const isLowest = Boolean(deal.is_lowest_price || (minPriceDeal && deal.id === minPriceDeal.id));
+            const isLowest = Boolean(minPriceDeal && deal.id === minPriceDeal.id);
             const colors = sc(deal.store || '');
             return (
               <article
@@ -444,7 +451,7 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                     )}
                     {isLowest ? (
                       <span className="absolute left-2 top-2 rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-black text-white shadow-xs">
-                        🏆 LOWEST
+                        LOWEST LISTED
                       </span>
                     ) : deal.discount_pct && deal.discount_pct > 0 ? (
                       <span className="absolute left-2 top-2 rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-black text-white shadow-xs">
@@ -464,6 +471,11 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                     <h3 className="line-clamp-2 min-h-9 text-xs font-bold leading-snug text-slate-900 dark:text-[#F1F5F9]" title={deal.title}>
                       {deal.title}
                     </h3>
+                    {deal.history_badge && (
+                      <p className="mt-1 text-[10px] font-medium text-slate-500 truncate" title={deal.verdict}>
+                        {deal.history_badge}
+                      </p>
+                    )}
                     <div className="mt-2 flex items-baseline gap-2">
                       <span className={`text-base font-black ${isLowest ? 'text-emerald-700' : 'text-slate-900 dark:text-[#F1F5F9]'}`}>
                         {money(deal.price)}
@@ -501,9 +513,9 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                               openSmartStoreLink(cartUrl, 'amazon', asin, true, subId);
                             }}
                             className="flex-1 rounded-xl bg-amber-500 hover:bg-amber-600 py-2 text-center text-[11px] font-bold text-white transition shadow-xs cursor-pointer"
-                            title="Locks deal in your Amazon cart for 90 days"
+                            title="Add to Amazon cart; confirm the final price there"
                           >
-                            🛒 Lock Cart (90d)
+                            🛒 Add to Amazon cart
                           </button>
                           <button
                             type="button"

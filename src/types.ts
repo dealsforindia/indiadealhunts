@@ -226,6 +226,8 @@ export interface TickerResponse {
 }
 
 export interface CategoryStoryItem {
+  is_expired?: boolean;
+  is_over?: boolean;
   id: string;
   title: string;
   price: number;

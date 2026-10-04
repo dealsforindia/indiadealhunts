@@ -1,3 +1,4 @@
+import { useModalSurface } from '../utils/useModalSurface';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PublicDeal } from '../types';
@@ -74,29 +75,23 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
   const [selectedCardId, setSelectedCardId] = useState<string>('hdfc_cc');
   const [emiTenure, setEmiTenure] = useState<number>(3); // 3, 6, 9, 12 months
 
+  const [instantDiscount, setInstantDiscount] = useState('0');
+  const [annualRate, setAnnualRate] = useState('0');
+  const [processingFee, setProcessingFee] = useState('0');
+  const modalSurface = useModalSurface(isOpen && !!deal, onClose);
   if (!isOpen || !deal) return null;
 
   const card = BANK_CARDS.find((c) => c.id === selectedCardId) || BANK_CARDS[0];
 
-  // Calculate card discount
-  let cardDiscount = 0;
-  if (!card.minPurchase || deal.price >= card.minPurchase) {
-    if (card.discountType === 'flat') {
-      cardDiscount = card.value;
-    } else {
-      const pctVal = Math.round(deal.price * (card.value / 100));
-      cardDiscount = card.maxDiscount ? Math.min(pctVal, card.maxDiscount) : pctVal;
-    }
-  }
-
-  const priceAfterCard = Math.max(0, deal.price - cardDiscount);
-
-  // EMI calculation (Assuming standard No-Cost EMI discount absorbs interest)
-  const monthlyEmi = Math.round(priceAfterCard / emiTenure);
-
+  const price = Number(deal.price) || 0;
+  const cardDiscount = Math.min(price, Math.max(0, Number(instantDiscount) || 0));
+  const priceAfterCard = Math.max(0, price - cardDiscount);
+  const rate = Math.max(0, Number(annualRate) || 0) / 1200;
+  const fee = Math.max(0, Number(processingFee) || 0);
+  const monthlyEmi = rate ? priceAfterCard * rate * (1 + rate) ** emiTenure / ((1 + rate) ** emiTenure - 1) : priceAfterCard / emiTenure;
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
+      <div ref={modalSurface} role="dialog" aria-modal="true" aria-label="Card and EMI planner" className="shopper-tool-modal fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -114,7 +109,7 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
                   Bank Card & EMI Simulator
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Real-time net effective price after bank offers & no-cost EMI
+                  Scenario using terms you enter. Bank eligibility must be confirmed.
                 </p>
               </div>
             </div>
@@ -122,7 +117,7 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#1E293B]/60 dark:bg-[#172440]/60 transition-colors cursor-pointer"
+              aria-label="Close dialog" className="w-11 h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#1E293B]/60 dark:bg-[#172440]/60 transition-colors cursor-pointer"
             >
               ✕
             </button>
@@ -174,18 +169,24 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
                       }`}
                     >
                       <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9]">{c.name}</span>
-                      <span className="text-[11px] font-semibold text-emerald-700 mt-1">{c.badge}</span>
+                      <span className="text-[11px] font-semibold text-emerald-700 mt-1">Enter confirmed offer terms</span>
                     </button>
                   );
                 })}
               </div>
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <label className="commerce-filter-field">Confirmed instant discount (₹)<input type="number" min="0" value={instantDiscount} onChange={event => setInstantDiscount(event.target.value)} /></label>
+              <label className="commerce-filter-field">Annual interest (%)<input type="number" min="0" step="0.1" value={annualRate} onChange={event => setAnnualRate(event.target.value)} /></label>
+              <label className="commerce-filter-field">Processing fee (₹)<input type="number" min="0" value={processingFee} onChange={event => setProcessingFee(event.target.value)} /></label>
+            </div>
+            <p className="text-xs text-slate-500">Scenario assumes {annualRate || '0'}% annual interest and ₹{processingFee || '0'} processing fees. Estimated total repayments: ₹{(monthlyEmi * emiTenure + fee).toLocaleString('en-IN', { maximumFractionDigits: 2 })}. Delivery, tax on finance charges and later cashback are not included.</p>
             {/* No-Cost EMI Tenure (Only applicable for purchases >= ₹3,000 per Indian banking rules) */}
-            {deal.price >= 3000 ? (
+            {true ? (
               <div>
                 <label className="block text-xs font-mono uppercase text-slate-400 font-semibold mb-2">
-                  2. Choose No-Cost EMI Tenure
+                  2. Choose a repayment scenario
                 </label>
                 <div className="grid grid-cols-4 gap-2">
                   {[3, 6, 9, 12].map((months) => (
@@ -211,7 +212,7 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
                 <div className="text-xs">
                   <p className="font-bold">No-Cost EMI threshold: Min. ₹3,000</p>
                   <p className="text-[11px] text-amber-800 mt-0.5">
-                    Per Indian banking guidelines, credit card EMI is enabled for cart values of ₹3,000+. For this item, upfront 5% cashback or flat card discounts apply directly!
+Available repayment terms depend on the merchant and bank. No bank offer is assumed.
                   </p>
                 </div>
               </div>
@@ -224,12 +225,12 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
                 <span>₹{deal.price.toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between text-xs font-semibold text-emerald-700">
-                <span>Card Instant Discount ({card.bank}):</span>
+                <span>Entered instant discount ({card.bank}):</span>
                 <span>-₹{cardDiscount.toLocaleString('en-IN')}</span>
               </div>
               <div className="pt-2 border-t border-emerald-200/60 flex items-baseline justify-between">
                 <div>
-                  <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] block">Final Net Price:</span>
+                  <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] block">Scenario principal:</span>
                   <span className="text-[11px] text-slate-500">
                     {deal.price >= 3000 ? `Payable in ${emiTenure} installments` : 'Single payment with instant savings'}
                   </span>
@@ -238,7 +239,7 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
                   <span className="text-2xl font-black text-emerald-800">
                     ₹{priceAfterCard.toLocaleString('en-IN')}
                   </span>
-                  {deal.price >= 3000 ? (
+                  {true ? (
                     <span className="block text-xs font-bold text-slate-600 dark:text-slate-400">
                       Just ₹{monthlyEmi.toLocaleString('en-IN')} / month
                     </span>
@@ -258,7 +259,7 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
               rel="noopener noreferrer"
               className="w-full py-3.5 px-6 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm tracking-wide shadow-md transition-all flex items-center justify-center gap-2 text-center"
             >
-              <span>Apply Offer on {deal.store || 'Store'}</span>
+              <span>Check terms at {deal.store || 'Store'}</span>
               <span>→</span>
             </a>
           </div>
@@ -267,3 +268,6 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
     </AnimatePresence>
   );
 };
+
+
+

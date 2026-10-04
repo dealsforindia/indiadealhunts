@@ -1,8 +1,8 @@
 import { PublicDeal } from '../types';
+import { publicShareUrl } from './publicLinks';
 
 /**
- * DealFlow 1-Click WhatsApp & Telegram Share Utility
- * Formats rich deal summaries with verified badges and affiliate links
+ * Formats source-reported offer summaries and public storefront links.
  */
 
 export function formatDealShareText(deal: PublicDeal): string {
@@ -10,9 +10,10 @@ export function formatDealShareText(deal: PublicDeal): string {
   const mrp = deal.mrp && deal.price && deal.mrp > deal.price ? ` (MRP: ₹${deal.mrp.toLocaleString('en-IN')})` : '';
   const discount = deal.discount_pct ? `\n🏷️ *Discount:* ${deal.discount_pct}% OFF` : '';
   const savings = deal.mrp && deal.price && deal.mrp > deal.price ? ` (Save ₹${(deal.mrp - deal.price).toLocaleString('en-IN')})` : '';
-  const store = deal.store || 'Verified Store';
+  const store = deal.store || 'Store';
+  const shareUrl = publicShareUrl(deal.url);
 
-  return `🔥 *VERIFIED LOOT DROP* 🔥\n\n🛍️ *${deal.title}*\n\n💰 *Price:* ${price}${mrp}${discount}${savings}\n🏪 *Store:* ${store}\n\n⚡ *Grab Deal Here:* ${deal.url}\n\n🛡️ Verified genuine by IndiaDealHunts`;
+  return `*IndiaDealHunts find*\n\n${deal.title}\n\nListed price: ${price}${mrp}${discount}${savings}\nStore: ${store}\n\nView offer: ${shareUrl}\n\nConfirm price, stock and offer eligibility at checkout. MRP is a reference price.`;
 }
 
 export function shareToWhatsApp(deal: PublicDeal): void {
@@ -36,7 +37,7 @@ export function shareToWhatsApp(deal: PublicDeal): void {
 export function shareToTelegram(deal: PublicDeal): void {
   const text = formatDealShareText(deal);
   const encodedText = encodeURIComponent(text);
-  const encodedUrl = encodeURIComponent(deal.url);
+  const encodedUrl = encodeURIComponent(publicShareUrl(deal.url));
   const url = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
   
   try {
@@ -54,13 +55,15 @@ export function shareToTelegram(deal: PublicDeal): void {
 
 export async function copyDealLink(deal: PublicDeal): Promise<boolean> {
   try {
+    const link = publicShareUrl(deal.url);
+    if (!link) return false;
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      await navigator.clipboard.writeText(deal.url);
+      await navigator.clipboard.writeText(link);
       return true;
     }
     // Fallback for older browsers
     const input = document.createElement('textarea');
-    input.value = deal.url;
+    input.value = link;
     document.body.appendChild(input);
     input.select();
     document.execCommand('copy');

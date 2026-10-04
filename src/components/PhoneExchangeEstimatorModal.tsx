@@ -1,3 +1,4 @@
+import { useModalSurface } from '../utils/useModalSurface';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PublicDeal } from '../types';
@@ -44,20 +45,23 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
   const [selectedModel, setSelectedModel] = useState<string>(POPULAR_OLD_PHONES[1].name);
   const [selectedCondition, setSelectedCondition] = useState<string>('good');
 
+  const [tradeQuote, setTradeQuote] = useState('0');
+  const [bonusQuote, setBonusQuote] = useState('0');
+  const modalSurface = useModalSurface(isOpen && !!deal, onClose);
   if (!isOpen || !deal) return null;
 
   const modelObj = POPULAR_OLD_PHONES.find((m) => m.name === selectedModel) || POPULAR_OLD_PHONES[1];
   const condObj = CONDITIONS.find((c) => c.id === selectedCondition) || CONDITIONS[1];
 
-  const exchangeBaseValue = Math.round(modelObj.baseValue * condObj.multiplier);
+  const exchangeBaseValue = Math.max(0, Number(tradeQuote) || 0);
   // Special Exchange bonus if deal is flagship (> ₹20k)
-  const exchangeBonus = deal.price >= 20000 ? 2500 : 1000;
+  const exchangeBonus = Math.max(0, Number(bonusQuote) || 0);
   const totalExchangeSavings = exchangeBaseValue + exchangeBonus;
   const netUpgradePrice = Math.max(0, deal.price - totalExchangeSavings);
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
+      <div ref={modalSurface} role="dialog" aria-modal="true" aria-label="Exchange cost planner" className="shopper-tool-modal fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -83,7 +87,7 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
             <button
               type="button"
               onClick={onClose}
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#1E293B]/60 dark:bg-[#172440]/60 transition-colors cursor-pointer"
+              aria-label="Close dialog" className="w-11 h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#1E293B]/60 dark:bg-[#172440]/60 transition-colors cursor-pointer"
             >
               ✕
             </button>
@@ -118,7 +122,7 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
               >
                 {POPULAR_OLD_PHONES.map((m) => (
                   <option key={m.name} value={m.name}>
-                    {m.name} (Max Value: ₹{m.baseValue.toLocaleString('en-IN')})
+                    {m.name} 
                   </option>
                 ))}
               </select>
@@ -151,6 +155,11 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
               </div>
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label className="commerce-filter-field">Confirmed trade-in value (₹)<input type="number" min="0" value={tradeQuote} onChange={event => setTradeQuote(event.target.value)} /></label>
+              <label className="commerce-filter-field">Confirmed exchange bonus (₹)<input type="number" min="0" value={bonusQuote} onChange={event => setBonusQuote(event.target.value)} /></label>
+            </div>
+            <p className="text-xs text-slate-500">Enter a quote obtained from your merchant. Selecting a model or condition does not create a quote. Eligibility, inspection and final value depend on the merchant.</p>
             {/* Price Upgrade Summary */}
             <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50 via-purple-50/40 to-white border border-indigo-200 shadow-xs space-y-2">
               <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400">
@@ -158,16 +167,16 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
                 <span>₹{deal.price.toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between text-xs font-semibold text-indigo-700">
-                <span>Device Residual Trade-in Value:</span>
+                <span>Entered trade-in quote:</span>
                 <span>-₹{exchangeBaseValue.toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between text-xs font-semibold text-emerald-700">
-                <span>Festive Upgrade Bonus:</span>
+                <span>Entered exchange bonus:</span>
                 <span>-₹{exchangeBonus.toLocaleString('en-IN')}</span>
               </div>
               <div className="pt-2 border-t border-indigo-200 flex items-baseline justify-between">
                 <div>
-                  <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] block">Net Upgrade Cost:</span>
+                  <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] block">Scenario upgrade cost:</span>
                   <span className="text-[11px] text-slate-500">You save ₹{totalExchangeSavings.toLocaleString('en-IN')} total</span>
                 </div>
                 <div className="text-right">
@@ -185,7 +194,7 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
               rel="noopener noreferrer"
               className="w-full py-3.5 px-6 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm tracking-wide shadow-md transition-all flex items-center justify-center gap-2 text-center"
             >
-              <span>Exchange & Buy on {deal.store || 'Store'}</span>
+              <span>Check exchange terms at {deal.store || 'Store'}</span>
               <span>→</span>
             </a>
           </div>
@@ -194,3 +203,6 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
     </AnimatePresence>
   );
 };
+
+
+

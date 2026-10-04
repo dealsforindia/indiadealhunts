@@ -13,11 +13,13 @@ export function getCleanImageUrl(url?: string | null): string {
     clean = clean.replace(/https?:\/\/74\.225\.250\.0(?::\d+)?/g, 'https://api.rudranil.me');
   }
 
+  // Serve backend images through the public site's origin.
+  clean = clean.replace(/^https?:\/\/api\.rudranil\.me\/images\//i, '/deal-images/');
   // Handle bare relative image paths like /images/abc.jpg or images/abc.jpg
   if (clean.startsWith('/images/')) {
-    clean = `https://api.rudranil.me${clean}`;
+    clean = clean.replace('/images/', '/deal-images/');
   } else if (clean.startsWith('images/')) {
-    clean = `https://api.rudranil.me/${clean}`;
+    clean = `/deal-${clean}`;
   }
 
   // Force HTTPS if protocol is HTTP for our API domain

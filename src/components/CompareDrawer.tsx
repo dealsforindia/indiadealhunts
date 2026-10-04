@@ -95,8 +95,8 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
       </motion.div>
 
       {/* ── Full Comparison Modal Table ── */}
-      <AnimatePresence>
-        {isOpen && createPortal(
+      {createPortal(<AnimatePresence>
+        {isOpen && (
           <div
             className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-sm"
             onClick={onCloseModal}
@@ -105,7 +105,7 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
-              className="w-full max-w-4xl bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl p-4 sm:p-6 overflow-hidden flex flex-col max-h-[calc(100dvh-2rem)] overscroll-contain"
+              role="dialog" aria-modal="true" aria-label="Compare selected offers" className="w-full max-w-4xl bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl p-4 sm:p-6 overflow-hidden flex flex-col max-h-[calc(100dvh-2rem)] overscroll-contain"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
@@ -225,10 +225,10 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
                 </table>
               </div>
             </motion.div>
-          </div>,
-          document.body
+          </div>
         )}
-      </AnimatePresence>
+      </AnimatePresence>, document.body)}
     </>
   );
 };
+

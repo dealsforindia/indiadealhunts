@@ -162,7 +162,7 @@ export const TopDiscountsPage: React.FC<TopDiscountsPageProps> = ({
       {/* ── Status Bar ── */}
       <div className="flex items-center justify-between text-xs text-slate-500 mb-4 px-1">
         <span>
-          Showing <strong className="text-slate-800 dark:text-[#F8FAFC] font-semibold">{sortedDeals.length}</strong> verified drops
+          Showing <strong className="text-slate-800 dark:text-[#F8FAFC] font-semibold">{sortedDeals.length}</strong> directory offers
           {discountThreshold > 0 && <span> with &ge;{discountThreshold}% off</span>}
         </span>
         <span className="text-[11px] font-mono text-emerald-600 font-semibold">

@@ -118,7 +118,7 @@ export const ExitIntentCartDrawer: React.FC<ExitIntentCartDrawerProps> = ({ topD
     markShown();
     setIsOpen(false);
     openSmartStoreLink(cartUrl, 'amazon', asin || undefined, true, subId);
-    onShowToast?.('Cart Lock activated — price held for 90 days!');
+    onShowToast?.('Opening Amazon cart. Confirm price and stock there.');
   };
 
   const handleOpenApp = () => {
@@ -148,7 +148,7 @@ export const ExitIntentCartDrawer: React.FC<ExitIntentCartDrawerProps> = ({ topD
           <div className="flex items-center justify-between">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold font-mono">
               <ShieldCheck size={14} className="text-amber-600" />
-              90-DAY PRICE GUARANTEE
+              REVISIT YOUR FIND
             </span>
             <button
               type="button"
@@ -163,10 +163,10 @@ export const ExitIntentCartDrawer: React.FC<ExitIntentCartDrawerProps> = ({ topD
           {/* Heading and value proposition */}
           <div>
             <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-[#F1F5F9] leading-snug">
-              Before you leave — Lock today's loot price for 90 Days!
+              Keep this find in your Amazon cart.
             </h3>
             <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-              Amazon flash drops and discount coupons expire quickly. Placing this verified loot into your Amazon shopping cart reserves today's price and protects you against price increases for up to 90 days.
+              Add the product to your Amazon cart to revisit it later. The merchant confirms the final price, availability and any coupons at checkout; adding it to a cart does not reserve a price.
             </p>
           </div>
 
@@ -209,7 +209,7 @@ export const ExitIntentCartDrawer: React.FC<ExitIntentCartDrawerProps> = ({ topD
               className="flex-1 min-h-[44px] flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-heading text-xs sm:text-sm font-black shadow-md shadow-amber-500/20 active:scale-[0.98] transition cursor-pointer"
             >
               <ShoppingCart size={16} />
-              <span>🛒 Lock in Amazon Cart (90 Days)</span>
+              <span>Add to Amazon cart</span>
             </button>
 
             <button
@@ -229,7 +229,7 @@ export const ExitIntentCartDrawer: React.FC<ExitIntentCartDrawerProps> = ({ topD
               onClick={() => setIsOpen(false)}
               className="text-[11px] text-slate-400 hover:text-slate-600 dark:text-slate-400 font-medium transition cursor-pointer"
             >
-              No thanks, I will risk paying full price later
+              Continue browsing
             </button>
           </div>
         </motion.div>

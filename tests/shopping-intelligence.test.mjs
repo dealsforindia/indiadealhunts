@@ -3,7 +3,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import ts from 'typescript';
 const source = readFileSync(new URL('../src/utils/shoppingIntelligence.ts', import.meta.url), 'utf8');
-const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 } }).outputText;
+const evidenceSource = readFileSync(new URL('../src/utils/priceEvidence.ts', import.meta.url), 'utf8');
+const evidenceModule = `data:text/javascript;base64,${Buffer.from(ts.transpileModule(evidenceSource, { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText).toString('base64')}`;
+const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 } }).outputText.replace("from './priceEvidence'", `from '${evidenceModule}'`);
 const { cleanHistory, productIdentity, offerIdentity, groupProducts, decisionFor, parseMission, shoppingMatch, validGtin } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
 const offer = { id: 'ext_gshop_1', title: 'OnePlus Nord CE4 8GB 128GB Celadon Marble', price: 19000, mrp: 25000, store: 'Amazon', url: 'https://www.amazon.in/dp/B0CX25NP84?tag=owner-21', image: null };
 test('variants remain separate and identical merchant products group', () => {
@@ -27,15 +29,25 @@ test('history is normalized, deduplicated and invalid points rejected', () => {
 });
 test('timing verdicts derive only from actual historical observations', () => {
   const history = [[1700000000, 18000], [1700000001, 20000]];
-  assert.equal(decisionFor({ ...offer, price: 17000, history }).label, 'At recorded low');
-  assert.equal(decisionFor({ ...offer, price: 19000, history }).label, 'Near recorded low');
-  assert.equal(decisionFor({ ...offer, price: 22000, history }).label, 'Consider waiting');
+  const current = { price_verified: true, price_source: 'merchant_product_page', last_checked_at: Date.now() };
+  assert.equal(decisionFor({ ...offer, ...current, price: 17000, history }).label, 'At recorded low');
+  assert.equal(decisionFor({ ...offer, ...current, price: 19000, history }).label, 'Near recorded low');
+  assert.equal(decisionFor({ ...offer, ...current, price: 22000, history }).label, 'Consider waiting');
+  assert.equal(decisionFor({ ...offer, price: 17000, history }).label, 'Verify first');
+  assert.equal(decisionFor({ ...offer, ...current, last_checked_at: Date.now() - 3600000, history }).label, 'Verify first');
 });
 test('natural-language budgets parse currency, k and lakh correctly', () => {
   assert.equal(parseMission('cpu under ₹20k').budget, 20000);
   assert.equal(parseMission('laptop below 1.5 lakh').budget, 150000);
   assert.equal(parseMission('SSD less than 7000').budget, 7000);
   assert.equal(parseMission('cpu').budget, null);
+});
+
+test('standalone CPU searches distinguish full computers and explicit accessory searches', () => {
+  assert.equal(shoppingMatch('cpu', { ...offer, title: 'ASUS Vivobook S16 Gaming Grade CPU 16 GB RAM' }), 'related');
+  assert.equal(shoppingMatch('processor', { ...offer, title: 'Assembled Desktop Intel Core i5 PC' }), 'related');
+  assert.equal(shoppingMatch('cpu cooler', { ...offer, title: 'Thermalright CPU Cooler Fan' }), 'product');
+  assert.equal(shoppingMatch('cpu', { ...offer, title: 'AMD Ryzen 5 5600 Processor' }), 'product');
 });
 
 test('duplicate merchant offers retain directory identity and enrich evidence', () => {

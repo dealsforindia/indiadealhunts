@@ -3,6 +3,7 @@
  * Handles 90-Day Cart Locks, Multi-ASIN bundles, Native Mobile OS Intents, and Client-Side SubID Attribution.
  */
 import { useState, useEffect } from 'react';
+import { publicStoreUrl } from './publicLinks';
 
 const DEFAULT_AMAZON_TAG = 'dealshare0b7-21';
 
@@ -178,6 +179,9 @@ export function openSmartStoreLink(
 ): void {
   if (typeof window === 'undefined') return;
 
+  webAffiliateUrl = publicStoreUrl(webAffiliateUrl);
+  if (!webAffiliateUrl) return;
+
   const isMobile = isMobileDevice();
   const rawUrl = subId ? injectSubIdToUrl(webAffiliateUrl, subId) : webAffiliateUrl;
   const targetWebUrl = normalizeUrlForDevice(rawUrl, isMobile);
@@ -189,16 +193,12 @@ export function openSmartStoreLink(
       let intentUrl = '';
       const cleanAsin = asin || extractAmazonAsin(webAffiliateUrl);
 
-      if (store.toLowerCase().includes('amazon') && cleanAsin) {
-        let targetPath = forceCart
-          ? `gp/aws/cart/add.html?ASIN.1=${cleanAsin}&Quantity.1=1&AssociateTag=${DEFAULT_AMAZON_TAG}`
-          : `dp/${cleanAsin}?tag=${DEFAULT_AMAZON_TAG}`;
-        if (subId) {
-          targetPath += `&ascsubtag=${encodeURIComponent(subId)}`;
-        }
-
+      if (store.toLowerCase().includes('amazon') && cleanAsin && /^https:\/\/(?:www\.|m\.)?amazon\.in\//i.test(targetWebUrl)) {
+        // Preserve the actual affiliate query and every item in a cart bundle.
+        const destination = new URL(targetWebUrl);
+        const targetPath = `${destination.pathname.replace(/^\//, '')}${destination.search}`;
         intentUrl = `intent://www.amazon.in/${targetPath}#Intent;scheme=https;package=in.amazon.mShop.android.shopping;end`;
-      } else if (store.toLowerCase().includes('flipkart')) {
+      } else if (store.toLowerCase().includes('flipkart') && /^https:\/\/(?:www\.|dl\.)?flipkart\.com\//i.test(targetWebUrl)) {
         const rawPath = targetWebUrl.replace(/^https?:\/\/(?:www\.|dl\.)?flipkart\.com\/(?:dl\/)?/, '');
         intentUrl = `intent://dl.flipkart.com/dl/${rawPath}#Intent;scheme=https;package=com.flipkart.android;end`;
       }

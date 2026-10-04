@@ -71,7 +71,7 @@ export const WorthScorePage: React.FC<WorthScorePageProps> = ({
           Highest Worth Score Deals
         </h1>
         <p className="mt-2 text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
-          Deals rated by our Worth Score engine (0–100). We evaluate genuine discount depth, historic floor prices, seller credibility, and product authenticity.
+          Offers ranked by a 0–100 heuristic using the supplied discount, price and store fields. This score is a browsing aid; it does not verify seller credibility, authenticity or a historical low.
         </p>
       </div>
 

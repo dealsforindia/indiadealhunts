@@ -97,6 +97,8 @@ export const PriceSparkline: React.FC<PriceSparklineProps> = ({
 
   const gradId = `spark-grad-${Math.random().toString(36).slice(2, 8)}`;
 
+  if (points.length < 2) return <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Insufficient price history</span>;
+
   return (
     <div>
       <svg

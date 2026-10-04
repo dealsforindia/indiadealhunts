@@ -1,4 +1,5 @@
 import React from 'react';
+import { ShoppingArtwork } from './ShoppingArtwork';
 
 interface PriceLookupStripProps {
   onOpenLookup: () => void;
@@ -14,12 +15,7 @@ export const PriceLookupStrip: React.FC<PriceLookupStripProps> = ({ onOpenLookup
         {/* Left Content */}
         <div className="flex items-start sm:items-center gap-4 sm:gap-5 max-w-2xl">
           {/* Emblem */}
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 flex-shrink-0 shadow-sm">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 3v18h18" />
-              <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
-            </svg>
-          </div>
+          <ShoppingArtwork className="shopping-artwork-inline" />
 
           <div>
             <h3 className="font-heading text-lg sm:text-xl font-black text-slate-900 dark:text-[#F1F5F9] tracking-tight leading-snug">

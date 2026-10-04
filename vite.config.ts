@@ -3,12 +3,28 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { resolveStoreRedirect, unavailableOfferPage } from './server/storeRedirect.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    {
+      name: 'public-store-links',
+      configureServer(server) {
+        server.middlewares.use('/out', async (req, res, next) => {
+          const url = new URL(req.url || '/', 'http://localhost');
+          const match = url.pathname.match(/^\/([a-zA-Z0-9_-]+)\/?$/);
+          if (!match) return next();
+          const result = await resolveStoreRedirect(match[1], url.searchParams);
+          res.setHeader('Cache-Control', 'no-store');
+          if (result.location) { res.writeHead(302, { Location: result.location }); res.end(); return; }
+          res.writeHead(result.status, { 'Content-Type': 'text/html; charset=utf-8' });
+          res.end(unavailableOfferPage);
+        });
+      },
+    },
     react(),
     tailwindcss(),
   ],
@@ -25,6 +41,17 @@ export default defineConfig({
       interval: 1000,
     },
     proxy: {
+      '/deal-images': {
+        target: 'https://api.rudranil.me',
+        changeOrigin: true,
+        secure: false,
+        rewrite: path => path.replace(/^\/deal-images/, '/images'),
+      },
+      '/feed-fallback': {
+        target: 'https://dealflow-edge.pottemasshippo.workers.dev',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/feed-fallback/, ''),
+      },
       '/api': {
         target: 'https://api.rudranil.me',
         changeOrigin: true,

@@ -1,5 +1,8 @@
+import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicStoreUrl, lookupTargetUrl } from '../utils/publicLinks';
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
+import { TrendingDown, Tag, Headphones, Shirt, ShoppingBasket, House } from 'lucide-react';
+import { getCleanImageUrl } from '../utils/imageUrl';
 import type { CategoryStoryCollection, StoriesResponse, PublicDeal } from '../types';
 import { StoryModal } from './StoryModal';
 
@@ -8,8 +11,8 @@ interface CategoryStoriesProps {
   deals?: PublicDeal[];
 }
 
-const EDGE_API = import.meta.env.VITE_EDGE_API_URL || 'https://dealflow-edge.pottemasshippo.workers.dev';
-const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
+const EDGE_API = PUBLIC_EDGE_BASE;
+const API_BASE = PUBLIC_API_BASE;
 
 // High-confidence fallback curated stories in case backend or worker is cold
 const FALLBACK_STORIES: CategoryStoryCollection[] = [
@@ -211,19 +214,20 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
       return;
     }
 
-    const liveSteals = deals.filter((d) => d.discount_pct && d.discount_pct >= 60 && d.image && d.price > 0).slice(0, 6);
-    const liveBudget = deals.filter((d) => d.price > 0 && d.price <= 499 && d.image).slice(0, 6);
-    const liveTech = deals.filter((d) => {
+    const availableDeals = deals.filter(d => !d.is_expired && !d.is_over && !!publicStoreUrl(d.url));
+    const liveSteals = availableDeals.filter((d) => d.discount_pct && d.discount_pct >= 70 && d.image && d.price > 0 && !d.is_expired && !d.is_over).slice(0, 6);
+    const liveBudget = availableDeals.filter((d) => d.price > 0 && d.price <= 499 && d.image).slice(0, 6);
+    const liveTech = availableDeals.filter((d) => {
       const c = (d.category || '').toLowerCase();
       const t = (d.title || '').toLowerCase();
       return (c.includes('mobile') || c.includes('electron') || c.includes('laptop') || /\b(phone|tws|earbuds|laptop|watch)\b/i.test(t)) && d.image;
     }).slice(0, 6);
-    const liveFashion = deals.filter((d) => {
+    const liveFashion = availableDeals.filter((d) => {
       const c = (d.category || '').toLowerCase();
       const t = (d.title || '').toLowerCase();
       return (c.includes('fashion') || /\b(shoes|sneakers|shirt|kurti|dress|saree)\b/i.test(t)) && d.image;
     }).slice(0, 6);
-    const liveGrocery = deals.filter((d) => {
+    const liveGrocery = availableDeals.filter((d) => {
       const c = (d.category || '').toLowerCase();
       const s = (d.store || '').toLowerCase();
       return (c.includes('grocery') || c.includes('beauty') || s.includes('blinkit') || s.includes('swiggy') || s.includes('zepto')) && d.image;
@@ -313,7 +317,7 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
           const data: StoriesResponse = await res.json();
           if (isMounted && data.stories && data.stories.length > 0) {
             // Filter collections that actually have deals
-            const validStories = data.stories.filter((s) => s.items && s.items.length > 0);
+            const validStories = data.stories.map(s => ({ ...s, badge: s.badge === 'ALL-TIME LOW' ? 'TECH' : s.badge === 'CLEARANCE' ? 'STYLE' : s.badge, items: (s.items || []).map(item => ({ ...item, url: publicStoreUrl(item.url) })).filter(item => item.url && !item.is_expired && !item.is_over) })).filter(s => s.items.length > 0);
             if (validStories.length > 0) {
               setCollections(validStories);
             }
@@ -398,10 +402,10 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
               </span>
               <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-[#F8FAFC] font-mono">
-                Flash Stories &amp; Curated Hauls
+                Collections worth exploring
               </h3>
               <span className="hidden sm:inline-block text-[11px] text-slate-400">
-                • Tap to preview 5-sec deals
+                A quick look at current finds
               </span>
             </div>
 
@@ -439,59 +443,24 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
           >
             {collections.map((story, index) => {
               const isViewed = viewedStoryIds.has(story.id);
-              const previewImg = story.items?.[0]?.image;
+              const storyKind = `${story.id} ${story.category_filter}`.toLowerCase();
+              const StoryIcon = /hot|loot|steal|discount/.test(storyKind) ? TrendingDown : /budget|under/.test(storyKind) ? Tag : /tech|elect|audio/.test(storyKind) ? Headphones : /fashion|wardrobe/.test(storyKind) ? Shirt : /grocery|swiggy|zepto/.test(storyKind) ? ShoppingBasket : House;
 
               return (
                 <button
                   key={story.id}
                   type="button"
                   onClick={() => handleStoryClick(index)}
-                  className="flex flex-col items-center gap-1.5 flex-shrink-0 group cursor-pointer focus:outline-none"
+                  className="premium-story-tile group"
                   style={{ scrollSnapAlign: 'start' }}
                   aria-label={`Open story: ${story.title}`}
                 >
-                  {/* Avatar Bubble with Gradient Ring */}
-                  <div className="relative">
-                    <div
-                      className={`w-[66px] h-[66px] sm:w-[72px] sm:h-[72px] rounded-full p-[2.5px] transition-all duration-300 transform group-hover:scale-105 ${
-                        isViewed
-                          ? 'bg-slate-200 dark:bg-[#172440]'
-                          : `bg-gradient-to-tr ${story.ring_color} shadow-sm`
-                      }`}
-                    >
-                      <div className="w-full h-full rounded-full bg-white dark:bg-[#0D1527] p-[2px] flex items-center justify-center overflow-hidden relative shadow-2xs">
-                        <div className="absolute inset-0 w-full h-full rounded-full bg-slate-100 dark:bg-[#111C33] flex items-center justify-center text-2xl">
-                          {story.emoji}
-                        </div>
-                        {previewImg && (
-                          <img
-                            src={previewImg}
-                            alt={story.title}
-                            className="relative z-10 w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-300"
-                            loading="lazy"
-                            onError={(event) => {
-                              event.currentTarget.classList.add('hidden');
-                            }}
-                          />
-                        )}
+                  <div className={`premium-story-image ${isViewed ? 'is-viewed' : ''}`}>
+                    <StoryIcon size={25} strokeWidth={1.5} aria-hidden="true" />
 
-                        {/* Centered Emoji Overlay Badge */}
-                        <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 flex items-center justify-center text-[11px] shadow-2xs">
-                          {story.emoji}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Badge Pill for Hottest */}
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-0.2 rounded-full text-[9px] font-bold uppercase tracking-wider bg-slate-900 text-white whitespace-nowrap shadow-sm">
-                      {story.badge}
-                    </div>
+                    <span className="premium-story-count">{story.items.length}</span>
                   </div>
-
-                  {/* Story Label */}
-                  <span className="text-[12px] font-semibold text-slate-700 dark:text-slate-200 group-hover:text-blue-600 transition-colors tracking-tight text-center max-w-[80px] sm:max-w-[90px] truncate mt-1">
-                    {story.title}
-                  </span>
+                  <span className="premium-story-title">{story.title}</span>
                 </button>
               );
             })}
@@ -510,3 +479,4 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
     </>
   );
 };
+

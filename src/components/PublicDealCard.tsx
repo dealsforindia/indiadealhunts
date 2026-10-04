@@ -1,903 +1,108 @@
-import { MobileDealCardContent } from './MobileDealCardContent';
-import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { ArrowUpRight, Bell, Bookmark, Check, Copy, CreditCard, Image, Layers, MoreHorizontal, Repeat2, ShoppingCart, X } from 'lucide-react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { isDealSaved, toggleSavedDealId } from '../utils/savedDeals';
 import { shareToWhatsApp, shareToTelegram, copyDealLink } from '../utils/shareDeal';
 import { calculateBestCardSavings } from '../utils/cardSavings';
 import { playTactileClick, playSuccessChime } from '../utils/audio';
-import {
-  extractAmazonAsin,
-  buildAmazonCartUrl,
-  buildMultiAsinCartUrl,
-  generateSubId,
-  openSmartStoreLink,
-  getRecommendedBundle,
-} from '../utils/affiliateEngine';
-
+import { extractAmazonAsin, buildAmazonCartUrl, buildMultiAsinCartUrl, generateSubId, openSmartStoreLink, getRecommendedBundle } from '../utils/affiliateEngine';
+import { TelegramIcon } from './TelegramIcon';
 interface PublicDealCardProps {
-  deal: PublicDeal;
-  index?: number;
-  isSaved?: boolean;
-  isComparing?: boolean;
-  activeCardIds?: string[];
-  onOpenImage?: (deal: PublicDeal) => void;
-  onSelectDeal?: (deal: PublicDeal) => void;
-  onToggleSave?: (deal: PublicDeal) => void;
-  onToggleCompare?: (deal: PublicDeal) => void;
-  onOpenCardEmi?: (deal: PublicDeal) => void;
-  onOpenPriceAlert?: (deal: PublicDeal) => void;
-  onOpenExchange?: (deal: PublicDeal) => void;
-  onShowToast?: (msg: string) => void;
+  deal: PublicDeal; index?: number; isSaved?: boolean; isComparing?: boolean; activeCardIds?: string[];
+  onOpenImage?: (deal: PublicDeal) => void; onSelectDeal?: (deal: PublicDeal) => void;
+  onToggleSave?: (deal: PublicDeal) => void; onToggleCompare?: (deal: PublicDeal) => void;
+  onOpenCardEmi?: (deal: PublicDeal) => void; onOpenPriceAlert?: (deal: PublicDeal) => void;
+  onOpenExchange?: (deal: PublicDeal) => void; onShowToast?: (msg: string) => void;
 }
-
-function getRelativeTime(timestamp?: number): string {
-  if (!timestamp) return 'Just now';
-  const ms = timestamp > 1e11 ? timestamp : timestamp * 1000;
-  const diffSec = Math.floor((Date.now() - ms) / 1000);
-  if (diffSec < 0 || diffSec < 60) return 'Just now';
-  const diffMin = Math.floor(diffSec / 60);
-  if (diffMin < 60) return `${diffMin}m ago`;
-  const diffHours = Math.floor(diffMin / 60);
-  if (diffHours < 24) return `${diffHours}h ago`;
-  return `${Math.floor(diffHours / 24)}d ago`;
+function relativeTime(timestamp?: number) {
+  if (!timestamp) return 'Time unavailable';
+  const minutes = Math.max(0, Math.floor((Date.now() - (timestamp > 1e11 ? timestamp : timestamp * 1000)) / 60000));
+  return minutes < 1 ? 'Just added' : minutes < 60 ? `${minutes}m ago` : minutes < 1440 ? `${Math.floor(minutes / 60)}h ago` : `${Math.floor(minutes / 1440)}d ago`;
 }
-
-function cleanTitle(deal: PublicDeal): string {
-  let title = deal.title
-    ? deal.title.replace(/^[\s\u2700-\u27BF\uE000-\uF8FF\uD83C-\uDBFF\uDC00-\uDFFF\u2011-\u26FF\uFE0E-\uFE0F\u00A0-\u00BF]+\s*/gu, '').trim() || deal.title
-    : 'Verified Retail Deal';
-
-  const tLower = title.toLowerCase().trim();
-  const channelHandles = ['smagnetdeals', 'lootdealsapp', 'technicalsheikh', 'glamhauldiaries', 'offerzone', 'dealztrendz', 'freekart', 'extrape', 'realearnkaro', 'desidime', 'bblbblp'];
-  const isChannelHandle = channelHandles.some((h) => tLower.includes(h)) ||
-    (tLower.startsWith('@') || ((tLower.endsWith('deals') || tLower.endsWith('dealsx') || tLower.endsWith('loot')) && !tLower.includes(' ')));
-
-  if (['products', 'product', 'item store online', 'store online', 'deal', 'loot', 'item'].includes(tLower) || isChannelHandle || title.length < 5) {
-    const slugMatch = deal.url?.match(/\/(?:flipkart\.com|shopsy\.in|fkrt\.cc)(?:\/dl)?\/([^/?#]+)\/p\/itm/i) ||
-      deal.url?.match(/amazon\.in\/([^/?#]+)\/dp\/[A-Z0-9]{10}/i);
-    if (slugMatch?.[1]) {
-      title = slugMatch[1].replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-    } else if (deal.category && deal.category !== 'Special Deal') {
-      title = `${deal.store} ${deal.category} Deal`;
-    } else {
-      title = `${deal.store} Verified Deal`;
-    }
-  }
-  return title;
-}
-
-function getStoreBadge(store?: string) {
-  const s = (store || '').toLowerCase();
-  if (s.includes('amazon')) {
-    return { name: 'Amazon', color: '#B45309', bg: '#FEF3C7', border: '#FDE68A', icon: '🛒' };
-  }
-  if (s.includes('flipkart')) {
-    return { name: 'Flipkart', color: '#0284C7', bg: '#E0F2FE', border: '#BAE6FD', icon: '🛍️' };
-  }
-  if (s.includes('myntra')) {
-    return { name: 'Myntra', color: '#BE185D', bg: '#FCE7F3', border: '#FBCFE8', icon: '👗' };
-  }
-  if (s.includes('ajio')) {
-    return { name: 'AJIO', color: '#1D4ED8', bg: '#EFF6FF', border: '#DBEAFE', icon: '🏷️' };
-  }
-  if (s.includes('desidime')) {
-    return { name: 'DesiDime', color: '#DC2626', bg: '#FEE2E2', border: '#FECACA', icon: '🔥' };
-  }
-  if (s.includes('swiggy') || s.includes('instamart')) {
-    return { name: 'Swiggy', color: '#C2410C', bg: '#FFEDD5', border: '#FED7AA', icon: '⚡' };
-  }
-  return { name: store || 'Store', color: '#047857', bg: '#D1FAE5', border: '#A7F3D0', icon: '✓' };
-}
-
-export const PublicDealCard: React.FC<PublicDealCardProps> = ({
-  deal,
-  index = 0,
-  isSaved: propIsSaved,
-  isComparing = false,
-  activeCardIds,
-  onOpenImage,
-  onSelectDeal,
-  onToggleSave,
-  onToggleCompare,
-  onOpenCardEmi,
-  onOpenPriceAlert,
-  onOpenExchange,
-  onShowToast,
-}) => {
-  const [imgLoaded, setImgLoaded] = useState(false);
-  const [imgError, setImgError] = useState(false);
+const money = (value: number) => `₹${value.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, isSaved: suppliedSaved, isComparing = false, activeCardIds, onOpenImage, onSelectDeal, onToggleSave, onToggleCompare, onOpenCardEmi, onOpenPriceAlert, onOpenExchange, onShowToast }) => {
+  const [imageFailed, setImageFailed] = useState(false);
   const [localSaved, setLocalSaved] = useState(() => isDealSaved(deal.id));
-  const [shareOpen, setShareOpen] = useState(false);
-  const shareRef = useRef<HTMLDivElement>(null);
-
-  const isSaved = propIsSaved !== undefined ? propIsSaved : localSaved;
-
-  const cardSavings = useMemo(() => {
-    if (!activeCardIds || activeCardIds.length === 0) return null;
-    return calculateBestCardSavings(deal, activeCardIds);
-  }, [deal, activeCardIds]);
-
-  useEffect(() => {
-    if (!shareOpen) return;
-    const handleClick = (e: MouseEvent | TouchEvent) => {
-      if (shareRef.current && !shareRef.current.contains(e.target as Node)) {
-        setShareOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClick);
-    document.addEventListener('touchstart', handleClick, { passive: true });
-    return () => {
-      document.removeEventListener('mousedown', handleClick);
-      document.removeEventListener('touchstart', handleClick);
-    };
-  }, [shareOpen]);
-
-  const cleanImageUrl = getCleanImageUrl(deal.image);
-  const displayTitle = cleanTitle(deal);
-  const isExpired = Boolean(deal.is_expired || deal.status === 'expired' || deal.is_over);
-
-  const price = deal.price || 0;
-  const mrp = deal.mrp && deal.mrp > price ? deal.mrp : undefined;
-  // Recalculate from MRP when backend sends corrupt discount_pct > 100.
-  // Exact 100 means a free/giveaway product — treat as valid and keep it.
-  const discount =
-    deal.discount_pct && deal.discount_pct > 100 && price > 0 && mrp
-      ? Math.round(((mrp - price) / mrp) * 100)
-      : deal.discount_pct ?? 0;
-
-  const savings = mrp && price > 0 ? mrp - price : 0;
-  const relativeTime = getRelativeTime(deal.display_ts || deal.posted_at);
-  const storeBadge = getStoreBadge(deal.store);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [includeBundle, setIncludeBundle] = useState(false);
-  const isAmazon = (deal.store || '').toLowerCase().includes('amazon');
-  const asin = isAmazon ? extractAmazonAsin(deal.url || deal.id) : null;
+  const trigger = useRef<HTMLButtonElement>(null);
+  const sheet = useRef<HTMLDivElement>(null);
+  const saved = suppliedSaved ?? localSaved;
+  const title = deal.title?.replace(/^[\s\u{1F300}-\u{1FAFF}\u2600-\u27BF\uFE0F]+/u, '').trim() || `${deal.store || 'Store'} offer`;
+  const store = deal.store || 'Store';
+  const price = Number(deal.price) || 0;
+  const mrp = deal.mrp && deal.mrp > price && price > 0 ? deal.mrp : null;
+  const discount = mrp ? Math.round((mrp - price) / mrp * 100) : null;
+  const expired = Boolean(deal.is_expired || deal.is_over || deal.status === 'expired');
+  // This upstream soundbar photo is a phone advertisement, so show an honest fallback.
+  const photo = deal.image?.includes('amz_B0H4VQX4CC.jpg') ? null : getCleanImageUrl(deal.image);
+  const asin = /amazon/i.test(store) ? extractAmazonAsin(deal.url || deal.id) : null;
   const subId = generateSubId('card', deal.id);
   const bundle = asin ? getRecommendedBundle(deal.category, price) : null;
-
-  const handleLockInCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const cardSavings = useMemo(() => activeCardIds?.length ? calculateBestCardSavings(deal, activeCardIds) : null, [deal, activeCardIds]);
+  useEffect(() => { setImageFailed(false); }, [photo]);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    sheet.current?.querySelector<HTMLButtonElement>('button')?.focus();
+    const keyboard = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuOpen(false);
+      if (event.key !== 'Tab') return;
+      const buttons = [...(sheet.current?.querySelectorAll<HTMLElement>('button, input, a[href]') || [])].filter(element => !element.hasAttribute('disabled'));
+      const first = buttons[0], last = buttons[buttons.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    };
+    document.addEventListener('keydown', keyboard);
+    return () => { document.body.style.overflow = originalOverflow; document.removeEventListener('keydown', keyboard); previousFocus?.focus(); };
+  }, [menuOpen]);
+  function save() {
     playTactileClick();
+    if (onToggleSave) onToggleSave(deal);
+    else { const next = toggleSavedDealId(deal.id).isSaved; setLocalSaved(next); if (next) playSuccessChime(); onShowToast?.(next ? 'Saved to your shortlist' : 'Removed from saved deals'); }
+  }
+  const details = () => { playTactileClick(); (onSelectDeal || onOpenImage)?.(deal); };
+  const action = (callback: () => void) => { setMenuOpen(false); callback(); };
+  function cart() {
     if (!asin) return;
-    const cartUrl = includeBundle && bundle
-      ? buildMultiAsinCartUrl(asin, bundle.asin, undefined, subId)
-      : buildAmazonCartUrl(asin, undefined, subId);
-    openSmartStoreLink(cartUrl, 'amazon', asin, true, subId);
-  };
-
-  const handleOpenStore = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    playTactileClick();
-    openSmartStoreLink(deal.url, deal.store || 'Store', asin || undefined, false, subId);
-  };
-
-  const handleToggleFavorite = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    playTactileClick();
-    if (onToggleSave) {
-      onToggleSave(deal);
-    } else {
-      const { isSaved: nextSaved } = toggleSavedDealId(deal.id);
-      setLocalSaved(nextSaved);
-      if (nextSaved) playSuccessChime();
-      onShowToast?.(nextSaved ? 'Saved to Loot Bookmarks!' : 'Removed from saved deals');
-    }
-  };
-
-  const handleCardClick = () => {
-    playTactileClick();
-    if (onSelectDeal) {
-      onSelectDeal(deal);
-    } else if (onOpenImage) {
-      onOpenImage(deal);
-    }
-  };
-
-  return (
-    <motion.article
-      onClick={handleCardClick}
-      className="deal-card-premium group"
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -2 }}
-      transition={{
-        duration: 0.25,
-        ease: 'easeOut',
-        delay: (index % 12) * 0.025,
-      }}
-      layout="position"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'visible',
-        cursor: 'pointer',
-        position: 'relative',
-        backgroundColor: 'var(--bg-surface-card)',
-        zIndex: shareOpen ? 30 : 1,
-      }}
-    >
-      <MobileDealCardContent deal={deal} title={displayTitle} image={cleanImageUrl} store={storeBadge.name}
-        price={price} mrp={mrp} discount={discount} expired={isExpired} saved={isSaved} comparing={isComparing}
-        time={relativeTime} onSave={handleToggleFavorite} onDetails={handleCardClick}
-        onCompare={onToggleCompare ? () => onToggleCompare(deal) : undefined} onToast={onShowToast} />
-      <div className="desktop-deal-card">
-      {/* Store, time and saved state */}
-      <div className="premium-card-header"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '12px 14px 10px',
-          zIndex: 2,
-        }}
-      >
-        {/* Store Pill */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
-              padding: '3px 8px',
-              borderRadius: '6px',
-              fontSize: '11px',
-              fontFamily: 'var(--font-heading)',
-              fontWeight: 700,
-              color: storeBadge.color,
-              backgroundColor: storeBadge.bg,
-              border: `1px solid ${storeBadge.border}`,
-              letterSpacing: '0.01em',
-            }}
-          >
-            <span>{storeBadge.icon}</span>
-            <span>{storeBadge.name}</span>
-          </span>
-
-          {discount > 0 && (
-            <span className={discount >= 50 ? 'badge-discount-fire' : 'badge-discount-emerald'}>
-              -{discount}% OFF
-            </span>
-          )}
-
-          {onToggleCompare && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                playTactileClick();
-                onToggleCompare(deal);
-              }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '3px',
-                padding: '2px 6px',
-                borderRadius: '5px',
-                fontSize: '10px',
-                fontFamily: 'var(--font-mono)',
-                fontWeight: 700,
-                border: `1px solid ${isComparing ? '#3B82F6' : '#E2E8F0'}`,
-                backgroundColor: isComparing ? '#EFF6FF' : '#FFFFFF',
-                color: isComparing ? '#1D4ED8' : '#64748B',
-                cursor: 'pointer',
-                transition: 'all 120ms ease',
-              }}
-              title={isComparing ? 'Remove from comparison' : 'Compare deal'}
-            >
-              <span>{isComparing ? '✓' : '+'}</span>
-              <span>Compare</span>
-            </button>
-          )}
-        </div>
-
-        {/* Right: Timestamp & Favorite Heart */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span
-            style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '11px',
-              color: '#94A3B8',
-              fontWeight: 500,
-            }}
-          >
-            {relativeTime}
-          </span>
-
-          <motion.button
-            type="button"
-            whileTap={{ scale: 0.8 }}
-            onClick={handleToggleFavorite}
-            title={isSaved ? 'Saved to favorites' : 'Save to favorites'}
-            aria-label="Save to favorites"
-            style={{
-              background: isSaved ? '#FEF3C7' : 'none',
-              border: isSaved ? '1px solid #FDE68A' : 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              padding: '3px',
-              display: 'flex',
-              alignItems: 'center',
-              color: isSaved ? '#D97706' : '#94A3B8',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            {isSaved ? (
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="#D97706">
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-              </svg>
-            ) : (
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            )}
-          </motion.button>
-        </div>
+    const url = includeBundle && bundle ? buildMultiAsinCartUrl(asin, bundle.asin, undefined, subId) : buildAmazonCartUrl(asin, undefined, subId);
+    openSmartStoreLink(url, 'amazon', asin, true, subId);
+  }
+  return <article className={`commerce-card${expired ? ' is-expired' : ''}${isComparing ? ' is-comparing' : ''}`}>
+    <div className="commerce-card-photo">
+      <button type="button" className="commerce-photo-button" onClick={details} aria-label={`View details for ${title}`}>
+        {photo && !imageFailed ? <img src={photo} alt={title} loading="lazy" decoding="async" onError={() => setImageFailed(true)} /> : <span className="commerce-image-fallback"><Image size={30} strokeWidth={1.2} /><span>Image unavailable</span></span>}
+      </button>
+      <span className={`commerce-store commerce-store-${store.toLowerCase().replace(/[^a-z]/g, '')}`}>{store}</span>
+      <button type="button" className={`commerce-card-save${saved ? ' is-saved' : ''}`} aria-label={`${saved ? 'Unsave' : 'Save'} ${title}`} aria-pressed={saved} onClick={save}><Bookmark size={18} fill={saved ? 'currentColor' : 'none'} /></button>
+      {expired ? <span className="commerce-discount">Ended</span> : discount != null && discount > 0 && <span className="commerce-discount">{discount}% below MRP</span>}
+    </div>
+    <div className="commerce-card-body">
+      <button type="button" className="commerce-card-title" onClick={details}>{title}</button>
+      <div className="commerce-card-price"><strong>{price > 0 ? money(price) : 'Check price'}</strong>{mrp && <s>{money(mrp)}</s>}</div>
+      <p className="commerce-card-note">{expired ? 'This offer has ended' : mrp ? `${money(mrp - price)} less than listed MRP` : 'Confirm current price at store'}</p>
+      <div className="commerce-card-actions"><button type="button" className="commerce-store-button" onClick={() => openSmartStoreLink(deal.url, store, asin || undefined, false, subId)} disabled={expired || !deal.url}>View at {store}<ArrowUpRight size={16} /></button><button ref={trigger} type="button" className="commerce-card-more" aria-label={`More options for ${title}`} aria-haspopup="dialog" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}><MoreHorizontal size={20} /></button></div>
+      <div className="commerce-card-meta"><span>{relativeTime(deal.display_ts || deal.posted_at)}</span><button type="button" onClick={details}>Details <span aria-hidden="true">↗</span></button></div>
+    </div>
+    {menuOpen && createPortal(<div className="commerce-sheet-backdrop" onClick={() => setMenuOpen(false)}><div ref={sheet} className="commerce-product-sheet" role="dialog" aria-modal="true" aria-label={`Shopping options for ${title}`} onClick={event => event.stopPropagation()}>
+      <div className="commerce-sheet-handle" aria-hidden="true" />
+      <header><div><small>SHOPPING OPTIONS</small><h2>{title}</h2></div><button type="button" aria-label="Close shopping options" onClick={() => setMenuOpen(false)}><X size={22} /></button></header>
+      <div className="commerce-sheet-options">
+        <button type="button" onClick={() => action(details)}><Layers size={19} /><span>Details & price evidence</span><ArrowUpRight size={16} /></button>
+        {onToggleCompare && <button type="button" onClick={() => action(() => onToggleCompare(deal))}>{isComparing ? <Check size={19} /> : <Layers size={19} />}<span>{isComparing ? 'Remove from comparison' : 'Add to comparison'}</span></button>}
+        {onOpenPriceAlert && <button type="button" onClick={() => action(() => onOpenPriceAlert(deal))}><Bell size={19} /><span>Set a price alert</span></button>}
+        {onOpenCardEmi && <button type="button" onClick={() => action(() => onOpenCardEmi(deal))}><CreditCard size={19} /><span>Card offers & EMI</span></button>}
+        {onOpenExchange && <button type="button" onClick={() => action(() => onOpenExchange(deal))}><Repeat2 size={19} /><span>Exchange calculator</span></button>}
+        {onOpenImage && <button type="button" onClick={() => action(() => onOpenImage(deal))}><Image size={19} /><span>View product photo</span></button>}
+        {asin && !expired && <button type="button" onClick={() => action(cart)}><ShoppingCart size={19} /><span>Open Amazon cart{includeBundle ? ' with add-on' : ''}</span><ArrowUpRight size={16} /></button>}
       </div>
-
-      {/* Product media */}
-      <div className="premium-card-media"
-        style={{
-          position: 'relative',
-          aspectRatio: '4 / 3',
-          backgroundColor: 'var(--surface-2)',
-          borderTop: '1px solid var(--border-subtle)',
-          borderBottom: '1px solid var(--border-subtle)',
-          padding: '16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          overflow: 'hidden',
-        }}
-      >
-        {!imgError && cleanImageUrl ? (
-          <>
-            {!imgLoaded && (
-              <div
-                className="skeleton"
-                style={{ position: 'absolute', inset: 0, borderRadius: 0 }}
-              />
-            )}
-            <motion.img
-              src={cleanImageUrl}
-              alt={displayTitle}
-              loading="lazy"
-              initial={{ scale: 1 }}
-              whileHover={{ scale: 1.06 }}
-              transition={{ duration: 0.35, ease: 'easeOut' }}
-              onLoad={() => setImgLoaded(true)}
-              onError={() => setImgError(true)}
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-                opacity: imgLoaded ? 1 : 0,
-                transition: 'opacity 0.25s ease',
-              }}
-            />
-          </>
-        ) : (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              color: '#64748B',
-            }}
-          >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <circle cx="8.5" cy="8.5" r="1.5" />
-              <path d="M21 15l-5-5L5 21" />
-            </svg>
-            <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
-              {deal.store || 'Verified Deal'}
-            </span>
-          </div>
-        )}
-
-        {/* Expired Overlay */}
-        {isExpired && (
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
-              backdropFilter: 'blur(4px)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <span
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '11px',
-                fontWeight: 800,
-                color: '#E11D48',
-                backgroundColor: '#FFE4E6',
-                padding: '6px 14px',
-                borderRadius: '8px',
-                border: '1px solid #FECDD3',
-                boxShadow: '0 2px 8px rgba(225, 29, 72, 0.15)',
-              }}
-            >
-              OFFER EXPIRED
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* ── Content Body ── */}
-      <div className="premium-card-body"
-        style={{
-          padding: '14px 16px 16px',
-          display: 'flex',
-          flexDirection: 'column',
-          flex: 1,
-          gap: '10px',
-          backgroundColor: 'var(--bg-surface-card)',
-        }}
-      >
-        {/* Title */}
-        <h3
-          title={displayTitle}
-          style={{
-            margin: 0,
-            fontFamily: 'var(--font-body)',
-            fontSize: '14px',
-            fontWeight: 700,
-            lineHeight: 1.4,
-            color: 'var(--text-primary)',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            minHeight: '39px',
-          }}
-        >
-          {displayTitle}
-        </h3>
-
-        {/* Pricing Row */}
-        <div style={{ marginTop: 'auto', paddingTop: '4px' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
-            <span className="premium-card-price"
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '20px',
-                fontWeight: 800,
-                color: 'var(--text-primary)',
-                lineHeight: 1,
-                letterSpacing: '-0.02em',
-              }}
-            >
-              {price > 0 ? `₹${price.toLocaleString('en-IN')}` : 'Check Price'}
-            </span>
-
-            {mrp && (
-              <span
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '12px',
-                  color: '#94A3B8',
-                  textDecoration: 'line-through',
-                }}
-              >
-                ₹{mrp.toLocaleString('en-IN')}
-              </span>
-            )}
-
-            {savings > 0 && (
-              <span
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  color: '#059669',
-                  backgroundColor: '#ECFDF5',
-                  border: '1px solid #A7F3D0',
-                  padding: '2px 7px',
-                  borderRadius: '6px',
-                  marginLeft: 'auto',
-                }}
-              >
-                Save ₹{savings.toLocaleString('en-IN')}
-              </span>
-            )}
-          </div>
-
-
-
-
-
-          {/* Sparkline Vector & Action Links (Breakdown + Share) */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '6px',
-              marginTop: '10px',
-              paddingTop: '8px',
-              borderTop: '1px solid var(--border-subtle)',
-            }}
-          >
-            {/* Price trend indicator — only shows when real MRP data confirms a discount */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              {discount >= 20 && mrp ? (
-                <>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round">
-                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                    <polyline points="17 6 23 6 23 12" />
-                  </svg>
-                  <span
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      color: '#059669',
-                    }}
-                  >
-                    ↓ {discount}% below MRP
-                  </span>
-                </>
-              ) : (
-                <span
-                  style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    color: '#64748B',
-                  }}
-                >
-                  ✓ Verified loot
-                </span>
-              )}
-            </div>
-
-            {/* Actions: Breakdown + 1-Click Share Popover */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              {/* Share Popover */}
-              <div ref={shareRef} style={{ position: 'relative' }}>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShareOpen(!shareOpen);
-                  }}
-                  style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    color: shareOpen ? '#1D4ED8' : '#64748B',
-                    background: shareOpen ? '#EFF6FF' : 'none',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    padding: '2px 6px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    transition: 'all 0.15s ease',
-                  }}
-                  title="Share verified deal"
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="18" cy="5" r="3" />
-                    <circle cx="6" cy="12" r="3" />
-                    <circle cx="18" cy="19" r="3" />
-                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-                  </svg>
-                  <span>Share</span>
-                </button>
-
-                <AnimatePresence>
-                  {shareOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 4, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 4, scale: 0.95 }}
-                      transition={{ duration: 0.15 }}
-                      onClick={(e) => e.stopPropagation()}
-                      style={{
-                        position: 'absolute',
-                        right: 0,
-                        bottom: 'calc(100% + 6px)',
-                        minWidth: '148px',
-                        backgroundColor: 'var(--bg-surface-card)',
-                        borderRadius: '12px',
-                        boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.1)',
-                        border: '1px solid #E2E8F0',
-                        padding: '4px',
-                        zIndex: 40,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '2px',
-                      }}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => {
-                          shareToWhatsApp(deal);
-                          setShareOpen(false);
-                          onShowToast?.('Opening WhatsApp share...');
-                        }}
-                        style={{
-                          width: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          padding: '6px 10px',
-                          borderRadius: '8px',
-                          fontSize: '11.5px',
-                          fontWeight: 600,
-                          color: '#065F46',
-                          backgroundColor: 'transparent',
-                          border: 'none',
-                          cursor: 'pointer',
-                          textAlign: 'left',
-                          transition: 'background-color 0.12s ease',
-                        }}
-                        onMouseEnter={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#ECFDF5';
-                        }}
-                        onMouseLeave={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent';
-                        }}
-                      >
-                        <span style={{ fontSize: '13px' }}>💬</span>
-                        <span>WhatsApp</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          shareToTelegram(deal);
-                          setShareOpen(false);
-                          onShowToast?.('Opening Telegram share...');
-                        }}
-                        style={{
-                          width: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          padding: '6px 10px',
-                          borderRadius: '8px',
-                          fontSize: '11.5px',
-                          fontWeight: 600,
-                          color: '#1E40AF',
-                          backgroundColor: 'transparent',
-                          border: 'none',
-                          cursor: 'pointer',
-                          textAlign: 'left',
-                          transition: 'background-color 0.12s ease',
-                        }}
-                        onMouseEnter={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#EFF6FF';
-                        }}
-                        onMouseLeave={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent';
-                        }}
-                      >
-                        <span style={{ fontSize: '13px' }}>✈️</span>
-                        <span>Telegram</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          const ok = await copyDealLink(deal);
-                          setShareOpen(false);
-                          if (ok) onShowToast?.('Deal link copied to clipboard!');
-                        }}
-                        style={{
-                          width: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          padding: '6px 10px',
-                          borderRadius: '8px',
-                          fontSize: '11.5px',
-                          fontWeight: 600,
-                          color: '#334155',
-                          backgroundColor: 'transparent',
-                          border: 'none',
-                          cursor: 'pointer',
-                          textAlign: 'left',
-                          transition: 'background-color 0.12s ease',
-                        }}
-                        onMouseEnter={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F1F5F9';
-                        }}
-                        onMouseLeave={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent';
-                        }}
-                      >
-                        <span style={{ fontSize: '13px' }}>📋</span>
-                        <span>Copy Link</span>
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Breakdown Modal trigger */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (onSelectDeal) onSelectDeal(deal);
-                }}
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  color: '#64748B',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '2px 4px',
-                  transition: 'color 0.15s ease',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.color = '#0F172A';
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.color = '#64748B';
-                }}
-              >
-                Breakdown ↗
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Multi-ASIN Accessory Bundle Toggle for Amazon Products */}
-        {asin && bundle && (
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-              setIncludeBundle(!includeBundle);
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '6px',
-              padding: '6px 10px',
-              borderRadius: '8px',
-              backgroundColor: includeBundle ? '#FEF08A' : '#FEFCE8',
-              border: `1px solid ${includeBundle ? '#EAB308' : '#FEF08A'}`,
-              fontSize: '11px',
-              color: '#854D0E',
-              cursor: 'pointer',
-              marginTop: '8px',
-              userSelect: 'none',
-              transition: 'all 0.15s ease',
-            }}
-            title="Add high-commission accessory / delivery fee saver to Amazon cart"
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '12px' }}>{includeBundle ? '☑️' : '◻️'}</span>
-              <span style={{ fontWeight: includeBundle ? 700 : 500 }}>
-                {bundle.badge}: +{bundle.name.slice(0, 22)}... (+₹{bundle.price})
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Dual-Action Desktop CTA Area: 90-Day Cart Lock + Store App */}
-        {asin ? (
-          <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-            <motion.button
-              type="button"
-              onClick={handleLockInCart}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              title="Locks price and attribution in Amazon Cart for up to 90 days"
-              style={{
-                flex: 1,
-                height: '38px',
-                borderRadius: '9999px',
-                fontSize: '12.5px',
-                fontWeight: 700,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px',
-                backgroundColor: '#F59E0B',
-                color: '#FFFFFF',
-                border: 'none',
-                boxShadow: '0 2px 6px rgba(245, 158, 11, 0.25)',
-                cursor: 'pointer',
-                transition: 'background-color 0.15s ease',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#D97706';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F59E0B';
-              }}
-            >
-              <span>🛒 {includeBundle ? 'Lock Bundle (90d)' : 'Lock in Cart (90d)'}</span>
-            </motion.button>
-
-            <motion.button
-              type="button"
-              onClick={handleOpenStore}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              title="View product on Amazon in new tab"
-              style={{
-                height: '38px',
-                padding: '0 14px',
-                borderRadius: '9999px',
-                fontSize: '12px',
-                fontWeight: 650,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '4px',
-                backgroundColor: 'var(--surface-2)',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border-strong)',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F1F5F9';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F8FAFC';
-              }}
-            >
-              <span>View on Amazon ↗</span>
-            </motion.button>
-          </div>
-        ) : (
-          <motion.button
-            type="button"
-            onClick={handleOpenStore}
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.98 }}
-            aria-label={`Get deal for ${displayTitle} on ${deal.store}`}
-            style={{
-              height: '38px',
-              width: '100%',
-              borderRadius: '9999px',
-              fontSize: '13px',
-              fontWeight: 600,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              marginTop: '10px',
-              cursor: 'pointer',
-              border: 'none',
-              backgroundColor: '#0066CC',
-              color: '#FFFFFF',
-              boxShadow: '0 1px 2px rgba(0, 102, 204, 0.2)',
-              transition: 'background-color 0.15s ease',
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#0071E3';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#0066CC';
-            }}
-          >
-            <span>⚡ View Deal on {storeBadge.name} ↗</span>
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M2 10L10 2M10 2H4M10 2V8" />
-            </svg>
-          </motion.button>
-        )}
-      </div>
-      </div>
-    </motion.article>
-  );
+      {bundle && <label className="commerce-bundle"><input type="checkbox" checked={includeBundle} onChange={event => setIncludeBundle(event.target.checked)} /><span>Optional add-on: {bundle.name}<small>Estimate {money(bundle.price)} · confirm final price at Amazon</small></span></label>}
+      {cardSavings && <p className="commerce-cashback">Estimated {money(cardSavings.cashbackAmount)} cashback with {cardSavings.cardName}. Check eligibility and bank terms.</p>}
+      <div className="commerce-share-row"><button type="button" onClick={() => action(() => shareToWhatsApp(deal))}>WhatsApp</button><button type="button" onClick={() => action(() => shareToTelegram(deal))}><TelegramIcon width={17} height={17} />Telegram</button><button type="button" onClick={() => action(() => { copyDealLink(deal); onShowToast?.('Deal link copied'); })}><Copy size={16} />Copy link</button></div>
+    </div></div>, document.body)}
+  </article>;
 };

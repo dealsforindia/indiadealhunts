@@ -1,9 +1,11 @@
+import { priceFreshness } from './priceEvidence';
 export interface IntelligenceOffer {
   id: string; title: string; price: number | null; mrp: number | null;
   store: string; image: string | null; url: string; raw_url?: string;
   source_type?: string; product_id?: string; gtin?: string; has_price_history?: boolean;
   history?: Array<[number, number]>; affiliate_applied?: boolean;
   in_stock?: boolean; last_checked_at?: number; effective_price?: number | null;
+  price_verified?: boolean; price_source?: string;
   coupon?: string | null; coupon_discount?: number | null; regular_price?: number | null;
   cluster_count?: number; consensus_badge?: string; posted_at?: number;
 }
@@ -83,6 +85,7 @@ export function decisionFor(offer: IntelligenceOffer) {
   const points = cleanHistory(offer.history);
   if (offer.in_stock === false) return { label: 'Unavailable', tone: 'amber', reason: 'The source reports this offer out of stock.' };
   if (!Number.isFinite(offer.price) || !offer.price || offer.price <= 0) return { label: 'Check price', tone: 'amber', reason: 'A current merchant price is required before comparing.' };
+  if (!priceFreshness(offer).current) return { label: 'Verify first', tone: 'slate', reason: 'This source price has no recent, confirmed merchant observation. Refresh the price before judging buy timing.' };
   if (points.length < 2) return { label: 'Verify first', tone: 'slate', reason: 'There is not enough recorded history to recommend buy timing.' };
   const low = Math.min(...points.map(p => p[1]));
   if (offer.price <= low) return { label: 'At recorded low', tone: 'emerald', reason: `Current price is at or below the lowest of ${points.length} recorded observations.` };
@@ -98,8 +101,11 @@ export function parseMission(query: string) {
 
 export function shoppingMatch(query: string, offer: IntelligenceOffer): 'product' | 'related' {
   const intent = parseMission(query).product.toLowerCase();
-  if (/\b(cpu|processor|processors)\b/.test(intent) &&
-      /\b(cooler|cooling|fan|fans|motherboard|thermal|paste|power supply|psu|cabinet|case|cable|cables)\b/i.test(offer.title)) return 'related';
+  const accessoryTerms = /\b(cooler|cooling|fan|fans|motherboard|thermal|paste|power supply|psu|cabinet|case|cable|cables)\b/i;
+  const computerTerms = /\b(laptop|pc|assembled|mini tower|mid tower|vivobook|all.in.one)\b/i;
+  const desktopComputer = /\bdesktop\b/i.test(offer.title) && (!/\bprocessor\b/i.test(offer.title) || /\b(ram|ssd|hdd)\b/i.test(offer.title));
+  const specificallyRelatedQuery = accessoryTerms.test(intent) || computerTerms.test(intent) || /\bdesktop\b/i.test(intent);
+  if (/\b(cpu|processor|processors)\b/.test(intent) && !specificallyRelatedQuery && (accessoryTerms.test(offer.title) || computerTerms.test(offer.title) || desktopComputer)) return 'related';
   return 'product';
 }
 

@@ -1,3 +1,4 @@
+import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicStoreUrl, lookupTargetUrl } from '../utils/publicLinks';
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import type { CommunityBrag, WallStats } from '../types';
@@ -8,8 +9,8 @@ interface WallOfHappinessProps {
   onNavigateTab?: (tab: any) => void;
 }
 
-const EDGE_API = import.meta.env.VITE_EDGE_API_URL || 'https://dealflow-edge.pottemasshippo.workers.dev';
-const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
+const EDGE_API = PUBLIC_EDGE_BASE;
+const API_BASE = PUBLIC_API_BASE;
 
 export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }) => {
   const [stats, setStats] = useState<WallStats | null>(null);
@@ -18,6 +19,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
 
   // Savings Simulator State
   const [monthlySpend, setMonthlySpend] = useState<number>(8000);
+  const [assumedDiscount, setAssumedDiscount] = useState(30);
 
   // Submit Modal State
   const [isSubmitOpen, setIsSubmitOpen] = useState<boolean>(false);
@@ -32,6 +34,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
   });
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
+  const [submitError, setSubmitError] = useState('');
 
   // Fetch live stats from API
   const fetchWallData = useCallback(async () => {
@@ -51,8 +54,12 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
       }
       if (res && res.ok) {
         const data = await res.json();
-        if (data.stats) setStats(data.stats);
-        if (data.brags && data.brags.length > 0) setBrags(data.brags);
+        // The legacy endpoint includes seeded testimonials and static platform
+        // claims. Display only actual submissions, explicitly as self-reports.
+        const reports: CommunityBrag[] = Array.isArray(data.brags) ? data.brags.filter((report: CommunityBrag) => report.id && !/^brag-\d+$/.test(report.id)) : [];
+        const reportedTotal = reports.reduce((sum, report) => sum + (Number.isFinite(report.saved_amount) && report.saved_amount > 0 ? report.saved_amount : 0), 0);
+        setBrags(reports);
+        setStats({ total_saved_inr: reportedTotal, formatted_savings: `₹${reportedTotal.toLocaleString('en-IN')}`, active_deals_count: reports.length, verified_shoppers_count: new Set(reports.map(report => `${report.name}|${report.city}`)).size, satisfaction_rate: 'Not measured', updated_at: Date.now() / 1000 });
       }
     } catch {
       // Fallback handles gracefully
@@ -63,16 +70,16 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
     fetchWallData();
   }, [fetchWallData]);
 
-  // Dynamic Savings Calculations — realistic 30% average across deal categories
-  const monthlySavings = Math.round(monthlySpend * 0.30);
+  // A shopper-controlled scenario, not a measured platform average.
+  const monthlySavings = Math.round(monthlySpend * assumedDiscount / 100);
   const annualSavings = monthlySavings * 12;
 
   const getSavingsPerk = (annual: number) => {
-    if (annual >= 100000) return '✈️ A luxury holiday to Thailand or Bali!';
-    if (annual >= 60000) return '📱 A brand new flagship iPhone or MacBook!';
-    if (annual >= 30000) return '🎧 Premium Sony/Bose headphones + 1 Year of dining out!';
-    if (annual >= 15000) return '⌚ A top Apple/Samsung smartwatch + yearly OTT subs!';
-    return '🛍️ Free festive wardrobe refresh every season!';
+    if (annual >= 100000) return 'Put it towards a travel fund';
+    if (annual >= 60000) return 'Put it towards a computer or phone upgrade';
+    if (annual >= 30000) return 'Build a fund for your next big purchase';
+    if (annual >= 15000) return 'Set aside a budget for accessories';
+    return 'Build your shopping budget over time';
   };
 
   const filteredBrags = filterStore === 'all'
@@ -84,6 +91,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
     if (!submitForm.name || !submitForm.product_name) return;
 
     setIsSubmitting(true);
+    setSubmitError('');
     try {
       const res = await fetch(`${API_BASE}/api/v1/deals/brag-submit`, {
         method: 'POST',
@@ -99,6 +107,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
         }),
       });
 
+      if (!res.ok) throw new Error('Submission unavailable');
       if (res.ok) {
         const newBrag: CommunityBrag = {
           id: `user-${Date.now()}`,
@@ -108,7 +117,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
           store: submitForm.store,
           sale_price: parseFloat(submitForm.sale_price) || 0,
           saved_amount: parseFloat(submitForm.savings_amount) || 0,
-          comment: submitForm.comment || 'Verified deal brag!',
+          comment: submitForm.comment || 'Shopper-submitted report',
           relative_time: 'Just now',
           avatar_bg: 'from-amber-500 to-rose-600',
         };
@@ -129,7 +138,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
         }, 1500);
       }
     } catch {
-      // Offline fallback
+      setSubmitError('Your report could not be sent. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -153,16 +162,16 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
       {/* Header Banner */}
       <div className="space-y-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-mono font-bold">
-          <span>💖 Community Social Proof</span>
+          <span>Community stories</span>
           <span>•</span>
-          <span>Verified Real Drops</span>
+          <span>Shopper submitted</span>
         </div>
 
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-[#F1F5F9] tracking-tight">
           Wall of Happiness
         </h1>
         <p className="text-slate-600 dark:text-slate-400 text-base max-w-2xl leading-relaxed">
-          Real savings scored by Indian shoppers using DealFlow’s autonomous verification engine. Every drop listed on IndiaDealHunts passes genuine price checks before reaching your screen.
+          Shopping experiences shared by the community. Prices and savings are reported by shoppers; purchase receipts and outcomes have not been independently verified.
         </p>
       </div>
 
@@ -175,15 +184,11 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
               <div className="text-xs font-mono font-bold tracking-wider uppercase text-emerald-600">
-                Live Platform Total Verified Savings
+                Reported savings in this community feed
               </div>
               <div className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 dark:text-[#F1F5F9] font-mono tracking-tight mt-1">
                 {stats?.formatted_savings ?? 'Live data unavailable'}
-                {stats && (
-                  <span className="text-base sm:text-xl text-slate-500 font-sans font-normal ml-2">
-                    (₹{stats.total_saved_inr.toLocaleString('en-IN')})
-                  </span>
-                )}
+
               </div>
             </div>
 
@@ -199,28 +204,28 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
           {/* 4 Stat Badges */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-100 dark:border-white/5">
             <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10">
-              <div className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Active Loot Deals</div>
+              <div className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Loaded reports</div>
               <div className="text-xl font-bold text-slate-900 dark:text-[#F1F5F9] font-mono mt-1">
                 {stats?.active_deals_count?.toLocaleString('en-IN') ?? '—'}
               </div>
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10">
-              <div className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Community Shoppers</div>
+              <div className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Reporting names</div>
               <div className="text-xl font-bold text-blue-600 font-mono mt-1">
-                {stats?.verified_shoppers_count?.toLocaleString('en-IN') ?? '—'}{stats ? '+' : ''}
+                {stats?.verified_shoppers_count?.toLocaleString('en-IN') ?? '—'}
               </div>
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10">
-              <div className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Average Discount</div>
+              <div className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Measured discount</div>
               <div className="text-xl font-bold text-emerald-600 font-mono mt-1">
                 —
               </div>
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10">
-              <div className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Verified Genuine Rate</div>
+              <div className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Purchase verification</div>
               <div className="text-xl font-bold text-slate-900 dark:text-[#F1F5F9] font-mono mt-1">
                 {stats?.satisfaction_rate ?? '—'}
               </div>
@@ -237,7 +242,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
               <span>🧮 Personal Deal Savings Simulator</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Calculate how much you save every year shopping verified discounts vs paying full retail MRP.
+              Explore an estimate using your own assumed discount. This is a planning scenario, not promised savings or a measured average.
             </p>
           </div>
           <div className="text-right">
@@ -248,6 +253,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
           </div>
         </div>
 
+        <label className="flex flex-wrap items-center gap-3 text-sm text-slate-600 dark:text-slate-300">Assumed saving <select aria-label="Assumed saving percentage" value={assumedDiscount} onChange={event => setAssumedDiscount(Number(event.target.value))} className="min-h-11 rounded-xl border border-slate-200 px-3">{[0, 5, 10, 15, 20, 25, 30, 40, 50].map(value => <option key={value} value={value}>{value}%</option>)}</select></label>
         {/* Range Slider */}
         <div className="space-y-2">
           <input
@@ -273,7 +279,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
             <div className="text-2xl font-extrabold text-emerald-600 font-mono mt-1">
               ₹{monthlySavings.toLocaleString('en-IN')}
             </div>
-            <p className="text-[11px] text-slate-500 mt-1">Kept in your wallet every 30 days</p>
+            <p className="text-[11px] text-slate-500 mt-1">Estimated using your assumption</p>
           </div>
 
           <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10">
@@ -281,11 +287,11 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
             <div className="text-2xl font-extrabold text-blue-600 font-mono mt-1">
               ₹{annualSavings.toLocaleString('en-IN')}
             </div>
-            <p className="text-[11px] text-slate-500 mt-1">Equivalent to a major bonus each year</p>
+            <p className="text-[11px] text-slate-500 mt-1">Estimated annual scenario</p>
           </div>
 
           <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 flex flex-col justify-center">
-            <div className="text-xs font-mono text-slate-500 uppercase font-semibold">What That Gets You</div>
+            <div className="text-xs font-mono text-slate-500 uppercase font-semibold">A possible savings goal</div>
             <div className="text-sm font-bold text-slate-800 dark:text-[#F8FAFC] mt-1">
               {getSavingsPerk(annualSavings)}
             </div>
@@ -301,7 +307,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
               <span>✨ Recent Community Loot Brags</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Genuine testimonials submitted by deal hunters across India.
+              Self-reported experiences. Confirm details with the shopper.
             </p>
           </div>
 
@@ -380,7 +386,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
               <div className="pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[10px] font-mono text-slate-400">
                 <span className="flex items-center gap-1 text-emerald-600 font-semibold">
                   <IconShieldCheck className="w-3 h-3 text-emerald-600" />
-                  Verified Purchase
+                  Shopper report
                 </span>
                 <span>IndiaDealHunts Drop</span>
               </div>
@@ -388,7 +394,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
           )) : (
             <div className="md:col-span-2 lg:col-span-3 rounded-2xl border border-dashed border-slate-300 dark:border-white/20 bg-white dark:bg-[#0D1527] p-8 text-center">
               <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Live community brags will appear here.</p>
-              <p className="text-xs text-slate-500 mt-1">No testimonial data is shown until it is returned by the community feed.</p>
+              <p className="text-xs text-slate-500 mt-1">No shopper reports are available in this view yet.</p>
             </div>
           )}
         </div>
@@ -421,13 +427,14 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
               {submitSuccess ? (
                 <div className="py-8 text-center space-y-2">
                   <div className="text-4xl">🎊</div>
-                  <h4 className="text-base font-bold text-emerald-600">Brag Published!</h4>
+                  <h4 className="text-base font-bold text-emerald-600">Report accepted</h4>
                   <p className="text-xs text-slate-500">
-                    Your loot has been verified and added to the Wall of Happiness.
+                    Your shopper report was accepted. Reported savings are not independently verified.
                   </p>
                 </div>
               ) : (
                 <form onSubmit={handleBragSubmit} className="space-y-4">
+                  {submitError && <p role="alert" className="text-sm text-rose-600">{submitError}</p>}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="text-xs font-mono text-slate-500 font-semibold">Your Name *</label>

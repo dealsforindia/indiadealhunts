@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ArrowRight, ArrowUpRight, Search, TrendingDown, X } from 'lucide-react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
+import { publicStoreUrl } from '../utils/publicLinks';
 
 interface HeroBannerProps {
   searchQuery: string;
@@ -26,7 +27,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ searchQuery, onSearch, o
     if ((/^https?:\/\//i.test(value) || /amzn\.|flipkart\.|myntra\./i.test(value)) && onOpenLookup) { onOpenLookup(value); return; }
     onSearch(value);
   }
-  const displayable = (offer?: PublicDeal | null) => !!offer?.image && !failedImages.has(getCleanImageUrl(offer.image) || '') && offer.price > 0 && !offer.is_expired && offer.status !== 'expired';
+  const displayable = (offer?: PublicDeal | null) => !!offer?.image && !failedImages.has(getCleanImageUrl(offer.image) || '') && offer.price > 0 && !offer.is_expired && !offer.is_over && !['expired', 'rejected', 'pending', 'pending_approval'].includes(offer.status || '') && !!publicStoreUrl(offer.url);
   const spotlight = displayable(spotlightDeal) ? spotlightDeal : spotlightAlternatives.find(displayable);
   const spotlightImage = spotlight ? getCleanImageUrl(spotlight.image) : null;
   const reference = spotlight?.mrp && spotlight.mrp > spotlight.price ? spotlight.mrp : null;

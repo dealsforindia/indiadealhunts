@@ -53,8 +53,8 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
           maxWidth: '640px',
           maxHeight: 'min(88vh, calc(100dvh - 2rem))',
           overscrollBehavior: 'contain',
-          backgroundColor: '#FFFFFF',
-          border: '1px solid #E2E8F0',
+          backgroundColor: 'var(--bg-surface-card)',
+          border: '1px solid var(--border-subtle)',
           borderRadius: '16px',
           boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25)',
           display: 'flex',
@@ -71,8 +71,8 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: '14px 18px',
-            borderBottom: '1px solid #F1F5F9',
-            backgroundColor: '#F8FAFC',
+            borderBottom: '1px solid var(--border-subtle)',
+            backgroundColor: 'var(--surface-2)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -83,7 +83,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
                 fontSize: '15px',
                 fontWeight: 700,
                 fontFamily: 'var(--font-heading)',
-                color: '#0F172A',
+                color: 'var(--text-primary)',
                 margin: 0,
               }}
             >
@@ -163,7 +163,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
                   Editorial Independence
                 </h4>
                 <p>
-                  Commission rates never determine which deals are posted. Deals are surfaced based strictly on verified price drops and genuine merchant discounts.
+                  Affiliate conversion may be applied to outbound links. The directory, reference prices and historical evidence are separate signals; an affiliate link does not prove a discount or product authenticity.
                 </p>
               </div>
             </>
@@ -177,7 +177,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
                   1. Multi-Channel Signal Verification
                 </h4>
                 <p>
-                  Incoming price drops are scanned across 27 monitored Indian shopping channels. Multi-source consensus verifies whether a price is genuine before promotion.
+                  Directory offers come from the deal feed. Where multiple sources report an offer, a consensus count may be shown. Repeated reports do not independently prove a price or purchase.
                 </p>
               </div>
 
@@ -186,7 +186,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
                   2. Inflation Filter
                 </h4>
                 <p>
-                  Sellers often artificially inflate MRP before applying fake discounts. Our engine compares current prices against historical retail prices to calculate honest discount percentages.
+                  MRP discounts are reference comparisons, not price-history verdicts. The product inspector shows supplied historical observations and their dates where available. Without enough observations, it asks you to verify first.
                 </p>
               </div>
 
@@ -195,7 +195,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
                   3. Direct Merchant Landing
                 </h4>
                 <p>
-                  All redirect links are resolved directly to official merchant domains (amazon.in, flipkart.com, myntra.com). Third-party redirect chains are inspected for user safety.
+                  Offer links open a merchant or an affiliate redirect. Directory redirects are resolved through the public storefront; if a usable destination cannot be retrieved, an unavailable-offer page is shown. Confirm the destination, final price and availability before purchasing.
                 </p>
               </div>
             </>

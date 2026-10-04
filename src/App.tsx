@@ -1,4 +1,5 @@
 import { RecoveryBoundary } from './components/RecoveryBoundary';
+import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicDeal, publicStoreUrl } from './utils/publicLinks';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Navbar } from './components/Navbar';
 import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
@@ -45,8 +46,8 @@ import { getSavedCards } from './utils/cardSavings';
 import { isAudioEnabled, setAudioEnabled, playTactileClick } from './utils/audio';
 import { useTheme } from './utils/themeManager';
 
-const EDGE_API = import.meta.env.VITE_EDGE_API_URL || 'https://dealflow-edge.pottemasshippo.workers.dev';
-const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
+const EDGE_API = PUBLIC_EDGE_BASE;
+const API_BASE = PUBLIC_API_BASE;
 
 export const App: React.FC = () => {
   // Theme Manager Engine (System vs Dark vs Light with OS sync)
@@ -105,7 +106,7 @@ export const App: React.FC = () => {
     setExternalSearchLoading(true);
     setExternalSearchError(null);
 
-    fetch(`${API_BASE}/api/v1/deals/external-search?q=${encodeURIComponent(query)}&limit=24`, { signal: controller.signal })
+    fetch(`${API_BASE}/api/v1/search/external?q=${encodeURIComponent(query)}&limit=24`, { signal: controller.signal })
       .then(async (res) => {
         if (!res.ok) throw new Error(`Live store search returned ${res.status}`);
         return res.json();
@@ -116,8 +117,9 @@ export const App: React.FC = () => {
           const number = typeof value === 'number' ? value : Number(value);
           return Number.isFinite(number) && number > 0 ? number : null;
         };
-        const normalized: ExternalSearchDeal[] = Array.isArray(data?.deals)
-          ? data.deals.map((deal: any, index: number) => ({
+        const rawDeals = data?.deals || data?.results || [];
+        const normalized: ExternalSearchDeal[] = Array.isArray(rawDeals)
+          ? rawDeals.map((deal: any, index: number) => ({
               id: String(deal.id || deal._id || `external-${index}-${query}`),
               title: String(deal.title || deal.product_name || deal.name || 'Store product match'),
               price: toNumber(deal.price ?? deal.sale_price ?? deal.current_price),
@@ -125,17 +127,21 @@ export const App: React.FC = () => {
               discount_pct: toNumber(deal.discount_pct ?? deal.discount),
               store: String(deal.store || deal.source || deal.source_type || 'Store'),
               image: deal.image || deal.image_url || deal.thumbnail || deal.img_url || null,
-              url: String(deal.url || deal.link || deal.buy_url || ''),
+              url: publicStoreUrl(String(deal.url || deal.link || deal.buy_url || '')),
               raw_url: String(deal.raw_url || deal.canonical_url || deal.url || ''),
               // Missing history metadata must stay unverified. The backend only
               // sets this flag when it has authentic points to show.
               has_price_history: Boolean(deal.has_price_history),
+              history_badge: deal.history_badge ? String(deal.history_badge) : undefined,
+              verdict: deal.verdict ? String(deal.verdict) : undefined,
               is_lowest_price: Boolean(deal.is_lowest_price),
               affiliate_applied: Boolean(deal.affiliate_applied),
               source_type: String(deal.source_type || 'live_store_search'),
               history: Array.isArray(deal.history) ? deal.history : [],
               in_stock: typeof deal.in_stock === 'boolean' ? deal.in_stock : undefined,
               last_checked_at: Number(deal.last_checked_at || deal.scraped_at) || undefined,
+              price_verified: deal.price_verified === true,
+              price_source: typeof deal.price_source === 'string' ? deal.price_source : undefined,
               product_id: deal.product_id,
               gtin: typeof deal.gtin === 'string' ? deal.gtin : undefined,
               effective_price: toNumber(deal.effective_price),
@@ -346,9 +352,9 @@ export const App: React.FC = () => {
                 const incomingDeals: PublicDeal[] = extData.deals.map((deal: any) => {
                   const score = typeof deal.worth_score === 'number' ? deal.worth_score : calculateWorthScore(deal).score;
                   return {
-                    ...deal,
+                    ...publicDeal(deal),
                     worth_score: score,
-                    display_ts: deal.posted_at ? deal.posted_at * 1000 : Date.now(),
+                    display_ts: deal.posted_at ? (deal.posted_at < 1e12 ? deal.posted_at * 1000 : deal.posted_at) : 0,
                   };
                 });
                 setDeals(incomingDeals);
@@ -402,9 +408,9 @@ export const App: React.FC = () => {
         const incomingDeals: PublicDeal[] = (data.deals || []).map((deal: PublicDeal) => {
           const score = typeof deal.worth_score === 'number' ? deal.worth_score : calculateWorthScore(deal).score;
           return {
-            ...deal,
+            ...publicDeal(deal),
             worth_score: score,
-            display_ts: deal.posted_at ? deal.posted_at * 1000 : Date.now(),
+            display_ts: deal.posted_at ? (deal.posted_at < 1e12 ? deal.posted_at * 1000 : deal.posted_at) : 0,
           };
         });
 
@@ -425,7 +431,7 @@ export const App: React.FC = () => {
         if (controller.signal.aborted) return;
         const msg = err instanceof Error ? err.message : 'Failed to fetch deals';
         console.warn('Live deal feed unavailable:', msg);
-        setError('The verified deal feed is temporarily unavailable. Retry to load live data.');
+        setError('The deal directory is temporarily unavailable. Retry to load offers.');
         if (!isAppend) {
           setDeals([]);
           setTotalDeals(0);
@@ -525,6 +531,12 @@ export const App: React.FC = () => {
     }
   };
 
+  const startProductSearch = (query: string) => {
+    setSearchQuery(query.trim());
+    setActiveTab('home');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
   const handleNavTabChange = (tab: NavTab) => {
     setActiveTab(tab);
     if (tab === 'home') {
@@ -582,6 +594,8 @@ export const App: React.FC = () => {
         onOpenSubmit={() => setIsSubmitOpen(true)}
         onFocusSearch={handleFocusSearch}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onOpenCardsModal={() => setIsCardsModalOpen(true)}
+        onOpenToolsHub={() => handleOpenToolsHub()}
         isAudioEnabled={isAudioActive}
         onToggleAudio={handleToggleAudio}
         savedCount={savedDealIds.length}
@@ -589,9 +603,10 @@ export const App: React.FC = () => {
 
       {/* ── Real-Time Loot Radar Marquee Ticker ── */}
       <MarqueeTicker
+        deals={deals}
+        loading={loading}
         onSelectDeal={(deal) => {
-          const fullDeal = deals.find((d) => d.id === deal.id);
-          setSelectedDetailDeal((fullDeal || deal) as PublicDeal);
+          setSelectedDetailDeal(deal);
         }}
         onOpenVerify={() => setIsVerifyModalOpen(true)}
       />
@@ -676,7 +691,7 @@ export const App: React.FC = () => {
             <SearchResultsHeader
               query={searchQuery}
               onQueryChange={setSearchQuery}
-              onSubmit={() => setSearchQuery((current) => current.trim())}
+              onSubmit={() => startProductSearch(searchQuery)}
               onClear={() => setSearchQuery('')}
               verifiedCount={filteredDeals.length}
             />
@@ -685,11 +700,11 @@ export const App: React.FC = () => {
               {/* ── 2. Hero Section & Decoupled Search ── */}
               <HeroBanner
                 searchQuery={searchQuery}
-                onSearch={(q) => setSearchQuery(q)}
+                onSearch={startProductSearch}
                 searchMode={searchMode}
                 onSearchModeChange={(mode) => {
                   setSearchMode(mode);
-                  showToast(mode === 'live' ? '🌐 Live Multi-Store Crawler Active' : '⚡ Verified Deals Database Active');
+                  showToast(mode === 'live' ? '🌐 External Store Search Selected' : '⚡ Deal Directory Active');
                 }}
                 onOpenLookup={(url) => {
                   setLookupUrl(url || '');
@@ -725,7 +740,7 @@ export const App: React.FC = () => {
           <div className={`mobile-shopping-controls ${searchFullScreen ? 'is-search' : ''}`}>
           {!searchFullScreen && <button type="button" className="mobile-desk-toggle" aria-expanded={mobileDeskOpen}
             aria-controls="shopping-desk" onClick={() => setMobileDeskOpen(v => !v)}>
-            <span><strong>Shopping desk</strong><small>Compare prices, history & checkout costs</small></span>
+            <span><strong>Compare & shopping tools</strong><small>Price evidence, shortlists & checkout costs</small></span>
             <span aria-hidden="true">{mobileDeskOpen ? '−' : '+'}</span>
           </button>}
           <div id="shopping-desk" className={`shopping-desk ${searchFullScreen || mobileDeskOpen ? 'is-open' : ''}`}>
@@ -740,7 +755,7 @@ export const App: React.FC = () => {
             ]}
             loading={loading || (searchFullScreen && externalSearchLoading)}
             externalError={searchFullScreen ? externalSearchError : null}
-            onSearch={setSearchQuery}
+            onSearch={startProductSearch}
             onLookup={(url) => { setLookupUrl(url); setIsLookupOpen(true); }}
             onAlert={(offer) => { setActiveFeatureDeal({ ...offer, category: 'General', posted_at: 0, discount_pct: null }); setIsPriceAlertOpen(true); }}
           />
@@ -777,17 +792,17 @@ export const App: React.FC = () => {
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-[#F1F5F9] font-heading">
-                        {searchMode === 'live' ? 'Live Web Crawler Active' : 'Verified Deals Database'}
+                        {searchMode === 'live' ? 'External Store Search' : 'Deal Directory'}
                       </span>
                       <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-300">
-                        {filteredDeals.length} Verified Match{filteredDeals.length === 1 ? '' : 'es'}
+                        {filteredDeals.length} Directory Match{filteredDeals.length === 1 ? '' : 'es'}
                       </span>
                     </div>
                     <p className="text-[11px] text-slate-600 dark:text-slate-400 m-0 mt-0.5">
                       Query: <span className="font-semibold text-blue-900 font-mono">"{searchQuery}"</span>
                       {searchMode === 'db'
-                        ? ' • Natural language budget and device matching across verified drops'
-                        : ' • Crawling real-time Amazon, Flipkart & Myntra storefronts via stealth proxy'}
+                        ? ' • Natural language budget and device matching across directory offers'
+                        : ' • Store coverage and price evidence vary by product'}
                     </p>
                   </div>
                 </div>
@@ -798,11 +813,11 @@ export const App: React.FC = () => {
                     onClick={() => {
                       const next = searchMode === 'db' ? 'live' : 'db';
                       setSearchMode(next);
-                      showToast(next === 'live' ? '🌐 Live Multi-Store Crawler Active' : '⚡ Verified Deals Database Active');
+                      showToast(next === 'live' ? '🌐 External Store Search Selected' : '⚡ Deal Directory Active');
                     }}
                     className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#0D1527] hover:bg-slate-50 dark:bg-[#070A11] border border-slate-300 dark:border-white/20 text-slate-700 dark:text-slate-200 text-xs font-bold cursor-pointer transition-colors shadow-2xs"
                   >
-                    {searchMode === 'db' ? '🌐 Switch to Live Crawler' : '⚡ Switch to Verified Database'}
+                    {searchMode === 'db' ? '🌐 Switch to Live Crawler' : '⚡ Switch to Deal Directory'}
                   </button>
                   <button
                     type="button"
@@ -824,11 +839,11 @@ export const App: React.FC = () => {
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </span>
                   <h2 className="font-heading text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-[#F1F5F9] m-0">
-                    <span className="hidden sm:inline">Latest Verified Drops</span>
+                    <span className="hidden sm:inline">Latest finds</span>
                     <span className="sm:hidden">Latest Drops</span>
                   </h2>
                   <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    LIVE RADAR
+                    DIRECTORY
                   </span>
                 </div>
                 <p className="text-slate-500 text-xs sm:text-sm mt-1">
@@ -842,7 +857,7 @@ export const App: React.FC = () => {
                       ? `${totalDeals.toLocaleString('en-IN')} drops`
                       : loading
                         ? 'Loading drops…'
-                        : 'No verified drops loaded'}
+                        : 'No directory offers loaded'}
               </span>
             </div>
 
@@ -867,7 +882,7 @@ export const App: React.FC = () => {
                 )}
                 <div className="py-12 px-6 text-center max-w-md mx-auto rounded-2xl border border-rose-200 bg-white dark:bg-[#0D1527] shadow-sm">
                   <h3 className="font-heading font-bold text-slate-900 dark:text-[#F1F5F9] mb-2">
-                    Could not load verified deals
+                    Could not load the deal directory
                   </h3>
                   <p className="text-xs text-rose-600 mb-4">{error}</p>
                   <button
@@ -896,7 +911,7 @@ export const App: React.FC = () => {
 
                 <div className="py-10 px-6 text-center max-w-md mx-auto rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] shadow-sm">
                   <h3 className="font-heading font-bold text-slate-900 dark:text-[#F1F5F9] mb-2">
-                    No verified deals found
+                    No directory deals found
                   </h3>
                   <p className="text-xs text-slate-500 mb-4">
                     Try a broader product name, clear a filter, or search the stores above.
@@ -932,10 +947,10 @@ export const App: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-50 text-xs font-bold text-indigo-700">⚡</span>
                         <h3 className="font-heading text-base font-black text-slate-900 dark:text-[#F1F5F9]">
-                          Community Deals from 27 Channels ({filteredDeals.length})
+                          Directory offers ({filteredDeals.length})
                         </h3>
                       </div>
-                      <span className="text-xs text-slate-500 font-medium">Curated verified drops matching “{searchQuery}”</span>
+                      <span className="text-xs text-slate-500 font-medium">Directory offers matching “{searchQuery}”</span>
                     </div>
                   </div>
                 )}
@@ -1087,12 +1102,7 @@ export const App: React.FC = () => {
         onSelectDeal={(deal) => {
           setSelectedDetailDeal(deal);
         }}
-        onSearchSubmit={(q) => {
-          setSearchQuery(q);
-          setActiveTab('home');
-          const el = document.getElementById('deals-section');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }}
+        onSearchSubmit={startProductSearch}
         onOpenTool={handleOpenToolsHub}
       />
 

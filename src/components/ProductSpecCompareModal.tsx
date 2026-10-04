@@ -1,3 +1,4 @@
+import { useModalSurface } from '../utils/useModalSurface';
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PublicDeal } from '../types';
@@ -52,7 +53,7 @@ function getProductAttributes(deal: PublicDeal) {
   let specRow1Label = 'Category';
   let specRow1Value = 'General Retail';
   let specRow2Label = 'Key Feature';
-  let specRow2Value = 'Verified Deal';
+  let specRow2Value = 'Not supplied';
 
   if (domain === 'phone') {
     specRow1Label = 'RAM & Storage';
@@ -63,32 +64,32 @@ function getProductAttributes(deal: PublicDeal) {
     } else if (storage) {
       specRow1Value = `${storage[0].toUpperCase()} Storage`;
     } else {
-      specRow1Value = 'Standard Storage';
+      specRow1Value = 'Not supplied';
     }
 
     specRow2Label = 'Network & Connectivity';
-    specRow2Value = t.includes('5g') ? '✅ 5G High-Speed' : '4G LTE / Dual SIM';
+    specRow2Value = t.includes('5g') ? '✅ 5G High-Speed' : 'Not supplied';
   } else if (domain === 'laptop') {
     specRow1Label = 'Processor & RAM';
     const cpu = deal.title.match(/(i[3579]|ryzen\s*[3579]|m[123]|snapdragon)/i);
     const ram = deal.title.match(/(\d+)\s*gb\s*ram/i);
-    specRow1Value = `${cpu ? cpu[0].toUpperCase() : 'Intel / AMD'} · ${ram ? ram[0].toUpperCase() : 'Configured RAM'}`;
+    specRow1Value = `${cpu ? cpu[0].toUpperCase() : 'Processor not supplied'} · ${ram ? ram[0].toUpperCase() : 'RAM not supplied'}`;
 
     specRow2Label = 'Storage & OS';
     const ssd = deal.title.match(/(\d+)\s*(?:gb|tb)\s*ssd/i);
-    specRow2Value = ssd ? `${ssd[0].toUpperCase()} Fast SSD` : 'High-Speed SSD Storage';
+    specRow2Value = ssd ? `${ssd[0].toUpperCase()} Fast SSD` : 'Not supplied';
   } else if (domain === 'audio') {
     specRow1Label = 'Audio Type';
     if (t.includes('tws') || t.includes('earbuds')) specRow1Value = 'True Wireless (TWS)';
     else if (t.includes('neckband')) specRow1Value = 'Wireless Neckband';
     else if (t.includes('headphones')) specRow1Value = 'Over-Ear Headphones';
     else if (t.includes('soundbar')) specRow1Value = 'Home Audio Soundbar';
-    else specRow1Value = 'Wireless Audio';
+    else specRow1Value = 'Not supplied';
 
     specRow2Label = 'Special Feature';
-    if (t.includes('anc') || t.includes('noise')) specRow2Value = '🎧 Active Noise Cancellation';
+    if (/\\banc\\b|active noise cancellation/i.test(t)) specRow2Value = '🎧 Active Noise Cancellation';
     else if (t.includes('bass')) specRow2Value = '🔊 Deep Bass Boost';
-    else specRow2Value = '⚡ Fast Charging Audio';
+    else specRow2Value = 'Not supplied';
   } else if (domain === 'fashion') {
     specRow1Label = 'Style & Apparel';
     if (t.includes('sneaker') || t.includes('shoes')) specRow1Value = '👟 Footwear / Sneakers';
@@ -102,12 +103,12 @@ function getProductAttributes(deal: PublicDeal) {
     specRow1Label = 'Appliance Type';
     specRow1Value = 'Home & Kitchen Utility';
     specRow2Label = 'Power & Warranty';
-    specRow2Value = 'Standard Manufacturer Warranty';
+    specRow2Value = 'Warranty details not supplied';
   } else if (domain === 'beauty') {
     specRow1Label = 'Product Category';
     specRow1Value = 'Beauty & Personal Care';
     specRow2Label = 'Authenticity';
-    specRow2Value = '100% Original Brand Stock';
+    specRow2Value = 'Authenticity not independently checked';
   }
 
   return {
@@ -131,6 +132,7 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
   onRemoveDeal,
   onClearAll,
 }) => {
+  const modalSurface = useModalSurface(isOpen, onClose);
   if (!isOpen) return null;
 
   const lowestPrice = deals.length > 0 ? Math.min(...deals.map((d) => d.price)) : 0;
@@ -139,7 +141,7 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/70 backdrop-blur-md">
+      <div ref={modalSurface} role="dialog" aria-modal="true" aria-label="Compare product specifications" className="shopper-tool-modal fixed inset-0 z-[110] flex items-center justify-center p-3 sm:p-6 bg-slate-900/70 backdrop-blur-md">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -175,7 +177,7 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
               <button
                 type="button"
                 onClick={onClose}
-                className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#1E293B]/60 dark:bg-[#172440]/60 transition-colors cursor-pointer"
+                aria-label="Close dialog" className="w-11 h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#1E293B]/60 dark:bg-[#172440]/60 transition-colors cursor-pointer"
               >
                 ✕
               </button>
@@ -347,3 +349,6 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
 };
 
 export default ProductSpecCompareModal;
+
+
+

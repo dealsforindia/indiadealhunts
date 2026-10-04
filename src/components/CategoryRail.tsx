@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'motion/react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { motion, useAnimationControls, useReducedMotion } from 'motion/react';
 import { Car, Dumbbell, Grid2X2, Headphones, House, Plane, Shirt, ShoppingBasket, Sparkles } from 'lucide-react';
 interface CategoryRailProps { selectedCategory: string; onSelectCategory: (cat: string) => void; categoryCounts?: Record<string, number>; }
 const CATEGORIES = [
@@ -13,14 +13,38 @@ const CATEGORIES = [
   { id: 'Automotive', label: 'Automotive', Icon: Car },
   { id: 'Travel', label: 'Luggage & Travel', Icon: Plane },
 ];
-export const CategoryRail: React.FC<CategoryRailProps> = ({ selectedCategory, onSelectCategory }) => <nav id="category-rail" aria-label="Category navigation rail" className="category-rail sticky top-16 z-40 w-full backdrop-blur-xl bg-white/95 dark:bg-[#0D1527]/95 border-b border-slate-200 dark:border-white/10 transition-all">
-  <div className="max-w-[1340px] mx-auto px-4 md:px-6 flex items-center gap-2 overflow-x-auto no-scrollbar py-2.5">
-    {CATEGORIES.map(({ id, label, Icon }) => {
-      const selected = selectedCategory === id || (id === 'all' && !selectedCategory);
-      return <button type="button" key={id} aria-pressed={selected} onClick={() => onSelectCategory(id)} className={`premium-category ${selected ? 'is-selected' : ''}`}>
-        <Icon size={17} aria-hidden="true" /><span>{label}</span>
-        {selected && <motion.div layoutId="active-category-pill" transition={{ type: 'spring', stiffness: 450, damping: 35 }} className="premium-category-fill" />}
-      </button>;
-    })}
-  </div>
-</nav>;
+export function CategoryRail({ selectedCategory, onSelectCategory }: CategoryRailProps) {
+  const rail = useRef<HTMLDivElement>(null);
+  const buttons = useRef(new Map<string, HTMLButtonElement>());
+  const selected = selectedCategory || 'all';
+  const reducedMotion = useReducedMotion();
+  const controls = useAnimationControls();
+  const [bounds, setBounds] = useState({ left: 0, top: 0, width: 0, height: 44 });
+  useLayoutEffect(() => {
+    const measure = () => {
+      const button = buttons.current.get(selected);
+      if (!button) return;
+      const next = { left: button.offsetLeft, top: button.offsetTop, width: button.offsetWidth, height: button.offsetHeight };
+      setBounds(previous => Object.keys(next).every(key => previous[key as keyof typeof next] === next[key as keyof typeof next]) ? previous : next);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    if (rail.current) observer.observe(rail.current);
+    buttons.current.forEach(button => observer.observe(button));
+    return () => observer.disconnect();
+  }, [selected]);
+  useEffect(() => {
+    if (!bounds.width) return;
+    controls.start(reducedMotion ? { x: bounds.left, y: bounds.top, width: bounds.width, height: bounds.height, opacity: 1, scaleX: 1, scaleY: 1, rotate: 0, transition: { duration: .12 } } : {
+      x: bounds.left, y: bounds.top, width: bounds.width, height: bounds.height, opacity: 1,
+      scaleX: [1, 1.06, .98, 1], scaleY: [1, .78, 1.06, 1], rotate: [0, -.65, .6, 0],
+      transition: { x: { type: 'spring', stiffness: 390, damping: 29, mass: .7 }, width: { type: 'spring', stiffness: 390, damping: 29 }, y: { duration: 0 }, height: { duration: 0 }, opacity: { duration: .1 }, scaleX: { duration: .48 }, scaleY: { duration: .48 }, rotate: { duration: .42, delay: .1 } },
+    });
+  }, [bounds, selected, reducedMotion, controls]);
+  return <nav id="category-rail" className="category-rail commerce-categories" aria-label="Category navigation rail">
+    <div ref={rail} className="liquid-category-list">
+      <motion.div className="liquid-category-indicator" initial={{ opacity: 0 }} animate={controls} aria-hidden="true"><span /></motion.div>
+      {CATEGORIES.map(({ id, label, Icon }) => <button ref={node => { if (node) buttons.current.set(id, node); else buttons.current.delete(id); }} type="button" key={id} className={`liquid-category-button${selected === id ? ' is-selected' : ''}`} aria-pressed={selected === id} onClick={() => onSelectCategory(id)}><Icon size={17} aria-hidden="true" /><span>{label}</span></button>)}
+    </div>
+  </nav>;
+}

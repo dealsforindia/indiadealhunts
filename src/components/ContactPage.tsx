@@ -1,7 +1,8 @@
+import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicStoreUrl, lookupTargetUrl } from '../utils/publicLinks';
 import React, { useState } from 'react';
 import { IconCheck } from './Icons';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
+const API_BASE = PUBLIC_API_BASE;
 
 interface ContactPageProps {
   onBackToHome?: () => void;

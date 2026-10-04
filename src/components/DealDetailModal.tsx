@@ -1,3 +1,4 @@
+import { publicShareUrl, publicStoreUrl } from '../utils/publicLinks';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
@@ -183,11 +184,11 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   };
 
   const handleShare = () => {
-    const text = `${deal.title}\n₹${price.toLocaleString('en-IN')} on ${storeName}\n${deal.url}`;
+    const text = `${deal.title}\n₹${price.toLocaleString('en-IN')} on ${storeName}\n${publicShareUrl(deal.url)}`;
     if (navigator.share) {
-      navigator.share({ title: deal.title, text, url: deal.url }).catch(() => {});
+      navigator.share({ title: deal.title, text, url: publicShareUrl(deal.url) }).catch(() => {});
     } else {
-      navigator.clipboard.writeText(deal.url).then(() => {
+      navigator.clipboard.writeText(publicShareUrl(deal.url)).then(() => {
         setCopyLink(true);
         setTimeout(() => setCopyLink(false), 2000);
         onShowToast?.('Deal link copied!');
@@ -197,7 +198,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
 
   const handleReportExpired = () => {
     setReportSent(true);
-    onShowToast?.('Reported — we will recheck this deal.');
+    onShowToast?.('Marked as expired in this view. Confirm availability with the store.');
   };
 
   return createPortal(
@@ -266,12 +267,12 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             {deal.category && (
               <>
                 <span style={{ color: '#94A3B8', fontSize: '10px' }}>›</span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#64748B', textTransform: 'uppercase' }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
                   {deal.category}
                 </span>
               </>
             )}
-            <span style={{
+            <span className="deal-source-badge" style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '5px',
@@ -345,7 +346,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                 backgroundColor: 'var(--bg-surface-card)',
                 border: '1px solid var(--border-subtle)',
                 borderRadius: '8px',
-                color: '#64748B',
+                color: 'var(--text-secondary)',
                 cursor: 'pointer',
                 flexShrink: 0,
                 transition: 'all 120ms ease',
@@ -497,7 +498,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             {/* Coupon code */}
             {deal.coupon && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
                   PROMO CODE
                 </span>
                 <div style={{
@@ -539,7 +540,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   </button>
                 </div>
                 {deal.coupon_discount && (
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#64748B' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-secondary)' }}>
                     {deal.coupon_discount}% off with this code
                   </span>
                 )}
@@ -565,7 +566,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                 border: '1px solid var(--border-subtle)',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: '12px', fontWeight: 800, color: '#0F172A' }}>
+                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: '12px', fontWeight: 800, color: 'var(--text-primary)' }}>
                     Compare store listings
                   </span>
                   <span style={{
@@ -578,7 +579,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                     padding: '2px 6px',
                     borderRadius: '4px',
                   }}>
-                    Live Store Links
+                    Store links
                   </span>
                 </div>
 
@@ -587,6 +588,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   {arbitrage.quotes.map((q, idx) => (
                     <div
                       key={idx}
+                      className="deal-compare-row"
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -599,7 +601,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontFamily: 'var(--font-heading)', fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>
+                        <span style={{ fontFamily: 'var(--font-heading)', fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>
                           {q.store}
                         </span>
                         <span style={{
@@ -628,7 +630,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                           </span>
                         ) : null}
                         <a
-                          href={q.url}
+                          href={publicStoreUrl(q.url) || undefined}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{
@@ -654,7 +656,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                 <p style={{
                   fontSize: '10.5px',
                   fontFamily: 'var(--font-body)',
-                  color: '#64748B',
+                  color: 'var(--text-secondary)',
                   margin: '2px 0 0',
                   lineHeight: 1.4,
                 }}>
@@ -670,8 +672,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               gap: '10px',
               padding: '16px',
               borderRadius: '16px',
-              backgroundColor: '#F5F5F7',
-              border: '1px solid #E5E5E7',
+              backgroundColor: 'var(--surface-2)',
+              border: '1px solid var(--border-subtle)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -687,7 +689,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                     fontSize: '11px',
                     fontWeight: 700,
                   }}>✓</span>
-                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: '13px', fontWeight: 700, color: '#1D1D1F' }}>
+                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>
                     Check before buying
                   </span>
                 </div>
@@ -703,7 +705,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
 
               <div style={{
                 fontSize: '12.5px',
-                color: '#424245',
+                color: 'var(--text-secondary)',
                 lineHeight: 1.5,
                 fontFamily: 'var(--font-body)',
               }}>
@@ -723,7 +725,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             <p style={{
               fontSize: '11px',
               fontFamily: 'var(--font-body)',
-              color: '#64748B',
+              color: 'var(--text-secondary)',
               lineHeight: 1.5,
               margin: 0,
               borderTop: '1px solid var(--border-subtle)',
@@ -768,7 +770,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   title="Add accessory bundle or delivery saver"
                 >
                   <span>{includeBundle ? '☑️' : '◻️'}</span>
-                  <span>{bundle.badge}: +₹{bundle.price}</span>
+                  <span>Optional accessory · Check price</span>
                 </button>
               )}
               <button
@@ -797,9 +799,9 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                 onMouseLeave={(e) => {
                   (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F59E0B';
                 }}
-                title="Locks this item and price into your Amazon Cart for up to 90 days"
+                title="Add to Amazon cart; confirm the final price there"
               >
-                <span>🛒 {includeBundle ? 'Lock Bundle (90d)' : 'Lock in Cart (90 Days)'}</span>
+                <span>🛒 {includeBundle ? 'Add bundle to cart' : 'Add to Amazon cart'}</span>
               </button>
               <button
                 type="button"
@@ -972,7 +974,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
             }}
           >
-            {reportSent ? '⚠ Reported' : '⚠ Report Expired'}
+            {reportSent ? '⚠ Marked expired' : '⚠ Mark expired here'}
           </button>
         </div>
       </motion.div>

@@ -1,3 +1,4 @@
+import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicStoreUrl, lookupTargetUrl } from '../utils/publicLinks';
 import React, { useState, useRef } from 'react';
 
 interface DealSubmissionResult {
@@ -11,7 +12,7 @@ interface SubmitDealProps {
   onBackToHome?: () => void;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
+const API_BASE = PUBLIC_API_BASE;
 
 export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
   const [email, setEmail] = useState('');
@@ -123,7 +124,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
           Submit a Deal or Loot Drop
         </h1>
         <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-          Found an insane price drop, flash error, or promo code? Share it with the community. Our AI pipeline verifies live pricing and credits fast contributors.
+          Found a price drop or promo code? Submit the source link for review. Submission does not guarantee verification or publication.
         </p>
       </div>
 
@@ -136,7 +137,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
             Deal Submitted for Review!
           </h3>
           <p className="text-xs text-slate-500 max-w-md leading-relaxed">
-            {dealResult?.message || 'Thank you! Our automated pipeline is now scraping price history and stock status. If verified, it will broadcast to our feeds.'}
+            {dealResult?.message || 'Your submission was accepted for review. Publication and price verification are not confirmed yet.'}
           </p>
           <div className="flex items-center gap-3 mt-3">
             <button

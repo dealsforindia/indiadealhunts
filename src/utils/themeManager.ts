@@ -1,112 +1,42 @@
-/**
- * Theme Manager & Controller
- * Supports 'system' (dynamic OS match), 'light' (clean Apple/Stripe), and 'dark' (Obsidian Titanium OLED).
- */
-import { useState, useEffect, useCallback } from 'react';
-
+import { useSyncExternalStore } from 'react';
 export type ThemePreference = 'system' | 'light' | 'dark';
 export type ResolvedTheme = 'light' | 'dark';
-
 export const THEME_STORAGE_KEY = 'idh_theme_preference';
-
-/**
- * Reads stored theme preference from localStorage or defaults to 'system'.
- */
+const THEME_EVENT = 'idh-appearance-change';
+let memoryPreference: ThemePreference | undefined;
 export function getStoredThemePreference(): ThemePreference {
   if (typeof window === 'undefined') return 'system';
-  try {
-    const saved = localStorage.getItem(THEME_STORAGE_KEY);
-    if (saved === 'light' || saved === 'dark' || saved === 'system') {
-      return saved;
-    }
-  } catch {
-    // Ignore storage errors
-  }
+  if (memoryPreference) return memoryPreference;
+  try { const value = localStorage.getItem(THEME_STORAGE_KEY); if (value === 'dark' || value === 'light' || value === 'system') return value; } catch {}
   return 'system';
 }
-
-/**
- * Returns the current OS theme ('dark' or 'light').
- */
-export function getSystemTheme(): ResolvedTheme {
-  if (typeof window === 'undefined') return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-
-/**
- * Resolves a preference to an actual visual theme.
- */
-export function resolveTheme(pref: ThemePreference): ResolvedTheme {
-  if (pref === 'system') {
-    return getSystemTheme();
-  }
-  return pref;
-}
-
-/**
- * Applies the theme to the DOM (class="dark", data-theme="dark/light", color-scheme).
- */
-export function applyTheme(pref: ThemePreference): ResolvedTheme {
-  if (typeof window === 'undefined') return 'light';
-  const resolved = resolveTheme(pref);
-  const root = document.documentElement;
-
-  if (resolved === 'dark') {
-    root.classList.add('dark');
-    root.setAttribute('data-theme', 'dark');
-    root.style.colorScheme = 'dark';
-  } else {
-    root.classList.remove('dark');
-    root.setAttribute('data-theme', 'light');
-    root.style.colorScheme = 'light';
-  }
-
-  // Update mobile browser chrome color
-  const metaTheme = document.querySelector('meta[name="theme-color"]');
-  if (metaTheme) {
-    metaTheme.setAttribute('content', resolved === 'dark' ? '#070A11' : '#F8FAFC');
-  }
-
-  try {
-    localStorage.setItem(THEME_STORAGE_KEY, pref);
-  } catch {
-    // Ignore storage errors
-  }
-
+export function getSystemTheme(): ResolvedTheme { return typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+export function resolveTheme(preference: ThemePreference): ResolvedTheme { return preference === 'system' ? getSystemTheme() : preference; }
+export function applyTheme(preference: ThemePreference): ResolvedTheme {
+  const resolved = resolveTheme(preference);
+  if (typeof window === 'undefined') return resolved;
+  memoryPreference = preference;
+  document.documentElement.classList.toggle('dark', resolved === 'dark');
+  document.documentElement.dataset.theme = resolved;
+  document.documentElement.style.colorScheme = resolved;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', resolved === 'dark' ? '#0b1220' : '#f7f8fa');
+  try { localStorage.setItem(THEME_STORAGE_KEY, preference); } catch {}
+  window.dispatchEvent(new Event(THEME_EVENT));
   return resolved;
 }
-
-/**
- * React Hook for theme management across components.
- */
+function snapshot() { const preference = getStoredThemePreference(); return `${preference}:${resolveTheme(preference)}`; }
+function subscribe(listener: () => void) {
+  const media = window.matchMedia('(prefers-color-scheme: dark)');
+  const storage = (event: StorageEvent) => { if (event.key === THEME_STORAGE_KEY || event.key === null) { memoryPreference = undefined; applyTheme(getStoredThemePreference()); } };
+  const system = () => { if (getStoredThemePreference() === 'system') applyTheme('system'); };
+  window.addEventListener(THEME_EVENT, listener);
+  window.addEventListener('storage', storage);
+  media.addEventListener('change', system);
+  applyTheme(getStoredThemePreference());
+  return () => { window.removeEventListener(THEME_EVENT, listener); window.removeEventListener('storage', storage); media.removeEventListener('change', system); };
+}
 export function useTheme() {
-  const [preference, setPreference] = useState<ThemePreference>(() => getStoredThemePreference());
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() => resolveTheme(getStoredThemePreference()));
-
-  const setTheme = useCallback((newPref: ThemePreference) => {
-    setPreference(newPref);
-    const resolved = applyTheme(newPref);
-    setResolvedTheme(resolved);
-  }, []);
-
-  useEffect(() => {
-    // Initial sync
-    const resolved = applyTheme(preference);
-    setResolvedTheme(resolved);
-
-    // If system preference is selected, dynamically update when user's OS changes theme
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleSystemChange = () => {
-      const currentPref = getStoredThemePreference();
-      if (currentPref === 'system') {
-        const nextResolved = applyTheme('system');
-        setResolvedTheme(nextResolved);
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleSystemChange);
-    return () => mediaQuery.removeEventListener('change', handleSystemChange);
-  }, [preference]);
-
-  return { preference, resolvedTheme, setTheme };
+  const value = useSyncExternalStore(subscribe, snapshot, () => 'system:light');
+  const [preference, resolvedTheme] = value.split(':') as [ThemePreference, ResolvedTheme];
+  return { preference, resolvedTheme, setTheme: applyTheme };
 }

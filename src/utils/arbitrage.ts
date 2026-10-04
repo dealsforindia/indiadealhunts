@@ -26,7 +26,7 @@ export interface ArbitrageAnalysis {
  * Never invents or fabricates fake competitor prices.
  */
 export function analyzeArbitrage(deal: Partial<PublicDeal>): ArbitrageAnalysis {
-  const currentStore = (deal.store || 'Verified Store').toLowerCase();
+  const currentStore = (deal.store || 'Source store').toLowerCase();
   const currentPrice = Number(deal.price) || 0;
   const mrp = Number(deal.mrp && deal.mrp > currentPrice ? deal.mrp : 0);
   const savingsVsMrp = mrp > currentPrice ? mrp - currentPrice : 0;
@@ -55,7 +55,7 @@ export function analyzeArbitrage(deal: Partial<PublicDeal>): ArbitrageAnalysis {
   const quotes: StorePriceQuote[] = [];
 
   // 1. Current Verified Deal Source
-  let sourceDisplayName = 'Verified Merchant';
+  let sourceDisplayName = 'Source store';
   if (isAmazon) sourceDisplayName = 'Amazon India';
   else if (isFlipkart) sourceDisplayName = 'Flipkart';
   else if (isMyntra) sourceDisplayName = 'Myntra';

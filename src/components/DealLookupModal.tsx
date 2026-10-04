@@ -1,8 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useModalSurface } from '../utils/useModalSurface';
+import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicStoreUrl, lookupTargetUrl } from '../utils/publicLinks';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { IconClose, IconSearch, IconShieldCheck, IconExternalLink } from './Icons';
 import { analyzeArbitrage, ArbitrageAnalysis } from '../utils/arbitrage';
+import { normalizeLookup } from '../utils/priceEvidence';
 
 interface DealLookupModalProps {
   initialUrl?: string;
@@ -23,7 +26,7 @@ interface PriceWatch {
 }
 
 const STORAGE_WATCHES_KEY = 'dealflow_price_watches_v1';
-const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
+const API_BASE = PUBLIC_API_BASE;
 
 const getLookupError = (targetUrl: string) => {
   try {
@@ -81,26 +84,13 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
     }
   });
 
+  const modalSurface = useModalSurface(isOpen, onClose);
+  const request = useRef<AbortController | null>(null);
   useEffect(() => {
-    if (!isOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose?.();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onClose]);
-
-  useEffect(() => {
-    if (initialUrl) {
-      handleLookup(initialUrl);
-    }
-  }, [initialUrl]);
-
+    if (!isOpen) { request.current?.abort(); return; }
+    if (initialUrl) { setUrl(initialUrl); handleLookup(initialUrl); }
+    return () => { request.current?.abort(); };
+  }, [initialUrl, isOpen]);
   const arbitrageData: ArbitrageAnalysis | null = useMemo(() => {
     if (!result) return null;
     return analyzeArbitrage({
@@ -113,7 +103,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
   }, [result]);
 
   const handleLookup = async (inputUrl: string) => {
-    let targetUrl = (inputUrl || url).trim();
+    let targetUrl = lookupTargetUrl((inputUrl || url).trim());
     if (!targetUrl) return;
 
     if (targetUrl.includes('google.') && (targetUrl.includes('/url?') || targetUrl.includes('url=') || targetUrl.includes('q=http'))) {
@@ -135,12 +125,15 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
     setResult(null);
     setWatchSaved(false);
 
+    request.current?.abort();
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6500);
+    request.current = controller;
+    const timeoutId = setTimeout(() => controller.abort(), 22000);
 
     try {
       let res = await fetch(`${API_BASE}/api/v1/deals/analyze-url?url=${encodeURIComponent(targetUrl)}`, {
         signal: controller.signal,
+        cache: 'no-store',
       }).catch(() => null);
 
       if (!res || !res.ok) {
@@ -152,14 +145,14 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
         }).catch(() => null);
       }
 
-      clearTimeout(timeoutId);
-
       if (res && res.ok) {
         const data = await res.json();
+        if (controller.signal.aborted || request.current !== controller) return;
         if (data && (data.status === 'success' || data.success || data.title || data.product_name)) {
-          setResult(data);
-          if (data.price) {
-            setTargetPrice(String(Math.round(data.price * 0.9)));
+          const normalized = normalizeLookup(data);
+          setResult(normalized);
+          if (normalized.price) {
+            setTargetPrice(String(Math.round(normalized.price * 0.9)));
           }
           return;
         }
@@ -185,14 +178,15 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
         };
         setResult(fallbackData);
       } else {
-        throw new Error(getLookupError(targetUrl));
+        throw new Error(getLookupError(targetUrl) || 'Current price could not be retrieved. Try again or confirm the price at the store.');
       }
     } catch (err: unknown) {
       clearTimeout(timeoutId);
-      setError(err instanceof Error ? err.message : 'Analysis failed. Please verify the URL.');
+      if (request.current === controller && !controller.signal.aborted) setError(err instanceof Error ? err.message : 'Analysis failed. Please verify the URL.');
+      else if (request.current === controller && isOpen) setError('The price check took too long. Try again or confirm the price at the store.');
     } finally {
       clearTimeout(timeoutId);
-      setLoading(false);
+      if (request.current === controller) setLoading(false);
     }
   };
 
@@ -207,7 +201,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
       url: result.clean_url || result.url || url,
       currentPrice: Number(result.price) || 0,
       targetPrice: Number(targetPrice) || 0,
-      store: result.store || 'Verified Store',
+      store: result.store || 'Source store',
       contact: contactInfo.trim() || 'Device-only goal',
       created_at: Date.now(),
     };
@@ -231,6 +225,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
 
   return createPortal(
     <div
+      ref={modalSurface} role="dialog" aria-modal="true" aria-label="Product price lookup"
       className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-sm"
       onClick={onClose}
     >
@@ -346,11 +341,11 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                 <div className="rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 p-4 flex flex-col gap-3.5">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-mono font-bold uppercase text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
-                      {result.store || 'Verified Store'}
+                      {result.store || 'Source store'}
                     </span>
                     <span className="text-[11px] font-mono font-bold text-emerald-600 flex items-center gap-1">
                       <IconShieldCheck size={14} />
-                      Verified Merchant Link
+                      Source product link
                     </span>
                   </div>
 
@@ -359,7 +354,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                   </h4>
 
                   <div className="flex items-baseline gap-2.5">
-                    {result.price && (
+                    {result.price > 0 && (
                       <span className="font-mono text-2xl font-extrabold text-slate-900 dark:text-[#F1F5F9]">
                         ₹{Number(result.price).toLocaleString('en-IN')}
                       </span>
@@ -375,16 +370,18 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                       </span>
                     )}
                   </div>
+                  <p className="text-xs text-slate-500 leading-relaxed m-0" role="status">{result.price_evidence_label || 'Current price unconfirmed'}{result.last_checked_at ? ` · ${new Date(result.last_checked_at).toLocaleString('en-IN')}` : '. A merchant observation timestamp was not supplied.'} Confirm your variant and final price at checkout.</p>
+                  {!result.price && result.historical_price > 0 && result.historical_price_at && <p className="text-xs text-slate-500 m-0">Historical observation: ₹{Number(result.historical_price).toLocaleString('en-IN')} on {new Date(result.historical_price_at < 1e11 ? result.historical_price_at * 1000 : result.historical_price_at).toLocaleDateString('en-IN')}. This is not the current price.</p>}
 
                   {/* Multi-Store Arbitrage / Verification Table */}
                   {arbitrageData && (
                     <div className="mt-1 p-3.5 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 flex flex-col gap-2.5 shadow-2xs">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-heading font-extrabold text-slate-900 dark:text-[#F1F5F9] flex items-center gap-1">
-                          <span>⚡ Real-Time Price Verification</span>
+                          <span>Price evidence & store checks</span>
                         </span>
                         <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
-                          Live Store Links
+                          Store search links
                         </span>
                       </div>
 
@@ -402,7 +399,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                               <span className="text-[11px] font-bold text-slate-800 dark:text-[#F8FAFC]">{q.store}</span>
                               {q.isVerifiedDeal && (
                                 <span className="text-[9px] font-mono font-extrabold text-emerald-700 uppercase bg-emerald-100 px-1 py-0.2 rounded">
-                                  VERIFIED
+                                  SOURCE
                                 </span>
                               )}
                             </div>
@@ -419,7 +416,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                               {q.badge}
                             </span>
                             <a
-                              href={q.url}
+                              href={publicStoreUrl(q.url) || undefined}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="mt-1 text-[10px] font-semibold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1"
@@ -485,7 +482,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
 
                   {(result.url || result.clean_url) && (
                     <a
-                      href={result.clean_url || result.url}
+                      href={publicStoreUrl(result.clean_url || result.url) || undefined}
                       target="_blank"
                       rel="noopener noreferrer sponsored"
                       className="w-full h-10 rounded-xl bg-slate-900 hover:bg-black text-white font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-xs"
@@ -544,7 +541,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
 
                       <div className="flex items-center gap-2 flex-shrink-0">
                         <a
-                          href={w.url}
+                          href={publicStoreUrl(w.url) || undefined}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-700 dark:text-slate-200 text-xs font-semibold"
@@ -572,3 +569,4 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
     document.body
   );
 };
+

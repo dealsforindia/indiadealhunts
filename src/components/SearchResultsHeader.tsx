@@ -29,7 +29,7 @@ export const SearchResultsHeader: React.FC<SearchResultsHeaderProps> = ({ query,
 
         <form onSubmit={handleSubmit} className="mt-4 flex max-w-3xl items-center gap-2 rounded-2xl border border-slate-300 dark:border-white/20 bg-white dark:bg-[#0D1527] p-1.5 shadow-sm focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100">
           <span className="pl-3 text-slate-400" aria-hidden="true">⌕</span>
-          <input id="search-results-input" aria-label="Search products" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Search products across the verified feed and stores…" className="min-w-0 flex-1 bg-transparent px-2 py-2 text-sm text-slate-900 dark:text-[#F1F5F9] outline-none" autoFocus />
+          <input id="search-results-input" aria-label="Search products" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Search products across the deal directory and stores…" className="min-w-0 flex-1 bg-transparent px-2 py-2 text-sm text-slate-900 dark:text-[#F1F5F9] outline-none" autoFocus />
           <button type="submit" className="rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-blue-700">Search</button>
           <button type="button" onClick={onClear} className="rounded-xl px-3 py-2.5 text-xs font-bold text-slate-500 transition hover:bg-slate-100 dark:bg-[#111C33] hover:text-slate-900 dark:text-[#F1F5F9]">Clear</button>
         </form>

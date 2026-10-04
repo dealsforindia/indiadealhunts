@@ -95,7 +95,7 @@ export function MobileDealCardContent(props: Props) {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             {includeBundle ? <CheckSquare size={13} color="#854d0e" /> : <Square size={13} color="#a16207" />}
-            <span>{bundle.badge}: +{bundle.name.slice(0, 24)}... (+{money(bundle.price)})</span>
+            <span>Optional accessory · Check price</span>
           </div>
         </div>
       )}
@@ -108,10 +108,10 @@ export function MobileDealCardContent(props: Props) {
               type="button"
               className={`phone-store-btn-cart${expired ? ' is-expired' : ''}`}
               onClick={handleLockInCart}
-              title="Locks price and attribution in Amazon Cart for up to 90 days"
+              title="Add to Amazon cart; confirm the final price there"
             >
               <ShoppingCart size={15} />
-              <span>{includeBundle ? 'Lock Bundle in Cart (90d)' : '🛒 Lock in Cart (90 Days)'}</span>
+              <span>{includeBundle ? 'Add bundle to cart' : 'Add to Amazon cart'}</span>
             </button>
             <button
               type="button"

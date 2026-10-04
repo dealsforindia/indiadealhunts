@@ -335,12 +335,12 @@ export const StoryModal: React.FC<StoryModalProps> = ({
                 </span>
                 {currentItem.mrp > currentItem.price && (
                   <span className="text-sm font-medium text-white/40 line-through font-mono">
-                    ₹{currentItem.mrp.toLocaleString('en-IN')}
+                    ₹{currentItem.mrp.toLocaleString('en-IN')} less than MRP
                   </span>
                 )}
                 {currentItem.mrp > currentItem.price && (
                   <span className="text-xs font-semibold text-amber-300/90 font-mono">
-                    Save ₹{(currentItem.mrp - currentItem.price).toLocaleString('en-IN')}
+                    ₹{(currentItem.mrp - currentItem.price).toLocaleString('en-IN')}
                   </span>
                 )}
               </div>
@@ -348,7 +348,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({
               {/* Anti-Fake Guarantee Chip */}
               <div className="mt-2 flex items-center gap-1.5 text-[11px] text-white/60">
                 <span className="text-emerald-400">✓</span>
-                <span>Price & Stock Verified by IndiaDealHunts Engine</span>
+                <span>Source-reported offer · Confirm price & stock at checkout</span>
               </div>
             </div>
           </div>

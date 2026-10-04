@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { PublicDeal } from '../types';
 import { PublicDealCard } from './PublicDealCard';
+import { ShoppingArtwork } from './ShoppingArtwork';
 
 interface SavedLootPageProps {
   deals: PublicDeal[];
@@ -168,12 +169,10 @@ export const SavedLootPage: React.FC<SavedLootPageProps> = ({
       ) : (
         /* ── Empty State (Apple / Mobbin Design Language) ── */
         <div className="max-w-md mx-auto my-12 text-center p-8 sm:p-10 rounded-3xl bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 shadow-sm">
-          <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-3xl mx-auto mb-4 border border-amber-200/60 shadow-2xs">
-            ❤️
-          </div>
+          <ShoppingArtwork className="shopping-artwork-empty" />
           <h2 className="text-xl font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">Your Loot Vault is Empty</h2>
           <p className="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
-            Click the heart icon on any deal card to save it here for instant comparison and price tracking.
+            Save a deal with the bookmark icon to revisit and compare it here. Saved prices are snapshots; confirm them before buying.
           </p>
           <button
             type="button"

@@ -1,3 +1,5 @@
+import { useModalSurface } from '../utils/useModalSurface';
+import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicStoreUrl, lookupTargetUrl } from '../utils/publicLinks';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PublicDeal } from '../types';
@@ -9,7 +11,7 @@ interface PriceDropAlertModalProps {
   onSuccessToast?: (msg: string) => void;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://api.rudranil.me';
+const API_BASE = PUBLIC_API_BASE;
 
 export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
   isOpen,
@@ -34,6 +36,7 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
     }
   }, [isOpen, deal?.id]);
 
+  const modalSurface = useModalSurface(isOpen && !!deal, onClose);
   if (!isOpen || !deal) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,7 +96,7 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
+      <div ref={modalSurface} role="dialog" aria-modal="true" aria-label="Set a price alert" className="shopper-tool-modal fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -119,7 +122,7 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#1E293B]/60 dark:bg-[#172440]/60 transition-colors cursor-pointer"
+              aria-label="Close dialog" className="w-11 h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#1E293B]/60 dark:bg-[#172440]/60 transition-colors cursor-pointer"
             >
               ✕
             </button>
@@ -248,3 +251,5 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
     </AnimatePresence>
   );
 };
+
+

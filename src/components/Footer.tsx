@@ -3,6 +3,7 @@ import { NavTab } from '../types';
 import { BrandMark } from './BrandMark';
 import { LegalDocType } from './LegalModal';
 import { ThemeToggle } from './ThemeToggle';
+import { TelegramIcon } from './TelegramIcon';
 
 interface FooterProps {
   onTabChange?: (tab: NavTab) => void;
@@ -44,7 +45,7 @@ export const Footer: React.FC<FooterProps> = ({
             </div>
 
             <div className="font-mono text-xs text-blue-600 font-bold uppercase tracking-wider">
-              Real Deals · Real Savings · Real Time
+              Discover · Compare · Save
             </div>
 
             <p className="text-xs text-slate-500 leading-relaxed">
@@ -60,11 +61,9 @@ export const Footer: React.FC<FooterProps> = ({
                 rel="noopener noreferrer"
                 title="Join Telegram"
                 aria-label="Telegram"
-                className="w-8 h-8 rounded-xl bg-white dark:bg-[#0D1527] hover:bg-blue-50 border border-slate-200 dark:border-white/10 hover:border-blue-300 text-blue-600 flex items-center justify-center transition-all shadow-xs"
+                className="commerce-footer-telegram w-11 h-11 rounded-xl bg-white dark:bg-[#0D1527] hover:bg-blue-50 border border-slate-200 dark:border-white/10 hover:border-blue-300 text-blue-600 flex items-center justify-center transition-all shadow-xs"
               >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.63 3.73-.53.36-1.02.54-1.45.53-.48-.01-1.4-.27-2.09-.49-.84-.27-1.51-.42-1.45-.88.03-.24.37-.49 1.02-.75 4-1.74 6.68-2.88 8.03-3.44 3.82-1.59 4.62-1.87 5.14-1.88.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.16-.04.29z"/>
-                </svg>
+                <TelegramIcon />
               </a>
 
 
@@ -81,7 +80,7 @@ export const Footer: React.FC<FooterProps> = ({
                 onClick={() => handleLinkClick('home')}
                 className="text-left text-slate-600 dark:text-slate-400 hover:text-blue-600 font-medium transition-colors cursor-pointer bg-transparent border-0 p-0"
               >
-                Latest Verified Deals
+                Latest directory offers
               </button>
               <button
                 onClick={() => handleLinkClick('ending_soon')}
@@ -196,3 +195,4 @@ export const Footer: React.FC<FooterProps> = ({
     </footer>
   );
 };
+

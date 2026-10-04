@@ -5,6 +5,8 @@ import './index.css'
 import { RecoveryBoundary } from './components/RecoveryBoundary'
 import './mobile.css'
 import './premium.css'
+import './premium-dark.css'
+import './commerce.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

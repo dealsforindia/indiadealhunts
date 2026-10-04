@@ -56,7 +56,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
   onSelectCategory,
   sortBy,
   onSortChange,
-  totalDeals = 1248,
+  totalDeals = 0,
   viewMode = 'grid',
   onViewModeChange,
 }) => {
@@ -69,6 +69,8 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
   const [draftCat, setDraftCat] = useState(selectedCategory);
   const [draftSort, setDraftSort] = useState(sortBy);
 
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const filterTriggerRef = useRef<HTMLButtonElement>(null);
   const storeRef = useRef<HTMLDivElement>(null);
   const catRef = useRef<HTMLDivElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
@@ -100,12 +102,20 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
     if (!mobileDrawerOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    drawerRef.current?.querySelector<HTMLButtonElement>('button')?.focus();
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setMobileDrawerOpen(false);
+      if (e.key === 'Tab') {
+        const controls = [...(drawerRef.current?.querySelectorAll<HTMLElement>('button, select') || [])];
+        const first = controls[0], last = controls[controls.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       document.body.style.overflow = prev;
+      filterTriggerRef.current?.focus();
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [mobileDrawerOpen]);
@@ -269,6 +279,9 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
         <div className="flex md:hidden items-center justify-between w-full">
           <button
             type="button"
+            ref={filterTriggerRef}
+            aria-haspopup="dialog"
+            aria-expanded={mobileDrawerOpen}
             onClick={openMobileDrawer}
             className="h-9 px-3.5 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-800 dark:text-[#F8FAFC] flex items-center gap-2 cursor-pointer shadow-2xs"
           >
@@ -292,7 +305,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
         {/* ── Desktop Right: Deals Count & View Grid/List Toggles ── */}
         <div className="hidden md:flex items-center gap-3.5 ml-auto">
           <span className="font-mono text-xs font-semibold text-slate-500">
-            {totalDeals.toLocaleString('en-IN')} live drops
+            {totalDeals.toLocaleString('en-IN')} loaded offers
           </span>
 
           {onViewModeChange && (
@@ -334,98 +347,17 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
         </div>
       </div>
 
-      {/* ── Mobile Filter Drawer ── */}
-      <AnimatePresence>
-        {mobileDrawerOpen && createPortal(
-          <div className="fixed inset-0 z-[100] flex flex-col justify-end">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMobileDrawerOpen(false)}
-              className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs cursor-pointer"
-            />
-
-            <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-              className="relative bg-white dark:bg-[#0D1527] border-t border-slate-200 dark:border-white/10 rounded-t-3xl max-h-[85vh] sm:max-h-[calc(100dvh-3rem)] overflow-y-auto overscroll-contain p-5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] flex flex-col gap-4 z-10 shadow-2xl"
-            >
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-white/5">
-                <h3 className="font-heading font-extrabold text-base text-slate-900 dark:text-[#F1F5F9]">
-                  Filter & Sort Drops
-                </h3>
-                <button
-                  type="button"
-                  onClick={() => setMobileDrawerOpen(false)}
-                  aria-label="Close filters"
-                  className="w-11 h-11 rounded-full bg-slate-100 dark:bg-[#111C33] text-slate-500 hover:text-slate-900 dark:text-[#F1F5F9] flex items-center justify-center text-sm cursor-pointer"
-                >
-                  ✕
-                </button>
-              </div>
-
-              {/* Stores */}
-              <div>
-                <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-2">
-                  Store
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {STORES.map((s) => (
-                    <button
-                      key={s.id}
-                      type="button"
-                      onClick={() => setDraftStore(s.id)}
-                      className={`p-2.5 rounded-xl text-xs font-semibold text-left border transition-all cursor-pointer ${
-                        draftStore === s.id
-                          ? 'bg-blue-50 text-blue-700 border-blue-300 font-bold'
-                          : 'bg-slate-50 dark:bg-[#070A11] text-slate-700 dark:text-slate-200 border-slate-200 dark:border-white/10'
-                      }`}
-                    >
-                      {s.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Sort */}
-              <div>
-                <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-2">
-                  Sort Order
-                </label>
-                <div className="flex flex-col gap-1.5">
-                  {SORT_OPTIONS.map((o) => (
-                    <button
-                      key={o.value}
-                      type="button"
-                      onClick={() => setDraftSort(o.value)}
-                      className={`p-2.5 rounded-xl text-xs font-semibold flex items-center justify-between border transition-all cursor-pointer ${
-                        draftSort === o.value
-                          ? 'bg-blue-50 text-blue-700 border-blue-300 font-bold'
-                          : 'bg-slate-50 dark:bg-[#070A11] text-slate-700 dark:text-slate-200 border-slate-200 dark:border-white/10'
-                      }`}
-                    >
-                      <span>{o.label}</span>
-                      {draftSort === o.value && <span className="text-blue-600">✓</span>}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={applyMobileDrawer}
-                className="mt-2 h-11 rounded-xl bg-slate-900 text-white font-bold text-sm tracking-wide shadow-sm active:scale-95 transition-all cursor-pointer"
-              >
-                Apply Filters ({totalDeals.toLocaleString('en-IN')} drops)
-              </button>
-            </motion.div>
-          </div>,
-          document.body
-        )}
-      </AnimatePresence>
+      {/* Portal contains the animation, so presence filtering cannot discard the drawer. */}
+      {createPortal(<AnimatePresence>{mobileDrawerOpen && <motion.div key="filters" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="commerce-sheet-backdrop" onClick={() => setMobileDrawerOpen(false)}>
+        <div ref={drawerRef} className="commerce-product-sheet commerce-filter-sheet" role="dialog" aria-modal="true" aria-label="Filter and sort offers" onClick={event => event.stopPropagation()}>
+          <div className="commerce-sheet-handle" aria-hidden="true" />
+          <header><div><small>MAKE IT YOURS</small><h2>Filter & sort</h2></div><button type="button" aria-label="Close filters" onClick={() => setMobileDrawerOpen(false)}>✕</button></header>
+          <label className="commerce-filter-field">Store<select value={draftStore} onChange={event => setDraftStore(event.target.value)}>{STORES.map(store => <option key={store.id} value={store.id}>{store.label}</option>)}</select></label>
+          <label className="commerce-filter-field">Category<select value={draftCat} onChange={event => setDraftCat(event.target.value)}>{CATEGORIES.map(category => <option key={category.id} value={category.id}>{category.label.replace(/^[^a-zA-Z]+/, '')}</option>)}</select></label>
+          <label className="commerce-filter-field">Sort by<select value={draftSort} onChange={event => setDraftSort(event.target.value as SortOption)}>{SORT_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label.replace(/^[^a-zA-Z]+/, '').replace('Sort: ', '')}</option>)}</select></label>
+          <div className="commerce-filter-footer"><button type="button" onClick={() => { setDraftStore('all'); setDraftCat('all'); setDraftSort('newest'); }}>Reset</button><button type="button" onClick={applyMobileDrawer}>Show results</button></div>
+        </div>
+      </motion.div>}</AnimatePresence>, document.body)}
     </>
   );
 };
