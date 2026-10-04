@@ -148,7 +148,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
   };
 
   return (
-    <div className="max-w-[1180px] mx-auto px-4 py-8 space-y-10">
+    <div className="max-w-[1180px] mx-auto px-4 pt-8 pb-28 md:pb-12 space-y-10">
       
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-slate-400">

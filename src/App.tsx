@@ -744,26 +744,26 @@ export const App: React.FC = () => {
               onShowToast={showToast}
             />
           ) : activeTab === 'about' ? (
-            <div style={{ flex: 1, padding: '40px 20px', maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
+            <div className="flex-1 w-full max-w-[1080px] mx-auto px-4 sm:px-6 pt-8 pb-28 md:pb-12">
               <AboutPage />
             </div>
           ) : activeTab === 'how_we_verify' ? (
-            <div style={{ flex: 1, padding: '40px 20px', maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
+            <div className="flex-1 w-full max-w-[1080px] mx-auto px-4 sm:px-6 pt-8 pb-28 md:pb-12">
               <HowWeVerify />
             </div>
           ) : activeTab === 'wall_of_happiness' ? (
-            <div style={{ flex: 1, width: '100%' }}>
+            <div className="flex-1 w-full">
               <WallOfHappiness
                 onBackToHome={() => setActiveTab('home')}
                 onNavigateTab={(tab) => setActiveTab(tab)}
               />
             </div>
           ) : activeTab === 'contact' ? (
-            <div style={{ flex: 1, padding: '40px 20px', maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
+            <div className="flex-1 w-full max-w-[1080px] mx-auto px-4 sm:px-6 pt-8 pb-28 md:pb-12">
               <ContactPage />
             </div>
           ) : activeTab === 'submit_deal' ? (
-            <div style={{ flex: 1, padding: '40px 20px', maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
+            <div className="flex-1 w-full max-w-[1080px] mx-auto px-4 sm:px-6 pt-8 pb-28 md:pb-12">
               <SubmitDeal onBackToHome={() => { setIsSubmitOpen(false); setActiveTab('home'); }} />
             </div>
           ) : (

@@ -282,6 +282,29 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
               type="button"
+              onClick={() => openGoogleShoppingModal(deal.title)}
+              title="Compare price across Amazon, Flipkart, Myntra & Google Shopping Radar"
+              aria-label="Scan other stores for this product"
+              style={{
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#EFF6FF',
+                border: '1px solid #BFDBFE',
+                borderRadius: '8px',
+                color: '#1D4ED8',
+                cursor: 'pointer',
+                transition: 'all 120ms ease',
+                fontSize: '15px',
+              }}
+            >
+              🛍️
+            </button>
+
+            <button
+              type="button"
               onClick={handleToggleFavorite}
               title={saved ? 'Saved in Loot Bookmarks' : 'Save deal'}
               aria-label={saved ? "Remove from bookmarks" : "Save deal to bookmarks"}
@@ -870,6 +893,31 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               </svg>
             </button>
           )}
+
+          <button
+            type="button"
+            onClick={() => openGoogleShoppingModal(deal.title)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '0 14px',
+              height: '42px',
+              backgroundColor: '#EFF6FF',
+              border: '1px solid #BFDBFE',
+              borderRadius: '9999px',
+              color: '#1D4ED8',
+              fontFamily: 'var(--font-body)',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 120ms ease',
+            }}
+            title="Scan all Indian stores on Google Shopping Radar"
+          >
+            <span>🛍️ Scan Stores</span>
+            <span style={{ fontSize: '9px', backgroundColor: '#DBEAFE', padding: '1px 5px', borderRadius: '4px', fontWeight: 800 }}>IN-APP</span>
+          </button>
 
           <button
             type="button"

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, ArrowUpRight, Search, TrendingDown, X } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Search, ShoppingBag, TrendingDown, X } from 'lucide-react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { publicStoreUrl } from '../utils/publicLinks';
+import { openGoogleShoppingModal } from '../utils/googleShopping';
 
 interface HeroBannerProps {
   searchQuery: string;
@@ -46,6 +47,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ searchQuery, onSearch, o
           <button className="premium-search-submit" type="submit" aria-label="Find deals"><span>Find deals</span><ArrowRight size={18} aria-hidden="true" /></button>
         </form>
         <div className="premium-popular" aria-label="Popular product searches"><span className="premium-popular-label">Explore</span>
+          <button type="button" className="premium-flash-search" onClick={() => openGoogleShoppingModal(input.trim() || 'trending deals')} title="Scan Pan-India stores with in-PWA Google Shopping Radar"><ShoppingBag size={15} />🛍️ Price Radar</button>
           {!!highDiscountCount && onFilterFlashLoot && <button type="button" className="premium-flash-search" onClick={onFilterFlashLoot}><TrendingDown size={15} />{highDiscountCount} big drops</button>}
           {SEARCHES.map(term => <button type="button" key={term} onClick={() => { setInput(term); onSearch(term); }}>{term}</button>)}
         </div>

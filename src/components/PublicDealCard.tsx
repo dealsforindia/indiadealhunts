@@ -1,12 +1,13 @@
 import { useModalSurface } from '../utils/useModalSurface';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowUpRight, Bell, Bookmark, Check, Copy, Image, Layers, MoreHorizontal, Repeat2, Share2, ShoppingCart, X } from 'lucide-react';
+import { ArrowUpRight, Bell, Bookmark, Check, Copy, Image, Layers, MoreHorizontal, Repeat2, Share2, ShoppingBag, ShoppingCart, X } from 'lucide-react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { isDealSaved, toggleSavedDealId } from '../utils/savedDeals';
 import { shareDeal, copyDealLink } from '../utils/shareDeal';
 import { playTactileClick, playSuccessChime } from '../utils/audio';
+import { openGoogleShoppingModal } from '../utils/googleShopping';
 import { extractAmazonAsin, buildAmazonCartUrl, buildMultiAsinCartUrl, generateSubId, openSmartStoreLink, getRecommendedBundle } from '../utils/affiliateEngine';
 interface PublicDealCardProps {
   deal: PublicDeal; index?: number; isSaved?: boolean; isComparing?: boolean; 
@@ -77,6 +78,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
       <header><div><small>SHOPPING OPTIONS</small><h2>{title}</h2></div><button type="button" aria-label="Close shopping options" onClick={() => setMenuOpen(false)}><X size={22} /></button></header>
       <div className="commerce-sheet-options">
         <button type="button" onClick={() => action(details)}><Layers size={19} /><span>Details & price evidence</span><ArrowUpRight size={16} /></button>
+        <button type="button" onClick={() => action(() => openGoogleShoppingModal(title))}><ShoppingBag size={19} /><span>Compare across stores (Google Radar)</span><ArrowUpRight size={16} /></button>
         {onToggleCompare && <button type="button" onClick={() => action(() => onToggleCompare(deal))}>{isComparing ? <Check size={19} /> : <Layers size={19} />}<span>{isComparing ? 'Remove from comparison' : 'Add to comparison'}</span></button>}
         {onOpenPriceAlert && <button type="button" onClick={() => action(() => onOpenPriceAlert(deal))}><Bell size={19} /><span>Set a price alert</span></button>}
         {onOpenExchange && <button type="button" onClick={() => action(() => onOpenExchange(deal))}><Repeat2 size={19} /><span>Exchange calculator</span></button>}

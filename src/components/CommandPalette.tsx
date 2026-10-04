@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { ToolId } from './tools/ToolsHubModal';
+import { openGoogleShoppingModal } from '../utils/googleShopping';
 
 interface CommandPaletteProps {
   isOpen: boolean;
@@ -267,7 +268,32 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           </span>
         </div>
 
-        {query.trim() && <button type="button" className="phone-search-all" onClick={() => { onSearchSubmit(query.trim()); onClose(); }}>Search all stores for “{query.trim()}” <span aria-hidden="true">→</span></button>}
+        {query.trim() && (
+          <div className="flex flex-col sm:flex-row gap-1.5 p-2 bg-slate-50 dark:bg-[#070A11] border-b border-slate-100 dark:border-white/5">
+            <button
+              type="button"
+              className="phone-search-all flex-1"
+              onClick={() => {
+                onSearchSubmit(query.trim());
+                onClose();
+              }}
+            >
+              <span>⚡ Search directory for “{query.trim()}”</span>
+              <span aria-hidden="true">→</span>
+            </button>
+            <button
+              type="button"
+              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer transition shrink-0"
+              onClick={() => {
+                openGoogleShoppingModal(query.trim());
+                onClose();
+              }}
+            >
+              <span>🛍️ Pan-India Radar</span>
+              <span className="bg-white/20 text-[9.5px] px-1 py-0.2 rounded font-mono">IN-APP</span>
+            </button>
+          </div>
+        )}
         {/* Quick Tools Match Section if query matches any utility */}
         {matchingTools.length > 0 && onOpenTool && (
           <div className="p-2 border-b border-slate-100 dark:border-white/5 bg-slate-50/70 dark:bg-[#070A11]/70">

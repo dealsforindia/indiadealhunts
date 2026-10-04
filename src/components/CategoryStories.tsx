@@ -385,6 +385,8 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
     railRef.current.scrollBy({ left: offset, behavior: 'smooth' });
   };
 
+  if (!collections.length) return null;
+
   return (
     <>
       <section data-mobile-stories

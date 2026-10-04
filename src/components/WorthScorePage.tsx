@@ -60,7 +60,7 @@ export const WorthScorePage: React.FC<WorthScorePageProps> = ({
   }, [deals, minScore, selectedStore, searchFilter]);
 
   return (
-    <div className="w-full max-w-[1340px] mx-auto px-4 md:px-6 py-6 sm:py-8">
+    <div className="w-full max-w-[1340px] mx-auto px-4 md:px-6 pt-6 pb-28 md:pb-12">
       {/* ── Page Header (Mobbin / Apple Inspired) ── */}
       <div className="mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-xs font-semibold mb-3">
@@ -178,7 +178,7 @@ export const WorthScorePage: React.FC<WorthScorePageProps> = ({
           layout
           className={
             viewMode === 'grid'
-              ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5'
+              ? 'grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5'
               : 'commerce-deal-list flex flex-col gap-3'
           }
         >

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
@@ -16,7 +17,8 @@ import {
   Filter,
   ShieldCheck,
   Grid,
-  List as ListIcon
+  List as ListIcon,
+  Image as ImageIcon
 } from 'lucide-react';
 import { PUBLIC_API_BASE, publicStoreUrl, lookupTargetUrl } from '../utils/publicLinks';
 import { openSmartStoreLink, extractAmazonAsin, generateSubId } from '../utils/affiliateEngine';
@@ -307,11 +309,13 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
     return valid.reduce((min, cur) => ((cur.price || Infinity) < (min.price || Infinity) ? cur : min), valid[0]);
   }, [offers]);
 
+  const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
+
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+      <div className="fixed inset-0 z-[120] flex items-center justify-center p-2.5 sm:p-5 overflow-y-auto">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -593,17 +597,20 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
                       {/* Content Area: Thumbnail + Title */}
                       <div className="flex gap-3">
                         <div className="h-18 w-18 shrink-0 rounded-xl border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#111C33] p-1 flex items-center justify-center overflow-hidden">
-                          {offer.image ? (
+                          {offer.image && !failedImages.has(offer.id) ? (
                             <img
                               src={offer.image}
                               alt={offer.title}
                               className="h-full w-full object-contain"
-                              onError={(e) => {
-                                (e.target as HTMLElement).style.display = 'none';
+                              onError={() => {
+                                setFailedImages(prev => new Set([...prev, offer.id]));
                               }}
                             />
                           ) : (
-                            <span className="text-2xl">{sc.icon}</span>
+                            <div className="flex flex-col items-center justify-center text-center p-1">
+                              <span className="text-xl mb-0.5">{sc.icon}</span>
+                              <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase">{offer.store}</span>
+                            </div>
                           )}
                         </div>
 
@@ -753,6 +760,7 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
           </div>
         </motion.div>
       </div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
