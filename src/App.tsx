@@ -12,6 +12,7 @@ import { TrustStrip } from './components/TrustStrip';
 import { MobileNav } from './components/MobileNav';
 import { Footer } from './components/Footer';
 import { DealDetailModal } from './components/DealDetailModal';
+import { ImageModal } from './components/ImageModal';
 import { DealLookupModal } from './components/DealLookupModal';
 import { SubmitDeal } from './components/SubmitDeal';
 import { LegalModal, LegalDocType } from './components/LegalModal';
@@ -30,7 +31,8 @@ import { ProductSpecCompareModal } from './components/ProductSpecCompareModal';
 import { CardEmiSimulatorModal } from './components/CardEmiSimulatorModal';
 import { PriceDropAlertModal } from './components/PriceDropAlertModal';
 import { PhoneExchangeEstimatorModal } from './components/PhoneExchangeEstimatorModal';
-import { ToolsHubModal, ToolId } from './components/tools/ToolsHubModal';
+import type { ToolId } from './components/tools/ToolsHubModal';
+import { DeferredToolsHub } from './components/DeferredToolsHub';
 import { TopDiscountsPage } from './components/TopDiscountsPage';
 import { WorthScorePage } from './components/WorthScorePage';
 import { SavedLootPage } from './components/SavedLootPage';
@@ -101,12 +103,12 @@ export const App: React.FC = () => {
 
     const controller = new AbortController();
     let active = true;
-    const timeout = setTimeout(() => controller.abort(), 20000);
+    const timeout = setTimeout(() => controller.abort(), 22000);
     setExternalSearchDeals([]);
     setExternalSearchLoading(true);
     setExternalSearchError(null);
 
-    fetch(`${API_BASE}/api/v1/search/external?q=${encodeURIComponent(query)}&limit=24`, { signal: controller.signal })
+    fetch(`${API_BASE}/api/v1/search/external?q=${encodeURIComponent(query)}&limit=24`, { signal: controller.signal, cache: 'no-store' })
       .then(async (res) => {
         if (!res.ok) throw new Error(`Live store search returned ${res.status}`);
         return res.json();
@@ -134,12 +136,12 @@ export const App: React.FC = () => {
               has_price_history: Boolean(deal.has_price_history),
               history_badge: deal.history_badge ? String(deal.history_badge) : undefined,
               verdict: deal.verdict ? String(deal.verdict) : undefined,
-              is_lowest_price: Boolean(deal.is_lowest_price),
+              is_lowest_price: false,
               affiliate_applied: Boolean(deal.affiliate_applied),
               source_type: String(deal.source_type || 'live_store_search'),
               history: Array.isArray(deal.history) ? deal.history : [],
               in_stock: typeof deal.in_stock === 'boolean' ? deal.in_stock : undefined,
-              last_checked_at: Number(deal.last_checked_at || deal.scraped_at) || undefined,
+              last_checked_at: Number(deal.last_checked_at) || undefined,
               price_verified: deal.price_verified === true,
               price_source: typeof deal.price_source === 'string' ? deal.price_source : undefined,
               product_id: deal.product_id,
@@ -173,6 +175,7 @@ export const App: React.FC = () => {
 
   // Modals & Power Tools
   const [selectedDetailDeal, setSelectedDetailDeal] = useState<PublicDeal | null>(null);
+  const [selectedPhotoDeal, setSelectedPhotoDeal] = useState<PublicDeal | null>(null);
   const [activeFeatureDeal, setActiveFeatureDeal] = useState<PublicDeal | null>(null);
   const [isCardEmiOpen, setIsCardEmiOpen] = useState<boolean>(false);
   const [isPriceAlertOpen, setIsPriceAlertOpen] = useState<boolean>(false);
@@ -187,6 +190,7 @@ export const App: React.FC = () => {
   const [activeToolId, setActiveToolId] = useState<ToolId>('gst');
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState<boolean>(false);
+  const [isSpecCompareOpen, setIsSpecCompareOpen] = useState(false);
   const [compareDeals, setCompareDeals] = useState<PublicDeal[]>([]);
   const [activeCardIds, setActiveCardIds] = useState<string[]>(() => getSavedCards());
   const [isAudioActive, setIsAudioActive] = useState<boolean>(() => isAudioEnabled());
@@ -234,6 +238,7 @@ export const App: React.FC = () => {
   const handleClearCompareAll = useCallback(() => {
     setCompareDeals([]);
     setIsCompareModalOpen(false);
+    setIsSpecCompareOpen(false);
   }, []);
 
   const handleToggleAudio = useCallback(() => {
@@ -332,6 +337,8 @@ export const App: React.FC = () => {
       feedRequest.current?.abort();
       const controller = new AbortController();
       feedRequest.current = controller;
+      let timedOut = false;
+      const requestTimeout = setTimeout(() => { timedOut = true; controller.abort(); }, 25000);
       if (isAppend) {
         setLoadingMore(true);
       } else {
@@ -344,10 +351,10 @@ export const App: React.FC = () => {
         // Mode 1: Live External Store Crawler
         if (searchMode === 'live' && debouncedSearch) {
           try {
-            const extRes = await fetch(`${API_BASE}/api/v1/deals/external-search?q=${encodeURIComponent(debouncedSearch)}`, { signal: controller.signal });
+            const extRes = await fetch(`${API_BASE}/api/v1/deals/external-search?q=${encodeURIComponent(debouncedSearch)}`, { signal: controller.signal, cache: 'no-store' });
             if (extRes.ok) {
               const extData = await extRes.json();
-              if (controller.signal.aborted) return;
+              if (controller.signal.aborted) { if (timedOut) throw new Error('Request timed out'); return; }
               if (extData && Array.isArray(extData.deals)) {
                 const incomingDeals: PublicDeal[] = extData.deals.map((deal: any) => {
                   const score = typeof deal.worth_score === 'number' ? deal.worth_score : calculateWorthScore(deal).score;
@@ -365,7 +372,7 @@ export const App: React.FC = () => {
               }
             }
           } catch (extErr) {
-            if (controller.signal.aborted) return;
+            if (controller.signal.aborted) { if (timedOut) throw new Error('Request timed out'); return; }
             console.warn('Live crawler fallback to DB:', extErr);
           }
         }
@@ -385,15 +392,15 @@ export const App: React.FC = () => {
 
         let res: Response | null = null;
         try {
-          res = await fetch(`${API_BASE}/api/v1/deals/public?${params.toString()}`, { signal: controller.signal });
+          res = await fetch(`${API_BASE}/api/v1/deals/public?${params.toString()}`, { signal: controller.signal, cache: 'no-store' });
         } catch {
           res = null;
         }
 
-        if (controller.signal.aborted) return;
+        if (controller.signal.aborted) { if (timedOut) throw new Error('Request timed out'); return; }
         if (!res || !res.ok) {
           try {
-            res = await fetch(`${EDGE_API}/deals?${params.toString()}`, { signal: controller.signal });
+            res = await fetch(`${EDGE_API}/deals?${params.toString()}`, { signal: controller.signal, cache: 'no-store' });
           } catch {
             res = null;
           }
@@ -404,7 +411,7 @@ export const App: React.FC = () => {
         }
 
         const data: PublicDealsResponse = await res.json();
-        if (controller.signal.aborted) return;
+        if (controller.signal.aborted) { if (timedOut) throw new Error('Request timed out'); return; }
         const incomingDeals: PublicDeal[] = (data.deals || []).map((deal: PublicDeal) => {
           const score = typeof deal.worth_score === 'number' ? deal.worth_score : calculateWorthScore(deal).score;
           return {
@@ -428,7 +435,7 @@ export const App: React.FC = () => {
         setHasMore(data.has_more ?? incomingDeals.length === PAGE_SIZE);
         setSkip(currentSkip);
       } catch (err: unknown) {
-        if (controller.signal.aborted) return;
+        if (controller.signal.aborted && !timedOut) return;
         const msg = err instanceof Error ? err.message : 'Failed to fetch deals';
         console.warn('Live deal feed unavailable:', msg);
         setError('The deal directory is temporarily unavailable. Retry to load offers.');
@@ -438,6 +445,7 @@ export const App: React.FC = () => {
           setHasMore(false);
         }
       } finally {
+        clearTimeout(requestTimeout);
         if (feedRequest.current === controller) {
           setLoading(false);
           setLoadingMore(false);
@@ -538,6 +546,7 @@ export const App: React.FC = () => {
   };
 
   const handleNavTabChange = (tab: NavTab) => {
+    setIsSubmitOpen(false);
     setActiveTab(tab);
     if (tab === 'home') {
       setSelectedStore('all');
@@ -591,7 +600,7 @@ export const App: React.FC = () => {
           setLookupUrl('');
           setIsLookupOpen(true);
         }}
-        onOpenSubmit={() => setIsSubmitOpen(true)}
+        onOpenSubmit={() => { setIsSubmitOpen(true); setActiveTab('submit_deal'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
         onFocusSearch={handleFocusSearch}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         onOpenCardsModal={() => setIsCardsModalOpen(true)}
@@ -614,7 +623,7 @@ export const App: React.FC = () => {
       {/* ── Main Tab Router with Smooth Apple/Mobbin Animated Transitions ── */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={isSubmitOpen ? 'submit_deal' : activeTab}
+          key={activeTab}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
@@ -680,7 +689,7 @@ export const App: React.FC = () => {
             <div style={{ flex: 1, padding: '40px 20px', maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
               <ContactPage />
             </div>
-          ) : activeTab === 'submit_deal' || isSubmitOpen ? (
+          ) : activeTab === 'submit_deal' ? (
             <div style={{ flex: 1, padding: '40px 20px', maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
               <SubmitDeal onBackToHome={() => { setIsSubmitOpen(false); setActiveTab('home'); }} />
             </div>
@@ -972,6 +981,7 @@ export const App: React.FC = () => {
                         onToggleCompare={handleToggleCompare}
                         onShowToast={showToast}
                         onSelectDeal={(d) => setSelectedDetailDeal(d)}
+                        onOpenImage={setSelectedPhotoDeal}
                         onOpenCardEmi={(d) => {
                           setActiveFeatureDeal(d);
                           setIsCardEmiOpen(true);
@@ -1033,7 +1043,7 @@ export const App: React.FC = () => {
           setLookupUrl('');
           setIsLookupOpen(true);
         }}
-        onOpenSubmit={() => setIsSubmitOpen(true)}
+        onOpenSubmit={() => { setIsSubmitOpen(true); setActiveTab('submit_deal'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
       />
 
       {/* ── 9. Mobile Bottom Navigation (md:hidden) ── */}
@@ -1044,7 +1054,7 @@ export const App: React.FC = () => {
           setLookupUrl('');
           setIsLookupOpen(true);
         }}
-        onOpenSubmit={() => setIsSubmitOpen(true)}
+        onOpenSubmit={() => { setIsSubmitOpen(true); setActiveTab('submit_deal'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
         onFocusSearch={() => setIsCommandPaletteOpen(true)}
         savedCount={savedDealIds.length}
       />
@@ -1053,6 +1063,7 @@ export const App: React.FC = () => {
       <RecoveryBoundary compact resetKey={selectedDetailDeal?.id || 'closed'} onRecover={() => setSelectedDetailDeal(null)}>
       <DealDetailModal
         deal={selectedDetailDeal}
+        onOpenImage={setSelectedPhotoDeal}
         onClose={() => setSelectedDetailDeal(null)}
         onShowToast={showToast}
         onToggleSave={handleToggleSaveDeal}
@@ -1060,6 +1071,8 @@ export const App: React.FC = () => {
       />
 
       </RecoveryBoundary>
+
+      <ImageModal deal={selectedPhotoDeal} onClose={() => setSelectedPhotoDeal(null)} />
 
       {/* ── Price Lookup Tool Modal ── */}
       <DealLookupModal
@@ -1112,14 +1125,16 @@ export const App: React.FC = () => {
         isOpen={isCompareModalOpen}
         onOpenModal={() => setIsCompareModalOpen(true)}
         onCloseModal={() => setIsCompareModalOpen(false)}
+        onOpenSpecs={() => { setIsCompareModalOpen(false); setIsSpecCompareOpen(true); }}
         onRemoveDeal={handleRemoveCompareDeal}
         onClearAll={handleClearCompareAll}
       />
 
       {/* ── Product Spec Comparison Modal (Detailed Tech Specs, 5% Cashback, GST ITC) ── */}
       <ProductSpecCompareModal
-        isOpen={isCompareModalOpen}
-        onClose={() => setIsCompareModalOpen(false)}
+        isOpen={isSpecCompareOpen && compareDeals.length > 0}
+        onClose={() => setIsSpecCompareOpen(false)}
+        onBack={() => { setIsSpecCompareOpen(false); setIsCompareModalOpen(true); }}
         deals={compareDeals}
         onRemoveDeal={handleRemoveCompareDeal}
         onClearAll={handleClearCompareAll}
@@ -1148,7 +1163,7 @@ export const App: React.FC = () => {
       />
 
       {/* ── Shopping Utilities & Loot Lab Suite (EMI, Shrinkflation, Energy, Warranties, Budgeting) ── */}
-      <ToolsHubModal
+      <DeferredToolsHub
         isOpen={isToolsHubOpen}
         onClose={() => setIsToolsHubOpen(false)}
         initialToolId={activeToolId}

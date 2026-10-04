@@ -72,12 +72,13 @@ const HSN_PRESETS: HSNCategoryPreset[] = [
 export const GSTInputTaxCreditCalculator: React.FC = () => {
   const [invoiceAmount, setInvoiceAmount] = useState<number>(64999);
   const [selectedPresetId, setSelectedPresetId] = useState<string>('laptops');
-  const [customRate, setCustomRate] = useState<number>(18);
-  const [isCustomRate, setIsCustomRate] = useState<boolean>(false);
+  const [customRate, setCustomRate] = useState<number>(0);
+  const [isCustomRate, setIsCustomRate] = useState<boolean>(true);
   const [isInterState, setIsInterState] = useState<boolean>(true); // IGST vs CGST+SGST
   const [businessType, setBusinessType] = useState<'individual' | 'corporate'>('corporate');
   const [taxSlab, setTaxSlab] = useState<number>(25); // 25% or 30% corporate income tax
-  const [claimDepreciation, setClaimDepreciation] = useState<boolean>(true);
+  const [claimDepreciation, setClaimDepreciation] = useState<boolean>(false);
+  const [eligibleItc, setEligibleItc] = useState(false);
   const [copiedSummary, setCopiedSummary] = useState<boolean>(false);
 
   const selectedPreset = HSN_PRESETS.find((p) => p.id === selectedPresetId) || HSN_PRESETS[0];
@@ -97,7 +98,7 @@ export const GSTInputTaxCreditCalculator: React.FC = () => {
     const sgst = isInterState ? 0 : totalGst / 2;
 
     // ITC Savings (Direct refund / tax liability offset)
-    const itcSavings = totalGst;
+    const itcSavings = eligibleItc ? totalGst : 0;
 
     // Income tax depreciation benefit on the Base Price (Asset Cost)
     // Section 32 allows 40% depreciation on computers, 15% on general plant
@@ -124,7 +125,7 @@ export const GSTInputTaxCreditCalculator: React.FC = () => {
       totalSavingsRupees: Math.round(totalSavingsRupees),
       totalSavingsPercent: Math.round(totalSavingsPercent * 10) / 10,
     };
-  }, [invoiceAmount, effectiveGstRate, isInterState, selectedPresetId, claimDepreciation, taxSlab]);
+  }, [invoiceAmount, effectiveGstRate, isInterState, selectedPresetId, claimDepreciation, taxSlab, eligibleItc]);
 
   const handleCopySummary = () => {
     const text = `GST INPUT TAX CREDIT BREAKDOWN (INDIA)
@@ -155,7 +156,7 @@ Generated via IndiaDealHunts GST Engine`;
               GST Business Invoice &amp; Input Tax Credit (ITC) Engine
             </h3>
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-              GSTR-3B / 2B COMPLIANT
+              PLANNING SCENARIO
             </span>
           </div>
           <p className="text-xs text-slate-500 m-0 leading-relaxed">
@@ -227,7 +228,7 @@ Generated via IndiaDealHunts GST Engine`;
                 onClick={() => setIsCustomRate(!isCustomRate)}
                 className="text-[11px] font-semibold text-blue-600 hover:underline cursor-pointer"
               >
-                {isCustomRate ? 'Use Standard HSN' : 'Custom GST %'}
+                {isCustomRate ? 'Example HSN presets' : 'Custom GST %'}
               </button>
             </div>
 
@@ -272,7 +273,7 @@ Generated via IndiaDealHunts GST Engine`;
                             {preset.name}
                           </span>
                           <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#111C33] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 shrink-0">
-                            {preset.rate}% GST
+                            {preset.rate}% example rate
                           </span>
                         </div>
                         <span className="text-[10px] text-slate-500 font-mono block truncate mt-0.5">
@@ -319,8 +320,9 @@ Generated via IndiaDealHunts GST Engine`;
             </div>
 
             {/* Income Tax Depreciation Checkbox */}
+            <label className="flex gap-3 items-center p-3 rounded-xl border border-slate-200 dark:border-white/10 text-xs mb-3"><input type="checkbox" checked={eligibleItc} onChange={event => setEligibleItc(event.target.checked)} />I have confirmed eligibility to claim the entered GST as input credit.</label>
             <div className="pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
-              <div>
+            <div>
                 <span className="text-xs font-bold text-slate-800 dark:text-[#F8FAFC] block">
                   Add Year-1 Income Tax Depreciation (Sec 32)
                 </span>
@@ -369,7 +371,7 @@ Generated via IndiaDealHunts GST Engine`;
             <div className="relative z-10 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono text-emerald-400 font-bold uppercase tracking-wider">
-                  REAL NET COST TO YOUR BUSINESS
+                  ESTIMATED ECONOMIC COST
                 </span>
                 <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                   {breakdown.totalSavingsPercent}% TOTAL TAX OFFSET
@@ -429,7 +431,7 @@ Generated via IndiaDealHunts GST Engine`;
           {/* Breakdown Matrix Table */}
           <div className="bg-white dark:bg-[#0D1527] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm space-y-3">
             <span className="text-xs font-mono uppercase font-bold text-slate-500 block pb-1 border-b border-slate-100 dark:border-white/5">
-              Official Tax Invoice Reconciliation
+              Scenario invoice breakdown
             </span>
 
             <div className="space-y-2 text-xs">
@@ -450,8 +452,8 @@ Generated via IndiaDealHunts GST Engine`;
               <div className="flex items-center justify-between py-1 text-emerald-700 bg-emerald-50/60 px-2.5 py-1.5 rounded-lg border border-emerald-100 font-medium">
                 <span>
                   {isInterState
-                    ? `IGST (${effectiveGstRate}%) Refundable:`
-                    : `CGST + SGST (${effectiveGstRate}%) Refundable:`}
+                    ? `IGST (${effectiveGstRate}%) potential credit:`
+                    : `CGST + SGST (${effectiveGstRate}%) potential credit:`}
                 </span>
                 <span className="font-mono font-extrabold text-emerald-800">
                   - ₹{breakdown.itcSavings.toLocaleString('en-IN')}
@@ -470,7 +472,7 @@ Generated via IndiaDealHunts GST Engine`;
               )}
 
               <div className="pt-2 border-t border-slate-200 dark:border-white/10 flex items-center justify-between text-slate-900 dark:text-[#F1F5F9] font-bold text-sm">
-                <span>Net Out-of-Pocket Expense:</span>
+                <span>Estimated economic cost:</span>
                 <span className="font-mono text-base text-blue-700">
                   ₹{breakdown.netEffectiveOutflow.toLocaleString('en-IN')}
                 </span>

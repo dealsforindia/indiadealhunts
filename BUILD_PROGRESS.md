@@ -1,6 +1,6 @@
 # IndiaDealHunts implementation ledger
 
-Updated 3 October 2026. Preserve all files, existing storefront features and the private DealFlow workflow. Local implementation is not production deployment.
+Updated 4 October 2026. Preserve all files, existing storefront features and the private DealFlow workflow. Local implementation is not production deployment.
 
 ## Current delivery
 
@@ -125,3 +125,19 @@ Status means implemented locally, partial, existing (not fully audited), or plan
 - Production build and all 21 existing intelligence, checkout and modal-hook checks passed. The existing JavaScript bundle-size warning remains.
 - Screenshots: tests/artifacts/premium-desktop.png, premium-mobile.png and premium-mobile-cards.png.
 - No files deleted. Private DealFlow and backend files were not modified in this visual pass. Local preview remains on port 5174; no production deployment performed.
+
+### Primary fixes and restrained premium polish — 2026-10-04
+
+- Fixed the mobile filter/sort freeze: the portal now contains the animation rather than being discarded by it while the body remains locked. Filter drafts apply together. Shared dialog handling restores scrolling and focus, contains keyboard navigation, and closes only the uppermost dialog.
+- Extended that handling to lookup, alerts, comparison, EMI, exchange, tools, photo zoom, legal, command search, stories, community submissions and cart revisit. Community submissions scroll within phone height; cart revisit does not interrupt another dialog or an active input.
+- Separated offer comparison from specification comparison so both screens no longer open together. Preserved the return path and all comparison features. Photo zoom and Submit navigation are connected again.
+- Preserved the premium visual design, Tiranga Chakra identity, proper Telegram icon, dark mode and all existing storefront features. Added liquid category selection, subtle press feedback, consistent sheet scrolling, safe-area spacing, readable phone controls and 16px input text to prevent unwanted mobile browser zoom.
+- Planning tools now distinguish entered assumptions from live merchant or bank offers. EMI, exchange and tax scenarios start without invented discounts, credits or trade-in quotes; tax credits require explicit eligibility confirmation. Missing product specifications remain unknown.
+- Public product lookup now reads scoped merchant product-page evidence. Conflicting structured or buy-box prices are rejected. History, MRP, stock and current price are separate fields. The frontend accepts a current-price verdict only with confirmed merchant evidence dated within 15 minutes; missing or stale evidence stays unconfirmed.
+- Public external search runs independent providers concurrently and moves blocking store fetches out of the API event loop. Provider and conversion budgets return available merchant links instead of waiting indefinitely. Short caches include the requested limit; retrieval time is not a price-check timestamp.
+- Google Shopping parses scoped product cards, preserves Flipkart variant query parameters, and does not replace listing prices with history-provider prices. Web-search snippets supply discovery links without invented prices. Public database search excludes pending/unapproved deals. Fixed value scores and cross-product historical-low verdicts are removed.
+- Future/invalid historical points are excluded. Historical savings comparisons require recent merchant price evidence. Privacy and pricing explanations describe the actual optional submissions and source limitations.
+- Shopping calculators load on first use and retain their state afterward. Production build passes: initial JavaScript is 713.64 kB (200.86 kB gzip); the tools chunk is separate. A large initial-chunk warning remains.
+- Stopped further browser tours and test suites at the owner's request to prioritize implementation. Performed only the final production build and Python source compilation for the latest changes. Earlier browser and regression checks apply to the state at the time they ran, not every latest edit.
+- Local development preview runs at http://127.0.0.1:5180/. Backend changes are local and not deployed: the VM rejected the supplied SSH access. Accurate live lookup still requires deploying the public backend changes with working access. Do not interpret local implementation as a successful production rollout.
+- No files deleted by this work. Private DealFlow ingestion, admin workflows, tg-setup and private history/scraper modules remain untouched. Roadmap features requiring additional merchant/provider data or a verified notification worker remain pending; no fabricated substitutes were added.

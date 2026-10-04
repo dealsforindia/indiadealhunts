@@ -1,3 +1,4 @@
+import { useModalSurface } from '../utils/useModalSurface';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
@@ -26,16 +27,6 @@ export const StoryModal: React.FC<StoryModalProps> = ({
   const [progress, setProgress] = useState<number>(0);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [imageError, setImageError] = useState<boolean>(false);
-
-  // Body scroll lock
-  useEffect(() => {
-    if (!isOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [isOpen]);
 
   // Sync initialCollectionIndex when modal opens
   useEffect(() => {
@@ -102,9 +93,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      } else if (e.key === 'ArrowRight') {
+      if (e.key === 'ArrowRight') {
         handleNext();
       } else if (e.key === 'ArrowLeft') {
         handlePrev();
@@ -118,6 +107,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, handleNext, handlePrev, onClose]);
 
+  const modalSurface = useModalSurface(isOpen && !!currentItem, onClose);
   if (!isOpen || !activeCollection || !currentItem) return null;
 
   const storeColorMap: Record<string, { bg: string; text: string; border: string }> = {
@@ -139,7 +129,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({
 
   return createPortal(
     <AnimatePresence>
-      <div
+      <div ref={modalSurface} role="dialog" aria-modal="true" aria-label="Collection stories"
         className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-xl"
         style={{ touchAction: 'none' }}
         onClick={(e) => {

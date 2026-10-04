@@ -1,3 +1,4 @@
+import { useModalSurface } from '../utils/useModalSurface';
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, ExternalLink, Tag, ShoppingBag } from 'lucide-react';
@@ -16,25 +17,12 @@ export const ImageModal: React.FC<ImageModalProps> = ({ deal, onClose }) => {
     setImageError(false);
   }, [deal?.id, deal?.image]);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (deal) {
-      const prev = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-      return () => {
-        document.body.style.overflow = prev;
-        window.removeEventListener('keydown', handleKeyDown);
-      };
-    }
-  }, [deal, onClose]);
+  const modalSurface = useModalSurface(!!deal, onClose);
 
   if (!deal) return null;
 
   return createPortal(
-    <div
+    <div ref={modalSurface}
       className="fixed inset-0 z-[250] flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200"
       onClick={onClose}
       role="dialog"
@@ -42,7 +30,7 @@ export const ImageModal: React.FC<ImageModalProps> = ({ deal, onClose }) => {
       aria-labelledby="image-modal-title"
     >
       <div
-        className="relative max-w-2xl w-full bg-white dark:bg-[#0D1527] rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-2xl overflow-hidden max-h-[calc(100dvh-2rem)] overscroll-contain"
+        className="relative max-w-2xl w-full bg-white dark:bg-[#0D1527] rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-2xl overflow-y-auto max-h-[calc(100dvh-2rem)] overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button with >= 44x44px Hit Target */}
@@ -69,7 +57,7 @@ export const ImageModal: React.FC<ImageModalProps> = ({ deal, onClose }) => {
             ) : (
               <div className="text-slate-400 flex flex-col items-center gap-2 p-4 text-center">
                 <ShoppingBag className="w-12 h-12 text-blue-600" aria-hidden="true" />
-                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Verified {deal.store} Drop</span>
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{deal.store} listing · Image unavailable</span>
               </div>
             )}
           </div>

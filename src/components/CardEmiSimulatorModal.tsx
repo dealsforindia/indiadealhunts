@@ -182,8 +182,8 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
               <label className="commerce-filter-field">Processing fee (₹)<input type="number" min="0" value={processingFee} onChange={event => setProcessingFee(event.target.value)} /></label>
             </div>
             <p className="text-xs text-slate-500">Scenario assumes {annualRate || '0'}% annual interest and ₹{processingFee || '0'} processing fees. Estimated total repayments: ₹{(monthlyEmi * emiTenure + fee).toLocaleString('en-IN', { maximumFractionDigits: 2 })}. Delivery, tax on finance charges and later cashback are not included.</p>
-            {/* No-Cost EMI Tenure (Only applicable for purchases >= ₹3,000 per Indian banking rules) */}
-            {true ? (
+            {/* User-entered repayment scenario; eligibility is not assumed. */}
+            {(
               <div>
                 <label className="block text-xs font-mono uppercase text-slate-400 font-semibold mb-2">
                   2. Choose a repayment scenario
@@ -201,19 +201,9 @@ export const CardEmiSimulatorModal: React.FC<CardEmiSimulatorModalProps> = ({
                       }`}
                     >
                       <span className="block text-sm font-bold">{months}M</span>
-                      <span className="text-[10px] opacity-80">₹{Math.round(priceAfterCard / months).toLocaleString('en-IN')}/mo</span>
+                      <span className="text-[10px] opacity-80">{months} months</span>
                     </button>
                   ))}
-                </div>
-              </div>
-            ) : (
-              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-900 flex items-start gap-2.5">
-                <span className="text-base shrink-0">ℹ️</span>
-                <div className="text-xs">
-                  <p className="font-bold">No-Cost EMI threshold: Min. ₹3,000</p>
-                  <p className="text-[11px] text-amber-800 mt-0.5">
-Available repayment terms depend on the merchant and bank. No bank offer is assumed.
-                  </p>
                 </div>
               </div>
             )}
@@ -232,22 +222,14 @@ Available repayment terms depend on the merchant and bank. No bank offer is assu
                 <div>
                   <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] block">Scenario principal:</span>
                   <span className="text-[11px] text-slate-500">
-                    {deal.price >= 3000 ? `Payable in ${emiTenure} installments` : 'Single payment with instant savings'}
+                    Scenario over {emiTenure} installments
                   </span>
                 </div>
                 <div className="text-right">
                   <span className="text-2xl font-black text-emerald-800">
                     ₹{priceAfterCard.toLocaleString('en-IN')}
                   </span>
-                  {true ? (
-                    <span className="block text-xs font-bold text-slate-600 dark:text-slate-400">
-                      Just ₹{monthlyEmi.toLocaleString('en-IN')} / month
-                    </span>
-                  ) : (
-                    <span className="block text-[11px] font-bold text-emerald-700">
-                      Save ₹{cardDiscount.toLocaleString('en-IN')} upfront
-                    </span>
-                  )}
+                  <span className="block text-xs font-bold text-slate-600 dark:text-slate-400">Estimated ₹{monthlyEmi.toLocaleString('en-IN', { maximumFractionDigits: 2 })} / month</span>
                 </div>
               </div>
             </div>

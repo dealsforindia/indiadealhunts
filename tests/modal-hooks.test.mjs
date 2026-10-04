@@ -41,3 +41,30 @@ for (const component of ['DealDetailModal', 'CardEmiSimulatorModal', 'PhoneExcha
     assert.deepEqual(hooksAfterGuard(source, component), []);
   });
 }
+
+function portalsInsidePresence(source) {
+  const file = ts.createSourceFile('drawer.tsx', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  let count = 0;
+  function visit(node) {
+    if (ts.isJsxElement(node) && node.openingElement.tagName.getText(file) === 'AnimatePresence') {
+      for (const child of node.children) {
+        if (!ts.isJsxExpression(child)) continue;
+        function inspect(expression) {
+          if (ts.isCallExpression(expression) && expression.expression.getText(file) === 'createPortal') count++;
+          ts.forEachChild(expression, inspect);
+        }
+        if (child.expression) inspect(child.expression);
+      }
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(file); return count;
+}
+test('presence regression catches a portal discarded before rendering', () => {
+  assert.equal(portalsInsidePresence('const Broken = <AnimatePresence>{open && createPortal(<div/>, document.body)}</AnimatePresence>;'), 1);
+});
+for (const component of ['DealToolbar', 'CompareDrawer']) {
+  test(`${component} renders its portal outside presence filtering`, () => {
+    assert.equal(portalsInsidePresence(readFileSync(new URL(`../src/components/${component}.tsx`, import.meta.url), 'utf8')), 0);
+  });
+}

@@ -9,6 +9,7 @@ interface ProductSpecCompareModalProps {
   deals: PublicDeal[];
   onRemoveDeal: (id: string) => void;
   onClearAll: () => void;
+  onBack?: () => void;
 }
 
 type ProductDomain = 'phone' | 'laptop' | 'audio' | 'fashion' | 'home' | 'beauty' | 'general';
@@ -87,7 +88,7 @@ function getProductAttributes(deal: PublicDeal) {
     else specRow1Value = 'Not supplied';
 
     specRow2Label = 'Special Feature';
-    if (/\\banc\\b|active noise cancellation/i.test(t)) specRow2Value = '🎧 Active Noise Cancellation';
+    if (/\banc\b|active noise cancellation/i.test(t)) specRow2Value = 'Title mentions ANC · confirm specification';
     else if (t.includes('bass')) specRow2Value = '🔊 Deep Bass Boost';
     else specRow2Value = 'Not supplied';
   } else if (domain === 'fashion') {
@@ -98,7 +99,7 @@ function getProductAttributes(deal: PublicDeal) {
     else specRow1Value = 'Fashion Lifestyle';
 
     specRow2Label = 'Brand & Quality';
-    specRow2Value = `${deal.store || 'Verified'} 100% Genuine`;
+    specRow2Value = 'Authenticity not independently checked';
   } else if (domain === 'home') {
     specRow1Label = 'Appliance Type';
     specRow1Value = 'Home & Kitchen Utility';
@@ -131,6 +132,7 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
   deals,
   onRemoveDeal,
   onClearAll,
+  onBack,
 }) => {
   const modalSurface = useModalSurface(isOpen, onClose);
   if (!isOpen) return null;
@@ -159,12 +161,13 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
                   Side-by-Side Product Comparison
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Real price comparison, discount depth, verified specs & deal scores
+                  Listed prices, supplied specifications and source scores
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
+              {onBack && <button type="button" onClick={onBack} className="min-h-11 px-3 rounded-xl border border-slate-200 text-xs font-bold">Offer prices</button>}
               {deals.length > 0 && (
                 <button
                   type="button"
@@ -300,7 +303,7 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
                       {deals.map((deal) => (
                         <td key={deal.id} className="p-3 text-xs">
                           <span className="font-bold text-slate-900 dark:text-[#F1F5F9]">{deal.store || 'Verified Store'}</span>
-                          <span className="block text-emerald-600 font-semibold mt-0.5">✓ 100% Genuine Stock</span>
+                          <span className="block text-slate-500 font-semibold mt-0.5">Confirm seller and authenticity at the store</span>
                         </td>
                       ))}
                     </tr>
@@ -312,9 +315,9 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
                         <td key={deal.id} className="p-3">
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 font-black text-xs flex items-center justify-center">
-                              {deal.worth_score || 85}
+                              {deal.worth_score ?? '—'}
                             </div>
-                            <span className="text-xs text-slate-500 font-medium">/ 100 Value</span>
+                            <span className="text-xs text-slate-500 font-medium">{deal.worth_score != null ? '/ 100 · source score' : 'Not supplied'}</span>
                           </div>
                         </td>
                       ))}

@@ -114,7 +114,7 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                   Price Drop Radar Alert
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Instant alert when price hits your target
+                  Register a target; delivery depends on monitoring coverage
                 </p>
               </div>
             </div>
@@ -153,7 +153,7 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] truncate">{deal.title}</p>
                     <p className="text-xs text-slate-500">
-                      Current Price: <span className="font-bold text-slate-800 dark:text-[#F8FAFC]">₹{deal.price.toLocaleString('en-IN')}</span>
+                      Listed price: <span className="font-bold text-slate-800 dark:text-[#F8FAFC]">₹{deal.price.toLocaleString('en-IN')}</span>
                     </p>
                   </div>
                 </div>

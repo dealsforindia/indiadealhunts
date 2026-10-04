@@ -1,3 +1,4 @@
+import { useModalSurface } from '../../utils/useModalSurface';
 import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
@@ -53,11 +54,11 @@ const TOOLS_CATALOG: ToolMeta[] = [
     id: 'gst',
     title: 'GST Input Tax Credit (ITC) & Depreciation Shield',
     shortName: 'GST ITC Shield',
-    tagline: 'Claim 18% or 28% GST on business invoices + Sec 32 Year-1 40% depreciation shield',
+    tagline: 'Model business purchase costs using confirmed tax rates and eligibility',
     icon: '🧾',
     badge: 'TAX & B2B',
     category: 'banking_taxes',
-    highlightTag: 'Saves 35%+',
+    highlightTag: 'Planning scenario',
   },
   {
     id: 'bank_offers',
@@ -67,7 +68,7 @@ const TOOLS_CATALOG: ToolMeta[] = [
     icon: '💳',
     badge: 'CARDS & REWARDS',
     category: 'banking_taxes',
-    highlightTag: 'SmartBuy 16.6%',
+    highlightTag: 'Check current terms',
   },
   {
     id: 'emi',
@@ -86,7 +87,7 @@ const TOOLS_CATALOG: ToolMeta[] = [
     icon: '⚡',
     badge: '10-MIN GROCERY',
     category: 'smart_checkout',
-    highlightTag: 'Zero Surge',
+    highlightTag: 'Cart scenario',
   },
   {
     id: 'unit_price',
@@ -114,7 +115,7 @@ const TOOLS_CATALOG: ToolMeta[] = [
     icon: '🛃',
     badge: 'CROSS-BORDER',
     category: 'tech_postpurchase',
-    highlightTag: 'CBIC 2024',
+    highlightTag: 'Confirm applicable rates',
   },
   {
     id: 'returns',
@@ -193,21 +194,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
     }
   }, [initialToolId]);
 
-  // Handle escape key and lock body scroll
-  useEffect(() => {
-    if (!isOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onClose]);
+  const modalSurface = useModalSurface(isOpen, onClose);
 
   const filteredTools = useMemo(() => {
     return TOOLS_CATALOG.filter((t) => {
@@ -230,7 +217,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
   const activeTool = TOOLS_CATALOG.find((t) => t.id === activeToolId) || TOOLS_CATALOG[0];
 
   return createPortal(
-    <div
+    <div ref={modalSurface}
       className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
@@ -259,11 +246,11 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
                   Shopping Utilities &amp; Loot Lab
                 </h2>
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  12 VERIFIED ENGINES
+                  12 PLANNING TOOLS
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-medium line-clamp-1">
-                Deep Indian retail calculation suites: GST ITC, card stacking, quick-commerce surge, customs duty, and return windows.
+                Use entered values and example assumptions. These calculators do not supply live bank offers or merchant quotes.
               </p>
             </div>
           </div>
@@ -359,6 +346,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
 
         {/* Scrollable Tool Workspace */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50/40 dark:bg-[#070A11]/40">
+          <p role="note" className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 dark:bg-amber-900/20 dark:text-amber-200 dark:border-amber-800">Planning scenarios. Preset bank rates, fees, valuations, tax rules and service terms are examples, not current verified offers. Confirm applicable terms and enter your own values before relying on the result.</p>
           <AnimatePresence mode="wait">
             <motion.div
               key={activeToolId}

@@ -1,3 +1,4 @@
+import { useModalSurface } from '../utils/useModalSurface';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowUpRight, Bell, Bookmark, Check, Copy, CreditCard, Image, Layers, MoreHorizontal, Repeat2, ShoppingCart, X } from 'lucide-react';
@@ -28,7 +29,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, isSaved: s
   const [menuOpen, setMenuOpen] = useState(false);
   const [includeBundle, setIncludeBundle] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
-  const sheet = useRef<HTMLDivElement>(null);
+  const sheet = useModalSurface(menuOpen, () => setMenuOpen(false));
   const saved = suppliedSaved ?? localSaved;
   const title = deal.title?.replace(/^[\s\u{1F300}-\u{1FAFF}\u2600-\u27BF\uFE0F]+/u, '').trim() || `${deal.store || 'Store'} offer`;
   const store = deal.store || 'Store';
@@ -43,23 +44,6 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, isSaved: s
   const bundle = asin ? getRecommendedBundle(deal.category, price) : null;
   const cardSavings = useMemo(() => activeCardIds?.length ? calculateBestCardSavings(deal, activeCardIds) : null, [deal, activeCardIds]);
   useEffect(() => { setImageFailed(false); }, [photo]);
-  useEffect(() => {
-    if (!menuOpen) return;
-    const previousFocus = document.activeElement as HTMLElement | null;
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    sheet.current?.querySelector<HTMLButtonElement>('button')?.focus();
-    const keyboard = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setMenuOpen(false);
-      if (event.key !== 'Tab') return;
-      const buttons = [...(sheet.current?.querySelectorAll<HTMLElement>('button, input, a[href]') || [])].filter(element => !element.hasAttribute('disabled'));
-      const first = buttons[0], last = buttons[buttons.length - 1];
-      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
-      if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
-    };
-    document.addEventListener('keydown', keyboard);
-    return () => { document.body.style.overflow = originalOverflow; document.removeEventListener('keydown', keyboard); previousFocus?.focus(); };
-  }, [menuOpen]);
   function save() {
     playTactileClick();
     if (onToggleSave) onToggleSave(deal);
@@ -85,8 +69,8 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, isSaved: s
       <button type="button" className="commerce-card-title" onClick={details}>{title}</button>
       <div className="commerce-card-price"><strong>{price > 0 ? money(price) : 'Check price'}</strong>{mrp && <s>{money(mrp)}</s>}</div>
       <p className="commerce-card-note">{expired ? 'This offer has ended' : mrp ? `${money(mrp - price)} less than listed MRP` : 'Confirm current price at store'}</p>
-      <div className="commerce-card-actions"><button type="button" className="commerce-store-button" onClick={() => openSmartStoreLink(deal.url, store, asin || undefined, false, subId)} disabled={expired || !deal.url}>View at {store}<ArrowUpRight size={16} /></button><button ref={trigger} type="button" className="commerce-card-more" aria-label={`More options for ${title}`} aria-haspopup="dialog" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}><MoreHorizontal size={20} /></button></div>
-      <div className="commerce-card-meta"><span>{relativeTime(deal.display_ts || deal.posted_at)}</span><button type="button" onClick={details}>Details <span aria-hidden="true">↗</span></button></div>
+      <div className="commerce-card-actions"><button type="button" className="commerce-store-button" onClick={() => openSmartStoreLink(deal.url, store, asin || undefined, false, subId)} disabled={expired || !deal.url}><span>View at {store}</span><ArrowUpRight size={16} /></button><button ref={trigger} type="button" className="commerce-card-more" aria-label={`More options for ${title}`} aria-haspopup="dialog" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}><MoreHorizontal size={20} /></button></div>
+      <div className="commerce-card-meta"><span>Listed {relativeTime(deal.display_ts || deal.posted_at)}</span><button type="button" onClick={details}>Details <span aria-hidden="true">↗</span></button></div>
     </div>
     {menuOpen && createPortal(<div className="commerce-sheet-backdrop" onClick={() => setMenuOpen(false)}><div ref={sheet} className="commerce-product-sheet" role="dialog" aria-modal="true" aria-label={`Shopping options for ${title}`} onClick={event => event.stopPropagation()}>
       <div className="commerce-sheet-handle" aria-hidden="true" />

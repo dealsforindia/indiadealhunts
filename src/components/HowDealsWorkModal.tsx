@@ -1,3 +1,4 @@
+import { useModalSurface } from '../utils/useModalSurface';
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
@@ -49,19 +50,7 @@ export const HowDealsWorkModal: React.FC<HowDealsWorkModalProps> = ({
 }) => {
   const [selectedStep, setSelectedStep] = useState<string>('ingestion');
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onClose]);
+  const modalSurface = useModalSurface(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -74,7 +63,7 @@ export const HowDealsWorkModal: React.FC<HowDealsWorkModalProps> = ({
         <div className="absolute inset-0" onClick={onClose} />
 
         {/* Modal Window */}
-        <motion.div
+        <motion.div ref={modalSurface} role="dialog" aria-modal="true" aria-label="How deal evidence works"
           initial={{ opacity: 0, scale: 0.95, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 12 }}

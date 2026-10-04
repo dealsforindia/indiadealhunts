@@ -170,7 +170,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
               type="url"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://www.amazon.in/dp/..."
+              aria-label="Product link" placeholder="https://www.amazon.in/dp/..."
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
             />
           </div>
@@ -180,7 +180,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
               <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
                 Store
               </label>
-              <select
+              <select aria-label="Store"
                 value={store}
                 onChange={(e) => setStore(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
@@ -203,7 +203,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
                 type="number"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                placeholder="899"
+                aria-label="Listed deal price" placeholder="899"
                 className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
               />
             </div>
@@ -216,7 +216,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
                 type="number"
                 value={mrp}
                 onChange={(e) => setMrp(e.target.value)}
-                placeholder="2499"
+                aria-label="Listed MRP" placeholder="2499"
                 className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
               />
             </div>
@@ -230,7 +230,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
               rows={3}
               value={tip}
               onChange={(e) => setTip(e.target.value)}
-              placeholder="e.g. Apply 10% coupon checkbox + ₹200 ICICI card discount"
+              aria-label="Deal details and conditions" placeholder="e.g. Apply 10% coupon checkbox + ₹200 ICICI card discount"
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
             />
           </div>
@@ -243,7 +243,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="hunter@gmail.com"
+              aria-label="Email address" placeholder="hunter@gmail.com"
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
             />
           </div>

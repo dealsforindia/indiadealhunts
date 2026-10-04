@@ -1,3 +1,4 @@
+import { useModalSurface } from '../utils/useModalSurface';
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
@@ -11,6 +12,7 @@ interface CompareDrawerProps {
   onCloseModal: () => void;
   onRemoveDeal: (id: string) => void;
   onClearAll: () => void;
+  onOpenSpecs: () => void;
 }
 
 export const CompareDrawer: React.FC<CompareDrawerProps> = ({
@@ -20,20 +22,9 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
   onCloseModal,
   onRemoveDeal,
   onClearAll,
+  onOpenSpecs,
 }) => {
-  useEffect(() => {
-    if (!isOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onCloseModal();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onCloseModal]);
+  const modalSurface = useModalSurface(isOpen && compareDeals.length > 0, onCloseModal);
 
   if (compareDeals.length === 0) return null;
 
@@ -105,7 +96,7 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
-              role="dialog" aria-modal="true" aria-label="Compare selected offers" className="w-full max-w-4xl bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl p-4 sm:p-6 overflow-hidden flex flex-col max-h-[calc(100dvh-2rem)] overscroll-contain"
+              ref={modalSurface} role="dialog" aria-modal="true" aria-label="Compare selected offers" className="w-full max-w-4xl bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl p-4 sm:p-6 overflow-hidden flex flex-col max-h-[calc(100dvh-2rem)] overscroll-contain"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
@@ -125,7 +116,7 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
                 <button
                   type="button"
                   onClick={onCloseModal}
-                  className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-600 dark:text-slate-400 flex items-center justify-center cursor-pointer"
+                  aria-label="Close comparison" className="w-11 h-11 rounded-lg bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-600 dark:text-slate-400 flex items-center justify-center cursor-pointer"
                 >
                   ✕
                 </button>
@@ -224,6 +215,7 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
                   </tbody>
                 </table>
               </div>
+              <button type="button" onClick={onOpenSpecs} className="min-h-11 mt-3 rounded-xl bg-blue-600 text-white font-bold text-sm shrink-0">Compare supplied specifications →</button>
             </motion.div>
           </div>
         )}
@@ -231,4 +223,5 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
     </>
   );
 };
+
 

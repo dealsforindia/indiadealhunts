@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useModalSurface } from '../utils/useModalSurface';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShoppingCart, Zap, X, ShieldCheck } from 'lucide-react';
 import { PublicDeal } from '../types';
@@ -23,12 +25,14 @@ export const ExitIntentCartDrawer: React.FC<ExitIntentCartDrawerProps> = ({ topD
   const isMobile = useIsMobile();
 
   const [isOpen, setIsOpen] = useState(false);
+  const modalSurface = useModalSurface(isOpen && !!topDeal, () => setIsOpen(false));
   const lastScrollY = useRef(0);
   const lastScrollTime = useRef(Date.now());
   const maxScrollY = useRef(0);
 
   const shouldTrigger = (): boolean => {
     if (typeof window === 'undefined' || !topDeal) return false;
+    if (document.querySelector('[role="dialog"], dialog[open]') || document.activeElement?.matches('input, textarea, select')) return false;
     try {
       const lastShown = localStorage.getItem(STORAGE_KEY);
       if (lastShown) {
@@ -94,17 +98,6 @@ export const ExitIntentCartDrawer: React.FC<ExitIntentCartDrawerProps> = ({ topD
     };
   }, [topDeal]);
 
-  // Escape key handler to close
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        setIsOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
-
   if (!isOpen || !topDeal) return null;
 
   const asin = extractAmazonAsin(topDeal.url || topDeal.id);
@@ -127,12 +120,14 @@ export const ExitIntentCartDrawer: React.FC<ExitIntentCartDrawerProps> = ({ topD
     openSmartStoreLink(topDeal.url, 'amazon', asin || undefined, false, subId);
   };
 
-  return (
+  return createPortal(
     <AnimatePresence>
       <div
         className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs transition-opacity"
         role="dialog"
         aria-modal="true"
+        aria-label="Revisit your Amazon find"
+        ref={modalSurface}
         onClick={(e) => {
           if (e.target === e.currentTarget) setIsOpen(false);
         }}
@@ -153,7 +148,7 @@ export const ExitIntentCartDrawer: React.FC<ExitIntentCartDrawerProps> = ({ topD
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="h-8 w-8 rounded-full bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-500 flex items-center justify-center transition cursor-pointer"
+              className="h-11 w-11 rounded-full bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-500 flex items-center justify-center transition cursor-pointer"
               aria-label="Close retention modal"
             >
               <X size={16} />
@@ -234,6 +229,6 @@ export const ExitIntentCartDrawer: React.FC<ExitIntentCartDrawerProps> = ({ topD
           </div>
         </motion.div>
       </div>
-    </AnimatePresence>
+    </AnimatePresence>, document.body
   );
 };

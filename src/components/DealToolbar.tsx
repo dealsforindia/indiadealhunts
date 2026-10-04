@@ -1,3 +1,4 @@
+import { useModalSurface } from '../utils/useModalSurface';
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
@@ -69,7 +70,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
   const [draftCat, setDraftCat] = useState(selectedCategory);
   const [draftSort, setDraftSort] = useState(sortBy);
 
-  const drawerRef = useRef<HTMLDivElement>(null);
+  const drawerRef = useModalSurface(mobileDrawerOpen, () => setMobileDrawerOpen(false));
   const filterTriggerRef = useRef<HTMLButtonElement>(null);
   const storeRef = useRef<HTMLDivElement>(null);
   const catRef = useRef<HTMLDivElement>(null);
@@ -97,28 +98,6 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
     setDraftSort(sortBy);
     setMobileDrawerOpen(true);
   };
-
-  useEffect(() => {
-    if (!mobileDrawerOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    drawerRef.current?.querySelector<HTMLButtonElement>('button')?.focus();
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMobileDrawerOpen(false);
-      if (e.key === 'Tab') {
-        const controls = [...(drawerRef.current?.querySelectorAll<HTMLElement>('button, select') || [])];
-        const first = controls[0], last = controls[controls.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
-        if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.body.style.overflow = prev;
-      filterTriggerRef.current?.focus();
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [mobileDrawerOpen]);
 
   const applyMobileDrawer = () => {
     onSelectStore(draftStore);

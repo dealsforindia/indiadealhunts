@@ -1,3 +1,4 @@
+import { useModalSurface } from '../utils/useModalSurface';
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, CreditCard, Sparkles, Check, ShieldCheck, Zap } from 'lucide-react';
@@ -16,20 +17,7 @@ export const CardCalculatorModal: React.FC<CardCalculatorModalProps> = ({
 }) => {
   const [selectedCards, setSelectedCards] = useState<string[]>(() => getSavedCards());
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onClose]);
+  const modalSurface = useModalSurface(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -56,7 +44,7 @@ export const CardCalculatorModal: React.FC<CardCalculatorModalProps> = ({
   };
 
   return createPortal(
-    <div
+    <div ref={modalSurface}
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"

@@ -27,7 +27,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onBackToHome, onNavigateTa
           <span>YOUR SHOPPING ADVANTAGE</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-heading font-black tracking-tight text-slate-900 dark:text-[#F1F5F9] leading-tight">
-          Verified Retail Deals & Honest Price Intelligence
+          Retail discoveries & clearer price evidence
         </h1>
         <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed max-w-2xl">
           E-commerce promotions frequently advertise artificial discounts against inflated MRPs. IndiaDealHunts monitors genuine price drops, flash clearances, and real coupon stacks across Amazon, Flipkart, Myntra, Swiggy Instamart, and partner platforms.

@@ -79,7 +79,7 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
                   Old Phone Trade-In & Exchange Estimator
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Estimate exchange bonus and upgrade cost for this deal
+                  Plan using your merchant’s confirmed exchange quote
                 </p>
               </div>
             </div>
@@ -104,7 +104,7 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <span className="text-[10px] font-mono font-bold text-indigo-700 uppercase tracking-wider">New Device Target:</span>
+                <span className="text-[10px] font-mono font-bold text-indigo-700 uppercase tracking-wider">Purchase target:</span>
                 <p className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] truncate">{deal.title}</p>
                 <p className="text-base font-black text-slate-900 dark:text-[#F1F5F9] mt-0.5">₹{deal.price.toLocaleString('en-IN')}</p>
               </div>
@@ -163,7 +163,7 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
             {/* Price Upgrade Summary */}
             <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50 via-purple-50/40 to-white border border-indigo-200 shadow-xs space-y-2">
               <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400">
-                <span>New Phone Deal Price:</span>
+                <span>Listed product price:</span>
                 <span>₹{deal.price.toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between text-xs font-semibold text-indigo-700">

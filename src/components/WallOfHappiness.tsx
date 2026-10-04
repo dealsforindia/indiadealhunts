@@ -1,6 +1,8 @@
 import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicStoreUrl, lookupTargetUrl } from '../utils/publicLinks';
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { createPortal } from 'react-dom';
+import { useModalSurface } from '../utils/useModalSurface';
 import type { CommunityBrag, WallStats } from '../types';
 import { IconShieldCheck, IconChevronRight } from './Icons';
 
@@ -23,6 +25,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
 
   // Submit Modal State
   const [isSubmitOpen, setIsSubmitOpen] = useState<boolean>(false);
+  const submitSurface = useModalSurface(isSubmitOpen, () => setIsSubmitOpen(false));
   const [submitForm, setSubmitForm] = useState({
     name: '',
     city: '',
@@ -401,24 +404,30 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
       </div>
 
       {/* ── 4. Submit Your Deal Loot Modal ── */}
-      <AnimatePresence>
+      {createPortal(<AnimatePresence>
         {isSubmitOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
             <div className="absolute inset-0" onClick={() => setIsSubmitOpen(false)} />
 
             <motion.div
+              ref={submitSurface}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Share your shopper report"
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="relative w-full max-w-lg bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 rounded-2xl shadow-2xl p-6 space-y-5 z-10"
+              className="relative w-full max-w-lg max-h-[88dvh] overflow-y-auto overscroll-contain bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 rounded-2xl shadow-2xl p-6 space-y-5 z-10"
             >
               <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-3">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-[#F1F5F9] flex items-center gap-2">
                   <span>🎉 Share Your Deal Loot</span>
                 </h3>
                 <button
+                  type="button"
+                  aria-label="Close shopper report"
                   onClick={() => setIsSubmitOpen(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-slate-800 dark:text-[#F8FAFC] cursor-pointer"
+                  className="min-h-11 min-w-11 rounded-lg text-slate-400 hover:text-slate-800 dark:text-[#F8FAFC] cursor-pointer"
                 >
                   ✕
                 </button>
@@ -542,7 +551,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
             </motion.div>
           </div>
         )}
-      </AnimatePresence>
+      </AnimatePresence>, document.body)}
 
     </div>
   );

@@ -1,5 +1,5 @@
 import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicStoreUrl, publicShareUrl, lookupTargetUrl } from '../utils/publicLinks';
-import { normalizeLookup } from '../utils/priceEvidence';
+import { normalizeLookup, priceFreshness } from '../utils/priceEvidence';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowUpRight, Bookmark, Check, ChevronRight, Clock3, Eye, Layers3, Search, ShieldCheck, Sparkles, TrendingDown, X, Bell, GitCompareArrows, Share2, RefreshCw } from 'lucide-react';
 import { cleanHistory, decisionFor, groupProducts, IntelligenceOffer, parseMission, offerIdentity, readWatchlist, rupees, writeWatchlist, shoppingMatch } from '../utils/shoppingIntelligence';
@@ -135,7 +135,7 @@ function EvidencePanel({ offer: originalOffer, group, onClose, onLookup, onSave,
   async function refreshEvidence() {
     request.current?.abort();
     const controller = new AbortController(); request.current = controller;
-    const timeout = setTimeout(() => controller.abort(), 15000);
+    const timeout = setTimeout(() => controller.abort(), 22000);
     setRefreshing(true); setMessage('');
     try {
       const api = PUBLIC_API_BASE;
@@ -144,6 +144,7 @@ function EvidencePanel({ offer: originalOffer, group, onClose, onLookup, onSave,
       if ((!res || !res.ok) && !controller.signal.aborted) res = await fetch(`${api}/api/v1/deals/lookup`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: target }), signal: controller.signal });
       if (!res?.ok) throw new Error('lookup unavailable');
       const data = normalizeLookup(await res.json()) as any;
+      if (controller.signal.aborted || request.current !== controller) return;
       if (data.success === false || data.status === 'error' || (!data.title && !data.product_name)) throw new Error('product unavailable');
       const history = cleanHistory([...(offer.history || []), ...(Array.isArray(data.history) ? data.history : [])]);
       setOffer(prev => ({ ...prev,
@@ -158,7 +159,7 @@ function EvidencePanel({ offer: originalOffer, group, onClose, onLookup, onSave,
         coupon: typeof data.coupon === 'string' ? data.coupon : null,
         coupon_discount: typeof data.coupon_discount === 'number' ? data.coupon_discount : null,
         regular_price: typeof data.regular_price === 'number' ? data.regular_price : null,
-        last_checked_at: Number(data.last_checked_at || data.scraped_at) || undefined,
+        last_checked_at: Number(data.last_checked_at) || undefined,
       }));
       setMessage(!data.price ? 'Current merchant price is unconfirmed. Supplied historical observations remain available.' : history.length >= 2 ? 'Price evidence updated from the lookup service.' : 'Merchant price checked. Enough historical observations were not supplied for a timing verdict.');
     } catch { if (request.current === controller) setMessage('Live evidence could not be retrieved. Existing observations are still shown; no price or history was invented.'); }
@@ -172,14 +173,15 @@ function EvidencePanel({ offer: originalOffer, group, onClose, onLookup, onSave,
   const low = points.length ? Math.min(...points.map(p => p[1])) : null;
   const high = points.length ? Math.max(...points.map(p => p[1])) : null;
   const median = points.length ? [...points.map(p => p[1])].sort((a, b) => a - b)[Math.floor(points.length / 2)] : null;
-  const observedDiscount = median && offer.price && median > offer.price ? Math.round((1 - offer.price / median) * 100) : null;
+  const freshness = priceFreshness(offer);
+  const observedDiscount = freshness.current && points.length >= 2 && median && offer.price && median > offer.price ? Math.round((1 - offer.price / median) * 100) : null;
   const [days, setDays] = useState(0);
   const range = days ? points.filter(p => p[0] >= Date.now() - days * 86400000) : points;
   const dialog = React.useRef<HTMLDialogElement>(null);
-  useEffect(() => { const before = document.activeElement as HTMLElement; const panel = dialog.current; panel?.showModal(); return () => { panel?.close(); if (before?.isConnected) before.focus(); }; }, []);
+  useEffect(() => { const before = document.activeElement as HTMLElement; const panel = dialog.current; panel?.showModal(); return () => { panel?.close(); if (before?.isConnected) before.focus({ preventScroll: true }); }; }, []);
   return <dialog ref={dialog} className="mine-dialog" onCancel={e => { e.preventDefault(); onClose(); }} onClick={e => { if (e.target === e.currentTarget) onClose(); }} aria-labelledby="mine-product-title">
     <div className="mine-dialog-top"><span className="mine-eyebrow"><ShieldCheck size={14} /> PRODUCT INTELLIGENCE</span><button type="button" aria-label="Close product intelligence" onClick={onClose}><X size={21} /></button></div>
-    <div className="mine-dialog-content"><p className="mine-merchant">{offer.store}</p><h2 id="mine-product-title">{offer.title}</h2><div className="mine-dialog-price">{rupees(offer.price)}<span>Source-reported price · confirm at checkout</span></div>
+    <div className="mine-dialog-content"><p className="mine-merchant">{offer.store}</p><h2 id="mine-product-title">{offer.title}</h2><div className="mine-dialog-price">{rupees(offer.price)}<span>{freshness.current ? freshness.label : 'Source-reported listing · current price unconfirmed'} · confirm at checkout</span></div>
       <div className={`mine-decision tone-${decision.tone}`}><strong>{decision.label}</strong><p>{decision.reason}</p></div>
       <div className="mine-refresh"><button type="button" disabled={refreshing} onClick={refreshEvidence}><RefreshCw size={15} />{refreshing ? 'Checking source…' : 'Refresh real price evidence'}</button><span>{message || 'Check history and current price directly through the lookup service.'}</span></div>
       <div className="mine-history-head"><h3>Recorded price history</h3><div>{[7, 30, 90, 0].map(d => <button type="button" key={d} aria-pressed={days === d} onClick={() => setDays(d)}>{d ? `${d}d` : 'All'}</button>)}</div></div>

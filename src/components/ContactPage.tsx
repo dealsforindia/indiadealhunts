@@ -108,7 +108,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Rohan Sharma"
+                aria-label="Your name" placeholder="Rohan Sharma"
                 className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
               />
             </div>
@@ -121,7 +121,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="rohan@gmail.com"
+                aria-label="Email address" placeholder="rohan@gmail.com"
                 className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
               />
             </div>
@@ -131,7 +131,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
             <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
               Subject
             </label>
-            <select
+            <select aria-label="Subject"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
@@ -147,7 +147,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
             <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
               Your Message *
             </label>
-            <textarea
+            <textarea aria-label="Your message"
               required
               rows={4}
               value={message}

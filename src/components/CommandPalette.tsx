@@ -1,3 +1,4 @@
+import { useModalSurface } from '../utils/useModalSurface';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
@@ -144,17 +145,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   const [selectedStore, setSelectedStore] = useState('all');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const modalSurface = useModalSurface(isOpen, onClose);
 
   useEffect(() => {
     if (isOpen) {
       setQuery('');
       setSelectedIndex(0);
-      const prev = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      setTimeout(() => inputRef.current?.focus(), 50);
-      return () => {
-        document.body.style.overflow = prev;
-      };
+      const timer = setTimeout(() => inputRef.current?.focus(), 50);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -193,10 +191,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape' && e.target !== inputRef.current) return;
-      if (e.key === 'Escape') {
-        onClose();
-      } else if (e.key === 'ArrowDown') {
+      if (e.target !== inputRef.current) return;
+      if (e.key === 'ArrowDown') {
         e.preventDefault();
         setSelectedIndex((prev) => (prev < filteredResults.length - 1 ? prev + 1 : prev));
       } else if (e.key === 'ArrowUp') {
@@ -234,7 +230,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.97, y: -10 }}
         transition={{ duration: 0.15, ease: 'easeOut' }}
-        role="dialog" aria-modal="true" aria-label="Search deals and shopping tools"
+        ref={modalSurface} role="dialog" aria-modal="true" aria-label="Search deals and shopping tools"
         className="phone-command-panel w-full max-w-2xl bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[calc(100dvh-3rem)] overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >

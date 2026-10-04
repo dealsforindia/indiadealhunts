@@ -1,3 +1,5 @@
+import { TelegramIcon } from './TelegramIcon';
+import { useModalSurface } from '../utils/useModalSurface';
 import { publicShareUrl, publicStoreUrl } from '../utils/publicLinks';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
@@ -47,7 +49,6 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   onToggleSave,
   onOpenTool,
 }) => {
-  const dialogRef = React.useRef<HTMLDivElement>(null);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [copiedCoupon, setCopiedCoupon] = useState(false);
@@ -111,36 +112,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
     setTimeout(onClose, 200);
   }, [onClose]);
 
-  // Escape key handler
-  useEffect(() => {
-    if (!deal) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose(); };
-    document.addEventListener('keydown', handler);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', handler);
-      document.body.style.overflow = prev;
-    };
-  }, [deal, handleClose]);
-
-  // Keep keyboard focus inside the sheet and return it to the tapped card.
-  useEffect(() => {
-    if (!deal) return;
-    const previous = document.activeElement as HTMLElement | null;
-    const panel = dialogRef.current;
-    panel?.querySelector<HTMLButtonElement>('[aria-label="Close deal details"]')?.focus({ preventScroll: true });
-    const trap = (event: KeyboardEvent) => {
-      if (event.key !== 'Tab' || !panel) return;
-      const items = [...panel.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], input, select, [tabindex="0"]')].filter(el => el.getClientRects().length > 0);
-      const first = items[0], last = items[items.length - 1];
-      if (!first || !last) return;
-      if (event.shiftKey && (document.activeElement === first || !panel.contains(document.activeElement))) { event.preventDefault(); last.focus(); }
-      else if (!event.shiftKey && (document.activeElement === last || !panel.contains(document.activeElement))) { event.preventDefault(); first.focus(); }
-    };
-    document.addEventListener('keydown', trap);
-    return () => { document.removeEventListener('keydown', trap); if (previous?.isConnected) previous.focus({ preventScroll: true }); };
-  }, [deal?.id]);
+  const dialogRef = useModalSurface(!!deal, handleClose);
 
   if (!deal) return null;
 
@@ -922,7 +894,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             }}
             title="Share to Telegram"
           >
-            <span>✈️ Telegram</span>
+            <TelegramIcon width={17} height={17} /><span>Telegram</span>
           </button>
 
           <button

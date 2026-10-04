@@ -1,3 +1,4 @@
+import { useModalSurface } from '../utils/useModalSurface';
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { IconClose, IconShieldCheck, IconCheck, IconDocument, IconInfo, IconExternalLink } from './Icons';
@@ -10,25 +11,12 @@ interface LegalModalProps {
 }
 
 export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (type) {
-      const prev = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-      return () => {
-        document.body.style.overflow = prev;
-        window.removeEventListener('keydown', handleKeyDown);
-      };
-    }
-  }, [type, onClose]);
+  const modalSurface = useModalSurface(!!type, onClose);
 
   if (!type) return null;
 
   return createPortal(
-    <div
+    <div ref={modalSurface}
       style={{
         position: 'fixed',
         inset: 0,
@@ -218,7 +206,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
                   2. Pricing and Stock Availability
                 </h4>
                 <p>
-                  Prices and stock availability fluctuate rapidly on retail marketplaces. While our automated engine scans deals continuously, prices displayed were accurate at the time of publication and may change without notice.
+                  Prices and stock availability can change. Directory and search listings are source-reported observations, not a guarantee of the current checkout price. A current-price check is shown only when dated merchant product-page evidence is available. Confirm the final price, seller, variant and availability at the merchant.
                 </p>
               </div>
 
@@ -238,10 +226,10 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
             <>
               <div>
                 <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
-                  1. Zero Personal Data Harvesting
+                  1. Browsing and Optional Submissions
                 </h4>
                 <p>
-                  IndiaDealHunts does not require user accounts, passwords, or personal identity information to browse or search deals.
+                  You can browse and search without an account. If you choose to send a message, submit a deal, share a shopper report or register an alert, the information you enter is sent to the service handling that request. Shopper reports may appear publicly; include only information you want to share.
                 </p>
               </div>
 
@@ -250,7 +238,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
                   2. Local Storage and Preferences
                 </h4>
                 <p>
-                  We store UI state preferences (such as selected store filters and theme configurations) locally in your browser storage. This data never leaves your device.
+                  Theme preferences, saved offers and other shopping preferences are stored in your browser. Search queries and product links are sent to the lookup service when you use those features. You can remove locally saved preferences by clearing this site's browser storage.
                 </p>
               </div>
 
@@ -270,8 +258,8 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
         <div
           style={{
             padding: '14px 18px',
-            borderTop: '1px solid #F1F5F9',
-            backgroundColor: '#F8FAFC',
+            borderTop: '1px solid var(--border-subtle)',
+            backgroundColor: 'var(--surface-2)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-end',

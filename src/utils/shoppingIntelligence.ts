@@ -16,7 +16,8 @@ export const rupees = (value?: number | null) => value != null && value > 0
 
 export function cleanHistory(history?: Array<[number, number]>) {
   const points = (Array.isArray(history) ? history : []).filter(p => Array.isArray(p) && Number.isFinite(p[0]) && p[0] > 0 && Number.isFinite(p[1]) && p[1] > 0)
-    .map(([t, p]): [number, number] => [t < 1e12 ? t * 1000 : t, p]);
+    .map(([t, p]): [number, number] => [t < 1e12 ? t * 1000 : t, p])
+    .filter(([t, p]) => t <= Date.now() + 60000 && p <= 10000000);
   return [...new Map(points.map(p => [p[0], p])).values()].sort((a, b) => a[0] - b[0]);
 }
 

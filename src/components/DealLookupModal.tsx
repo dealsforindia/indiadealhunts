@@ -145,6 +145,8 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
         }).catch(() => null);
       }
 
+      if (controller.signal.aborted || request.current !== controller) return;
+
       if (res && res.ok) {
         const data = await res.json();
         if (controller.signal.aborted || request.current !== controller) return;
@@ -169,11 +171,11 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
           status: 'success',
           product_name: title,
           title: title,
-          price: 0,
+          price: null,
           pendingLivePrice: true,
           url: targetUrl,
           store: isFk ? 'Flipkart' : 'Amazon India',
-          is_deal: true,
+          is_deal: false,
           verdict: 'Merchant listing identified. Open the product page below to verify current checkout price.',
         };
         setResult(fallbackData);
@@ -254,7 +256,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
 
           <div className="flex items-center gap-2">
             {/* View Selector Tabs */}
-            <div className="hidden sm:flex items-center gap-1 bg-slate-200/70 dark:bg-[#172440]/70 p-1 rounded-xl">
+            <div className="flex items-center gap-1 bg-slate-200/70 dark:bg-[#172440]/70 p-1 rounded-xl">
               <button
                 type="button"
                 onClick={() => setActiveTab('analyzer')}
@@ -523,7 +525,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                   {watches.map((w) => (
                     <div
                       key={w.id}
-                      className="p-3.5 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 shadow-2xs flex items-center justify-between gap-3"
+                      className="p-3.5 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
                     >
                       <div className="flex flex-col gap-1 min-w-0">
                         <div className="flex items-center gap-2">
@@ -532,8 +534,8 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                           </span>
                           <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] truncate">{w.title}</span>
                         </div>
-                        <div className="flex items-center gap-3 text-[11px] font-mono">
-                          <span className="text-slate-500">Saved price: ₹{w.currentPrice.toLocaleString('en-IN')}</span>
+                        <div className="flex flex-wrap items-center gap-3 text-[11px] font-mono">
+                          <span className="text-slate-500">Saved price: {w.currentPrice > 0 ? `₹${w.currentPrice.toLocaleString('en-IN')}` : 'Unconfirmed'}</span>
                           <span className="font-bold text-emerald-600">Target: ₹{w.targetPrice.toLocaleString('en-IN')}</span>
                           <span className="text-slate-400 text-[10px]">Note: {w.contact}</span>
                         </div>
@@ -551,7 +553,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                         <button
                           type="button"
                           onClick={() => handleRemoveWatch(w.id)}
-                          className="w-7 h-7 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer"
+                          aria-label={`Remove price goal for ${w.title}`} className="w-11 h-11 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer"
                           title="Remove watch"
                         >
                           ✕
