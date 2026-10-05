@@ -1,7 +1,8 @@
 import { useModalSurface } from '../utils/useModalSurface';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowUpRight, Bell, Bookmark, Check, Copy, Image, Layers, MoreHorizontal, Repeat2, Share2, ShoppingBag, ShoppingCart, X } from 'lucide-react';
+import { ArrowUpRight, Bell, Bookmark, Check, Copy, Heart, Image, Layers, MoreHorizontal, Repeat2, Share2, ShoppingBag, ShoppingCart, Star, X } from 'lucide-react';
+import { useAutomaticReviews } from '../utils/reviewEvidence';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { isDealSaved, toggleSavedDealId } from '../utils/savedDeals';
@@ -30,6 +31,8 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
   const trigger = useRef<HTMLButtonElement>(null);
   const sheet = useModalSurface(menuOpen, () => setMenuOpen(false));
   const saved = suppliedSaved ?? localSaved;
+  const card = useRef<HTMLElement>(null);
+  const { result: reviewEvidence, load: reviewLoad } = useAutomaticReviews(deal.id, deal.url || '', card);
   const title = deal.title?.replace(/^[\s\u{1F300}-\u{1FAFF}\u2600-\u27BF\uFE0F]+/u, '').trim() || `${deal.store || 'Store'} offer`;
   const store = deal.store || 'Store';
   const price = Number(deal.price) || 0;
@@ -57,20 +60,24 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
   const handleViewDeal = () => {
     openSmartStoreLink(deal.url, store, asin || undefined, false, subId);
   };
-  return <article style={{ '--card-delay': `${Math.min(index % 40, 7) * 35}ms` } as React.CSSProperties} className={`commerce-card commerce-card-reveal${expired ? ' is-expired' : ''}${isComparing ? ' is-comparing' : ''}`}>
+  return <article ref={card} style={{ '--card-delay': `${Math.min(index % 40, 7) * 35}ms` } as React.CSSProperties} className={`commerce-card commerce-card-reveal${expired ? ' is-expired' : ''}${isComparing ? ' is-comparing' : ''}`}>
     <div className="commerce-card-photo">
       <button type="button" className="commerce-photo-button" onClick={details} aria-label={`View details for ${title}`}>
         {photo && !imageFailed ? <img src={photo} alt={title} loading="lazy" decoding="async" onError={() => setImageFailed(true)} /> : <span className="commerce-image-fallback"><Image size={30} strokeWidth={1.2} /><span>Image unavailable</span></span>}
       </button>
       <span className={`commerce-store commerce-store-${store.toLowerCase().replace(/[^a-z]/g, '')}`}>{store}</span>
-      <button type="button" className={`commerce-card-save${saved ? ' is-saved' : ''}`} aria-label={`${saved ? 'Unsave' : 'Save'} ${title}`} aria-pressed={saved} onClick={save}><Bookmark size={18} fill={saved ? 'currentColor' : 'none'} /></button>
-      {expired ? <span className="commerce-discount">Ended</span> : deal.sellout_prediction?.urgency_label ? <span className="commerce-discount is-urgent">{deal.sellout_prediction.urgency_label}</span> : discount != null && discount > 0 && <span className="commerce-discount">{discount}% below MRP</span>}
+      <button type="button" className={`commerce-card-save${saved ? ' is-saved' : ''}`} aria-label={`${saved ? 'Unsave' : 'Save'} ${title}`} aria-pressed={saved} onClick={save}><Bookmark className="desktop-save-icon" size={18} fill={saved ? 'currentColor' : 'none'} /><Heart className="mobile-save-icon" size={20} fill={saved ? 'currentColor' : 'none'} /></button>
+      {expired ? <span className="commerce-discount">Ended</span> : discount != null && discount > 0 ? <span className="commerce-discount">{discount}% below MRP</span> : deal.sellout_prediction?.urgency_label && <span className="commerce-discount is-urgent" title="Estimated by the deal model, not merchant-confirmed stock">Estimate: {deal.sellout_prediction.urgency_label}</span>}
     </div>
     <div className="commerce-card-body">
       <button type="button" className="commerce-card-title" onClick={details}>{title}</button>
+      <button type="button" className={`commerce-card-rating${reviewEvidence?.rating == null ? ' is-unrated' : ''}`} onClick={details} aria-label={reviewEvidence?.rating != null ? `Customer rating ${reviewEvidence.rating} out of 5. View review evidence` : `Customer reviews for ${title}`} title={reviewEvidence?.message || reviewLoad?.message || 'Customer review evidence from the merchant'}>
+        <Star size={13} fill={reviewEvidence?.rating != null ? 'currentColor' : 'none'} />
+        <span>{reviewEvidence?.rating != null ? <>{reviewEvidence.rating.toFixed(1)}{reviewEvidence.rating_count != null ? ` (${reviewEvidence.rating_count.toLocaleString('en-IN')})` : ' / 5'}</> : reviewEvidence?.reviews.length ? `${reviewEvidence.reviews.length} review excerpts` : reviewEvidence || reviewLoad?.status === 'error' ? 'Reviews unavailable' : reviewLoad ? 'Checking reviews…' : 'Customer reviews'}</span>
+      </button>
       <div className="commerce-card-price"><strong>{price > 0 ? money(price) : 'Check price'}</strong>{mrp && <s>{money(mrp)}</s>}</div>
       <p className="commerce-card-note">{expired ? 'This offer has ended' : 'Confirm price at checkout'}</p>
-      <div className="commerce-card-actions"><button type="button" className="commerce-store-button" onClick={handleViewDeal} disabled={expired || !deal.url}><span>View at {store}</span><ArrowUpRight size={16} /></button><button ref={trigger} type="button" className="commerce-card-more" aria-label={`More options for ${title}`} aria-haspopup="dialog" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}><MoreHorizontal size={20} /></button></div>
+      <div className="commerce-card-actions"><button type="button" className="commerce-store-button" aria-label={`View at ${store}`} onClick={handleViewDeal} disabled={expired || !deal.url}><span><span className="commerce-store-prefix">View at </span>{store}</span><ArrowUpRight size={16} /></button><button ref={trigger} type="button" className="commerce-card-more" aria-label={`More options for ${title}`} aria-haspopup="dialog" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}><MoreHorizontal size={20} /></button></div>
       <div className="commerce-card-meta"><span>Listed {relativeTime(deal.display_ts || deal.posted_at)}</span><button type="button" onClick={details}>Details <span aria-hidden="true">↗</span></button></div>
     </div>
     {menuOpen && createPortal(<div className="commerce-sheet-backdrop" onClick={() => setMenuOpen(false)}><div ref={sheet} className="commerce-product-sheet" role="dialog" aria-modal="true" aria-label={`Shopping options for ${title}`} onClick={event => event.stopPropagation()}>

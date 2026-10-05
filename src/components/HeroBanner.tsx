@@ -36,10 +36,11 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ searchQuery, onSearch, o
   const discount = reference && spotlight ? Math.round((reference - spotlight.price) / reference * 100) : null;
   return <section className="premium-hero" aria-label="Discover your next deal">
     <div className={`premium-hero-frame${!spotlight ? ' has-no-spotlight' : ''}`}>
+      <img className="mobile-hero-art" src="/brand/mobile-product-collage-v1.webp" alt="" aria-hidden="true" width="600" height="600" fetchPriority="high" />
       <div className="premium-hero-copy">
         <div className="premium-kicker"><span aria-hidden="true" />THE SMARTER WAY TO SHOP</div>
         <h1>Great finds.<br /><span>Smarter savings.</span></h1>
-        <p className="premium-hero-description"><span className="hidden md:inline">Search your favourite stores. Compare available price evidence.<br className="hidden xl:block" /> Keep the finds worth coming back for.</span><span className="md:hidden">Search stores. Compare prices. Save smarter.</span></p>
+        <p className="premium-hero-description"><span className="hidden md:inline">Search your favourite stores. Compare available price evidence.<br className="hidden xl:block" /> Keep the finds worth coming back for.</span><span className="md:hidden">Search stores. Compare prices. Track drops.<br />Save smarter.</span></p>
         <form className="premium-search" onSubmit={submit} role="search" aria-label="Search the deal directory and stores">
           <Search size={21} aria-hidden="true" />
           <input id="hero-search-input" aria-label="Search deals or paste product URL" placeholder="Search products or paste a link" value={input} onChange={event => setInput(event.target.value)} type="search" />
@@ -47,7 +48,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ searchQuery, onSearch, o
           <button className="premium-search-submit" type="submit" aria-label="Find deals"><span>Find deals</span><ArrowRight size={18} aria-hidden="true" /></button>
         </form>
         <div className="premium-popular" aria-label="Popular product searches"><span className="premium-popular-label">Explore</span>
-          <button type="button" className="premium-flash-search" onClick={() => openGoogleShoppingModal(input.trim() || 'trending deals')} title="Scan Pan-India stores with in-PWA Google Shopping Radar"><ShoppingBag size={15} />🛍️ Price Radar</button>
+          <button type="button" className="premium-flash-search premium-radar-search" onClick={() => openGoogleShoppingModal(input.trim() || 'trending deals')} title="Search available external store listings"><ShoppingBag size={15} />Price Radar <ArrowRight size={13} /></button>
           {!!highDiscountCount && onFilterFlashLoot && <button type="button" className="premium-flash-search" onClick={onFilterFlashLoot}><TrendingDown size={15} />{highDiscountCount} big drops</button>}
           {SEARCHES.map(term => <button type="button" key={term} onClick={() => { setInput(term); onSearch(term); }}>{term}</button>)}
         </div>

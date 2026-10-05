@@ -1,4 +1,3 @@
-import { TelegramIcon } from './TelegramIcon';
 import { useModalSurface } from '../utils/useModalSurface';
 import { publicShareUrl, publicStoreUrl } from '../utils/publicLinks';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
@@ -12,7 +11,7 @@ import { ProductReviews } from './ProductReviews';
 import { couponOffer } from '../utils/couponOffer';
 import { analyzeArbitrage } from '../utils/arbitrage';
 import { openGoogleShoppingModal } from '../utils/googleShopping';
-import { shareToWhatsApp, shareToTelegram, copyDealLink } from '../utils/shareDeal';
+import { copyDealLink } from '../utils/shareDeal';
 import { isDealSaved, toggleSavedDealId } from '../utils/savedDeals';
 import {
   extractAmazonAsin,
@@ -923,60 +922,6 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
           >
             <span>🛍️ Scan Stores</span>
             <span style={{ fontSize: '9px', backgroundColor: '#DBEAFE', padding: '1px 5px', borderRadius: '4px', fontWeight: 800 }}>IN-APP</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              shareToWhatsApp(deal);
-              onShowToast?.('Opening WhatsApp share...');
-            }}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-              padding: '0 14px',
-              height: '42px',
-              backgroundColor: '#ECFDF5',
-              border: '1px solid #A7F3D0',
-              borderRadius: '9999px',
-              color: '#065F46',
-              fontFamily: 'var(--font-body)',
-              fontSize: '12px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 120ms ease',
-            }}
-            title="Share to WhatsApp"
-          >
-            <span>💬 WhatsApp</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              shareToTelegram(deal);
-              onShowToast?.('Opening Telegram share...');
-            }}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-              padding: '0 14px',
-              height: '42px',
-              backgroundColor: '#EFF6FF',
-              border: '1px solid #DBEAFE',
-              borderRadius: '9999px',
-              color: '#1E40AF',
-              fontFamily: 'var(--font-body)',
-              fontSize: '12px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 120ms ease',
-            }}
-            title="Share to Telegram"
-          >
-            <TelegramIcon width={17} height={17} /><span>Telegram</span>
           </button>
 
           <button

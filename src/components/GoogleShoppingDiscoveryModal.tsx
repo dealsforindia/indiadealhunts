@@ -23,6 +23,7 @@ import {
 import { PUBLIC_API_BASE, publicStoreUrl, lookupTargetUrl } from '../utils/publicLinks';
 import { openSmartStoreLink, extractAmazonAsin, generateSubId } from '../utils/affiliateEngine';
 import { ProductPriceHistory } from './ProductPriceHistory';
+import { CardReviewEvidence } from './CardReviewEvidence';
 
 export interface DiscoveredStoreOffer {
   id: string;
@@ -619,6 +620,7 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
                             {offer.title}
                           </h4>
 
+                          <CardReviewEvidence id={offer.id} url={offer.raw_url || offer.url} title={offer.title} />
                           {/* Pricing */}
                           <div className="mt-1.5 flex items-baseline gap-1.5">
                             {offer.price ? (

@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { motion, useAnimationControls, useReducedMotion } from 'motion/react';
-import { Car, Dumbbell, Grid2X2, Headphones, House, Plane, Shirt, ShoppingBasket, Sparkles } from 'lucide-react';
+import { Car, Dumbbell, Grid2X2, Headphones, House, MoreHorizontal, Plane, Shirt, ShoppingBasket, Sparkles } from 'lucide-react';
 interface CategoryRailProps { selectedCategory: string; onSelectCategory: (cat: string) => void; categoryCounts?: Record<string, number>; }
 const CATEGORIES = [
   { id: 'all', label: 'All Deals', Icon: Grid2X2 },
@@ -49,5 +49,6 @@ export function CategoryRail({ selectedCategory, onSelectCategory }: CategoryRai
       <motion.div className="liquid-category-indicator" initial={{ opacity: 0 }} animate={controls} aria-hidden="true"><span /></motion.div>
       {CATEGORIES.map(({ id, label, Icon }) => <button ref={node => { if (node) buttons.current.set(id, node); else buttons.current.delete(id); }} type="button" key={id} className={`liquid-category-button${selected === id ? ' is-selected' : ''}`} aria-pressed={selected === id} onClick={() => onSelectCategory(id)}><Icon size={17} aria-hidden="true" /><span>{label}</span></button>)}
     </div>
+    <button type="button" className="mobile-category-more" aria-label="More shopping tools and categories" onClick={() => window.dispatchEvent(new Event('idh-open-mobile-menu'))}><MoreHorizontal size={20} /><span>More</span></button>
   </nav>;
 }

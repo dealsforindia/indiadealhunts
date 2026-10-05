@@ -24,5 +24,6 @@ dist-ssr
 *.sw?
 *.tsbuildinfo
 tests/.python-deps/
+tests/artifacts/
 .build-check/
 .revert-snapshots/

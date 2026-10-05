@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Bookmark, ChevronDown, Heart, Menu, Plus, Search, SlidersHorizontal, TrendingDown, Volume2, VolumeX, X } from 'lucide-react';
+import { Bell, Bookmark, ChevronDown, Heart, Menu, Plus, Search, SlidersHorizontal, TrendingDown, Volume2, VolumeX, X } from 'lucide-react';
 import { NavTab } from '../types';
 import { BrandMark } from './BrandMark';
 import { ThemeToggle } from './ThemeToggle';
@@ -8,12 +8,19 @@ interface NavbarProps {
   activeTab: NavTab; onTabChange: (tab: NavTab) => void; onSelectCategory?: (category: string) => void;
   onOpenLookup: () => void; onOpenSubmit: () => void; onFocusSearch?: () => void;
   onOpenToolsHub?: () => void; onOpenCommandPalette?: () => void;
+  onOpenWatches?: () => void; onBrowseCollections?: () => void;
+  onOpenCompareTools?: () => void;
   isAudioEnabled?: boolean; onToggleAudio?: () => void; savedCount?: number;
 }
-export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, onSelectCategory, onOpenLookup, onOpenSubmit, onFocusSearch, onOpenToolsHub, onOpenCommandPalette, isAudioEnabled = true, onToggleAudio, savedCount = 0 }) => {
+export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, onSelectCategory, onOpenLookup, onOpenSubmit, onFocusSearch, onOpenToolsHub, onOpenCommandPalette, onOpenWatches, onBrowseCollections, onOpenCompareTools, isAudioEnabled = true, onToggleAudio, savedCount = 0 }) => {
   const [open, setOpen] = useState(false);
   const container = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const reveal = () => setOpen(true);
+    window.addEventListener('idh-open-mobile-menu', reveal);
+    return () => window.removeEventListener('idh-open-mobile-menu', reveal);
+  }, []);
   useEffect(() => {
     if (!open) return;
     const outside = (event: PointerEvent) => { if (!container.current?.contains(event.target as Node)) setOpen(false); };
@@ -32,14 +39,17 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, onSelect
         <button type="button" className="commerce-icon-button" aria-label="Search products" onClick={() => run(onOpenCommandPalette || onFocusSearch)}><Search size={20} /></button>
         <ThemeToggle />
         <a className="commerce-telegram" href="https://t.me/dealsforindiachannel" target="_blank" rel="noopener noreferrer" aria-label="Join IndiaDealHunts on Telegram"><TelegramIcon /><span>Join Telegram</span></a>
+        <button type="button" className="mobile-review-alerts" aria-label="Price watches and alerts" onClick={() => run(onOpenWatches || onOpenLookup)}><Bell size={22} /></button>
         <div className="commerce-menu" ref={container}>
           <button ref={trigger} type="button" className="commerce-more" aria-label={open ? 'Close navigation' : 'More shopping tools'} aria-expanded={open} aria-controls="commerce-navigation" onClick={() => setOpen(value => !value)}><span>More</span>{open ? <X size={20} /> : <><ChevronDown className="commerce-more-chevron" size={16} /><Menu className="commerce-more-hamburger" size={21} /></>}</button>
           {open && <div id="commerce-navigation" className="commerce-menu-panel">
             <div className="commerce-menu-heading">Your shopping space</div>
+            {onBrowseCollections && <button type="button" className="mobile-collections-menu-action" onClick={() => run(onBrowseCollections)}><Heart size={18} />Browse all collections</button>}
             <div className="commerce-mobile-links">{links.map(link => <button type="button" key={link.id} onClick={() => go(link.id)}>{link.id === 'saved' ? <Bookmark size={18} /> : <TrendingDown size={18} />}{link.label}</button>)}</div>
             <button type="button" onClick={() => go('best_worth')}><TrendingDown size={18} />Worth score</button>
             <button type="button" onClick={() => go('wall_of_happiness')}><Heart size={18} />Wall of happiness</button>
             <button type="button" onClick={() => run(onOpenLookup)}><Search size={18} />Price lookup</button>
+            {onOpenCompareTools && <button type="button" onClick={() => run(onOpenCompareTools)}><SlidersHorizontal size={18} />Compare & shopping tools</button>}
             {onOpenToolsHub && <button type="button" onClick={() => run(onOpenToolsHub)}><SlidersHorizontal size={18} />Shopping tools</button>}
             <button type="button" onClick={() => run(onOpenSubmit)}><Plus size={18} />Submit a deal</button>
             {onToggleAudio && <button type="button" aria-pressed={isAudioEnabled} onClick={onToggleAudio}>{isAudioEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}Sounds <small>{isAudioEnabled ? 'On' : 'Off'}</small></button>}

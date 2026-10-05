@@ -8,7 +8,8 @@ import { analyzeArbitrage, ArbitrageAnalysis } from '../utils/arbitrage';
 import { openGoogleShoppingModal } from '../utils/googleShopping';
 import { normalizeLookup } from '../utils/priceEvidence';
 
-interface DealLookupModalProps {
+interface DealLookupModalProps {
+  initialTab?: 'analyzer' | 'watches';
   initialUrl?: string;
   isOpen?: boolean;
   onClose?: () => void;
@@ -60,12 +61,14 @@ const getLookupError = (targetUrl: string) => {
   return null;
 };
 
-export const DealLookupModal: React.FC<DealLookupModalProps> = ({
+export const DealLookupModal: React.FC<DealLookupModalProps> = ({
+  initialTab = 'analyzer',
   initialUrl = '',
   isOpen = true,
   onClose,
 }) => {
-  const [activeTab, setActiveTab] = useState<'analyzer' | 'watches'>('analyzer');
+  const [activeTab, setActiveTab] = useState<'analyzer' | 'watches'>('analyzer');
+  useEffect(() => { if (isOpen) setActiveTab(initialTab); }, [initialTab, isOpen]);
   const [url, setUrl] = useState(initialUrl);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

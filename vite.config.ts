@@ -43,6 +43,10 @@ export default defineConfig({
       interval: 1000,
     },
     proxy: {
+      '/api/v1/products/reviews': {
+        target: process.env.VITE_REVIEW_BACKEND_URL || BACKEND_URL,
+        changeOrigin: true,
+      },
       '/deal-images': {
         target: BACKEND_URL,
         changeOrigin: true,
