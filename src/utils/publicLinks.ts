@@ -23,7 +23,7 @@ export function lookupTargetUrl(value: string): string {
   try {
     const parsed = new URL(value, 'https://indiadealhunts.vercel.app');
     const match = parsed.pathname.match(/^\/out\/([a-zA-Z0-9_-]+)\/?$/);
-    return match && ['indiadealhunts.vercel.app', 'indiadealhunts.com', '127.0.0.1', 'localhost'].includes(parsed.hostname) ? `https://api.rudranil.me/r/${match[1]}` : value;
+    return match && ['indiadealhunts.vercel.app', 'indiadealhunts.com', '127.0.0.1', 'localhost'].includes(parsed.hostname) ? `https://api.rudranil.me/r/${match[1]}${parsed.search}` : value;
   } catch { return value; }
 }
 

@@ -3,7 +3,7 @@
  * Handles 90-Day Cart Locks, Multi-ASIN bundles, Native Mobile OS Intents, and Client-Side SubID Attribution.
  */
 import { useState, useEffect } from 'react';
-import { publicStoreUrl } from './publicLinks';
+import { publicStoreUrl, lookupTargetUrl } from './publicLinks';
 
 const DEFAULT_AMAZON_TAG = 'dealshare0b7-21';
 
@@ -227,15 +227,16 @@ export function openSmartStoreLink(
   // features (such as 'sponsored') as POPUP WINDOW mode and restricts the window to ~516px width,
   // which forces responsive e-commerce stores to render their mobile web version!
   // Instead, open a full, standard desktop tab via a simulated clean anchor click.
+  const destinationUrl = lookupTargetUrl(targetWebUrl);
   try {
     const a = document.createElement('a');
-    a.href = targetWebUrl;
+    a.href = destinationUrl;
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
   } catch {
-    window.open(targetWebUrl, '_blank');
+    window.open(destinationUrl, '_blank');
   }
 }

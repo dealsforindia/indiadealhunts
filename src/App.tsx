@@ -1,5 +1,5 @@
 import { RecoveryBoundary } from './components/RecoveryBoundary';
-import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicDeal, publicStoreUrl, isDisplayableOffer } from './utils/publicLinks';
+import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicDeal, publicStoreUrl, lookupTargetUrl, isDisplayableOffer } from './utils/publicLinks';
 import { ArrowDown, LoaderCircle } from 'lucide-react';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Navbar } from './components/Navbar';
@@ -54,6 +54,16 @@ const API_BASE = PUBLIC_API_BASE;
 export const App: React.FC = () => {
   // Theme Manager Engine (System vs Dark vs Light with OS sync)
   useTheme();
+
+  // Instant outbound deal redirect if loaded on /out/:id
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/out/')) {
+      const target = lookupTargetUrl(window.location.pathname + window.location.search);
+      if (target && target.startsWith('http') && !target.includes('/out/')) {
+        window.location.replace(target);
+      }
+    }
+  }, []);
 
   // Navigation Tab State
   const [mobileDeskOpen, setMobileDeskOpen] = useState(false);
