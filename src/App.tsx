@@ -1,6 +1,6 @@
 import { RecoveryBoundary } from './components/RecoveryBoundary';
 import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicDeal, publicStoreUrl, lookupTargetUrl, isDisplayableOffer } from './utils/publicLinks';
-import { ArrowDown, LoaderCircle } from 'lucide-react';
+import { ArrowDown, LoaderCircle, X } from 'lucide-react';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Navbar } from './components/Navbar';
 import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
@@ -67,6 +67,8 @@ export const App: React.FC = () => {
 
   // Navigation Tab State
   const [mobileDeskOpen, setMobileDeskOpen] = useState(false);
+  const [mobileCollectionsOpen, setMobileCollectionsOpen] = useState(false);
+  const [collectionFilter, setCollectionFilter] = useState<'all' | 'loot70' | 'budget499'>('all');
   const [activeTab, setActiveTab] = useState<NavTab>('home');
 
   // Deals State (Starts empty with skeleton shimmer until live drops load from API)
@@ -240,6 +242,7 @@ export const App: React.FC = () => {
   const [isPriceAlertOpen, setIsPriceAlertOpen] = useState<boolean>(false);
   const [isTradeInOpen, setIsTradeInOpen] = useState<boolean>(false);
   const [isLookupOpen, setIsLookupOpen] = useState<boolean>(false);
+  const [lookupInitialTab, setLookupInitialTab] = useState<'analyzer' | 'watches'>('analyzer');
   const [lookupUrl, setLookupUrl] = useState<string>('');
   const [isSubmitOpen, setIsSubmitOpen] = useState<boolean>(false);
   const [activeLegal, setActiveLegal] = useState<LegalDocType>(null);
@@ -370,8 +373,8 @@ export const App: React.FC = () => {
   }, [showToast]);
 
   const flashLootCount = useMemo(() => {
-    return deals.filter((d) => (d.discount_pct || 0) >= 70).length;
-  }, [deals]);
+    return discoveryDeals.filter(d => d.price != null && d.price > 0 && d.mrp != null && d.mrp > d.price && (1 - d.price / d.mrp) * 100 >= 70).length;
+  }, [discoveryDeals]);
 
   const handleFilterFlashLoot = useCallback(() => {
     setActiveTab('home');
@@ -379,6 +382,7 @@ export const App: React.FC = () => {
     setSelectedStore('all');
     setSearchQuery('');
     setSortBy('discount');
+    setCollectionFilter('loot70');
     const section = document.getElementById('deals-section');
     if (section) section.scrollIntoView({ behavior: 'smooth' });
   }, []);
@@ -535,6 +539,8 @@ export const App: React.FC = () => {
   // Filter deals locally based on search query, category rail, activeTab
   const filteredDeals = useMemo(() => {
     let result = deals;
+    if (collectionFilter === 'loot70') result = result.filter(d => d.price != null && d.price > 0 && d.mrp != null && d.mrp > d.price && (1 - d.price / d.mrp) * 100 >= 70);
+    if (collectionFilter === 'budget499') result = result.filter(d => d.price != null && d.price > 0 && d.price < 499);
 
     // Search query filtering: Rank / filter locally while preserving server results
     if (searchQuery.trim()) {
@@ -581,7 +587,7 @@ export const App: React.FC = () => {
     // Store filtering
     if (selectedStore !== 'all') {
       const storeLower = selectedStore.toLowerCase();
-      result = result.filter((d) => d.store?.toLowerCase().includes(storeLower));
+      result = result.filter((d) => (d.store || '').toLowerCase() === storeLower || (d.store || '').toLowerCase().includes(storeLower));
     }
 
     // Tab-based filtering
@@ -608,12 +614,22 @@ export const App: React.FC = () => {
     }
 
     return result;
-  }, [deals, searchQuery, selectedCategory, selectedStore, activeTab, savedDealIds, sortBy]);
+  }, [deals, searchQuery, selectedCategory, selectedStore, activeTab, savedDealIds, sortBy, collectionFilter]);
 
   const spotlightDeal = useMemo(() => {
     if (!discoveryDeals.length) return null;
     return discoveryDeals.find((d) => d.discount_pct && d.discount_pct >= 50 && d.price > 200 && d.image) || discoveryDeals[0];
   }, [discoveryDeals]);
+
+  const allLoadedStores = useMemo(() => {
+    const set = new Set<string>();
+    deals.forEach((d) => {
+      if (d.store && d.store.trim() && !['all', 'store', 'retail deal', 'unknown', 'deals', 'none'].includes(d.store.toLowerCase())) {
+        set.add(d.store.trim());
+      }
+    });
+    return Array.from(set);
+  }, [deals]);
 
   const handleFocusSearch = () => {
     const inputEl = (document.getElementById('search-results-input') || document.getElementById('hero-search-input')) as HTMLInputElement | null;
@@ -624,12 +640,14 @@ export const App: React.FC = () => {
   };
 
   const startProductSearch = (query: string) => {
+    setCollectionFilter('all');
     setSearchQuery(query.trim());
     setActiveTab('home');
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const handleNavTabChange = (tab: NavTab) => {
+    setCollectionFilter('all');
     setIsSubmitOpen(false);
     setActiveTab(tab);
     if (tab === 'home') {
@@ -644,7 +662,7 @@ export const App: React.FC = () => {
 
   return (
     <div
-      className="storefront-app"
+      className={`storefront-app${mobileCollectionsOpen ? ' mobile-collections-open' : ''}${mobileDeskOpen ? ' mobile-desk-open' : ''}`}
       style={{
         minHeight: '100vh',
         maxWidth: '100vw',
@@ -679,7 +697,7 @@ export const App: React.FC = () => {
       <Navbar
         activeTab={activeTab}
         onTabChange={handleNavTabChange}
-        onSelectCategory={(cat) => setSelectedCategory(cat)}
+        onSelectCategory={(cat) => { setCollectionFilter('all'); setSelectedCategory(cat); }}
         onOpenLookup={() => {
           setLookupUrl('');
           setIsLookupOpen(true);
@@ -687,6 +705,12 @@ export const App: React.FC = () => {
         onOpenSubmit={() => { setIsSubmitOpen(true); setActiveTab('submit_deal'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
         onFocusSearch={handleFocusSearch}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onOpenWatches={() => { setLookupInitialTab('watches'); setLookupUrl(''); setIsLookupOpen(true); }}
+        onBrowseCollections={() => setMobileCollectionsOpen(v => !v)}
+        onOpenCompareTools={() => {
+          setActiveTab('home'); setSearchQuery(''); setMobileDeskOpen(true);
+          requestAnimationFrame(() => document.getElementById('shopping-desk')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+        }}
         onOpenToolsHub={() => handleOpenToolsHub()}
         isAudioEnabled={isAudioActive}
         onToggleAudio={handleToggleAudio}
@@ -809,9 +833,12 @@ export const App: React.FC = () => {
               />
 
               {/* ── 2.5 Flash Category Stories Rail (live deals only) ── */}
+              {/* Curated offers/video placements are deferred until DealFlow controls them.
+                  Keep the dormant tile component for that future integration. */}
               <CategoryStories
                 deals={discoveryDeals}
                 onSelectCategoryFilter={(cat) => {
+                  setCollectionFilter('all');
                   setSelectedCategory(cat);
                   const dealGrid = document.getElementById('deals-section');
                   if (dealGrid) {
@@ -823,19 +850,21 @@ export const App: React.FC = () => {
               {/* ── 3. Category Rail (Sticky below header) ── */}
               <CategoryRail
                 selectedCategory={selectedCategory}
-                onSelectCategory={(cat) => setSelectedCategory(cat)}
+                onSelectCategory={(cat) => { setCollectionFilter('all'); setSelectedCategory(cat); }}
               />
             </>
           )}
 
           {/* ── 4. Deal Toolbar (Store, Category, Sort, Deal Count, View Toggle) ── */}
           <div className={`mobile-shopping-controls ${searchFullScreen ? 'is-search' : ''}`}>
+          {!searchFullScreen && <div className="mobile-drops-title"><h2>Latest Drops <span aria-hidden="true">🔥</span></h2><p>Latest directory offers · Check price evidence before buying</p></div>}
           {!searchFullScreen && <button type="button" className="mobile-desk-toggle" aria-expanded={mobileDeskOpen}
             aria-controls="shopping-desk" onClick={() => setMobileDeskOpen(v => !v)}>
             <span><strong>Compare & shopping tools</strong><small>Price evidence, shortlists & checkout costs</small></span>
             <span aria-hidden="true">{mobileDeskOpen ? '−' : '+'}</span>
           </button>}
           <div id="shopping-desk" className={`shopping-desk ${searchFullScreen || mobileDeskOpen ? 'is-open' : ''}`}>
+          {!searchFullScreen && mobileDeskOpen && <div className="shopping-desk-dismiss"><span>Compare & shopping tools</span><button type="button" aria-label="Close compare and shopping tools" onClick={() => setMobileDeskOpen(false)}><X size={20} /><span>Close</span></button></div>}
           <IntelligenceWorkspace
             query={searchQuery}
             offers={[
@@ -856,15 +885,17 @@ export const App: React.FC = () => {
             selectedStore={selectedStore}
             onSelectStore={setSelectedStore}
             selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
+            onSelectCategory={(cat) => { if (cat !== selectedCategory) setCollectionFilter('all'); setSelectedCategory(cat); }}
             sortBy={sortBy}
             onSortChange={setSortBy}
             totalDeals={filteredDeals.length}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
+            availableStores={allLoadedStores}
           />
 
           </div>
+          {collectionFilter !== 'all' && !searchFullScreen && <div className="mobile-active-collection"><span>{collectionFilter === 'loot70' ? '70%+ below listed MRP' : 'Directory offers under ₹499'}</span><button type="button" onClick={() => setCollectionFilter('all')}>Clear collection ×</button></div>}
           {/* ── 5. Deal Section: Latest Verified Deals ── */}
           <section
             id="deals-section"
@@ -1161,8 +1192,9 @@ export const App: React.FC = () => {
       {/* ── Price Lookup Tool Modal ── */}
       <DealLookupModal
         isOpen={isLookupOpen}
-        onClose={() => setIsLookupOpen(false)}
+        onClose={() => { setIsLookupOpen(false); setLookupInitialTab('analyzer'); }}
         initialUrl={lookupUrl}
+        initialTab={lookupInitialTab}
       />
 
       {/* ── Google Shopping & Pan-India Discovery Radar Modal (In-App) ── */}

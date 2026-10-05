@@ -8,6 +8,7 @@ import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { SignaturePriceGraph } from './SignaturePriceGraph';
 import { ProductPriceHistory } from './ProductPriceHistory';
+import { ProductReviews } from './ProductReviews';
 import { couponOffer } from '../utils/couponOffer';
 import { analyzeArbitrage } from '../utils/arbitrage';
 import { openGoogleShoppingModal } from '../utils/googleShopping';
@@ -33,15 +34,19 @@ interface DealDetailModalProps {
 }
 
 function getStoreDisplayName(store?: string): string {
-  const s = (store || '').toLowerCase();
-  if (s.includes('amazon'))  return 'Amazon India';
-  if (s.includes('flipkart')) return 'Flipkart';
-  if (s.includes('myntra'))  return 'Myntra';
-  if (s.includes('ajio'))    return 'AJIO';
-  if (s.includes('blinkit')) return 'Blinkit';
-  if (s.includes('swiggy'))  return 'Swiggy Instamart';
-  if (s.includes('zepto'))   return 'Zepto';
-  return store || 'Store';
+  const s = (store || '').trim();
+  const low = s.toLowerCase();
+  if (!s || ['store', 'retail deal', 'unknown', 'deals', 'none'].includes(low)) {
+    return 'Verified Store';
+  }
+  if (low === 'amazon' || low === 'amazon india') return 'Amazon India';
+  if (low === 'flipkart') return 'Flipkart';
+  if (low === 'myntra') return 'Myntra';
+  if (low === 'ajio') return 'AJIO';
+  if (low === 'blinkit') return 'Blinkit';
+  if (low === 'swiggy') return 'Swiggy Instamart';
+  if (low === 'zepto') return 'Zepto';
+  return s;
 }
 
 export const DealDetailModal: React.FC<DealDetailModalProps> = ({
@@ -552,6 +557,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               mrp={mrp}
             />
             <ProductPriceHistory url={deal.url} dealId={deal.fp_hash || deal.id} />
+            <ProductReviews url={deal.url} id={deal.id} />
 
             {/* Multi-Store Real-Time Live Check Matrix */}
             {arbitrage && (

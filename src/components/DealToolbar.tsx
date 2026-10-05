@@ -1,5 +1,5 @@
 import { useModalSurface } from '../utils/useModalSurface';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { SortOption } from '../types';
@@ -14,9 +14,10 @@ interface DealToolbarProps {
   totalDeals?: number;
   viewMode?: 'grid' | 'list';
   onViewModeChange?: (mode: 'grid' | 'list') => void;
+  availableStores?: string[];
 }
 
-const STORES = [
+const DEFAULT_STORES = [
   { id: 'all', label: 'All Stores' },
   { id: 'Amazon', label: 'Amazon' },
   { id: 'Flipkart', label: 'Flipkart' },
@@ -60,6 +61,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
   totalDeals = 0,
   viewMode = 'grid',
   onViewModeChange,
+  availableStores,
 }) => {
   const [storeOpen, setStoreOpen] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
@@ -106,7 +108,24 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
     setMobileDrawerOpen(false);
   };
 
-  const desktopStoreLabel = STORES.find((s) => s.id === selectedStore)?.label || 'All Stores';
+  const storeList = useMemo(() => {
+    const set = new Set<string>();
+    DEFAULT_STORES.filter(s => s.id !== 'all').forEach(s => set.add(s.id));
+    if (availableStores) {
+      availableStores.forEach(s => {
+        if (s && s.trim() && !['all', 'store', 'retail deal', 'unknown', 'deals', 'none'].includes(s.toLowerCase())) {
+          set.add(s.trim());
+        }
+      });
+    }
+    const sorted = Array.from(set).sort((a, b) => a.localeCompare(b));
+    return [
+      { id: 'all', label: 'All Stores' },
+      ...sorted.map(s => ({ id: s, label: s }))
+    ];
+  }, [availableStores]);
+
+  const desktopStoreLabel = storeList.find((s) => s.id.toLowerCase() === selectedStore.toLowerCase())?.label || (selectedStore !== 'all' ? selectedStore : 'All Stores');
   const desktopCatLabel = CATEGORIES.find((c) => c.id === selectedCategory)?.label || 'All Categories';
   const desktopSortLabel = SORT_OPTIONS.find((s) => s.value === sortBy)?.label || 'Sort: Latest';
 
@@ -140,20 +159,20 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 6, scale: 0.98 }}
                   transition={{ duration: 0.12 }}
-                  className="absolute top-full left-0 mt-2 w-44 rounded-2xl bg-white/95 dark:bg-[#0D1527]/95 backdrop-blur-md border border-slate-200/80 dark:border-white/10 p-1.5 shadow-xl z-50"
+                  className="absolute top-full left-0 mt-2 w-48 max-h-72 overflow-y-auto rounded-2xl bg-white/95 dark:bg-[#0D1527]/95 backdrop-blur-md border border-slate-200/80 dark:border-white/10 p-1.5 shadow-xl z-50"
                 >
-                  {STORES.map((s) => (
+                  {storeList.map((s) => (
                     <button
                       key={s.id}
                       onClick={() => { onSelectStore(s.id); setStoreOpen(false); }}
                       className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-colors text-left ${
-                        selectedStore === s.id
+                        selectedStore.toLowerCase() === s.id.toLowerCase()
                           ? 'bg-[#0066cc]/10 text-[#0066cc] font-semibold'
-                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-[#070A11]'
+                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                       }`}
                     >
-                      <span>{s.label}</span>
-                      {selectedStore === s.id && <span className="text-[#0066cc]">✓</span>}
+                      <span className="truncate">{s.label}</span>
+                      {selectedStore.toLowerCase() === s.id.toLowerCase() && <span className="text-[#0066cc] ml-1">✓</span>}
                     </button>
                   ))}
                 </motion.div>
@@ -331,7 +350,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
         <div ref={drawerRef} className="commerce-product-sheet commerce-filter-sheet" role="dialog" aria-modal="true" aria-label="Filter and sort offers" onClick={event => event.stopPropagation()}>
           <div className="commerce-sheet-handle" aria-hidden="true" />
           <header><div><small>MAKE IT YOURS</small><h2>Filter & sort</h2></div><button type="button" aria-label="Close filters" onClick={() => setMobileDrawerOpen(false)}>✕</button></header>
-          <label className="commerce-filter-field">Store<select value={draftStore} onChange={event => setDraftStore(event.target.value)}>{STORES.map(store => <option key={store.id} value={store.id}>{store.label}</option>)}</select></label>
+          <label className="commerce-filter-field">Store<select value={draftStore} onChange={event => setDraftStore(event.target.value)}>{storeList.map(store => <option key={store.id} value={store.id}>{store.label}</option>)}</select></label>
           <label className="commerce-filter-field">Category<select value={draftCat} onChange={event => setDraftCat(event.target.value)}>{CATEGORIES.map(category => <option key={category.id} value={category.id}>{category.label.replace(/^[^a-zA-Z]+/, '')}</option>)}</select></label>
           <label className="commerce-filter-field">Sort by<select value={draftSort} onChange={event => setDraftSort(event.target.value as SortOption)}>{SORT_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label.replace(/^[^a-zA-Z]+/, '').replace('Sort: ', '')}</option>)}</select></label>
           <div className="commerce-filter-footer"><button type="button" onClick={() => { setDraftStore('all'); setDraftCat('all'); setDraftSort('newest'); }}>Reset</button><button type="button" onClick={applyMobileDrawer}>Show results</button></div>
