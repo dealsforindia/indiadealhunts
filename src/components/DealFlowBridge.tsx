@@ -119,7 +119,7 @@ export const DealFlowBridge: React.FC<DealFlowBridgeProps> = ({
               <div className="text-[10px] text-slate-500 font-mono space-y-1 py-1">
                 <div className="flex justify-between">
                   <span>Backend Gateway:</span>
-                  <span className="text-slate-700 dark:text-slate-200 font-semibold">api.rudranil.me</span>
+                  <span className="text-slate-700 dark:text-slate-200 font-semibold">DealFlow Edge (Encrypted)</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Redis Queue:</span>

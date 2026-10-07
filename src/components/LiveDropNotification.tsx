@@ -110,7 +110,8 @@ export const LiveDropNotification: React.FC<LiveDropNotificationProps> = ({
               if (possibleCoupon && navigator.clipboard) {
                 navigator.clipboard.writeText(possibleCoupon).catch(() => {});
               }
-              window.open(`https://api.rudranil.me/r/${deal.fp_hash || deal.id}`, '_blank', 'noopener,noreferrer');
+              const targetUrl = `/out/${deal.fp_hash || deal.id}`;
+              window.open(targetUrl, '_blank', 'noopener,noreferrer');
               onClose();
             }}
             className="py-1.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition-colors text-center"
