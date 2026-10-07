@@ -433,8 +433,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const handleDeleteAlert = async (alertId: string) => {
     playTactileClick();
     try {
-      const res = await fetch(`${PUBLIC_API_BASE}/api/v1/alerts/${alertId}`, {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('idh_auth_token') : null;
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const emailParam = userEmail ? `?email=${encodeURIComponent(userEmail.trim().toLowerCase())}` : '';
+      const res = await fetch(`${PUBLIC_API_BASE}/api/v1/alerts/${alertId}${emailParam}`, {
         method: 'DELETE',
+        headers,
       });
       if (res.ok) {
         setTrackedAlerts((prev) => prev.filter((a) => a.id !== alertId));
