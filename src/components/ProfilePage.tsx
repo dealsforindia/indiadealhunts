@@ -56,6 +56,34 @@ interface TrackedAlert {
   email_status?: string;
 }
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function suggestEmailDomain(email: string): string | null {
+  const parts = email.toLowerCase().trim().split('@');
+  if (parts.length !== 2) return null;
+  const [local, domain] = parts;
+  if (!local || !domain) return null;
+  const typoMap: Record<string, string> = {
+    'gmil.com': 'gmail.com',
+    'gmial.com': 'gmail.com',
+    'gamil.com': 'gmail.com',
+    'gmaill.com': 'gmail.com',
+    'gmai.com': 'gmail.com',
+    'gmal.com': 'gmail.com',
+    'gmaik.com': 'gmail.com',
+    'yaho.com': 'yahoo.com',
+    'yahho.com': 'yahoo.com',
+    'yaho.co.in': 'yahoo.co.in',
+    'hotmial.com': 'hotmail.com',
+    'hotmai.com': 'hotmail.com',
+    'outlok.com': 'outlook.com',
+  };
+  if (typoMap[domain]) {
+    return `${local}@${typoMap[domain]}`;
+  }
+  return null;
+}
+
 export const ProfilePage: React.FC<ProfilePageProps> = ({
   onNavigateTab,
   onOpenLookup,
@@ -165,8 +193,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     e?.preventDefault();
     setAuthError(null);
     const cleanEmail = inputEmail.trim().toLowerCase();
-    if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
-      setAuthError('Please enter a valid email address');
+    if (!cleanEmail || !EMAIL_REGEX.test(cleanEmail)) {
+      setAuthError('Please enter a valid email address (e.g. yourname@gmail.com)');
       return;
     }
     setIsSendingCode(true);
@@ -317,8 +345,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       return;
     }
     const cleanEmail = (inputScraperEmail || userEmail).trim().toLowerCase();
-    if (!cleanEmail || !cleanEmail.includes('@')) {
-      onShowToast?.('Please enter your email to receive price drop notifications');
+    if (!cleanEmail || !EMAIL_REGEX.test(cleanEmail)) {
+      onShowToast?.('Please enter a valid email address (e.g. yourname@gmail.com)');
       return;
     }
     const targetP = parseFloat(inputTargetPrice);
@@ -1005,7 +1033,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
                 {authStep === 'email'
                   ? 'Passwordless & secure email authentication. Enter your email to receive a 6-digit verification code.'
-                  : `Enter the 6-digit verification code sent to ${inputEmail}.`}
+                  : (
+                    <>
+                      Enter the 6-digit verification code sent to{' '}
+                      <strong className="text-slate-900 dark:text-white font-semibold">{inputEmail}</strong>.
+                    </>
+                  )}
               </p>
 
               {authError && (
@@ -1026,10 +1059,29 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       required
                       autoFocus
                       value={inputEmail}
-                      onChange={(e) => setInputEmail(e.target.value)}
+                      onChange={(e) => {
+                        setInputEmail(e.target.value);
+                        if (authError) setAuthError(null);
+                      }}
                       placeholder="e.g. yourname@gmail.com"
                       className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
+                    {suggestEmailDomain(inputEmail) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const suggested = suggestEmailDomain(inputEmail);
+                          if (suggested) {
+                            setInputEmail(suggested);
+                            setAuthError(null);
+                          }
+                        }}
+                        className="mt-2 text-xs text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer font-medium"
+                      >
+                        <span>💡 Did you mean <strong>{suggestEmailDomain(inputEmail)}</strong>?</span>
+                        <span className="font-bold underline ml-1">Use this</span>
+                      </button>
+                    )}
                   </div>
 
                   <button
@@ -1068,6 +1120,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                     />
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2 text-center">
                       Check your inbox or spam folder for an email from <span className="text-slate-700 dark:text-slate-300 font-medium">IndiaDealHunts</span>.
+                      <br />
+                      <span className="text-slate-400">If you entered the wrong email address, use &ldquo;← Change Email&rdquo; below.</span>
                     </p>
                   </div>
 

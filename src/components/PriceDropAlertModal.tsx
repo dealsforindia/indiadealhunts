@@ -41,8 +41,13 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!contact.trim()) {
+    const cleanContact = contact.trim().toLowerCase();
+    if (!cleanContact) {
       setErrorMsg('Please enter your Telegram handle or Email');
+      return;
+    }
+    if (cleanContact.includes('@') && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanContact)) {
+      setErrorMsg('Please enter a valid email address (e.g. name@gmail.com)');
       return;
     }
     const tPrice = parseFloat(targetPrice);
