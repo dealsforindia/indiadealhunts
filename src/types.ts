@@ -5,6 +5,8 @@ export interface PublicDeal {
   id: string;
   title: string;
   price: number | null;
+  sale_price?: number | null;
+  prices?: { sale?: number | null; mrp?: number | null; discount_pct?: number | null };
   mrp: number | null;
   discount_pct: number | null;
   store: string;
@@ -12,6 +14,12 @@ export interface PublicDeal {
   url: string;
   category: string;
   posted_at: number;
+  rating?: number | null;
+  rating_count?: number | null;
+  review_count?: number | null;
+  brand?: string | null;
+  highlights?: string[];
+  description?: string | null;
   coupon?: string | null;
   coupon_discount?: number | null;
   effective_price?: number | null;

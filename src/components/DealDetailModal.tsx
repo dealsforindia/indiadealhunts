@@ -3,6 +3,7 @@ import { publicShareUrl, publicStoreUrl } from '../utils/publicLinks';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
+import { Star, Sparkles } from 'lucide-react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { SignaturePriceGraph } from './SignaturePriceGraph';
@@ -124,9 +125,10 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   if (!deal) return null;
 
   const cleanImage = getCleanImageUrl(deal.image);
-  const price = deal.price || 0;
-  const mrp = (deal.mrp && deal.mrp > price) ? deal.mrp : undefined;
-  const discount = deal.discount_pct || 0;
+  const price = Number(deal.price ?? deal.sale_price ?? deal.prices?.sale) || 0;
+  const rawMrp = deal.mrp ?? deal.prices?.mrp;
+  const mrp = (rawMrp && rawMrp > price) ? rawMrp : undefined;
+  const discount = deal.discount_pct || (mrp ? Math.round((mrp - price) / mrp * 100) : 0);
   const savings = mrp ? mrp - price : 0;
   const storeName = getStoreDisplayName(deal.store);
   const coupon = couponOffer(deal);
@@ -448,6 +450,51 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               {deal.title}
             </h2>
 
+            {/* Brand & Ratings Metadata */}
+            {(deal.brand || deal.rating != null) && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                {deal.brand && (
+                  <span style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    color: '#2563EB',
+                    backgroundColor: '#EFF6FF',
+                    border: '1px solid #BFDBFE',
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
+                  }}>
+                    {deal.brand}
+                  </span>
+                )}
+                {deal.rating != null && (
+                  <div style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '2px 8px',
+                    backgroundColor: '#FEF3C7',
+                    border: '1px solid #FDE68A',
+                    borderRadius: '6px',
+                    color: '#92400E',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    fontFamily: 'var(--font-mono)',
+                  }}>
+                    <Star size={13} fill="#F59E0B" stroke="#F59E0B" />
+                    <span>{deal.rating.toFixed(1)}</span>
+                    {(deal.rating_count != null || deal.review_count != null) && (
+                      <span style={{ fontSize: '11px', color: '#B45309', fontWeight: 500 }}>
+                        ({(deal.rating_count ?? deal.review_count)?.toLocaleString('en-IN')})
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Price matrix */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
@@ -498,6 +545,47 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                 </span>
               )}
             </div>
+
+            {/* Key Features & Highlights */}
+            {deal.highlights && deal.highlights.length > 0 && (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px',
+                padding: '10px 14px',
+                borderRadius: '8px',
+                backgroundColor: 'var(--surface-2, #F8FAFC)',
+                border: '1px solid var(--border-subtle, #E2E8F0)',
+              }}>
+                <span style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  letterSpacing: '0.05em',
+                  textTransform: 'uppercase',
+                  color: 'var(--text-secondary, #64748B)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                }}>
+                  <Sparkles size={13} color="#2563EB" /> Key Highlights
+                </span>
+                <ul style={{
+                  margin: 0,
+                  paddingLeft: '18px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  fontSize: '12px',
+                  color: 'var(--text-primary)',
+                  lineHeight: 1.45,
+                }}>
+                  {deal.highlights.slice(0, 4).map((h, i) => (
+                    <li key={i}>{h}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Coupon code */}
             {coupon && (

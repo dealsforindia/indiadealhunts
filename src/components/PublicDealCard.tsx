@@ -33,11 +33,14 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
   const saved = suppliedSaved ?? localSaved;
   const card = useRef<HTMLElement>(null);
   const { result: reviewEvidence, load: reviewLoad } = useAutomaticReviews(deal.id, deal.url || '', card);
+  const effectiveRating = reviewEvidence?.rating ?? deal.rating ?? null;
+  const effectiveRatingCount = reviewEvidence?.rating_count ?? deal.rating_count ?? deal.review_count ?? null;
   const title = deal.title?.replace(/^[\s\u{1F300}-\u{1FAFF}\u2600-\u27BF\uFE0F]+/u, '').trim() || `${deal.store || 'Store'} offer`;
   const store = deal.store || 'Store';
-  const price = Number(deal.price) || 0;
-  const mrp = deal.mrp && deal.mrp > price && price > 0 ? deal.mrp : null;
-  const discount = mrp ? Math.round((mrp - price) / mrp * 100) : null;
+  const price = Number(deal.price ?? deal.sale_price ?? deal.prices?.sale) || 0;
+  const rawMrp = deal.mrp ?? deal.prices?.mrp ?? null;
+  const mrp = rawMrp && rawMrp > price && price > 0 ? rawMrp : null;
+  const discount = deal.discount_pct ?? (mrp ? Math.round((mrp - price) / mrp * 100) : null);
   const expired = Boolean(deal.is_expired || deal.is_over || deal.status === 'expired');
   // This upstream soundbar photo is a phone advertisement, so show an honest fallback.
   const photo = deal.image?.includes('amz_B0H4VQX4CC.jpg') ? null : getCleanImageUrl(deal.image);
@@ -71,9 +74,9 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
     </div>
     <div className="commerce-card-body">
       <button type="button" className="commerce-card-title" onClick={details}>{title}</button>
-      <button type="button" className={`commerce-card-rating${reviewEvidence?.rating == null ? ' is-unrated' : ''}`} onClick={details} aria-label={reviewEvidence?.rating != null ? `Customer rating ${reviewEvidence.rating} out of 5. View review evidence` : `Customer reviews for ${title}`} title={reviewEvidence?.message || reviewLoad?.message || 'Customer review evidence from the merchant'}>
-        <Star size={13} fill={reviewEvidence?.rating != null ? 'currentColor' : 'none'} />
-        <span>{reviewEvidence?.rating != null ? <>{reviewEvidence.rating.toFixed(1)}{reviewEvidence.rating_count != null ? ` (${reviewEvidence.rating_count.toLocaleString('en-IN')})` : ' / 5'}</> : reviewEvidence?.reviews.length ? `${reviewEvidence.reviews.length} review excerpts` : reviewEvidence || reviewLoad?.status === 'error' ? 'Reviews unavailable' : reviewLoad ? 'Checking reviews…' : 'Customer reviews'}</span>
+      <button type="button" className={`commerce-card-rating${effectiveRating == null ? ' is-unrated' : ''}`} onClick={details} aria-label={effectiveRating != null ? `Customer rating ${effectiveRating} out of 5. View review evidence` : `Customer reviews for ${title}`} title={reviewEvidence?.message || reviewLoad?.message || (effectiveRating != null ? `Rating: ${effectiveRating} ★${effectiveRatingCount != null ? ` (${effectiveRatingCount.toLocaleString('en-IN')} reviews)` : ''}` : 'Customer review evidence from the merchant')}>
+        <Star size={13} fill={effectiveRating != null ? 'currentColor' : 'none'} />
+        <span>{effectiveRating != null ? <>{effectiveRating.toFixed(1)}{effectiveRatingCount != null ? ` (${effectiveRatingCount.toLocaleString('en-IN')})` : ' / 5'}</> : reviewEvidence?.reviews.length ? `${reviewEvidence.reviews.length} review excerpts` : reviewEvidence || reviewLoad?.status === 'error' ? 'Reviews unavailable' : reviewLoad ? 'Checking reviews…' : 'Customer reviews'}</span>
       </button>
       <div className="commerce-card-price"><strong>{price > 0 ? money(price) : 'Check price'}</strong>{mrp && <s>{money(mrp)}</s>}</div>
       <p className="commerce-card-note">{expired ? 'This offer has ended' : 'Confirm price at checkout'}</p>
