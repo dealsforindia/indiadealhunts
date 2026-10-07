@@ -14,7 +14,6 @@ import {
   Send,
   Bookmark,
   Sparkles,
-  GraduationCap,
   Check,
   LogIn,
   LogOut,
@@ -91,33 +90,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       return '';
     }
   });
-  const isEduEmail = (email: string) => {
-    const low = email.toLowerCase().trim();
-    return (
-      low.includes('.edu') ||
-      low.includes('.ac.in') ||
-      low.includes('.ac.uk') ||
-      low.includes('@github.com') ||
-      low.includes('student') ||
-      low.includes('campus')
-    );
-  };
-
-  const [isStudentPlan, setIsStudentPlan] = useState<boolean>(() => {
-    try {
-      const email = localStorage.getItem('idh_user_email') || '';
-      return localStorage.getItem('idh_is_student') === 'true' || isEduEmail(email);
-    } catch {
-      return false;
-    }
-  });
 
   // Auth dialog state
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authStep, setAuthStep] = useState<'email' | 'code'>('email');
   const [inputEmail, setInputEmail] = useState('');
   const [inputCode, setInputCode] = useState('');
-  const [inputStudent, setInputStudent] = useState(false);
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [isVerifyingCode, setIsVerifyingCode] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -283,22 +261,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       }
       setUserEmail(cleanEmail);
       setInputScraperEmail(cleanEmail);
-      setIsStudentPlan(inputStudent);
       try {
         localStorage.setItem('idh_user_email', cleanEmail);
-        localStorage.setItem('idh_is_student', inputStudent ? 'true' : 'false');
       } catch {}
-
-      if (inputStudent) {
-        fetch(`${PUBLIC_API_BASE}/api/v1/user/profile`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(data.token ? { Authorization: `Bearer ${data.token}` } : {}),
-          },
-          body: JSON.stringify({ is_student: true }),
-        }).catch(() => {});
-      }
 
       playSuccessChime();
       setShowAuthModal(false);
@@ -306,7 +271,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       setInputCode('');
       setDevCodeHint(null);
       fetchUserAlerts(cleanEmail);
-      onShowToast?.(inputStudent ? '🎓 Student Plan activated with Free perks!' : 'Signed in successfully! Active Price Radar linked.');
+      onShowToast?.(`Signed in successfully as ${cleanEmail}`);
     } catch (err: any) {
       setAuthError(err.message || 'Invalid or expired verification code');
       onShowToast?.(err.message || 'Verification failed');
@@ -318,12 +283,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const handleSignOut = () => {
     playTactileClick();
     setUserEmail('');
-    setIsStudentPlan(false);
     setTrackedAlerts([]);
     try {
       localStorage.removeItem('idh_user_email');
       localStorage.removeItem('idh_auth_token');
-      localStorage.removeItem('idh_is_student');
     } catch {}
     onShowToast?.('Signed out of Deal Hunter session');
   };
@@ -520,11 +483,6 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   )}
                 </div>
               </div>
-              {isStudentPlan && (
-                <div className="absolute -bottom-2 -right-2 bg-purple-600 text-white p-1 rounded-full border-2 border-slate-900 shadow" title="Verified Student Plan">
-                  <GraduationCap size={16} />
-                </div>
-              )}
             </div>
 
             <div>
@@ -532,20 +490,20 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
                   {userEmail ? userEmail.split('@')[0] : 'Guest Shopper'}
                 </h1>
-                {isStudentPlan ? (
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-500/20 border border-purple-400/40 text-purple-300 flex items-center gap-1">
-                    <GraduationCap size={12} /> Student Free Plan
+                {userEmail ? (
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 flex items-center gap-1">
+                    <ShieldCheck size={12} /> Verified Member
                   </span>
                 ) : (
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 flex items-center gap-1">
-                    <ShieldCheck size={12} /> Free Member
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-500/20 border border-slate-400/40 text-slate-300 flex items-center gap-1">
+                    <User size={12} /> Guest
                   </span>
                 )}
               </div>
               <p className="text-slate-300 text-sm max-w-md">
                 {userEmail
-                  ? `Signed in as ${userEmail} · 24/7 price drop scraper active`
-                  : 'Sign in with your email to unlock saved deal syncing, student perks, and instant price drop alerts.'}
+                  ? `Signed in as ${userEmail} · 24/7 personal price drop scraper active`
+                  : 'Sign in with your email to track custom products, receive instant price drop alerts, and sync saved deals.'}
               </p>
             </div>
           </div>
@@ -568,7 +526,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 }}
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-lg transition-transform active:scale-95 flex items-center gap-2 cursor-pointer"
               >
-                <LogIn size={16} /> Sign in / Register (Free)
+                <LogIn size={16} /> Sign in / Register
               </button>
             )}
           </div>
@@ -604,9 +562,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
           <div className="bg-white/5 p-3.5 rounded-2xl border border-white/5">
             <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1">
-              <GraduationCap size={14} className="text-purple-400" /> Plan Status
+              <ShieldCheck size={14} className="text-emerald-400" /> Account Status
             </div>
-            <div className="text-lg font-bold text-purple-300">{isStudentPlan ? 'Student' : 'Free Forever'}</div>
+            <div className="text-lg font-bold text-emerald-300">{userEmail ? 'Verified Member' : 'Guest'}</div>
           </div>
         </div>
       </div>
@@ -631,17 +589,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 <p className="text-xs text-slate-500 dark:text-slate-400">
                   Paste Amazon, Flipkart, Myntra, or any store URL. When price drops, get an instant email!
                 </p>
-                {isStudentPlan ? (
-                  <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-500/15 border border-purple-400/30 text-purple-300 text-[11px] font-semibold">
-                    <GraduationCap size={13} className="text-purple-400" />
-                    <span>GitHub Education Dev Radar: <strong>50 Scraper Slots</strong> · 1-Min Live Sweep · Instant Alerts</span>
-                  </div>
-                ) : (
-                  <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-[11px] font-semibold">
-                    <ShieldCheck size={13} className="text-emerald-400" />
-                    <span>Free Radar: <strong>10 Scraper Slots</strong> · 5-Min Background Sweeps</span>
-                  </div>
-                )}
+                <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-[11px] font-semibold">
+                  <ShieldCheck size={13} className="text-emerald-400" />
+                  <span>24/7 Autonomous Radar: Continuous background sweeps · Instant email delivery on price drops</span>
+                </div>
               </div>
             </div>
 
@@ -1028,7 +979,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           </div>
         </div>
 
-        {/* ── Right Column: Email Preferences, Student Perks & Shortcuts (5 Cols) ── */}
+        {/* ── Right Column: Email Preferences, Radar Guide & Shortcuts (5 Cols) ── */}
         <div className="lg:col-span-5 space-y-6">
           {/* 1. Global Price Drop Email Preferences */}
           <div className="p-6 rounded-3xl bg-white dark:bg-[#0D1527] border border-slate-200/80 dark:border-white/10 shadow-sm">
@@ -1111,29 +1062,49 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             </div>
           </div>
 
-          {/* 2. Student & College Perks Plan */}
-          <div className="p-6 rounded-3xl bg-gradient-to-br from-purple-900/90 to-indigo-950 text-white border border-purple-500/20 shadow-lg relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl" />
+          {/* 2. How 24/7 Price Radar Works */}
+          <div className="p-6 rounded-3xl bg-gradient-to-br from-slate-900 to-indigo-950 text-white border border-indigo-500/20 shadow-lg relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl" />
             <div className="relative z-10">
               <div className="flex items-center gap-2.5 mb-2">
-                <GraduationCap size={20} className="text-purple-300" />
-                <h3 className="text-base font-bold text-white">Student & College Perks</h3>
+                <Target size={20} className="text-emerald-400" />
+                <h3 className="text-base font-bold text-white">How 24/7 Price Radar Works</h3>
               </div>
-              <p className="text-xs text-purple-200/90 leading-relaxed mb-4">
-                IndiaDealHunts is 100% free for all students. Get priority notifications on student laptop deals, textbooks, and hostel gadgets.
+              <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                Track any product on Amazon, Flipkart, Myntra, Swiggy, or any store without installing browser extensions.
               </p>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setInputEmail(userEmail || '');
-                  setInputStudent(true);
-                  setShowAuthModal(true);
-                }}
-                className="w-full py-2.5 px-4 rounded-xl bg-purple-500 hover:bg-purple-400 text-slate-950 font-bold text-xs shadow transition-colors flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Zap size={14} /> {isStudentPlan ? 'Student Status Active ✓' : 'Verify Student Free Perks'}
-              </button>
+              <div className="space-y-3 mb-4">
+                <div className="flex items-start gap-2.5 text-xs text-slate-300">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0 text-[10px]">1</span>
+                  <span><strong>Paste Product Link:</strong> Paste any store URL in the tracker on the left.</span>
+                </div>
+                <div className="flex items-start gap-2.5 text-xs text-slate-300">
+                  <span className="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 font-bold flex items-center justify-center shrink-0 text-[10px]">2</span>
+                  <span><strong>Set Target Price:</strong> Specify the exact price you want to pay.</span>
+                </div>
+                <div className="flex items-start gap-2.5 text-xs text-slate-300">
+                  <span className="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 font-bold flex items-center justify-center shrink-0 text-[10px]">3</span>
+                  <span><strong>24/7 Background Sweeps:</strong> Our server continuously checks prices every few minutes.</span>
+                </div>
+                <div className="flex items-start gap-2.5 text-xs text-slate-300">
+                  <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center shrink-0 text-[10px]">4</span>
+                  <span><strong>Instant Email Alert:</strong> As soon as the price drops to or below your target, you get an email.</span>
+                </div>
+              </div>
+
+              {!userEmail && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInputEmail('');
+                    setShowAuthModal(true);
+                  }}
+                  className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <LogIn size={14} /> Sign In to Link Scrapers
+                </button>
+              )}
             </div>
           </div>
 
@@ -1191,7 +1162,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
                     <User size={20} />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Deal Hunter Account</h3>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Sign In to IndiaDealHunts</h3>
                 </div>
                 <button
                   type="button"
@@ -1204,7 +1175,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
                 {authStep === 'email'
-                  ? 'Passwordless & 100% Free. Enter your email to receive a 6-digit sign-in code.'
+                  ? 'Passwordless & secure email authentication. Enter your email to receive a 6-digit verification code.'
                   : `Enter the 6-digit verification code sent to ${inputEmail}.`}
               </p>
 
@@ -1224,42 +1195,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                     <input
                       type="email"
                       required
+                      autoFocus
                       value={inputEmail}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setInputEmail(val);
-                        if (isEduEmail(val)) {
-                          setInputStudent(true);
-                        }
-                      }}
-                      placeholder="name@gmail.com, campus.edu, or GitHub education email"
+                      onChange={(e) => setInputEmail(e.target.value)}
+                      placeholder="e.g. yourname@gmail.com"
                       className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
-                    {isEduEmail(inputEmail) && (
-                      <div className="mt-2.5 p-2.5 rounded-xl bg-purple-500/15 border border-purple-400/30 text-purple-300 text-xs font-semibold flex items-center gap-2">
-                        <GraduationCap size={16} className="text-purple-400 shrink-0" />
-                        <span>🎓 GitHub Education / Student Email Detected · 50 Custom Scraper Slots Unlocked!</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/40">
-                    <label className="flex items-start gap-2.5 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={inputStudent}
-                        onChange={(e) => setInputStudent(e.target.checked)}
-                        className="mt-0.5 rounded text-purple-600 focus:ring-purple-500 cursor-pointer"
-                      />
-                      <div>
-                        <div className="text-xs font-bold text-purple-900 dark:text-purple-200 flex items-center gap-1">
-                          <GraduationCap size={14} /> GitHub Education & Student Developer Perks
-                        </div>
-                        <div className="text-[11px] text-purple-700 dark:text-purple-300">
-                          Enables unlimited 50 product scraper slots, 1-min live radar, and priority price drop emails.
-                        </div>
-                      </div>
-                    </label>
                   </div>
 
                   <button
