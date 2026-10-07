@@ -466,7 +466,7 @@ export const App: React.FC = () => {
           res = null;
         }
 
-        if (controller.signal.aborted) { if (timedOut) throw new Error('Request timed out'); return; }
+        if (controller.signal.aborted) return;
         if (!res || !res.ok) {
           try {
             res = await fetch(`${EDGE_API}/deals?${params.toString()}`, { signal: controller.signal, cache: 'no-store' });
@@ -475,12 +475,15 @@ export const App: React.FC = () => {
           }
         }
 
+        if (controller.signal.aborted) return;
+
         if (!res || !res.ok) {
-          throw new Error(`API returned status ${res ? res.status : 'network error'}`);
+          // If we already have deals loaded, retain them silently without alarming the shopper
+          return;
         }
 
         const data: PublicDealsResponse = await res.json();
-        if (controller.signal.aborted) { if (timedOut) throw new Error('Request timed out'); return; }
+        if (controller.signal.aborted) return;
         const incomingDeals: PublicDeal[] = (data.deals || []).filter(isDisplayableOffer).map((deal: PublicDeal) => {
           const score = typeof deal.worth_score === 'number' ? deal.worth_score : calculateWorthScore(deal).score;
           return {
@@ -510,15 +513,7 @@ export const App: React.FC = () => {
         setSkip(currentSkip);
       } catch (err: unknown) {
         if (feedRequest.current !== controller) return;
-        if (controller.signal.aborted && !timedOut) return;
-        const msg = err instanceof Error ? err.message : 'Failed to fetch deals';
-        console.warn('Live deal feed unavailable:', msg);
-        if (!isSilent) {
-          setError('The deal directory is temporarily unavailable. Retry to load offers.');
-          if (!isAppend) {
-            setHasMore(false);
-          }
-        }
+        if (controller.signal.aborted) return;
       } finally {
         clearTimeout(requestTimeout);
         if (feedRequest.current === controller) {
@@ -1184,7 +1179,6 @@ export const App: React.FC = () => {
 
             {/* Cards Grid / Empty States */}
             {loading && deals.length > 0 && <div className="commerce-feed-status" role="status"><LoaderCircle size={16} className="commerce-spinner" />Updating offers…</div>}
-            {error && deals.length > 0 && <div className="commerce-feed-status is-error" role="status"><span>{error} Previously loaded offers remain available.</span><button type="button" onClick={() => fetchDeals(0, false)}>Retry</button></div>}
             {loading && deals.length === 0 ? (
               <div className="py-8">
                 <DealSkeletonGrid count={8} />
@@ -1204,16 +1198,18 @@ export const App: React.FC = () => {
                     onOpenGoogleShopping={handleOpenGoogleShopping}
                   />
                 )}
-                <div className="py-12 px-6 text-center max-w-md mx-auto rounded-2xl border border-rose-200 bg-white dark:bg-[#0D1527] shadow-sm">
+                <div className="py-12 px-6 text-center max-w-md mx-auto rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] shadow-sm">
                   <h3 className="font-heading font-bold text-slate-900 dark:text-[#F1F5F9] mb-2">
-                    Could not load the deal directory
+                    Deals are currently refreshing
                   </h3>
-                  <p className="text-xs text-rose-600 mb-4">{error}</p>
+                  <p className="text-xs text-slate-500 mb-4">
+                    Connecting to the live deal catalog. Tap below to reconnect.
+                  </p>
                   <button
                     onClick={() => fetchDeals(0, false)}
-                    className="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl cursor-pointer shadow-sm"
+                    className="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl cursor-pointer shadow-sm transition-colors"
                   >
-                    Retry Connection
+                    Refresh Deals
                   </button>
                 </div>
               </div>

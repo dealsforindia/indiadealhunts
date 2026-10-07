@@ -287,13 +287,9 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
         </div>
       ) : !hasDeals ? (
         <div className="mt-5 rounded-2xl border border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#070A11] p-6 text-center">
-          {error ? (
-            <p className="text-xs font-bold text-amber-700">⚠️ {error}</p>
-          ) : (
-            <p className="text-xs font-bold text-slate-500">
-              No direct store offers returned yet for &ldquo;{cleanQuery}&rdquo;. Check the direct store buttons below.
-            </p>
-          )}
+          <p className="text-xs font-bold text-slate-500">
+            No direct store offers returned yet for &ldquo;{cleanQuery}&rdquo;. Check the direct store buttons below or scan via Google Shopping Radar.
+          </p>
         </div>
       ) : viewMode === 'matrix' ? (
         /* Matrix Comparison Table View */

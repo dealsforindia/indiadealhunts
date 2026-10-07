@@ -8,7 +8,7 @@ export function ProductReviews({ id, url }: { id: string; url: string }) {
   return <section className="product-reviews" aria-label="Customer review evidence" aria-busy={loading}>
     <header><div><h3><MessageSquare size={18} />Customer reviews</h3><p>Public merchant ratings and review excerpts. Loaded automatically.</p></div>{(error || result?.status === 'busy' || result?.status === 'blocked') && <button type="button" disabled={loading} onClick={retry} aria-label="Retry customer reviews"><RefreshCw size={16} />Retry</button>}</header>
     {loading && <p role="status">Checking the product’s public review evidence…</p>}
-    {error && <p className="review-error" role="alert">{error}</p>}
+    {error && <p className="text-xs text-slate-500 dark:text-slate-400 py-1">Reviews could not be synced for this offer. Check feedback directly on the store page.</p>}
     {!result && !loading && !error && <p>Available for specific Amazon India, Flipkart and Myntra product pages. Ratings appear only when the source supplies them.</p>}
     {result && <>
       {result.rating != null && <div className="review-rating-summary"><Star size={23} fill="currentColor" /><strong>{result.rating.toFixed(1)}<small> / 5</small></strong><span>{result.rating_count != null ? `${result.rating_count.toLocaleString('en-IN')} ratings` : 'Rating count unavailable'}{result.review_count != null && ` · ${result.review_count.toLocaleString('en-IN')} reviews`}</span></div>}
