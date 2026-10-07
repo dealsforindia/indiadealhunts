@@ -27,14 +27,41 @@ export function lookupTargetUrl(value: string): string {
   } catch { return value; }
 }
 
+export function isAssetUrl(url: string): boolean {
+  if (!url) return false;
+  const low = url.toLowerCase();
+  return (
+    low.includes('.css') ||
+    low.includes('.js') ||
+    low.includes('static-assets-web.flixcart.com') ||
+    low.includes('rukminim1.flixcart.com') ||
+    low.includes('rukminim2.flixcart.com')
+  );
+}
+
+export function sanitizeStoreUrl(value: string, title?: string, store?: string): string {
+  if (!value) return '';
+  if (isAssetUrl(value)) {
+    if (store?.toLowerCase().includes('amazon')) {
+      return `https://www.amazon.in/s?k=${encodeURIComponent(title || 'deals')}&tag=rudranil0a-21`;
+    }
+    return `https://www.flipkart.com/search?q=${encodeURIComponent(title || 'deals')}`;
+  }
+  return value;
+}
+
 export function publicDeal(deal: PublicDeal): PublicDeal {
   const resolvedImage = deal.image || (deal as any).uploaded_img_url || (deal as any).uploadedImgUrl || (deal as any).img_url || null;
+  const rawStore = deal.store || 'Store';
+  const cleanStore = /static[\s_-]?assets/i.test(rawStore) ? 'Flipkart' : rawStore;
+  const rawUrl = sanitizeStoreUrl(deal.url, deal.title, cleanStore);
   return {
     ...deal,
+    store: cleanStore,
     image: resolvedImage,
-    url: publicStoreUrl(deal.url),
-    ...(Array.isArray(deal.items) ? { items: deal.items.map(item => ({ ...item, buy_url: publicStoreUrl(item.buy_url) })) } : {}),
-    ...(deal.arbitrage ? { arbitrage: { ...deal.arbitrage, stores: Array.isArray(deal.arbitrage.stores) ? deal.arbitrage.stores.map(store => ({ ...store, ...(store.url ? { url: publicStoreUrl(store.url) } : {}) })) : [] } } : {}),
+    url: publicStoreUrl(rawUrl),
+    ...(Array.isArray(deal.items) ? { items: deal.items.map(item => ({ ...item, buy_url: publicStoreUrl(sanitizeStoreUrl(item.buy_url, (item as any).title || deal.title, cleanStore)) })) } : {}),
+    ...(deal.arbitrage ? { arbitrage: { ...deal.arbitrage, stores: Array.isArray(deal.arbitrage.stores) ? deal.arbitrage.stores.map(store => ({ ...store, ...(store.url ? { url: publicStoreUrl(sanitizeStoreUrl(store.url, deal.title, store.store || cleanStore)) } : {}) })) : [] } } : {}),
   };
 }
 

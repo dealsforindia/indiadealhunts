@@ -91,9 +91,22 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       return '';
     }
   });
+  const isEduEmail = (email: string) => {
+    const low = email.toLowerCase().trim();
+    return (
+      low.includes('.edu') ||
+      low.includes('.ac.in') ||
+      low.includes('.ac.uk') ||
+      low.includes('@github.com') ||
+      low.includes('student') ||
+      low.includes('campus')
+    );
+  };
+
   const [isStudentPlan, setIsStudentPlan] = useState<boolean>(() => {
     try {
-      return localStorage.getItem('idh_is_student') === 'true';
+      const email = localStorage.getItem('idh_user_email') || '';
+      return localStorage.getItem('idh_is_student') === 'true' || isEduEmail(email);
     } catch {
       return false;
     }
@@ -618,6 +631,17 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 <p className="text-xs text-slate-500 dark:text-slate-400">
                   Paste Amazon, Flipkart, Myntra, or any store URL. When price drops, get an instant email!
                 </p>
+                {isStudentPlan ? (
+                  <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-500/15 border border-purple-400/30 text-purple-300 text-[11px] font-semibold">
+                    <GraduationCap size={13} className="text-purple-400" />
+                    <span>GitHub Education Dev Radar: <strong>50 Scraper Slots</strong> · 1-Min Live Sweep · Instant Alerts</span>
+                  </div>
+                ) : (
+                  <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-[11px] font-semibold">
+                    <ShieldCheck size={13} className="text-emerald-400" />
+                    <span>Free Radar: <strong>10 Scraper Slots</strong> · 5-Min Background Sweeps</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1201,10 +1225,22 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       type="email"
                       required
                       value={inputEmail}
-                      onChange={(e) => setInputEmail(e.target.value)}
-                      placeholder="name@gmail.com or campus.edu"
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setInputEmail(val);
+                        if (isEduEmail(val)) {
+                          setInputStudent(true);
+                        }
+                      }}
+                      placeholder="name@gmail.com, campus.edu, or GitHub education email"
                       className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
+                    {isEduEmail(inputEmail) && (
+                      <div className="mt-2.5 p-2.5 rounded-xl bg-purple-500/15 border border-purple-400/30 text-purple-300 text-xs font-semibold flex items-center gap-2">
+                        <GraduationCap size={16} className="text-purple-400 shrink-0" />
+                        <span>🎓 GitHub Education / Student Email Detected · 50 Custom Scraper Slots Unlocked!</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="p-3.5 rounded-xl bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/40">
@@ -1217,10 +1253,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       />
                       <div>
                         <div className="text-xs font-bold text-purple-900 dark:text-purple-200 flex items-center gap-1">
-                          <GraduationCap size={14} /> Student / College Perks
+                          <GraduationCap size={14} /> GitHub Education & Student Developer Perks
                         </div>
                         <div className="text-[11px] text-purple-700 dark:text-purple-300">
-                          Enable free student plan for verified campus deals & gear.
+                          Enables unlimited 50 product scraper slots, 1-min live radar, and priority price drop emails.
                         </div>
                       </div>
                     </label>

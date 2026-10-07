@@ -35,8 +35,9 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
   const { result: reviewEvidence, load: reviewLoad } = useAutomaticReviews(deal.id, deal.url || '', card);
   const effectiveRating = reviewEvidence?.rating ?? deal.rating ?? null;
   const effectiveRatingCount = reviewEvidence?.rating_count ?? deal.rating_count ?? deal.review_count ?? null;
-  const title = deal.title?.replace(/^[\s\u{1F300}-\u{1FAFF}\u2600-\u27BF\uFE0F]+/u, '').trim() || `${deal.store || 'Store'} offer`;
-  const store = deal.store || 'Store';
+  const rawStore = deal.store || 'Store';
+  const store = /static[\s_-]?assets/i.test(rawStore) ? 'Flipkart' : rawStore;
+  const title = deal.title?.replace(/^[\s\u{1F300}-\u{1FAFF}\u2600-\u27BF\uFE0F]+/u, '').trim() || `${store} offer`;
   const price = Number(deal.price ?? deal.sale_price ?? deal.prices?.sale) || 0;
   const rawMrp = deal.mrp ?? deal.prices?.mrp ?? null;
   const mrp = rawMrp && rawMrp > price && price > 0 ? rawMrp : null;
@@ -61,7 +62,11 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
     openSmartStoreLink(url, 'amazon', asin, true, subId);
   }
   const handleViewDeal = () => {
-    openSmartStoreLink(deal.url, store, asin || undefined, false, subId);
+    let targetUrl = deal.url;
+    if (!targetUrl || targetUrl.includes('.css') || targetUrl.includes('static-assets-web')) {
+      targetUrl = `https://www.flipkart.com/search?q=${encodeURIComponent(title)}`;
+    }
+    openSmartStoreLink(targetUrl, store, asin || undefined, false, subId);
   };
   return <article ref={card} style={{ '--card-delay': `${Math.min(index % 40, 7) * 35}ms` } as React.CSSProperties} className={`commerce-card commerce-card-reveal${expired ? ' is-expired' : ''}${isComparing ? ' is-comparing' : ''}`}>
     <div className="commerce-card-photo">
