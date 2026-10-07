@@ -14,12 +14,18 @@ export interface DealFlowEngineSnapshot {
 export interface UseDealFlowSyncOptions {
   onDealReceived?: (deal: PublicDeal) => void;
   onDealStatusChange?: (change: { id: string; status: string }) => void;
+  onDealDeleted?: (id: string) => void;
+  onDealUnpublished?: (id: string) => void;
+  onDealEdited?: (deal: PublicDeal) => void;
   enableAlerts?: boolean;
 }
 
 export function useDealFlowSync({
   onDealReceived,
   onDealStatusChange,
+  onDealDeleted,
+  onDealUnpublished,
+  onDealEdited,
   enableAlerts = true,
 }: UseDealFlowSyncOptions = {}) {
   const [status, setStatus] = useState<'connected' | 'connecting' | 'disconnected'>('connecting');
@@ -32,14 +38,15 @@ export function useDealFlowSync({
   const reconnectAttempts = useRef<number>(0);
 
   const formatIncomingDeal = useCallback((raw: Record<string, any>): PublicDeal => {
-    const id = raw.id || raw.fp_hash || raw._id || String(raw.ts || Date.now());
+    const id = String(raw.id || raw.fp_hash || raw._id || (raw.ts ? String(raw.ts) : Date.now()));
+    const fp_hash = raw.fp_hash || raw.id || id;
     const title = raw.title || raw.prod_name || 'Verified Deal Drop';
-    const price = raw.price !== undefined ? Number(raw.price) : (raw.prices?.sale !== undefined ? Number(raw.prices.sale) : null);
-    const mrp = raw.mrp !== undefined ? Number(raw.mrp) : (raw.prices?.mrp !== undefined ? Number(raw.prices.mrp) : null);
-    const discount_pct = raw.discount_pct !== undefined ? Number(raw.discount_pct) : (raw.prices?.discount_pct !== undefined ? Number(raw.prices.discount_pct) : (mrp && price ? Math.round(((mrp - price) / mrp) * 100) : null));
+    const price = raw.price !== undefined && raw.price !== null ? Number(raw.price) : (raw.prices?.sale !== undefined && raw.prices?.sale !== null ? Number(raw.prices.sale) : null);
+    const mrp = raw.mrp !== undefined && raw.mrp !== null ? Number(raw.mrp) : (raw.prices?.mrp !== undefined && raw.prices?.mrp !== null ? Number(raw.prices.mrp) : null);
+    const discount_pct = raw.discount_pct !== undefined && raw.discount_pct !== null ? Number(raw.discount_pct) : (raw.prices?.discount_pct !== undefined && raw.prices?.discount_pct !== null ? Number(raw.prices.discount_pct) : (mrp && price ? Math.round(((mrp - price) / mrp) * 100) : null));
     
-    // Resolve store image
-    let image: string | null = raw.image || raw.img_url || null;
+    // Resolve store / uploaded image (Uploaded images have 1st priority)
+    let image: string | null = raw.uploaded_img_url || raw.uploadedImgUrl || raw.image || raw.img_url || null;
     if (!image && raw.img_path) {
       const cleanPath = raw.img_path.includes('/images/')
         ? 'images/' + raw.img_path.split('/images/').pop()
@@ -49,11 +56,17 @@ export function useDealFlowSync({
 
     const store = raw.store || raw.platforms?.[0] || 'Store';
     const category = raw.category || 'General';
-    const url = raw.url || raw.buy_url || raw.aff_url || '#';
-    const posted_at = raw.posted_at || raw.ts || Math.floor(Date.now() / 1000);
+    let url = raw.url || raw.buy_url || raw.canonical_url || raw.aff_url || '';
+    if (!url && (raw.aff_text || raw.original_text || raw.message)) {
+      const match = (raw.aff_text || raw.original_text || raw.message).match(/https?:\/\/[^\s<>"]+/i);
+      if (match) url = match[0];
+    }
+    if (!url) url = '#';
+    const posted_at = raw.posted_at || raw.processed_ts || raw.ts || Math.floor(Date.now() / 1000);
 
     const baseDeal: PublicDeal = {
       id,
+      fp_hash,
       title,
       price,
       mrp,
@@ -72,7 +85,7 @@ export function useDealFlowSync({
       is_lowest_price: Boolean(raw.is_lowest_price),
       deal_score: raw.deal_score || (typeof raw.score === 'number' ? Math.round(raw.score * 10) : 80),
       deal_badges: Array.isArray(raw.deal_badges) ? raw.deal_badges : [],
-      status: 'approved',
+      status: raw.status || 'approved',
     };
 
     const calculated = calculateWorthScore(baseDeal);
@@ -149,14 +162,45 @@ export function useDealFlowSync({
             if (onDealReceived) {
               onDealReceived(formatted);
             }
+            return;
           }
 
-          // 3. Status changes (out of stock, expired, rejected)
-          if (data.event === 'deal_status_change' && onDealStatusChange) {
+          // 3. Deal Deleted (Real-time removal without reload)
+          if (data.event === 'deal_deleted' || (data.event === 'deal_status_change' && data.status === 'deleted')) {
+            const id = data.fp_hash || data.id;
+            if (id && onDealDeleted) {
+              onDealDeleted(id);
+            }
+            return;
+          }
+
+          // 4. Deal Unpublished (Real-time pull from storefront)
+          if (data.event === 'deal_unpublished' || (data.event === 'deal_status_change' && data.status === 'unpublished')) {
+            const id = data.fp_hash || data.id;
+            if (id) {
+              if (onDealUnpublished) onDealUnpublished(id);
+              if (onDealDeleted) onDealDeleted(id);
+            }
+            return;
+          }
+
+          // 5. Deal Edited (Real-time price / title / details update)
+          if (data.event === 'deal_edited') {
+            const rawDeal = data.deal || data;
+            const formatted = formatIncomingDeal(rawDeal);
+            if (onDealEdited) {
+              onDealEdited(formatted);
+            }
+            return;
+          }
+
+          // 6. Status changes (out of stock, expired, rejected)
+          if ((data.event === 'deal_status_change' || data.event === 'deal_rejected') && onDealStatusChange) {
             onDealStatusChange({
               id: data.fp_hash || data.id,
-              status: data.status,
+              status: data.status || (data.event === 'deal_rejected' ? 'rejected' : 'updated'),
             });
+            return;
           }
         } catch (parseErr) {
           console.debug('DealFlow WS message parsing skipped:', parseErr);
@@ -183,7 +227,7 @@ export function useDealFlowSync({
     } catch {
       setStatus('disconnected');
     }
-  }, [formatIncomingDeal, onDealReceived, onDealStatusChange, enableAlerts]);
+  }, [formatIncomingDeal, onDealReceived, onDealStatusChange, onDealDeleted, onDealUnpublished, onDealEdited, enableAlerts]);
 
   useEffect(() => {
     connect();

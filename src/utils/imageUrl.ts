@@ -15,11 +15,15 @@ export function getCleanImageUrl(url?: string | null): string {
 
   // Serve backend images through the public site's origin.
   clean = clean.replace(/^https?:\/\/api\.rudranil\.me\/images\//i, '/deal-images/');
-  // Handle bare relative image paths like /images/abc.jpg or images/abc.jpg
+  // Handle bare relative image paths like /images/abc.jpg or images/abc.jpg or upload_abc.jpg
   if (clean.startsWith('/images/')) {
     clean = clean.replace('/images/', '/deal-images/');
   } else if (clean.startsWith('images/')) {
     clean = `/deal-${clean}`;
+  } else if (clean.startsWith('upload_')) {
+    clean = `/deal-images/${clean}`;
+  } else if (clean.startsWith('/upload_')) {
+    clean = `/deal-images${clean}`;
   }
 
   // Force HTTPS if protocol is HTTP for our API domain

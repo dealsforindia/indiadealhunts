@@ -28,8 +28,10 @@ export function lookupTargetUrl(value: string): string {
 }
 
 export function publicDeal(deal: PublicDeal): PublicDeal {
+  const resolvedImage = deal.image || (deal as any).uploaded_img_url || (deal as any).uploadedImgUrl || (deal as any).img_url || null;
   return {
     ...deal,
+    image: resolvedImage,
     url: publicStoreUrl(deal.url),
     ...(Array.isArray(deal.items) ? { items: deal.items.map(item => ({ ...item, buy_url: publicStoreUrl(item.buy_url) })) } : {}),
     ...(deal.arbitrage ? { arbitrage: { ...deal.arbitrage, stores: Array.isArray(deal.arbitrage.stores) ? deal.arbitrage.stores.map(store => ({ ...store, ...(store.url ? { url: publicStoreUrl(store.url) } : {}) })) : [] } } : {}),
@@ -45,7 +47,7 @@ export function publicShareUrl(value: string): string {
 export function isDisplayableOffer(deal: Pick<PublicDeal, 'title' | 'url' | 'status'>): boolean {
   const title = typeof deal.title === 'string' ? deal.title.trim() : '';
   return !!title && !/\{\{?\s*(?:title|product(?:_name)?|name)\s*\}?\}|^\s*(?:undefined|null|test (?:deal|product)|sample product|placeholder)\s*$/i.test(title)
-    && !['rejected', 'pending', 'pending_approval'].includes(deal.status || '')
+    && !['rejected', 'pending', 'pending_approval', 'deleted', 'unpublished'].includes(deal.status || '')
     && !!publicStoreUrl(deal.url);
 }
 

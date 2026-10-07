@@ -46,7 +46,8 @@ import type { PublicDeal, PublicDealsResponse, SortOption, NavTab } from './type
 import { calculateWorthScore } from './utils/worthScore';
 import { searchDealsClient } from './utils/semanticSearch';
 import { getSavedDealIds, getSavedDealSnapshots, rememberSavedDeals, toggleSavedDealId, subscribeSavedDeals, clearAllSavedDealIds } from './utils/savedDeals';
-import { isAudioEnabled, setAudioEnabled, playTactileClick } from './utils/audio';
+import { isAudioEnabled, setAudioEnabled, playTactileClick, playSuccessChime } from './utils/audio';
+import { useDealFlowSync } from './hooks/useDealFlowSync';
 import { useTheme } from './utils/themeManager';
 
 const EDGE_API = PUBLIC_EDGE_BASE;
@@ -400,16 +401,18 @@ export const App: React.FC = () => {
   useEffect(() => () => feedRequest.current?.abort(), []);
   // Fetch Deals from Backend
   const fetchDeals = useCallback(
-    async (currentSkip = 0, isAppend = false) => {
+    async (currentSkip = 0, isAppend = false, isSilent = false) => {
       feedRequest.current?.abort();
       const controller = new AbortController();
       feedRequest.current = controller;
       let timedOut = false;
       const requestTimeout = setTimeout(() => { timedOut = true; controller.abort(); }, 25000);
-      if (isAppend) {
-        setLoadingMore(true);
-      } else {
-        setLoading(true);
+      if (!isSilent) {
+        if (isAppend) {
+          setLoadingMore(true);
+        } else {
+          setLoading(true);
+        }
       }
       setError(null);
 
@@ -510,15 +513,19 @@ export const App: React.FC = () => {
         if (controller.signal.aborted && !timedOut) return;
         const msg = err instanceof Error ? err.message : 'Failed to fetch deals';
         console.warn('Live deal feed unavailable:', msg);
-        setError('The deal directory is temporarily unavailable. Retry to load offers.');
-        if (!isAppend) {
-          setHasMore(false);
+        if (!isSilent) {
+          setError('The deal directory is temporarily unavailable. Retry to load offers.');
+          if (!isAppend) {
+            setHasMore(false);
+          }
         }
       } finally {
         clearTimeout(requestTimeout);
         if (feedRequest.current === controller) {
-          setLoading(false);
-          setLoadingMore(false);
+          if (!isSilent) {
+            setLoading(false);
+            setLoadingMore(false);
+          }
         }
       }
     },
@@ -529,6 +536,180 @@ export const App: React.FC = () => {
   useEffect(() => {
     fetchDeals(0, false);
   }, [fetchDeals]);
+
+  // Real-Time WebSocket Event Handlers (No page reload needed for Delete, Edit, or New Deals)
+  const handleDealReceived = useCallback((incomingDeal: PublicDeal) => {
+    if (!isDisplayableOffer(incomingDeal)) return;
+
+    setDeals((prev) => {
+      const targetId = String(incomingDeal.id);
+      const targetFp = incomingDeal.fp_hash ? String(incomingDeal.fp_hash) : null;
+      const idx = prev.findIndex((d) => String(d.id) === targetId || (targetFp && String(d.fp_hash) === targetFp));
+      if (idx !== -1) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...incomingDeal };
+        return next;
+      }
+      return [incomingDeal, ...prev];
+    });
+
+    setDiscoveryDeals((prev) => {
+      const targetId = String(incomingDeal.id);
+      const targetFp = incomingDeal.fp_hash ? String(incomingDeal.fp_hash) : null;
+      const idx = prev.findIndex((d) => String(d.id) === targetId || (targetFp && String(d.fp_hash) === targetFp));
+      if (idx !== -1) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...incomingDeal };
+        return next;
+      }
+      return [incomingDeal, ...prev];
+    });
+
+    setTotalDeals((prev) => prev + 1);
+
+    if (isAudioActive) {
+      try { playSuccessChime(); } catch {}
+    }
+    const priceStr = incomingDeal.price ? `₹${incomingDeal.price.toLocaleString('en-IN')}` : '';
+    showToast(`⚡ New Drop: ${incomingDeal.title.slice(0, 36)}… ${priceStr ? `(${priceStr})` : ''}`);
+  }, [isAudioActive, showToast]);
+
+  const handleDealDeleted = useCallback((targetId: string) => {
+    if (!targetId) return;
+    const cleanId = String(targetId).trim();
+
+    setDeals((prev) => prev.filter((d) => String(d.id) !== cleanId && String(d.fp_hash) !== cleanId));
+    setDiscoveryDeals((prev) => prev.filter((d) => String(d.id) !== cleanId && String(d.fp_hash) !== cleanId));
+    setCompareDeals((prev) => prev.filter((d) => String(d.id) !== cleanId && String(d.fp_hash) !== cleanId));
+
+    setSelectedDetailDeal((prev) => {
+      if (prev && (String(prev.id) === cleanId || String(prev.fp_hash) === cleanId)) {
+        showToast('This deal drop has been removed by curators');
+        return null;
+      }
+      return prev;
+    });
+
+    setSelectedPhotoDeal((prev) => {
+      if (prev && (String(prev.id) === cleanId || String(prev.fp_hash) === cleanId)) {
+        return null;
+      }
+      return prev;
+    });
+
+    setTotalDeals((prev) => Math.max(0, prev - 1));
+  }, [showToast]);
+
+  const handleDealUnpublished = useCallback((targetId: string) => {
+    handleDealDeleted(targetId);
+  }, [handleDealDeleted]);
+
+  const handleDealEdited = useCallback((updatedDeal: PublicDeal) => {
+    if (!updatedDeal) return;
+    const targetId = String(updatedDeal.id);
+    const targetFp = updatedDeal.fp_hash ? String(updatedDeal.fp_hash) : null;
+
+    setDeals((prev) =>
+      prev.map((d) =>
+        String(d.id) === targetId || (targetFp && String(d.fp_hash) === targetFp)
+          ? { ...d, ...updatedDeal }
+          : d
+      )
+    );
+    setDiscoveryDeals((prev) =>
+      prev.map((d) =>
+        String(d.id) === targetId || (targetFp && String(d.fp_hash) === targetFp)
+          ? { ...d, ...updatedDeal }
+          : d
+      )
+    );
+    setCompareDeals((prev) =>
+      prev.map((d) =>
+        String(d.id) === targetId || (targetFp && String(d.fp_hash) === targetFp)
+          ? { ...d, ...updatedDeal }
+          : d
+      )
+    );
+
+    setSelectedDetailDeal((prev) => {
+      if (prev && (String(prev.id) === targetId || (targetFp && String(prev.fp_hash) === targetFp))) {
+        return { ...prev, ...updatedDeal };
+      }
+      return prev;
+    });
+
+    setSelectedPhotoDeal((prev) => {
+      if (prev && (String(prev.id) === targetId || (targetFp && String(prev.fp_hash) === targetFp))) {
+        return { ...prev, ...updatedDeal };
+      }
+      return prev;
+    });
+
+    showToast(`Live update: ${updatedDeal.title.slice(0, 32)}…`);
+  }, [showToast]);
+
+  const handleDealStatusChange = useCallback(({ id, status }: { id: string; status: string }) => {
+    if (!id) return;
+    const cleanId = String(id).trim();
+
+    if (['deleted', 'unpublished', 'rejected'].includes(status)) {
+      handleDealDeleted(cleanId);
+    } else if (['expired', 'oos', 'out_of_stock'].includes(status)) {
+      setDeals((prev) =>
+        prev.map((d) =>
+          String(d.id) === cleanId || String(d.fp_hash) === cleanId
+            ? { ...d, is_over: true, is_expired: true, status: 'expired' }
+            : d
+        )
+      );
+      setDiscoveryDeals((prev) =>
+        prev.map((d) =>
+          String(d.id) === cleanId || String(d.fp_hash) === cleanId
+            ? { ...d, is_over: true, is_expired: true, status: 'expired' }
+            : d
+        )
+      );
+      setSelectedDetailDeal((prev) => {
+        if (prev && (String(prev.id) === cleanId || String(prev.fp_hash) === cleanId)) {
+          return { ...prev, is_over: true, is_expired: true, status: 'expired' };
+        }
+        return prev;
+      });
+    }
+  }, [handleDealDeleted]);
+
+  // DealFlow Live WebSocket Sync
+  useDealFlowSync({
+    onDealReceived: handleDealReceived,
+    onDealDeleted: handleDealDeleted,
+    onDealUnpublished: handleDealUnpublished,
+    onDealEdited: handleDealEdited,
+    onDealStatusChange: handleDealStatusChange,
+    enableAlerts: isAudioActive,
+  });
+
+  // Background focus & visibility sync (Reconcile updates automatically without manual page reload)
+  useEffect(() => {
+    const handleRevalidate = () => {
+      if (document.visibilityState === 'visible' && !searchQuery.trim()) {
+        fetchDeals(0, false, true); // silent background fetch
+      }
+    };
+    window.addEventListener('focus', handleRevalidate);
+    document.addEventListener('visibilitychange', handleRevalidate);
+
+    const heartbeat = setInterval(() => {
+      if (document.visibilityState === 'visible' && !searchQuery.trim()) {
+        fetchDeals(0, false, true);
+      }
+    }, 45000);
+
+    return () => {
+      window.removeEventListener('focus', handleRevalidate);
+      document.removeEventListener('visibilitychange', handleRevalidate);
+      clearInterval(heartbeat);
+    };
+  }, [fetchDeals, searchQuery]);
 
   // Load More Handler
   const handleLoadMore = () => {
