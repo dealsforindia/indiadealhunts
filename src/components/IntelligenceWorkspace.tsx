@@ -94,7 +94,7 @@ export function IntelligenceWorkspace({ query, offers, loading, onSearch, onLook
       </div>
     </div>
     {query && tab === 'discover' && (externalError || relatedCount > 0) && <div className="mine-search-note"><Search size={18} /><div><strong>{relatedCount === offers.length && offers.length > 0 ? 'These are related products, not standalone processors.' : 'Keep searching across stores'}</strong><p>{externalError ? 'External results could not be loaded. You can search the stores directly.' : `${relatedCount} related results are labelled separately from product matches.`}</p><button type="button" className="mine-store-disclosure" aria-expanded={storeLinksExpanded} onClick={() => setStoreLinksExpanded(v => !v)}>Search more stores <ChevronRight size={16} /></button><div className={`mine-store-links ${storeLinksExpanded ? 'is-expanded' : ''}`}>{[
-      ['Amazon', `https://www.amazon.in/s?k=${encodeURIComponent(mission.product || query)}`],
+      ['Amazon', `https://www.amazon.in/s?k=${encodeURIComponent(mission.product || query)}&tag=rudranil0a-21`],
       ['Flipkart', `https://www.flipkart.com/search?q=${encodeURIComponent(mission.product || query)}`],
       ['Myntra', `https://www.myntra.com/search?q=${encodeURIComponent(mission.product || query)}`],
       ['Google Shopping', 'in-app-radar'],

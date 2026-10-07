@@ -5,7 +5,15 @@
 import { useState, useEffect } from 'react';
 import { publicStoreUrl, lookupTargetUrl } from './publicLinks';
 
-const DEFAULT_AMAZON_TAG = 'dealshare0b7-21';
+export const DEFAULT_AMAZON_TAG = 'rudranil0a-21';
+
+/**
+ * Generates an authentic Amazon India search URL with 100% affiliate attribution.
+ */
+export function buildAmazonSearchUrl(query: string, tag: string = DEFAULT_AMAZON_TAG): string {
+  const cleanQ = encodeURIComponent(query.trim());
+  return `https://www.amazon.in/s?k=${cleanQ}&tag=${tag}`;
+}
 
 /**
  * Robust device detector differentiating PC / Mac Desktop from Mobile Phones & Tablets.

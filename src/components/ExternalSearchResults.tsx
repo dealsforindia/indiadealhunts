@@ -38,7 +38,7 @@ interface ExternalSearchResultsProps {
 
 const STORE_LINKS = [
   { name: 'Google Shopping', url: (q: string) => `https://www.google.com/search?q=${encodeURIComponent(q)}&udm=28#ip=1`, tone: 'border-slate-300 dark:border-white/20 bg-slate-900 text-white hover:bg-black', icon: '🛍️' },
-  { name: 'Amazon India', url: (q: string) => `https://www.amazon.in/s?k=${encodeURIComponent(q)}`, tone: 'border-amber-200 bg-amber-50 text-amber-900 hover:bg-amber-100', icon: '📦' },
+  { name: 'Amazon India', url: (q: string) => `https://www.amazon.in/s?k=${encodeURIComponent(q)}&tag=rudranil0a-21`, tone: 'border-amber-200 bg-amber-50 text-amber-900 hover:bg-amber-100', icon: '📦' },
   { name: 'Flipkart', url: (q: string) => `https://www.flipkart.com/search?q=${encodeURIComponent(q)}`, tone: 'border-blue-200 bg-blue-50 text-blue-900 hover:bg-blue-100', icon: '⚡' },
   { name: 'Myntra', url: (q: string) => `https://www.myntra.com/search?q=${encodeURIComponent(q)}`, tone: 'border-pink-200 bg-pink-50 text-pink-900 hover:bg-pink-100', icon: '👗' },
 ];

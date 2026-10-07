@@ -81,7 +81,7 @@ export function analyzeArbitrage(deal: Partial<PublicDeal>): ArbitrageAnalysis {
       store: 'Amazon India',
       isVerifiedDeal: false,
       statusText: 'Live Search Comparison',
-      url: `https://www.amazon.in/s?k=${query}&tag=dealshare0b7-21`,
+      url: `https://www.amazon.in/s?k=${query}&tag=rudranil0a-21`,
       badge: '🔍 Live Catalog Search',
       actionText: 'Check Amazon ↗',
     });

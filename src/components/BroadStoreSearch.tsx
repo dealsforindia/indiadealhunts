@@ -11,7 +11,7 @@ const STORE_SEARCHES = [
     name: 'Amazon',
     label: 'Search Amazon catalog',
     tone: 'border-amber-200 bg-amber-50 text-amber-900 hover:bg-amber-100',
-    buildUrl: (query: string) => `https://www.amazon.in/s?k=${encodeURIComponent(query)}`,
+    buildUrl: (query: string) => `https://www.amazon.in/s?k=${encodeURIComponent(query)}&tag=rudranil0a-21`,
   },
   {
     name: 'Flipkart',

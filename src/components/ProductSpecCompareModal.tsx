@@ -44,12 +44,13 @@ function getProductAttributes(deal: PublicDeal) {
   const t = (deal.title || '').toLowerCase();
 
   // Price calculations
-  const cardCashback = Math.round(deal.price * 0.05);
-  const netCardPrice = Math.max(0, deal.price - cardCashback);
+  const cleanPrice = Number(deal.price ?? deal.sale_price ?? deal.prices?.sale) || 0;
+  const cardCashback = Math.round(cleanPrice * 0.05);
+  const netCardPrice = Math.max(0, cleanPrice - cardCashback);
 
-  const isB2BEligible = ['phone', 'laptop', 'audio'].includes(domain) && deal.price >= 1500;
-  const gstItc = isB2BEligible ? Math.round(deal.price - deal.price / 1.18) : 0;
-  const netGstPrice = isB2BEligible ? Math.max(0, deal.price - gstItc) : deal.price;
+  const isB2BEligible = ['phone', 'laptop', 'audio'].includes(domain) && cleanPrice >= 1500;
+  const gstItc = isB2BEligible ? Math.round(cleanPrice - cleanPrice / 1.18) : 0;
+  const netGstPrice = isB2BEligible ? Math.max(0, cleanPrice - gstItc) : cleanPrice;
 
   let specRow1Label = 'Category';
   let specRow1Value = 'General Retail';
@@ -137,7 +138,7 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
   const modalSurface = useModalSurface(isOpen, onClose);
   if (!isOpen) return null;
 
-  const lowestPrice = deals.length > 0 ? Math.min(...deals.map((d) => d.price)) : 0;
+  const lowestPrice = deals.length > 0 ? Math.min(...deals.map((d) => Number(d.price ?? d.sale_price ?? d.prices?.sale) || 0)) : 0;
   const anyPhone = deals.some((d) => detectDomain(d) === 'phone');
   const anyLaptop = deals.some((d) => detectDomain(d) === 'laptop');
 
@@ -249,7 +250,10 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
                       {deals.map((deal) => (
                         <td key={deal.id} className="p-3">
                           <div className="flex items-baseline gap-2">
-                            <span className="text-lg font-black text-slate-900 dark:text-[#F1F5F9]">₹{deal.price.toLocaleString('en-IN')}</span>
+                            {(() => {
+                            const p = Number(deal.price ?? deal.sale_price ?? deal.prices?.sale) || 0;
+                            return <span className="text-lg font-black text-slate-900 dark:text-[#F1F5F9]">{p > 0 ? `₹${p.toLocaleString('en-IN')}` : 'Check store'}</span>;
+                          })()}
                             {deal.mrp && deal.mrp > deal.price && (
                               <span className="text-xs text-slate-400 line-through">₹{deal.mrp.toLocaleString('en-IN')}</span>
                             )}
