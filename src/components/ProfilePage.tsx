@@ -20,16 +20,25 @@ import {
   LogOut,
   Sliders,
   TrendingDown,
-  Layers,
   Search,
   ExternalLink,
   ChevronRight,
   Zap,
+  Trash2,
+  RefreshCw,
+  Plus,
+  Target,
+  ArrowDownRight,
+  CheckCircle2,
+  Activity,
+  Clock,
+  AlertCircle,
 } from 'lucide-react';
 import { useTheme, ThemePreference } from '../utils/themeManager';
 import { getSavedDealIds } from '../utils/savedDeals';
 import { TelegramIcon } from './TelegramIcon';
 import { playTactileClick, playSuccessChime } from '../utils/audio';
+import { PUBLIC_API_BASE } from '../utils/publicLinks';
 
 interface ProfilePageProps {
   onNavigateTab: (tab: any) => void;
@@ -38,6 +47,21 @@ interface ProfilePageProps {
   onShowToast?: (msg: string) => void;
   isAudioEnabled?: boolean;
   onToggleAudio?: () => void;
+}
+
+interface TrackedAlert {
+  id: string;
+  product_url: string;
+  target_price: number;
+  current_price?: number;
+  product_title: string;
+  store?: string;
+  image_url?: string;
+  status: string;
+  created_at: number;
+  last_checked_at?: number;
+  triggered_at?: number;
+  email_status?: string;
 }
 
 const ACCENT_PRESETS = [
@@ -57,9 +81,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   isAudioEnabled = true,
   onToggleAudio,
 }) => {
-  const { preference, resolvedTheme, setTheme } = useTheme();
+  const { preference, setTheme } = useTheme();
 
-  // User state (Email-based Auth with Free / Student Plan support)
+  // User auth state
   const [userEmail, setUserEmail] = useState<string>(() => {
     try {
       return localStorage.getItem('idh_user_email') || '';
@@ -75,10 +99,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     }
   });
 
-  // Auth modal/dialog state
+  // Auth dialog state
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authStep, setAuthStep] = useState<'email' | 'code'>('email');
   const [inputEmail, setInputEmail] = useState('');
+  const [inputCode, setInputCode] = useState('');
   const [inputStudent, setInputStudent] = useState(false);
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [devCodeHint, setDevCodeHint] = useState<string | null>(null);
 
   // Theme Accent state
   const [accent, setAccent] = useState<string>(() => {
@@ -108,9 +138,60 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   // Saved deals count
   const [savedCount, setSavedCount] = useState<number>(0);
 
+  // ── Scraper & Watchlist State ──
+  const [trackedAlerts, setTrackedAlerts] = useState<TrackedAlert[]>([]);
+  const [loadingAlerts, setLoadingAlerts] = useState(false);
+
+  // Add Scraper Form state
+  const [inputUrl, setInputUrl] = useState('');
+  const [inputTargetPrice, setInputTargetPrice] = useState('');
+  const [inputScraperEmail, setInputScraperEmail] = useState(userEmail || '');
+  const [isInspecting, setIsInspecting] = useState(false);
+  const [inspectPreview, setInspectPreview] = useState<{
+    title: string;
+    price?: number;
+    mrp?: number;
+    image?: string;
+    store?: string;
+  } | null>(null);
+  const [isArmingScraper, setIsArmingScraper] = useState(false);
+  const [checkingAlertId, setCheckingAlertId] = useState<string | null>(null);
+
+  // Sync user email to input email
+  useEffect(() => {
+    if (userEmail && !inputScraperEmail) {
+      setInputScraperEmail(userEmail);
+    }
+  }, [userEmail]);
+
   useEffect(() => {
     setSavedCount(getSavedDealIds().length);
   }, []);
+
+  // Fetch active alerts for current user
+  const fetchUserAlerts = async (emailToFetch: string) => {
+    if (!emailToFetch.trim() || !emailToFetch.includes('@')) return;
+    setLoadingAlerts(true);
+    try {
+      const res = await fetch(`${PUBLIC_API_BASE}/api/v1/alerts?contact=${encodeURIComponent(emailToFetch.trim().toLowerCase())}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.alerts)) {
+          setTrackedAlerts(data.alerts);
+        }
+      }
+    } catch (e) {
+      console.warn('Could not fetch user alerts:', e);
+    } finally {
+      setLoadingAlerts(false);
+    }
+  };
+
+  useEffect(() => {
+    if (userEmail) {
+      fetchUserAlerts(userEmail);
+    }
+  }, [userEmail]);
 
   const handleSelectAccent = (colorId: string, hexColor: string) => {
     playTactileClick();
@@ -122,30 +203,113 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     onShowToast?.(`Accent theme updated to ${colorId.charAt(0).toUpperCase() + colorId.slice(1)}`);
   };
 
-  const handleSaveAuth = (e: React.FormEvent) => {
+  const handleRequestCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputEmail.trim() || !inputEmail.includes('@')) {
-      onShowToast?.('Please enter a valid email address');
+    setAuthError(null);
+    const cleanEmail = inputEmail.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+      setAuthError('Please enter a valid email address');
       return;
     }
-    const cleanEmail = inputEmail.trim().toLowerCase();
-    setUserEmail(cleanEmail);
-    setIsStudentPlan(inputStudent);
+    setIsSendingCode(true);
+    playTactileClick();
+
     try {
-      localStorage.setItem('idh_user_email', cleanEmail);
-      localStorage.setItem('idh_is_student', inputStudent ? 'true' : 'false');
-    } catch {}
-    playSuccessChime();
-    setShowAuthModal(false);
-    onShowToast?.(inputStudent ? '🎓 Student Plan activated with Free perks!' : 'Signed in successfully!');
+      const res = await fetch(`${PUBLIC_API_BASE}/api/v1/auth/request-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.detail || data.message || 'Failed to send verification code');
+      }
+      playSuccessChime();
+      setAuthStep('code');
+      if (data.dev_code) {
+        setDevCodeHint(data.dev_code);
+      }
+      onShowToast?.(`6-digit verification code sent to ${cleanEmail}`);
+    } catch (err: any) {
+      setAuthError(err.message || 'Could not connect to auth service');
+      onShowToast?.(err.message || 'Error sending code');
+    } finally {
+      setIsSendingCode(false);
+    }
+  };
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+    const cleanEmail = inputEmail.trim().toLowerCase();
+    const cleanCode = inputCode.trim();
+
+    if (!cleanCode || cleanCode.length < 4) {
+      setAuthError('Please enter the 6-digit verification code');
+      return;
+    }
+
+    setIsVerifyingCode(true);
+    playTactileClick();
+
+    try {
+      const res = await fetch(`${PUBLIC_API_BASE}/api/v1/auth/verify-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, code: cleanCode }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.detail || data.message || 'Invalid or expired verification code');
+      }
+
+      if (data.token) {
+        try {
+          localStorage.setItem('idh_auth_token', data.token);
+        } catch {}
+      }
+      setUserEmail(cleanEmail);
+      setInputScraperEmail(cleanEmail);
+      setIsStudentPlan(inputStudent);
+      try {
+        localStorage.setItem('idh_user_email', cleanEmail);
+        localStorage.setItem('idh_is_student', inputStudent ? 'true' : 'false');
+      } catch {}
+
+      if (inputStudent) {
+        fetch(`${PUBLIC_API_BASE}/api/v1/user/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(data.token ? { Authorization: `Bearer ${data.token}` } : {}),
+          },
+          body: JSON.stringify({ is_student: true }),
+        }).catch(() => {});
+      }
+
+      playSuccessChime();
+      setShowAuthModal(false);
+      setAuthStep('email');
+      setInputCode('');
+      setDevCodeHint(null);
+      fetchUserAlerts(cleanEmail);
+      onShowToast?.(inputStudent ? '🎓 Student Plan activated with Free perks!' : 'Signed in successfully! Active Price Radar linked.');
+    } catch (err: any) {
+      setAuthError(err.message || 'Invalid or expired verification code');
+      onShowToast?.(err.message || 'Verification failed');
+    } finally {
+      setIsVerifyingCode(false);
+    }
   };
 
   const handleSignOut = () => {
     playTactileClick();
     setUserEmail('');
     setIsStudentPlan(false);
+    setTrackedAlerts([]);
     try {
       localStorage.removeItem('idh_user_email');
+      localStorage.removeItem('idh_auth_token');
       localStorage.removeItem('idh_is_student');
     } catch {}
     onShowToast?.('Signed out of Deal Hunter session');
@@ -168,6 +332,160 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       localStorage.setItem('idh_alert_threshold', String(pct));
     } catch {}
     onShowToast?.(`Drop alert set to ≥${pct}% reduction`);
+  };
+
+  // Inspect any store URL to fetch live product metadata
+  const handleInspectUrl = async (urlToInspect?: string) => {
+    const targetUrl = (urlToInspect || inputUrl).trim();
+    if (!targetUrl || !targetUrl.startsWith('http')) {
+      onShowToast?.('Please paste a valid product link (Amazon, Flipkart, Myntra, etc.)');
+      return;
+    }
+    setIsInspecting(true);
+    playTactileClick();
+    try {
+      const res = await fetch(`${PUBLIC_API_BASE}/api/v1/deals/lookup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: targetUrl }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.title || data.product_name || data.price) {
+          const preview = {
+            title: data.title || data.product_name || 'Verified Product',
+            price: data.price ? Number(data.price) : undefined,
+            mrp: data.mrp ? Number(data.mrp) : undefined,
+            image: data.image || undefined,
+            store: data.store || 'Store',
+          };
+          setInspectPreview(preview);
+          if (preview.price && !inputTargetPrice) {
+            setInputTargetPrice(String(Math.round(preview.price * 0.85)));
+          }
+          playSuccessChime();
+          onShowToast?.(`Detected: ${preview.title.slice(0, 30)}... (₹${preview.price?.toLocaleString('en-IN') || 'Live'})`);
+          return;
+        }
+      }
+      onShowToast?.('Product link verified. Enter your desired target price below.');
+    } catch {
+      onShowToast?.('Could not pre-fetch store details. You can still arm the price alert.');
+    } finally {
+      setIsInspecting(false);
+    }
+  };
+
+  // Arm scraper and save price drop alert
+  const handleAddScraper = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanUrl = inputUrl.trim();
+    if (!cleanUrl || !cleanUrl.startsWith('http')) {
+      onShowToast?.('Please enter a valid store product link');
+      return;
+    }
+    const cleanEmail = (inputScraperEmail || userEmail).trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      onShowToast?.('Please enter your email to receive price drop notifications');
+      return;
+    }
+    const targetP = parseFloat(inputTargetPrice);
+    if (isNaN(targetP) || targetP <= 0) {
+      onShowToast?.('Please enter a target price greater than ₹0');
+      return;
+    }
+
+    setIsArmingScraper(true);
+    playTactileClick();
+
+    try {
+      const payload = {
+        product_url: cleanUrl,
+        target_price: targetP,
+        contact: cleanEmail,
+        product_title: inspectPreview?.title || 'Tracked Product',
+        current_price: inspectPreview?.price || null,
+        store: inspectPreview?.store || 'Store',
+        image_url: inspectPreview?.image || null,
+      };
+
+      const res = await fetch(`${PUBLIC_API_BASE}/api/v1/alerts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Server returned ${res.status}`);
+      }
+
+      const data = await res.json();
+      playSuccessChime();
+      onShowToast?.(`🎯 Scraper active! We will email ${cleanEmail} when price drops to ≤₹${targetP.toLocaleString('en-IN')}`);
+
+      // Auto-save user email session if not yet saved
+      if (!userEmail) {
+        setUserEmail(cleanEmail);
+        try {
+          localStorage.setItem('idh_user_email', cleanEmail);
+        } catch {}
+      }
+
+      // Reset form & reload alerts list
+      setInputUrl('');
+      setInputTargetPrice('');
+      setInspectPreview(null);
+      fetchUserAlerts(cleanEmail);
+    } catch (err: any) {
+      onShowToast?.('Could not arm price drop scraper. Please check connection and retry.');
+    } finally {
+      setIsArmingScraper(false);
+    }
+  };
+
+  // Run live scraper check on demand for an alert
+  const handleCheckAlertNow = async (alert: TrackedAlert) => {
+    setCheckingAlertId(alert.id);
+    playTactileClick();
+    try {
+      const res = await fetch(`${PUBLIC_API_BASE}/api/v1/alerts/${alert.id}/check`, {
+        method: 'POST',
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.triggered) {
+          playSuccessChime();
+          onShowToast?.(`🎉 PRICE DROPPED! New Price: ₹${data.live_price}. Email notification dispatched to ${userEmail}!`);
+        } else {
+          onShowToast?.(data.message || `Current price is ₹${data.live_price || 'unconfirmed'}. Target is ₹${alert.target_price}. Radar active.`);
+        }
+        if (userEmail) fetchUserAlerts(userEmail);
+      } else {
+        onShowToast?.('Scanner check completed.');
+      }
+    } catch {
+      onShowToast?.('Could not complete live check. 24/7 background scanner remains active.');
+    } finally {
+      setCheckingAlertId(null);
+    }
+  };
+
+  // Delete an alert
+  const handleDeleteAlert = async (alertId: string) => {
+    playTactileClick();
+    try {
+      const res = await fetch(`${PUBLIC_API_BASE}/api/v1/alerts/${alertId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setTrackedAlerts((prev) => prev.filter((a) => a.id !== alertId));
+        onShowToast?.('Price scraper stopped and removed from radar.');
+      } else {
+        setTrackedAlerts((prev) => prev.filter((a) => a.id !== alertId));
+      }
+    } catch {
+      setTrackedAlerts((prev) => prev.filter((a) => a.id !== alertId));
+    }
   };
 
   return (
@@ -213,7 +531,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               </div>
               <p className="text-slate-300 text-sm max-w-md">
                 {userEmail
-                  ? `Signed in as ${userEmail} · Price drop tracking active`
+                  ? `Signed in as ${userEmail} · 24/7 price drop scraper active`
                   : 'Sign in with your email to unlock saved deal syncing, student perks, and instant price drop alerts.'}
               </p>
             </div>
@@ -224,7 +542,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-sm font-semibold border border-white/10 transition-colors flex items-center gap-2"
+                className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-sm font-semibold border border-white/10 transition-colors flex items-center gap-2 cursor-pointer"
               >
                 <LogOut size={16} /> Sign out
               </button>
@@ -235,7 +553,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   setInputEmail('');
                   setShowAuthModal(true);
                 }}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-lg transition-transform active:scale-95 flex items-center gap-2"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-lg transition-transform active:scale-95 flex items-center gap-2 cursor-pointer"
               >
                 <LogIn size={16} /> Sign in / Register (Free)
               </button>
@@ -264,9 +582,11 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
           <div className="bg-white/5 p-3.5 rounded-2xl border border-white/5">
             <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1">
-              <Bell size={14} className="text-blue-400" /> Price Watches
+              <Bell size={14} className="text-blue-400" /> Active Scrapers
             </div>
-            <div className="text-lg font-bold text-white">{emailAlerts ? 'Active' : 'Paused'}</div>
+            <div className="text-lg font-bold text-white">
+              {trackedAlerts.length > 0 ? `${trackedAlerts.length} Products` : emailAlerts ? 'Active' : 'Paused'}
+            </div>
           </div>
 
           <div className="bg-white/5 p-3.5 rounded-2xl border border-white/5">
@@ -279,9 +599,293 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* ── Left Column: Theme & Interface Studio (7 Cols) ── */}
+        {/* ── Left Column: Live Scraper & Watchlist Radar (7 Cols) ── */}
         <div className="lg:col-span-7 space-y-6">
-          {/* 1. Theme Mode Switcher */}
+
+          {/* 1. Add Scraper Card (The Core Feature Requested) */}
+          <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#0D1527] border border-slate-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center font-bold shadow-md">
+                <Target size={22} />
+              </div>
+              <div>
+                <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  Track Any Product Link
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">
+                    24/7 Live Scraper
+                  </span>
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Paste Amazon, Flipkart, Myntra, or any store URL. When price drops, get an instant email!
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleAddScraper} className="mt-5 space-y-4">
+              {/* Product URL Input */}
+              <div>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-1.5">
+                  Store Product Link (URL)
+                </label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type="url"
+                      required
+                      value={inputUrl}
+                      onChange={(e) => setInputUrl(e.target.value)}
+                      placeholder="https://www.amazon.in/dp/... or flipkart.com/..."
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleInspectUrl()}
+                    disabled={isInspecting || !inputUrl.trim()}
+                    className="px-4 py-3 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-slate-800 dark:text-white text-xs font-bold border border-slate-200 dark:border-white/10 transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-40"
+                    title="Inspect product live"
+                  >
+                    {isInspecting ? (
+                      <RefreshCw size={14} className="animate-spin text-emerald-500" />
+                    ) : (
+                      <Search size={14} />
+                    )}
+                    <span>Inspect</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Scraped Product Live Preview Card */}
+              {inspectPreview && (
+                <div className="p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-xl bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800/40 p-1 flex items-center justify-center shrink-0 overflow-hidden">
+                    {inspectPreview.image ? (
+                      <img src={inspectPreview.image} alt={inspectPreview.title} className="w-full h-full object-contain" />
+                    ) : (
+                      <span className="text-xl">📦</span>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-200/60 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300">
+                        {inspectPreview.store || 'Verified Store'}
+                      </span>
+                      {inspectPreview.price && (
+                        <span className="text-xs font-bold text-slate-900 dark:text-white">
+                          Live: ₹{inspectPreview.price.toLocaleString('en-IN')}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate">
+                      {inspectPreview.title}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Target Price & Email Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Target Price */}
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-1.5">
+                    Alert Me If Price Drops Below (₹)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={inputTargetPrice}
+                      onChange={(e) => setInputTargetPrice(e.target.value)}
+                      placeholder="e.g. 1499"
+                      className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+                  {/* Quick percentage drop pills */}
+                  {inspectPreview?.price && (
+                    <div className="flex items-center gap-1.5 mt-2">
+                      {[0.9, 0.8, 0.7].map((pct) => {
+                        const val = Math.round((inspectPreview.price || 0) * pct);
+                        return (
+                          <button
+                            key={pct}
+                            type="button"
+                            onClick={() => {
+                              playTactileClick();
+                              setInputTargetPrice(String(val));
+                            }}
+                            className="px-2 py-0.5 rounded-lg text-[10.5px] font-semibold bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
+                          >
+                            -{Math.round((1 - pct) * 100)}% (₹{val.toLocaleString('en-IN')})
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Email for price drops */}
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-1.5">
+                    Notification Email Address
+                  </label>
+                  <div className="relative">
+                    <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="email"
+                      required
+                      value={inputScraperEmail}
+                      onChange={(e) => setInputScraperEmail(e.target.value)}
+                      placeholder="yourname@gmail.com"
+                      className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isArmingScraper}
+                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-sm shadow-lg transition-transform active:scale-98 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {isArmingScraper ? (
+                  <>
+                    <RefreshCw size={16} className="animate-spin" />
+                    <span>Arming 24/7 Scraper...</span>
+                  </>
+                ) : (
+                  <>
+                    <Target size={16} />
+                    <span>Arm Price Drop Scraper & Email Radar</span>
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+
+          {/* 2. Active Tracked Scrapers Watchlist */}
+          <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#0D1527] border border-slate-200/80 dark:border-white/10 shadow-sm space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                  <Activity size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                    Your Tracked Scrapers ({trackedAlerts.length})
+                  </h3>
+                  <p className="text-xs text-slate-500">Live scanners active on IndiaDealHunts server</p>
+                </div>
+              </div>
+
+              {userEmail && (
+                <button
+                  type="button"
+                  onClick={() => fetchUserAlerts(userEmail)}
+                  disabled={loadingAlerts}
+                  className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 transition-colors cursor-pointer"
+                  title="Refresh list"
+                >
+                  <RefreshCw size={14} className={loadingAlerts ? 'animate-spin text-blue-500' : ''} />
+                </button>
+              )}
+            </div>
+
+            {trackedAlerts.length === 0 ? (
+              <div className="py-8 px-4 rounded-2xl bg-slate-50/70 dark:bg-white/[0.02] border border-dashed border-slate-200 dark:border-white/10 text-center">
+                <Target size={28} className="mx-auto mb-2 text-slate-400" />
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  No active scrapers yet
+                </p>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+                  Paste any Amazon, Flipkart, or store product link in the tool above to start automated 24/7 price scanning with email alerts.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {trackedAlerts.map((alert) => {
+                  const isChecking = checkingAlertId === alert.id;
+                  const isTriggered = alert.status === 'triggered';
+                  return (
+                    <div
+                      key={alert.id}
+                      className="p-4 rounded-2xl bg-slate-50/70 dark:bg-white/[0.02] border border-slate-200/70 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3.5"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 p-1 flex items-center justify-center shrink-0 overflow-hidden">
+                          {alert.image_url ? (
+                            <img src={alert.image_url} alt={alert.product_title} className="w-full h-full object-contain" />
+                          ) : (
+                            <span className="text-lg">📱</span>
+                          )}
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                              {alert.store || 'Store'}
+                            </span>
+                            {isTriggered ? (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                                <CheckCircle2 size={10} /> Price Dropped! (Emailed)
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center gap-1">
+                                <Clock size={10} /> 5-Min Radar Active
+                              </span>
+                            )}
+                          </div>
+                          <a
+                            href={alert.product_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs font-bold text-slate-900 dark:text-white truncate block hover:text-emerald-500 transition-colors"
+                          >
+                            {alert.product_title}
+                          </a>
+                          <div className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-2">
+                            <span>
+                              Target: <strong className="text-emerald-600 dark:text-emerald-400">≤ ₹{alert.target_price.toLocaleString('en-IN')}</strong>
+                            </span>
+                            {alert.current_price && (
+                              <span>
+                                · Last check: ₹{alert.current_price.toLocaleString('en-IN')}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleCheckAlertNow(alert)}
+                          disabled={isChecking}
+                          className="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/15 text-slate-800 dark:text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-40"
+                          title="Check store price now"
+                        >
+                          <RefreshCw size={12} className={isChecking ? 'animate-spin text-emerald-500' : ''} />
+                          <span>{isChecking ? 'Checking...' : 'Check Price'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteAlert(alert.id)}
+                          className="p-1.5 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+                          title="Delete scraper"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* 3. Appearance & Theme Settings */}
           <div className="p-6 rounded-3xl bg-white dark:bg-[#0D1527] border border-slate-200/80 dark:border-white/10 shadow-sm">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
@@ -308,7 +912,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       playTactileClick();
                       setTheme(id);
                     }}
-                    className={`relative p-4 rounded-2xl border text-left transition-all flex flex-col justify-between h-28 ${
+                    className={`relative p-4 rounded-2xl border text-left transition-all flex flex-col justify-between h-28 cursor-pointer ${
                       active
                         ? 'border-blue-600 bg-blue-50/50 dark:bg-blue-950/20 ring-2 ring-blue-500/40'
                         : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 bg-slate-50/50 dark:bg-white/[0.02]'
@@ -340,7 +944,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       key={p.id}
                       type="button"
                       onClick={() => handleSelectAccent(p.id, p.color)}
-                      className={`group relative flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-semibold transition-all ${
+                      className={`group relative flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
                         isSelected
                           ? `border-slate-900 dark:border-white bg-slate-100 dark:bg-white/10 ring-2 ${p.ring}`
                           : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 text-slate-700 dark:text-slate-300'
@@ -359,7 +963,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             </div>
           </div>
 
-          {/* 2. Interactive Audio & Accessibility Settings */}
+          {/* 4. Interactive Audio & Accessibility Settings */}
           <div className="p-6 rounded-3xl bg-white dark:bg-[#0D1527] border border-slate-200/80 dark:border-white/10 shadow-sm space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
@@ -386,7 +990,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               <button
                 type="button"
                 onClick={onToggleAudio}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer focus:outline-none ${
                   isAudioEnabled ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'
                 }`}
               >
@@ -400,17 +1004,17 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           </div>
         </div>
 
-        {/* ── Right Column: Price Drop Tracker & Student Plan (5 Cols) ── */}
+        {/* ── Right Column: Email Preferences, Student Perks & Shortcuts (5 Cols) ── */}
         <div className="lg:col-span-5 space-y-6">
-          {/* 1. Price Drop Email Tracker (#13) */}
+          {/* 1. Global Price Drop Email Preferences */}
           <div className="p-6 rounded-3xl bg-white dark:bg-[#0D1527] border border-slate-200/80 dark:border-white/10 shadow-sm">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                 <Bell size={20} />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Price Drop Tracker</h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Real-time alerts for your saved and watched products</p>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Drop Alert Radar</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Automated notification delivery parameters</p>
               </div>
             </div>
 
@@ -428,7 +1032,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 <button
                   type="button"
                   onClick={handleToggleEmailAlerts}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
                     emailAlerts ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'
                   }`}
                 >
@@ -450,7 +1054,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       key={pct}
                       type="button"
                       onClick={() => handleSelectThreshold(pct)}
-                      className={`py-2 px-3 rounded-xl border text-xs font-semibold transition-all ${
+                      className={`py-2 px-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
                         alertThreshold === pct
                           ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 font-bold'
                           : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400'
@@ -475,7 +1079,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   href="https://t.me/dealsforindiachannel"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold shadow hover:bg-blue-500 transition-colors flex items-center gap-1"
+                  className="px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold shadow hover:bg-blue-500 transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   Join <ExternalLink size={11} />
                 </a>
@@ -483,7 +1087,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             </div>
           </div>
 
-          {/* 2. Student & Community Perks Plan (#12) */}
+          {/* 2. Student & College Perks Plan */}
           <div className="p-6 rounded-3xl bg-gradient-to-br from-purple-900/90 to-indigo-950 text-white border border-purple-500/20 shadow-lg relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl" />
             <div className="relative z-10">
@@ -502,14 +1106,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   setInputStudent(true);
                   setShowAuthModal(true);
                 }}
-                className="w-full py-2.5 px-4 rounded-xl bg-purple-500 hover:bg-purple-400 text-slate-950 font-bold text-xs shadow transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2.5 px-4 rounded-xl bg-purple-500 hover:bg-purple-400 text-slate-950 font-bold text-xs shadow transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Zap size={14} /> {isStudentPlan ? 'Student Status Active ✓' : 'Verify Student Free Perks'}
               </button>
             </div>
           </div>
 
-          {/* 3. Fast Tool Shortcuts */}
+          {/* 3. Fast Shopping Tool Shortcuts */}
           <div className="p-5 rounded-3xl bg-white dark:bg-[#0D1527] border border-slate-200/80 dark:border-white/10 space-y-2">
             <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
               Fast Shopping Shortcuts
@@ -517,7 +1121,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <button
               type="button"
               onClick={onOpenLookup}
-              className="w-full p-3 rounded-xl bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-100 dark:border-white/5 text-left text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center justify-between"
+              className="w-full p-3 rounded-xl bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-100 dark:border-white/5 text-left text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center justify-between cursor-pointer"
             >
               <span className="flex items-center gap-2">
                 <Search size={15} className="text-blue-500" /> Analyze Any Store URL
@@ -527,10 +1131,20 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <button
               type="button"
               onClick={onOpenSubmit}
-              className="w-full p-3 rounded-xl bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-100 dark:border-white/5 text-left text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center justify-between"
+              className="w-full p-3 rounded-xl bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-100 dark:border-white/5 text-left text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center justify-between cursor-pointer"
             >
               <span className="flex items-center gap-2">
                 <Sparkles size={15} className="text-amber-500" /> Submit a Verified Deal
+              </span>
+              <ChevronRight size={14} className="text-slate-400" />
+            </button>
+            <button
+              type="button"
+              onClick={() => onNavigateTab('saved')}
+              className="w-full p-3 rounded-xl bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-100 dark:border-white/5 text-left text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center justify-between cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <Bookmark size={15} className="text-emerald-500" /> View Saved Loot ({savedCount})
               </span>
               <ChevronRight size={14} className="text-slate-400" />
             </button>
@@ -538,7 +1152,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         </div>
       </div>
 
-      {/* ── Auth / Sign In Modal (#12) ── */}
+      {/* ── Auth / Sign In Modal ── */}
       <AnimatePresence>
         {showAuthModal && (
           <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md">
@@ -558,57 +1172,146 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowAuthModal(false)}
-                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center text-sm"
+                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center text-sm cursor-pointer"
                 >
                   ✕
                 </button>
               </div>
 
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
-                100% Free Forever. No credit card required. Track price drops and sync your saved bookmarks.
+                {authStep === 'email'
+                  ? 'Passwordless & 100% Free. Enter your email to receive a 6-digit sign-in code.'
+                  : `Enter the 6-digit verification code sent to ${inputEmail}.`}
               </p>
 
-              <form onSubmit={handleSaveAuth} className="space-y-4">
-                <div>
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
-                    Your Email Address
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={inputEmail}
-                    onChange={(e) => setInputEmail(e.target.value)}
-                    placeholder="name@gmail.com or campus.edu"
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  />
+              {authError && (
+                <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-semibold flex items-center gap-2">
+                  <AlertCircle size={15} className="shrink-0" />
+                  <span>{authError}</span>
                 </div>
+              )}
 
-                <div className="p-3.5 rounded-xl bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/40">
-                  <label className="flex items-start gap-2.5 cursor-pointer">
+              {authStep === 'email' ? (
+                <form onSubmit={handleRequestCode} className="space-y-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                      Your Email Address
+                    </label>
                     <input
-                      type="checkbox"
-                      checked={inputStudent}
-                      onChange={(e) => setInputStudent(e.target.checked)}
-                      className="mt-0.5 rounded text-purple-600 focus:ring-purple-500"
+                      type="email"
+                      required
+                      value={inputEmail}
+                      onChange={(e) => setInputEmail(e.target.value)}
+                      placeholder="name@gmail.com or campus.edu"
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
-                    <div>
-                      <div className="text-xs font-bold text-purple-900 dark:text-purple-200 flex items-center gap-1">
-                        <GraduationCap size={14} /> Student / College Perks
-                      </div>
-                      <div className="text-[11px] text-purple-700 dark:text-purple-300">
-                        Enable free student plan for verified campus deals & gear.
-                      </div>
-                    </div>
-                  </label>
-                </div>
+                  </div>
 
-                <button
-                  type="submit"
-                  className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-sm shadow hover:from-emerald-400 hover:to-teal-400 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Check size={16} /> Continue as Deal Hunter
-                </button>
-              </form>
+                  <div className="p-3.5 rounded-xl bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/40">
+                    <label className="flex items-start gap-2.5 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={inputStudent}
+                        onChange={(e) => setInputStudent(e.target.checked)}
+                        className="mt-0.5 rounded text-purple-600 focus:ring-purple-500 cursor-pointer"
+                      />
+                      <div>
+                        <div className="text-xs font-bold text-purple-900 dark:text-purple-200 flex items-center gap-1">
+                          <GraduationCap size={14} /> Student / College Perks
+                        </div>
+                        <div className="text-[11px] text-purple-700 dark:text-purple-300">
+                          Enable free student plan for verified campus deals & gear.
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSendingCode}
+                    className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-sm shadow hover:from-emerald-400 hover:to-teal-400 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isSendingCode ? (
+                      <>
+                        <RefreshCw size={16} className="animate-spin" /> Sending Verification Code...
+                      </>
+                    ) : (
+                      <>
+                        <Mail size={16} /> Send 6-Digit Code
+                      </>
+                    )}
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleVerifyCode} className="space-y-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                      6-Digit Verification Code
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      maxLength={6}
+                      autoFocus
+                      value={inputCode}
+                      onChange={(e) => setInputCode(e.target.value.replace(/\D/g, ''))}
+                      placeholder="123456"
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-xl font-mono font-black text-center tracking-[8px] text-emerald-600 dark:text-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+
+                  {devCodeHint && (
+                    <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center">
+                      <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mr-2">Testing Code:</span>
+                      <button
+                        type="button"
+                        onClick={() => setInputCode(devCodeHint)}
+                        className="text-xs font-mono font-bold bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded cursor-pointer hover:bg-emerald-500/30 transition-colors"
+                      >
+                        Auto-fill {devCodeHint}
+                      </button>
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isVerifyingCode || inputCode.length < 4}
+                    className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-sm shadow hover:from-emerald-400 hover:to-teal-400 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isVerifyingCode ? (
+                      <>
+                        <RefreshCw size={16} className="animate-spin" /> Verifying Code...
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck size={16} /> Verify & Access Profile
+                      </>
+                    )}
+                  </button>
+
+                  <div className="flex items-center justify-between pt-2 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAuthStep('email');
+                        setInputCode('');
+                        setAuthError(null);
+                      }}
+                      className="text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 font-medium cursor-pointer"
+                    >
+                      ← Change Email
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleRequestCode}
+                      disabled={isSendingCode}
+                      className="text-emerald-600 dark:text-emerald-400 hover:underline font-semibold cursor-pointer disabled:opacity-50"
+                    >
+                      Resend Code
+                    </button>
+                  </div>
+                </form>
+              )}
             </motion.div>
           </div>
         )}
@@ -616,4 +1319,5 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     </div>
   );
 };
+
 export default ProfilePage;

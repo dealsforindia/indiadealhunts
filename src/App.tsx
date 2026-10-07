@@ -932,7 +932,20 @@ export const App: React.FC = () => {
               onViewModeChange={setViewMode}
               onShowToast={showToast}
             />
-          ) : activeTab === 'profile' || activeTab === 'best_worth' ? (
+          ) : activeTab === 'best_worth' ? (
+            <WorthScorePage
+              deals={deals}
+              loading={loading}
+              onSelectDeal={(d) => setSelectedDetailDeal(d)}
+              onToggleSaveDeal={handleToggleSaveDeal}
+              savedDealIds={savedDealIds}
+              onToggleCompare={handleToggleCompare}
+              compareDeals={compareDeals}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              onShowToast={showToast}
+            />
+          ) : activeTab === 'profile' ? (
             <ProfilePage
               onNavigateTab={handleNavTabChange}
               onOpenLookup={() => {
