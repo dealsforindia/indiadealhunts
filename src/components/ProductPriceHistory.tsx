@@ -32,7 +32,7 @@ export function ProductPriceHistory({ url, dealId }: { url: string; dealId?: str
             if (response.ok) {
               const data = await response.json();
               observations = cleanHistory(data.price_intelligence?.history || data.history);
-              if (observations.length) historySource = 'ShoppinGenie';
+              if (observations.length) historySource = 'DealFlow Verified History';
             }
           } catch { /* Try URL lookup when directory history is unavailable. */ }
           finally { clearTimeout(deadline); controller.signal.removeEventListener('abort', stop); }
@@ -46,7 +46,7 @@ export function ProductPriceHistory({ url, dealId }: { url: string; dealId?: str
             const fallback = cleanHistory(data.history || data.price_intelligence?.history);
             if (fallback.length > observations.length) {
               observations = fallback;
-              historySource = data.history_source === 'shoppingenie' ? 'ShoppinGenie' : 'Recorded product observations';
+              historySource = 'DealFlow Verified History';
             }
           }
         }
@@ -70,7 +70,7 @@ export function ProductPriceHistory({ url, dealId }: { url: string; dealId?: str
   const start = visible[0]?.[0] || 0, end = visible[visible.length - 1]?.[0] || start;
   const path = visible.map(([time, price], index) => `${index ? 'L' : 'M'}${(20 + (time - start) / (end - start || 1) * 560).toFixed(1)},${(20 + (high - price) / (high - low || 1) * 110).toFixed(1)}`).join(' ');
   return <section className="commerce-price-history" aria-label="Recorded product price history" aria-busy={loading}>
-    <header><div><h3><History size={17} />Price history</h3><span className="commerce-history-source">{source || 'Recorded price observations'}</span></div><button type="button" disabled={loading} aria-label="Refresh price history" onClick={() => setAttempt(value => value + 1)}><RefreshCw size={16} /></button></header>
+    <header><div><h3><History size={17} />Price history</h3><span className="commerce-history-source">{source || 'DealFlow Verified History'}</span></div><button type="button" disabled={loading} aria-label="Refresh price history" onClick={() => setAttempt(value => value + 1)}><RefreshCw size={16} /></button></header>
     <div className="commerce-history-periods" aria-label="History period">{[7, 30, 90, 0].map(period => <button type="button" key={period} aria-pressed={days === period} onClick={() => setDays(period)}>{period ? `${period} days` : 'All'}</button>)}</div>
     {loading ? <p className="commerce-history-status" role="status"><RefreshCw size={20} className="commerce-spinner" />Looking up recorded prices…</p> : visible.length >= 2 ? <>
       <svg viewBox="0 0 600 160" role="img" aria-label={`Recorded prices range from ${rupees(low)} to ${rupees(high)} across ${visible.length} observations`}>

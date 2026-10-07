@@ -316,7 +316,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
 
           {/* Store Filter Tabs */}
           <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-[#111C33] border border-slate-200 dark:border-white/10 overflow-x-auto">
-            {['all', 'Amazon', 'Flipkart', 'Zepto', 'DesiDime'].map((st) => (
+            {['all', 'Amazon', 'Flipkart', 'Myntra', 'Zepto'].map((st) => (
               <button
                 key={st}
                 onClick={() => setFilterStore(st)}
@@ -493,7 +493,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
                         <option value="Zepto">Zepto</option>
                         <option value="Myntra">Myntra</option>
                         <option value="AJIO">AJIO</option>
-                        <option value="DesiDime">DesiDime</option>
+                        <option value="Croma">Croma</option>
                         <option value="Other">Other</option>
                       </select>
                     </div>

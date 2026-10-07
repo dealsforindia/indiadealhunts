@@ -213,7 +213,7 @@ export interface LookupResult {
 }
 
 export type SortOption = 'worth' | 'newest' | 'discount' | 'price_low' | 'price_high';
-export type NavTab = 'home' | 'ending_soon' | 'best_worth' | 'active_offers' | 'lookup' | 'submit_deal' | 'about' | 'how_we_verify' | 'wall_of_happiness' | 'contact' | 'saved';
+export type NavTab = 'home' | 'ending_soon' | 'best_worth' | 'active_offers' | 'lookup' | 'submit_deal' | 'about' | 'how_we_verify' | 'wall_of_happiness' | 'contact' | 'saved' | 'profile';
 
 export interface CommunityBrag {
   id: string;

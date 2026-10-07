@@ -89,10 +89,10 @@ export const Footer: React.FC<FooterProps> = ({
                 Top Percentage Discounts
               </button>
               <button
-                onClick={() => handleLinkClick('best_worth')}
+                onClick={() => handleLinkClick('profile')}
                 className="text-left text-slate-600 dark:text-slate-400 hover:text-blue-600 font-medium transition-colors cursor-pointer bg-transparent border-0 p-0"
               >
-                Top Worth Score Deals
+                Profile & Custom Themes
               </button>
               <button
                 onClick={() => handleLinkClick('wall_of_happiness')}

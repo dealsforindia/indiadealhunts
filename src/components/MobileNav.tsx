@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bookmark, Gem, Home, Search, TrendingDown } from 'lucide-react';
+import { Bookmark, Home, Search, TrendingDown, User } from 'lucide-react';
 import { NavTab } from '../types';
 
 interface MobileNavProps {
@@ -17,7 +17,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ activeTab, onTabChange, on
     { tab: 'ending_soon' as NavTab, label: 'Discounts', aria: 'Top Discounts', Icon: TrendingDown },
     { tab: null, label: 'Search', aria: 'Search deals', Icon: Search },
     { tab: 'saved' as NavTab, label: 'Saved', aria: 'Saved Loot Bookmarks', Icon: Bookmark },
-    { tab: 'best_worth' as NavTab, label: 'Worth', aria: 'Top Worth Score Deals', Icon: Gem },
+    { tab: 'profile' as NavTab, label: 'Profile', aria: 'Profile & Theme Customization', Icon: User },
   ];
   return <nav className="phone-navigation md:hidden" aria-label="Mobile Bottom Navigation">
     {items.map(({ tab, label, aria, Icon }) => <button key={label} type="button"

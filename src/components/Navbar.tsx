@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Bell, Bookmark, ChevronDown, Heart, Menu, Plus, Search, SlidersHorizontal, TrendingDown, Volume2, VolumeX, X } from 'lucide-react';
+import { Bell, Bookmark, ChevronDown, Heart, Menu, Plus, Search, SlidersHorizontal, TrendingDown, User, Volume2, VolumeX, X } from 'lucide-react';
 import { NavTab } from '../types';
 import { BrandMark } from './BrandMark';
 import { ThemeToggle } from './ThemeToggle';
@@ -37,6 +37,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, onSelect
       <nav className="commerce-nav-links" aria-label="Main navigation">{links.map(link => <button type="button" key={link.id} className={activeTab === link.id ? 'is-active' : ''} aria-current={activeTab === link.id ? 'page' : undefined} onClick={() => go(link.id)}>{link.label}</button>)}</nav>
       <div className="commerce-nav-actions">
         <button type="button" className="commerce-icon-button" aria-label="Search products" onClick={() => run(onOpenCommandPalette || onFocusSearch)}><Search size={20} /></button>
+        <button type="button" className={`commerce-icon-button${activeTab === 'profile' ? ' is-active' : ''}`} aria-label="User Profile & Theme Customization" title="Profile & Themes" onClick={() => go('profile')}><User size={20} /></button>
         <ThemeToggle />
         <a className="commerce-telegram" href="https://t.me/dealsforindiachannel" target="_blank" rel="noopener noreferrer" aria-label="Join IndiaDealHunts on Telegram"><TelegramIcon /><span>Join Telegram</span></a>
         <button type="button" className="mobile-review-alerts" aria-label="Price watches and alerts" onClick={() => run(onOpenWatches || onOpenLookup)}><Bell size={22} /></button>
@@ -46,7 +47,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, onSelect
             <div className="commerce-menu-heading">Your shopping space</div>
             {onBrowseCollections && <button type="button" className="mobile-collections-menu-action" onClick={() => run(onBrowseCollections)}><Heart size={18} />Browse all collections</button>}
             <div className="commerce-mobile-links">{links.map(link => <button type="button" key={link.id} onClick={() => go(link.id)}>{link.id === 'saved' ? <Bookmark size={18} /> : <TrendingDown size={18} />}{link.label}</button>)}</div>
-            <button type="button" onClick={() => go('best_worth')}><TrendingDown size={18} />Worth score</button>
+            <button type="button" onClick={() => go('profile')}><User size={18} />Profile & Themes</button>
             <button type="button" onClick={() => go('wall_of_happiness')}><Heart size={18} />Wall of happiness</button>
             <button type="button" onClick={() => run(onOpenLookup)}><Search size={18} />Price lookup</button>
             {onOpenCompareTools && <button type="button" onClick={() => run(onOpenCompareTools)}><SlidersHorizontal size={18} />Compare & shopping tools</button>}

@@ -34,6 +34,7 @@ import type { ToolId } from './components/tools/ToolsHubModal';
 import { DeferredToolsHub } from './components/DeferredToolsHub';
 import { TopDiscountsPage } from './components/TopDiscountsPage';
 import { WorthScorePage } from './components/WorthScorePage';
+import { ProfilePage } from './components/ProfilePage';
 import { SavedLootPage } from './components/SavedLootPage';
 import { ExternalSearchResults, ExternalSearchDeal } from './components/ExternalSearchResults';
 import { GoogleShoppingDiscoveryModal } from './components/GoogleShoppingDiscoveryModal';
@@ -750,18 +751,21 @@ export const App: React.FC = () => {
               onViewModeChange={setViewMode}
               onShowToast={showToast}
             />
-          ) : activeTab === 'best_worth' ? (
-            <WorthScorePage
-              deals={deals}
-              loading={loading}
-              onSelectDeal={(d) => setSelectedDetailDeal(d)}
-              onToggleSaveDeal={handleToggleSaveDeal}
-              savedDealIds={savedDealIds}
-              onToggleCompare={handleToggleCompare}
-              compareDeals={compareDeals}
-              viewMode={viewMode}
-              onViewModeChange={setViewMode}
+          ) : activeTab === 'profile' || activeTab === 'best_worth' ? (
+            <ProfilePage
+              onNavigateTab={handleNavTabChange}
+              onOpenLookup={() => {
+                setLookupUrl('');
+                setIsLookupOpen(true);
+              }}
+              onOpenSubmit={() => {
+                setIsSubmitOpen(true);
+                setActiveTab('submit_deal');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
               onShowToast={showToast}
+              isAudioEnabled={isAudioActive}
+              onToggleAudio={handleToggleAudio}
             />
           ) : activeTab === 'saved' ? (
             <SavedLootPage
