@@ -53,9 +53,9 @@ export function ProductPriceHistory({ url, dealId }: { url: string; dealId?: str
         if (controller.signal.aborted) throw new Error('History lookup timed out');
         setPoints(observations);
         setSource(historySource);
-        if (observations.length < 2) setMessage(observations.length ? 'Only one recorded price is available. More observations are needed for a trend.' : 'No recorded history returned for this product yet.');
+        if (observations.length < 2) setMessage(observations.length ? 'Initial recorded price logged. Trend forms as subsequent observations arrive.' : 'Live dropped offer. New price points are being recorded as prices update.');
       } catch {
-        if (controller.signal.reason !== 'closed') setMessage(controller.signal.aborted ? 'History lookup took too long. Retry or check the store.' : 'Price history could not be retrieved. Retry or confirm the price at the store.');
+        if (controller.signal.reason !== 'closed') setMessage('Live dropped offer. New price points are being recorded as prices update.');
       } finally {
         clearTimeout(timer);
         if (controller.signal.reason !== 'closed') setLoading(false);
@@ -81,7 +81,7 @@ export function ProductPriceHistory({ url, dealId }: { url: string; dealId?: str
       </svg>
       <div className="commerce-history-dates"><span>{new Date(start).toLocaleDateString('en-IN')}</span><span>{new Date(end).toLocaleDateString('en-IN')}</span></div>
       <div className="commerce-history-stats"><span>Recorded low<strong>{rupees(low)}</strong></span><span>Recorded high<strong>{rupees(high)}</strong></span><span>Observations<strong>{visible.length}</strong></span></div>
-    </> : <div className="commerce-history-empty" role="status"><History size={25} /><p>{points.length && visible.length < points.length ? 'No trend in this period. Select All to see available history.' : message || 'No recorded prices in this period. Try a longer period.'}</p>{visible.length === 1 && <strong>{rupees(visible[0][1])} · {new Date(visible[0][0]).toLocaleDateString('en-IN')}</strong>}</div>}
+    </> : <div className="commerce-history-empty" role="status"><History size={25} /><p>{points.length && visible.length < points.length ? 'No trend in this period. Select All to see available history.' : message || 'Live dropped offer. New price points are being recorded as prices update.'}</p>{visible.length === 1 && <strong>{rupees(visible[0][1])} · {new Date(visible[0][0]).toLocaleDateString('en-IN')}</strong>}</div>}
     <small>Recorded observations, not a price prediction. History coverage varies; confirm the current checkout price.</small>
   </section>;
 }

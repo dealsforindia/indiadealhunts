@@ -88,7 +88,7 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
         setSuccess(false);
       }, 1800);
     } catch (err: any) {
-      setErrorMsg('The alert could not be registered. Please retry. No notification has been scheduled.');
+      setErrorMsg('Unable to schedule alert at this time. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -226,7 +226,9 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                 </div>
 
                 {errorMsg && (
-                  <p className="text-xs text-rose-600 font-medium">{errorMsg}</p>
+                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-medium">
+                    {errorMsg}
+                  </div>
                 )}
 
                 <button

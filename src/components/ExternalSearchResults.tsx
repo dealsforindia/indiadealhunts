@@ -208,11 +208,10 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
               <button
                 type="button"
                 onClick={() => setStoreFilter('flipkart')}
-                className={`rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
-                  storeFilter === 'flipkart'
+                className={`rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${storeFilter === 'flipkart'
                     ? 'bg-blue-600 text-white shadow-xs'
                     : 'border border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100'
-                }`}
+                  }`}
               >
                 ⚡ Flipkart ({deals.filter((d) => d.store?.toLowerCase().includes('flipkart')).length})
               </button>
@@ -221,11 +220,10 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
               <button
                 type="button"
                 onClick={() => setStoreFilter('amazon')}
-                className={`rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
-                  storeFilter === 'amazon'
+                className={`rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${storeFilter === 'amazon'
                     ? 'bg-amber-600 text-white shadow-xs'
                     : 'border border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100'
-                }`}
+                  }`}
               >
                 📦 Amazon ({deals.filter((d) => d.store?.toLowerCase().includes('amazon')).length})
               </button>
@@ -234,11 +232,10 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
               <button
                 type="button"
                 onClick={() => setStoreFilter('other')}
-                className={`rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
-                  storeFilter === 'other'
+                className={`rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${storeFilter === 'other'
                     ? 'bg-purple-600 text-white shadow-xs'
                     : 'border border-purple-200 bg-purple-50 text-purple-800 hover:bg-purple-100'
-                }`}
+                  }`}
               >
                 🛍️ Google Shopping + More
               </button>
@@ -248,18 +245,16 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
             <button
               type="button"
               onClick={() => setViewMode('cards')}
-              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
-                viewMode === 'cards' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-xs' : 'text-slate-500 hover:text-slate-900 dark:text-[#F1F5F9]'
-              }`}
+              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer ${viewMode === 'cards' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-xs' : 'text-slate-500 hover:text-slate-900 dark:text-[#F1F5F9]'
+                }`}
             >
               Product Cards
             </button>
             <button
               type="button"
               onClick={() => setViewMode('matrix')}
-              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
-                viewMode === 'matrix' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-xs' : 'text-slate-500 hover:text-slate-900 dark:text-[#F1F5F9]'
-              }`}
+              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer ${viewMode === 'matrix' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-xs' : 'text-slate-500 hover:text-slate-900 dark:text-[#F1F5F9]'
+                }`}
             >
               Comparison Table
             </button>
@@ -287,8 +282,8 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
         </div>
       ) : !hasDeals ? (
         <div className="mt-5 rounded-2xl border border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#070A11] p-6 text-center">
-          <p className="text-xs font-bold text-slate-500">
-            No direct store offers returned yet for &ldquo;{cleanQuery}&rdquo;. Check the direct store buttons below or scan via Google Shopping Radar.
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            No direct store offers returned yet for &ldquo;{cleanQuery}&rdquo;. Explore live merchant links or Google Shopping Radar below.
           </p>
         </div>
       ) : viewMode === 'matrix' ? (
@@ -312,9 +307,8 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                 return (
                   <tr
                     key={deal.id}
-                    className={`border-b border-slate-50 transition hover:bg-slate-50 dark:hover:bg-[#0E1729]/80 dark:bg-[#070A11]/80 ${
-                      isLowest ? 'bg-emerald-50/60' : idx % 2 === 0 ? 'bg-white dark:bg-[#0D1527]' : 'bg-slate-50/30 dark:bg-[#070A11]/30'
-                    }`}
+                    className={`border-b border-slate-50 transition hover:bg-slate-50 dark:hover:bg-[#0E1729]/80 dark:bg-[#070A11]/80 ${isLowest ? 'bg-emerald-50/60' : idx % 2 === 0 ? 'bg-white dark:bg-[#0D1527]' : 'bg-slate-50/30 dark:bg-[#070A11]/30'
+                      }`}
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2.5">
@@ -401,9 +395,8 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                               <button
                                 type="button"
                                 onClick={() => openSmartStoreLink(deal.url, deal.store, asin || undefined, false, subId)}
-                                className={`rounded-lg px-2.5 py-1 text-[10px] font-bold text-white transition shadow-2xs hover:opacity-95 cursor-pointer ${
-                                  isLowest ? 'bg-emerald-600 hover:bg-emerald-700' : colors.btn
-                                }`}
+                                className={`rounded-lg px-2.5 py-1 text-[10px] font-bold text-white transition shadow-2xs hover:opacity-95 cursor-pointer ${isLowest ? 'bg-emerald-600 hover:bg-emerald-700' : colors.btn
+                                  }`}
                               >
                                 {asin ? (isMobile ? '⚡ Open App' : 'View on Amazon ↗') : (isMobile ? `Buy Deal ↗` : `View on ${deal.store} ↗`)}
                               </button>
@@ -436,9 +429,8 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
             return (
               <article
                 key={deal.id}
-                className={`group flex flex-col justify-between overflow-hidden rounded-2xl border bg-white dark:bg-[#0D1527] transition hover:-translate-y-0.5 hover:shadow-md ${
-                  isLowest ? 'border-emerald-400 ring-2 ring-emerald-500/30' : 'border-slate-200 dark:border-white/10 hover:border-emerald-300'
-                }`}
+                className={`group flex flex-col justify-between overflow-hidden rounded-2xl border bg-white dark:bg-[#0D1527] transition hover:-translate-y-0.5 hover:shadow-md ${isLowest ? 'border-emerald-400 ring-2 ring-emerald-500/30' : 'border-slate-200 dark:border-white/10 hover:border-emerald-300'
+                  }`}
               >
                 <div>
                   <div className="relative flex h-36 items-center justify-center bg-slate-50/70 dark:bg-[#070A11]/70 p-3">
@@ -541,9 +533,8 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                       <button
                         type="button"
                         onClick={() => openSmartStoreLink(deal.url, deal.store, undefined, false, subId)}
-                        className={`w-full block rounded-xl px-3 py-2 text-center text-[11px] font-bold text-white transition shadow-xs hover:opacity-95 cursor-pointer ${
-                          isLowest ? 'bg-emerald-600 hover:bg-emerald-700' : colors.btn
-                        }`}
+                        className={`w-full block rounded-xl px-3 py-2 text-center text-[11px] font-bold text-white transition shadow-xs hover:opacity-95 cursor-pointer ${isLowest ? 'bg-emerald-600 hover:bg-emerald-700' : colors.btn
+                          }`}
                       >
                         ⚡ Open on {deal.store || 'Store'} ↗
                       </button>

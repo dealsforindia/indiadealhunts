@@ -93,7 +93,7 @@ export function IntelligenceWorkspace({ query, offers, loading, onSearch, onLook
         <button type="button" aria-pressed={tab === 'mine'} onClick={() => setTab('mine')}><Bookmark size={16} /> My Mine <span>{saved.length}</span></button>
       </div>
     </div>
-    {query && tab === 'discover' && (externalError || relatedCount > 0) && <div className="mine-search-note"><Search size={18} /><div><strong>{relatedCount === offers.length && offers.length > 0 ? 'These are related products, not standalone processors.' : 'Keep searching across stores'}</strong><p>{externalError ? 'External results could not be loaded. You can search the stores directly.' : `${relatedCount} related results are labelled separately from product matches.`}</p><button type="button" className="mine-store-disclosure" aria-expanded={storeLinksExpanded} onClick={() => setStoreLinksExpanded(v => !v)}>Search more stores <ChevronRight size={16} /></button><div className={`mine-store-links ${storeLinksExpanded ? 'is-expanded' : ''}`}>{[
+    {query && tab === 'discover' && <div className="mine-search-note"><Search size={18} /><div><strong>{relatedCount === offers.length && offers.length > 0 ? 'These are related products, not standalone processors.' : 'Keep searching across stores'}</strong><p>{relatedCount > 0 ? `${relatedCount} related results are labelled separately from product matches.` : 'Explore matching offers across Amazon, Flipkart, Myntra, and more.'}</p><button type="button" className="mine-store-disclosure" aria-expanded={storeLinksExpanded} onClick={() => setStoreLinksExpanded(v => !v)}>Search more stores <ChevronRight size={16} /></button><div className={`mine-store-links ${storeLinksExpanded ? 'is-expanded' : ''}`}>{[
       ['Amazon', `https://www.amazon.in/s?k=${encodeURIComponent(mission.product || query)}&tag=rudranil0a-21`],
       ['Flipkart', `https://www.flipkart.com/search?q=${encodeURIComponent(mission.product || query)}`],
       ['Myntra', `https://www.myntra.com/search?q=${encodeURIComponent(mission.product || query)}`],
@@ -210,7 +210,7 @@ function EvidencePanel({ offer: originalOffer, group, onClose, onLookup, onSave,
 
 function ProductImage({ offer }: { offer: IntelligenceOffer }) {
   const [failed, setFailed] = useState(false);
-  if (!offer.image || failed) return <div className="mine-image-fallback"><Layers3 size={42} /><span>Image unavailable</span></div>;
+  if (!offer.image || failed) return <div className="mine-image-fallback"><Layers3 size={42} /><span>Offer Preview</span></div>;
   return <img src={offer.image} alt={offer.title} loading="lazy" onError={() => setFailed(true)} />;
 }
 

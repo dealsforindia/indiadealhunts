@@ -57,7 +57,7 @@ export const ImageModal: React.FC<ImageModalProps> = ({ deal, onClose }) => {
             ) : (
               <div className="text-slate-400 flex flex-col items-center gap-2 p-4 text-center">
                 <ShoppingBag className="w-12 h-12 text-blue-600" aria-hidden="true" />
-                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{deal.store} listing · Image unavailable</span>
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{deal.store} listing · Offer Preview</span>
               </div>
             )}
           </div>

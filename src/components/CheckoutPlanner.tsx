@@ -26,7 +26,7 @@ export function CheckoutPlanner({ offer }: { offer: IntelligenceOffer }) {
         <label htmlFor={`${id}-cashback`}>Cashback / rewards (₹)<input id={`${id}-cashback`} inputMode="decimal" value={cashback} onChange={e => setCashback(e.target.value)} placeholder="e.g. 200 Amazon Pay" /></label>
       </div>
       <div className="mine-checkout-total" aria-live="polite">
-        {!result ? <p>{missingPrice ? 'Listed price unavailable for checkout calculation.' : 'Enter valid positive numbers.'}</p> : <>
+        {!result ? <p>{missingPrice ? 'Confirm listed price at store to calculate checkout.' : 'Enter valid positive numbers.'}</p> : <>
           <div><span>Pay at checkout</span><strong>{money(result.payNow ?? result.subtotal)}</strong></div>
           {result.discount > 0 && <p className="text-emerald-500 font-medium">✨ You save {money(result.discount)} instantly at payment.</p>}
           {result.cashback > 0 && <p>{money(result.cashback)} post-purchase cashback (Effective cost: <strong>{money(result.afterCashback ?? result.subtotal)}</strong>)</p>}

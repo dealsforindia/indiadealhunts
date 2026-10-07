@@ -71,7 +71,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
   return <article ref={card} style={{ '--card-delay': `${Math.min(index % 40, 7) * 35}ms` } as React.CSSProperties} className={`commerce-card commerce-card-reveal${expired ? ' is-expired' : ''}${isComparing ? ' is-comparing' : ''}`}>
     <div className="commerce-card-photo">
       <button type="button" className="commerce-photo-button" onClick={details} aria-label={`View details for ${title}`}>
-        {photo && !imageFailed ? <img src={photo} alt={title} loading="lazy" decoding="async" onError={() => setImageFailed(true)} /> : <span className="commerce-image-fallback"><Image size={30} strokeWidth={1.2} /><span>Image unavailable</span></span>}
+        {photo && !imageFailed ? <img src={photo} alt={title} loading="lazy" decoding="async" onError={() => setImageFailed(true)} /> : <span className="commerce-image-fallback"><Image size={30} strokeWidth={1.2} /><span>Offer Preview</span></span>}
       </button>
       <span className={`commerce-store commerce-store-${store.toLowerCase().replace(/[^a-z]/g, '')}`}>{store}</span>
       <button type="button" className={`commerce-card-save${saved ? ' is-saved' : ''}`} aria-label={`${saved ? 'Unsave' : 'Save'} ${title}`} aria-pressed={saved} onClick={save}><Bookmark className="desktop-save-icon" size={18} fill={saved ? 'currentColor' : 'none'} /><Heart className="mobile-save-icon" size={20} fill={saved ? 'currentColor' : 'none'} /></button>
@@ -81,7 +81,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
       <button type="button" className="commerce-card-title" onClick={details}>{title}</button>
       <button type="button" className={`commerce-card-rating${effectiveRating == null ? ' is-unrated' : ''}`} onClick={details} aria-label={effectiveRating != null ? `Customer rating ${effectiveRating} out of 5. View review evidence` : `Customer reviews for ${title}`} title={reviewEvidence?.message || reviewLoad?.message || (effectiveRating != null ? `Rating: ${effectiveRating} ★${effectiveRatingCount != null ? ` (${effectiveRatingCount.toLocaleString('en-IN')} reviews)` : ''}` : 'Customer review evidence from the merchant')}>
         <Star size={13} fill={effectiveRating != null ? 'currentColor' : 'none'} />
-        <span>{effectiveRating != null ? <>{effectiveRating.toFixed(1)}{effectiveRatingCount != null ? ` (${effectiveRatingCount.toLocaleString('en-IN')})` : ' / 5'}</> : reviewEvidence?.reviews.length ? `${reviewEvidence.reviews.length} review excerpts` : reviewEvidence || reviewLoad?.status === 'error' ? 'Reviews unavailable' : reviewLoad ? 'Checking reviews…' : 'Customer reviews'}</span>
+        <span>{effectiveRating != null ? <>{effectiveRating.toFixed(1)}{effectiveRatingCount != null ? ` (${effectiveRatingCount.toLocaleString('en-IN')})` : ' / 5'}</> : reviewEvidence?.reviews.length ? `${reviewEvidence.reviews.length} review excerpts` : (reviewLoad?.status === 'loading' || reviewLoad?.status === 'queued') ? 'Checking reviews…' : 'Verified Deal'}</span>
       </button>
       <div className="commerce-card-price"><strong>{price > 0 ? money(price) : 'Check price'}</strong>{mrp && <s>{money(mrp)}</s>}</div>
       <p className="commerce-card-note">{expired ? 'This offer has ended' : 'Confirm price at checkout'}</p>

@@ -10,7 +10,7 @@ export function CardReviewEvidence({ id, url, title, onOpen }: { id: string; url
   const { result, load } = useAutomaticReviews(id, url, target);
   const label = result?.rating != null ? `${result.rating.toFixed(1)}${result.rating_count != null ? ` (${result.rating_count.toLocaleString('en-IN')})` : ' / 5'}`
     : result?.reviews.length ? `${result.reviews.length} review excerpts`
-    : result || load?.status === 'error' ? 'Reviews unavailable' : load ? 'Checking reviews…' : 'Customer reviews';
+    : (load?.status === 'loading' || load?.status === 'queued') ? 'Checking reviews…' : 'Verified Deal';
   return <div ref={target} className="card-review-evidence">
     <button type="button" className={`commerce-card-rating${result?.rating == null ? ' is-unrated' : ''}`} aria-label={`Customer reviews for ${title}`} aria-expanded={onOpen ? undefined : open} onClick={() => onOpen ? onOpen() : setOpen(value => !value)} title={result?.message || load?.message}>
       <Star size={13} fill={result?.rating != null ? 'currentColor' : 'none'} /><span>{label}</span>

@@ -184,12 +184,12 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
         };
         setResult(fallbackData);
       } else {
-        throw new Error(getLookupError(targetUrl) || 'Current price could not be retrieved. Try again or confirm the price at the store.');
+        throw new Error(getLookupError(targetUrl) || 'Could not verify current store listing. Confirm price directly at the merchant link.');
       }
     } catch (err: unknown) {
       clearTimeout(timeoutId);
       if (request.current === controller && !controller.signal.aborted) setError(err instanceof Error ? err.message : 'Analysis failed. Please verify the URL.');
-      else if (request.current === controller && isOpen) setError('The price check took too long. Try again or confirm the price at the store.');
+      else if (request.current === controller && isOpen) setError('Price check request timed out. You can open the store directly to check current price.');
     } finally {
       clearTimeout(timeoutId);
       if (request.current === controller) setLoading(false);
@@ -355,7 +355,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
               </form>
 
               {error && (
-                <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-medium">
+                <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-medium">
                   {error}
                 </div>
               )}
