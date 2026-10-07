@@ -83,7 +83,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [isVerifyingCode, setIsVerifyingCode] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [devCodeHint, setDevCodeHint] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  // Resend OTP countdown timer
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const interval = setInterval(() => {
+      setResendCooldown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [resendCooldown]);
 
   // Alert preferences
   const [emailAlerts, setEmailAlerts] = useState<boolean>(() => {
@@ -152,8 +161,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     }
   }, [userEmail]);
 
-  const handleRequestCode = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleRequestCode = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     setAuthError(null);
     const cleanEmail = inputEmail.trim().toLowerCase();
     if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
@@ -175,9 +184,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       }
       playSuccessChime();
       setAuthStep('code');
-      if (data.dev_code) {
-        setDevCodeHint(data.dev_code);
-      }
+      setResendCooldown(30);
       onShowToast?.(`6-digit verification code sent to ${cleanEmail}`);
     } catch (err: any) {
       setAuthError(err.message || 'Could not connect to auth service');
@@ -193,7 +200,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     const cleanEmail = inputEmail.trim().toLowerCase();
     const cleanCode = inputCode.trim();
 
-    if (!cleanCode || cleanCode.length < 4) {
+    if (!cleanCode || cleanCode.length !== 6) {
       setAuthError('Please enter the 6-digit verification code');
       return;
     }
@@ -227,7 +234,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       setShowAuthModal(false);
       setAuthStep('email');
       setInputCode('');
-      setDevCodeHint(null);
+      setResendCooldown(0);
       fetchUserAlerts(cleanEmail);
       onShowToast?.(`Signed in successfully as ${cleanEmail}`);
     } catch (err: any) {
@@ -1052,29 +1059,21 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       required
                       maxLength={6}
                       autoFocus
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       value={inputCode}
-                      onChange={(e) => setInputCode(e.target.value.replace(/\D/g, ''))}
+                      onChange={(e) => setInputCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                       placeholder="123456"
                       className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-xl font-mono font-black text-center tracking-[8px] text-emerald-600 dark:text-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2 text-center">
+                      Check your inbox or spam folder for an email from <span className="text-slate-700 dark:text-slate-300 font-medium">IndiaDealHunts</span>.
+                    </p>
                   </div>
-
-                  {devCodeHint && (
-                    <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center">
-                      <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mr-2">Testing Code:</span>
-                      <button
-                        type="button"
-                        onClick={() => setInputCode(devCodeHint)}
-                        className="text-xs font-mono font-bold bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded cursor-pointer hover:bg-emerald-500/30 transition-colors"
-                      >
-                        Auto-fill {devCodeHint}
-                      </button>
-                    </div>
-                  )}
 
                   <button
                     type="submit"
-                    disabled={isVerifyingCode || inputCode.length < 4}
+                    disabled={isVerifyingCode || inputCode.length !== 6}
                     className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-sm shadow hover:from-emerald-400 hover:to-teal-400 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {isVerifyingCode ? (
@@ -1095,6 +1094,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                         setAuthStep('email');
                         setInputCode('');
                         setAuthError(null);
+                        setResendCooldown(0);
                       }}
                       className="text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 font-medium cursor-pointer"
                     >
@@ -1102,11 +1102,11 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                     </button>
                     <button
                       type="button"
-                      onClick={handleRequestCode}
-                      disabled={isSendingCode}
-                      className="text-emerald-600 dark:text-emerald-400 hover:underline font-semibold cursor-pointer disabled:opacity-50"
+                      onClick={() => handleRequestCode()}
+                      disabled={isSendingCode || resendCooldown > 0}
+                      className="text-emerald-600 dark:text-emerald-400 hover:underline font-semibold cursor-pointer disabled:opacity-50 disabled:no-underline"
                     >
-                      Resend Code
+                      {isSendingCode ? 'Sending...' : resendCooldown > 0 ? `Resend Code (${resendCooldown}s)` : 'Resend Code'}
                     </button>
                   </div>
                 </form>
