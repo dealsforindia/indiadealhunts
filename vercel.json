@@ -1,4 +1,17 @@
 {
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "indiadealhunts.vercel.app"
+        }
+      ],
+      "destination": "https://www.indiadealhunts.me/$1",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/v1/search/external",

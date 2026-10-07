@@ -21,9 +21,9 @@ export function publicStoreUrl(value: string): string {
 
 export function lookupTargetUrl(value: string): string {
   try {
-    const parsed = new URL(value, 'https://indiadealhunts.vercel.app');
+    const parsed = new URL(value, typeof window !== 'undefined' ? window.location.origin : 'https://www.indiadealhunts.me');
     const match = parsed.pathname.match(/^\/out\/([a-zA-Z0-9_-]+)\/?$/);
-    return match && ['indiadealhunts.vercel.app', 'indiadealhunts.com', '127.0.0.1', 'localhost'].includes(parsed.hostname) ? `https://api.rudranil.me/r/${match[1]}${parsed.search}` : value;
+    return match && ['indiadealhunts.me', 'www.indiadealhunts.me', 'indiadealhunts.vercel.app', 'indiadealhunts.com', '127.0.0.1', 'localhost'].includes(parsed.hostname) ? `https://api.rudranil.me/r/${match[1]}${parsed.search}` : value;
   } catch { return value; }
 }
 
@@ -67,7 +67,7 @@ export function publicDeal(deal: PublicDeal): PublicDeal {
 
 export function publicShareUrl(value: string): string {
   const link = publicStoreUrl(value);
-  return link.startsWith('/') ? `${typeof window === 'undefined' ? 'https://indiadealhunts.vercel.app' : window.location.origin}${link}` : link;
+  return link.startsWith('/') ? `${typeof window === 'undefined' ? 'https://www.indiadealhunts.me' : window.location.origin}${link}` : link;
 }
 
 /** Hide unfinished template records without inventing replacement product data. */
