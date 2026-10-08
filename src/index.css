@@ -489,10 +489,6 @@ html.dark .ambient-mesh {
     radial-gradient(ellipse at 70% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 40%) !important;
 }
 
-/* ── Scroll Progress Glow Bar ─────────────────────────── */
-.glow-amber {
-  box-shadow: 0 0 8px 1px rgba(245, 158, 11, 0.55), 0 0 2px rgba(245, 158, 11, 0.8);
-}
 
 /* ── Universal Dark Mode Utility Mappings ─────────────── */
 html.dark .bg-white {

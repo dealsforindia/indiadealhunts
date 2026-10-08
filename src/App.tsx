@@ -3,7 +3,7 @@ import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicDeal, publicStoreUrl, lookupTa
 import { ArrowDown, LoaderCircle, X } from 'lucide-react';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Navbar } from './components/Navbar';
-import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { HeroBanner } from './components/HeroBanner';
 import { CategoryRail } from './components/CategoryRail';
 import { DealToolbar } from './components/DealToolbar';
@@ -384,13 +384,7 @@ export const App: React.FC = () => {
     if (section) section.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
-  // Top Page Scroll Progress (Micro-interaction 15: 2px Amber indicator)
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001,
-  });
+
 
   const feedRequest = useRef<AbortController | null>(null);
   useEffect(() => () => feedRequest.current?.abort(), []);
@@ -847,22 +841,7 @@ export const App: React.FC = () => {
       {/* ── 0. Global Ambient Mesh Background ── */}
       <div className="ambient-mesh"></div>
 
-      {/* ── 0.1 Top Scroll Progress Indicator ── */}
-      <motion.div
-        style={{
-          scaleX,
-          transformOrigin: '0%',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '2px',
-          backgroundColor: '#F59E0B',
-          zIndex: 9999,
-          pointerEvents: 'none',
-        }}
-        className="glow-amber"
-      />
+
 
       {/* ── 1. Header (Navbar) ── */}
       <Navbar
