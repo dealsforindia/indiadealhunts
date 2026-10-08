@@ -6,7 +6,6 @@ import { motion } from 'motion/react';
 import { Star, Sparkles } from 'lucide-react';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
-import { SignaturePriceGraph } from './SignaturePriceGraph';
 import { ProductPriceHistory } from './ProductPriceHistory';
 import { ProductReviews } from './ProductReviews';
 import { couponOffer } from '../utils/couponOffer';
@@ -207,7 +206,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
           width: '100%',
           maxWidth: '740px',
           maxHeight: 'min(92vh, calc(100dvh - 1.5rem))',
-          overflowY: 'auto',
+          overflow: 'hidden',
           overscrollBehavior: 'contain',
           borderRadius: '16px',
           backgroundColor: 'var(--bg-surface-card)',
@@ -238,14 +237,21 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             }}>
               {storeName}
             </span>
-            {deal.category && (
-              <>
-                <span style={{ color: '#94A3B8', fontSize: '10px' }}>›</span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
-                  {deal.category}
-                </span>
-              </>
-            )}
+            {(() => {
+              const cat = deal.category?.trim();
+              if (!cat) return null;
+              const sLower = storeName.toLowerCase().replace(/india|in|\.com|\.in/g, '').trim();
+              const cLower = cat.toLowerCase();
+              if (cLower === sLower || cLower.includes(sLower) || sLower.includes(cLower)) return null;
+              return (
+                <>
+                  <span style={{ color: '#94A3B8', fontSize: '10px' }}>›</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
+                    {cat}
+                  </span>
+                </>
+              );
+            })()}
             <span className="deal-source-badge" style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -366,66 +372,99 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Body: Two-column */}
+        {/* Body: Two-column with scrollable container */}
         <div className="deal-detail-layout" style={{
           display: 'grid',
-          gridTemplateColumns: 'minmax(160px, 260px) 1fr',
+          gridTemplateColumns: 'minmax(180px, 260px) 1fr',
           gap: '0',
           flex: 1,
+          overflowY: 'auto',
+          overscrollBehavior: 'contain',
         }}>
-          {/* Left: Image */}
-          <button
-            onClick={() => onOpenImage && onOpenImage(deal)}
-            className="deal-detail-media"
-            aria-label={onOpenImage ? "Click to zoom" : "Product image"}
-            style={{
-              aspectRatio: '4 / 3',
-              alignSelf: 'start',
-              backgroundColor: 'var(--surface-2)',
-              border: 'none',
-              borderRight: '1px solid var(--border-subtle)',
-              cursor: onOpenImage ? 'zoom-in' : 'default',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '16px',
-              position: 'relative',
-            }}
-          >
-            {!imgError && cleanImage ? (
-              <img
-                src={cleanImage}
-                alt={deal.title}
-                loading="lazy"
-                onLoad={() => setImgLoaded(true)}
-                onError={() => setImgError(true)}
-                style={{
-                  maxWidth: '100%',
-                  maxHeight: '100%',
-                  objectFit: 'contain',
-                  opacity: imgLoaded ? 1 : 0,
-                  transition: 'opacity 150ms ease',
-                }}
-              />
-            ) : (
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#94A3B8' }}>
-                {deal.store}
-              </span>
-            )}
-            {onOpenImage && (
-              <span style={{
-                position: 'absolute',
-                bottom: '8px',
-                right: '8px',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '9px',
-                color: '#94A3B8',
-                letterSpacing: '0.04em',
-              }}>
-                🔍 Click to zoom
-              </span>
-            )}
-          </button>
+          {/* Left: Sticky Image & Quick Highlights Column */}
+          <div style={{
+            position: 'sticky',
+            top: 0,
+            alignSelf: 'start',
+            display: 'flex',
+            flexDirection: 'column',
+            borderRight: '1px solid var(--border-subtle)',
+            backgroundColor: 'var(--surface-2)',
+          }}>
+            <button
+              onClick={() => onOpenImage && onOpenImage(deal)}
+              className="deal-detail-media"
+              aria-label={onOpenImage ? "Click to zoom" : "Product image"}
+              style={{
+                aspectRatio: '4 / 3',
+                backgroundColor: 'var(--surface-2)',
+                border: 'none',
+                cursor: onOpenImage ? 'zoom-in' : 'default',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '16px',
+                position: 'relative',
+              }}
+            >
+              {!imgError && cleanImage ? (
+                <img
+                  src={cleanImage}
+                  alt={deal.title}
+                  loading="lazy"
+                  onLoad={() => setImgLoaded(true)}
+                  onError={() => setImgError(true)}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'contain',
+                    opacity: imgLoaded ? 1 : 0,
+                    transition: 'opacity 150ms ease',
+                  }}
+                />
+              ) : (
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#94A3B8' }}>
+                  {deal.store}
+                </span>
+              )}
+              {onOpenImage && (
+                <span style={{
+                  position: 'absolute',
+                  bottom: '8px',
+                  right: '8px',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '9px',
+                  color: '#94A3B8',
+                  letterSpacing: '0.04em',
+                }}>
+                  🔍 Click to zoom
+                </span>
+              )}
+            </button>
+            {/* Quick Trust Highlights on Left Column */}
+            <div className="hidden sm:flex" style={{
+              padding: '12px 14px',
+              borderTop: '1px solid var(--border-subtle)',
+              flexDirection: 'column',
+              gap: '8px',
+              fontSize: '11px',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#059669', fontWeight: 650 }}>
+                <span>🛡️</span>
+                <span>Verified {storeName}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)' }}>
+                <span>⚡</span>
+                <span>Direct merchant drop</span>
+              </div>
+              {discount > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#D97706', fontWeight: 650 }}>
+                  <span>🔥</span>
+                  <span>{discount}% price drop</span>
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Right: Details */}
           <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -708,12 +747,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               </div>
             )}
 
-            {/* Signature Animated 30-Day Price History Graph */}
-            <SignaturePriceGraph
-              currentPrice={price}
-              regularPrice={deal.regular_price || deal.usually_price || undefined}
-              mrp={mrp}
-            />
+            {/* Verified Multi-Store Price History & Trends Graph */}
             <ProductPriceHistory url={deal.url} dealId={deal.fp_hash || deal.id} currentPrice={price} mrp={mrp} />
             <ProductReviews url={deal.url} id={deal.id} />
 
@@ -923,16 +957,19 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Footer Actions */}
+        {/* Footer Actions - Pinned Sticky Dock */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          padding: '14px 18px',
+          padding: '12px 18px max(14px, env(safe-area-inset-bottom))',
           borderTop: '1px solid var(--border-subtle)',
           backgroundColor: 'var(--surface-2)',
           flexWrap: 'wrap',
           flexShrink: 0,
+          position: 'relative',
+          zIndex: 10,
+          boxShadow: '0 -4px 16px rgba(0, 0, 0, 0.04)',
         }}>
           {asin ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>

@@ -281,8 +281,10 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveTab('analyzer')}
-                className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-                  activeTab === 'analyzer' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-[#F1F5F9]'
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                  activeTab === 'analyzer'
+                    ? 'bg-white dark:bg-sky-500/20 text-slate-900 dark:text-sky-300 shadow-sm border border-slate-300/40 dark:border-sky-500/30'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
                 Analyzer
@@ -290,8 +292,10 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveTab('watches')}
-                className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-1 ${
-                  activeTab === 'watches' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-[#F1F5F9]'
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeTab === 'watches'
+                    ? 'bg-white dark:bg-sky-500/20 text-slate-900 dark:text-sky-300 shadow-sm border border-slate-300/40 dark:border-sky-500/30'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
                 <span>Watches</span>
@@ -307,7 +311,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
               <button
                 onClick={onClose}
                 aria-label="Close price lookup"
-                className="w-11 h-11 rounded-lg bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-500 hover:text-slate-900 dark:text-[#F1F5F9] flex items-center justify-center transition-colors cursor-pointer"
+                className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 hover:dark:bg-[#172440] text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer"
               >
                 <IconClose size={16} />
               </button>

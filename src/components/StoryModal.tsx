@@ -2,6 +2,7 @@ import { useModalSurface } from '../utils/useModalSurface';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
+import { getCleanImageUrl } from '../utils/imageUrl';
 import type { CategoryStoryCollection, CategoryStoryItem } from '../types';
 
 interface StoryModalProps {
@@ -269,23 +270,26 @@ export const StoryModal: React.FC<StoryModalProps> = ({
                 border: '1px solid rgba(255, 255, 255, 0.08)',
               }}
             >
-              {currentItem.image && !imageError ? (
-                <img
-                  src={currentItem.image}
-                  alt={currentItem.title}
-                  onError={() => setImageError(true)}
-                  className="max-h-full max-w-full object-contain filter drop-shadow-xl transition-transform duration-300 hover:scale-105"
-                  loading="eager"
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center text-white/50 text-center p-4">
-                  <div className="w-16 h-16 rounded-2xl bg-white/5 dark:bg-[#0D1527]/5 border border-white/10 flex items-center justify-center text-3xl mb-2 shadow-inner">
-                    {activeCollection.emoji}
+              {(() => {
+                const cleanImg = currentItem.image ? (getCleanImageUrl(currentItem.image) || currentItem.image) : '';
+                return cleanImg && !imageError ? (
+                  <img
+                    src={cleanImg}
+                    alt={currentItem.title}
+                    onError={() => setImageError(true)}
+                    className="max-h-full max-w-full object-contain filter drop-shadow-xl transition-transform duration-300 hover:scale-105"
+                    loading="eager"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center text-white/50 text-center p-4">
+                    <div className="w-16 h-16 rounded-2xl bg-white/5 dark:bg-[#0D1527]/5 border border-white/10 flex items-center justify-center text-3xl mb-2 shadow-inner">
+                      {activeCollection.emoji}
+                    </div>
+                    <span className="text-xs font-semibold text-white/70">{currentItem.store} Verified Deal</span>
+                    <span className="text-[10px] text-white/40 mt-0.5">Click Grab Deal to view live product</span>
                   </div>
-                  <span className="text-xs font-semibold text-white/70">{currentItem.store} Verified Deal</span>
-                  <span className="text-[10px] text-white/40 mt-0.5">Click Grab Deal to view live product</span>
-                </div>
-              )}
+                );
+              })()}
 
               {/* Store Tag */}
               <div
@@ -319,7 +323,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({
               </h3>
 
               {/* Price & Savings */}
-              <div className="mt-2.5 flex items-baseline gap-2.5">
+              <div className="mt-2.5 flex items-center flex-wrap gap-2.5">
                 {currentItem.price ? (
                   <span className="text-2xl font-black text-emerald-400 font-mono tracking-tight">
                     ₹{currentItem.price.toLocaleString('en-IN')}
@@ -327,12 +331,12 @@ export const StoryModal: React.FC<StoryModalProps> = ({
                 ) : null}
                 {currentItem.mrp && currentItem.price && currentItem.mrp > currentItem.price ? (
                   <span className="text-sm font-medium text-white/40 line-through font-mono">
-                    ₹{currentItem.mrp.toLocaleString('en-IN')} less than MRP
+                    ₹{currentItem.mrp.toLocaleString('en-IN')}
                   </span>
                 ) : null}
                 {currentItem.mrp && currentItem.price && currentItem.mrp > currentItem.price ? (
-                  <span className="text-xs font-semibold text-amber-300/90 font-mono">
-                    ₹{(currentItem.mrp - currentItem.price).toLocaleString('en-IN')}
+                  <span className="text-xs font-bold text-amber-300 font-mono bg-amber-400/15 border border-amber-400/25 px-2 py-0.5 rounded-md">
+                    Save ₹{(currentItem.mrp - currentItem.price).toLocaleString('en-IN')}
                   </span>
                 ) : null}
               </div>

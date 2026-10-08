@@ -45,7 +45,7 @@ export function CategoryRail({ selectedCategory, onSelectCategory }: CategoryRai
     return () => controls.stop();
   }, [bounds, reducedMotion, controls]);
   return <nav id="category-rail" className="category-rail commerce-categories" aria-label="Category navigation rail">
-    <div ref={rail} className="liquid-category-list">
+    <div ref={rail} className="liquid-category-list pr-16 md:pr-4">
       <motion.div className="liquid-category-indicator" initial={{ opacity: 0 }} animate={controls} aria-hidden="true"><span /></motion.div>
       {CATEGORIES.map(({ id, label, Icon }) => <button ref={node => { if (node) buttons.current.set(id, node); else buttons.current.delete(id); }} type="button" key={id} className={`liquid-category-button${selected === id ? ' is-selected' : ''}`} aria-pressed={selected === id} onClick={() => onSelectCategory(id)}><Icon size={17} aria-hidden="true" /><span>{label}</span></button>)}
     </div>

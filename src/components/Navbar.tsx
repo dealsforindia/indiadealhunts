@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Bell, Bookmark, ChevronDown, Heart, Menu, Plus, Search, SlidersHorizontal, TrendingDown, User, Volume2, VolumeX, X } from 'lucide-react';
+import { Bell, Bookmark, ChevronDown, Heart, Menu, Plus, Scale, Search, SlidersHorizontal, TrendingDown, User, Volume2, VolumeX, Wrench, X } from 'lucide-react';
 import { NavTab } from '../types';
 import { BrandMark } from './BrandMark';
 import { ThemeToggle } from './ThemeToggle';
@@ -50,8 +50,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, onSelect
             <button type="button" onClick={() => go('profile')}><User size={18} />Profile & Themes</button>
             <button type="button" onClick={() => go('wall_of_happiness')}><Heart size={18} />Wall of happiness</button>
             <button type="button" onClick={() => run(onOpenLookup)}><Search size={18} />Price lookup</button>
-            {onOpenCompareTools && <button type="button" onClick={() => run(onOpenCompareTools)}><SlidersHorizontal size={18} />Compare & shopping tools</button>}
-            {onOpenToolsHub && <button type="button" onClick={() => run(onOpenToolsHub)}><SlidersHorizontal size={18} />Shopping tools</button>}
+            {onOpenCompareTools && <button type="button" onClick={() => run(onOpenCompareTools)}><Scale size={18} />Compare deals desk</button>}
+            {onOpenToolsHub && <button type="button" onClick={() => run(onOpenToolsHub)}><Wrench size={18} />Shopping tools hub</button>}
             <button type="button" onClick={() => run(onOpenSubmit)}><Plus size={18} />Submit a deal</button>
             {onToggleAudio && <button type="button" aria-pressed={isAudioEnabled} onClick={onToggleAudio}>{isAudioEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}Sounds <small>{isAudioEnabled ? 'On' : 'Off'}</small></button>}
             {onSelectCategory && <div className="commerce-menu-categories"><span>Browse categories</span>{['all', 'Electronics', 'Fashion', 'Home', 'Grocery', 'Beauty', 'Sports', 'Automotive', 'Travel'].map(category => <button type="button" key={category} onClick={() => run(() => { onTabChange('home'); onSelectCategory(category); requestAnimationFrame(() => document.getElementById('deals-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })); })}>{category === 'all' ? 'All deals' : category}</button>)}</div>}
