@@ -26,7 +26,7 @@ export function useDealFlowSync({
   onDealDeleted,
   onDealUnpublished,
   onDealEdited,
-  enableAlerts = true,
+  enableAlerts = false,
 }: UseDealFlowSyncOptions = {}) {
   const [status, setStatus] = useState<'connected' | 'connecting' | 'disconnected'>('connecting');
   const [snapshot, setSnapshot] = useState<DealFlowEngineSnapshot | null>(null);

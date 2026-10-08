@@ -41,12 +41,11 @@ import { GoogleShoppingDiscoveryModal } from './components/GoogleShoppingDiscove
 import { openGoogleShoppingModal } from './utils/googleShopping';
 import { SearchResultsHeader } from './components/SearchResultsHeader';
 import { IntelligenceWorkspace } from './components/IntelligenceWorkspace';
-import { ExitIntentCartDrawer } from './components/ExitIntentCartDrawer';
 import type { PublicDeal, PublicDealsResponse, SortOption, NavTab } from './types';
 import { calculateWorthScore } from './utils/worthScore';
 import { searchDealsClient } from './utils/semanticSearch';
 import { getSavedDealIds, getSavedDealSnapshots, rememberSavedDeals, toggleSavedDealId, subscribeSavedDeals, clearAllSavedDealIds } from './utils/savedDeals';
-import { isAudioEnabled, setAudioEnabled, playTactileClick, playSuccessChime } from './utils/audio';
+import { isAudioEnabled, setAudioEnabled, playTactileClick } from './utils/audio';
 import { useDealFlowSync } from './hooks/useDealFlowSync';
 import { useTheme } from './utils/themeManager';
 
@@ -110,10 +109,6 @@ export const App: React.FC = () => {
     setGoogleShoppingQuery(q);
     setIsGoogleShoppingOpen(true);
   }, []);
-
-  const topAmazonDeal = useMemo(() => {
-    return deals.find((d) => (d.store || '').toLowerCase().includes('amazon') && (d.price || 0) > 0) || null;
-  }, [deals]);
 
   // Debounce search query (300ms)
   useEffect(() => {
@@ -566,13 +561,7 @@ export const App: React.FC = () => {
     });
 
     setTotalDeals((prev) => prev + 1);
-
-    if (isAudioActive) {
-      try { playSuccessChime(); } catch { }
-    }
-    const priceStr = incomingDeal.price ? `₹${incomingDeal.price.toLocaleString('en-IN')}` : '';
-    showToast(`⚡ New Drop: ${incomingDeal.title.slice(0, 36)}… ${priceStr ? `(${priceStr})` : ''}`);
-  }, [isAudioActive, showToast]);
+  }, []);
 
   const handleDealDeleted = useCallback((targetId: string) => {
     if (!targetId) return;
@@ -685,7 +674,7 @@ export const App: React.FC = () => {
     onDealUnpublished: handleDealUnpublished,
     onDealEdited: handleDealEdited,
     onDealStatusChange: handleDealStatusChange,
-    enableAlerts: isAudioActive,
+    enableAlerts: false,
   });
 
   // Background focus & visibility sync (Reconcile updates automatically without manual page reload)
@@ -1485,9 +1474,6 @@ export const App: React.FC = () => {
         onClose={() => setIsToolsHubOpen(false)}
         initialToolId={activeToolId}
       />
-
-      {/* ── Exit-Intent 90-Day Cart Lock Retention Drawer ── */}
-      <ExitIntentCartDrawer topDeal={topAmazonDeal} onShowToast={showToast} />
 
       {/* ── Floating Action Toast ── */}
       {toastMessage && (
