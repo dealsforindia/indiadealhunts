@@ -60,6 +60,9 @@ export interface PublicDeal {
   haul_store?: string;
   pincodes?: string[];
   items?: MegaHaulItem[];
+  is_multi_deal?: boolean;
+  multi_deal_count?: number;
+  multi_items?: MultiDealItem[];
   arbitrage?: {
     winnerStore: string;
     savingsVsOthers: number;
@@ -104,6 +107,13 @@ export interface MegaHaulItem {
   buy_url: string;
   img_url?: string | null;
   store?: string;
+}
+
+export interface MultiDealItem {
+  label: string;
+  url: string;
+  price?: number | null;
+  discount?: number | null;
 }
 
 

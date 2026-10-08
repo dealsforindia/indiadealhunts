@@ -637,6 +637,86 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               </div>
             )}
 
+            {/* Universal Multi-Deal Options Deck */}
+            {deal.is_multi_deal && deal.multi_items && deal.multi_items.length >= 2 && (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+                padding: '16px',
+                borderRadius: '14px',
+                backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                border: '1px solid rgba(99, 102, 241, 0.25)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: '13px', fontWeight: 800, color: '#4338ca' }}>
+                    📦 MULTIPLE DEALS INSIDE ({deal.multi_items.length} ITEMS)
+                  </span>
+                  <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '999px', backgroundColor: '#e0e7ff', color: '#4338ca' }}>
+                    Direct Links
+                  </span>
+                </div>
+                <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  This curated drop includes multiple direct purchase options. Pick any item below to shop with verified discounts:
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
+                  {deal.multi_items.map((item, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '10px',
+                        padding: '10px 12px',
+                        borderRadius: '10px',
+                        backgroundColor: 'var(--surface-primary, #ffffff)',
+                        border: '1px solid var(--border-subtle, #e2e8f0)',
+                      }}
+                    >
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 650, fontSize: '13.5px', color: 'var(--text-primary)' }}>
+                          {item.label}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                          {item.price ? (
+                            <span style={{ fontWeight: 700, color: '#0066cc', fontSize: '12.5px' }}>
+                              ₹{item.price.toLocaleString('en-IN')}
+                            </span>
+                          ) : null}
+                          {item.discount ? (
+                            <span style={{ fontSize: '10.5px', fontWeight: 700, padding: '1px 5px', borderRadius: '4px', backgroundColor: '#dcfce7', color: '#15803d' }}>
+                              Flat {item.discount}% OFF
+                            </span>
+                          ) : null}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          padding: '7px 12px',
+                          borderRadius: '7px',
+                          background: 'linear-gradient(135deg, #0066cc, #2563eb)',
+                          color: '#ffffff',
+                          border: 'none',
+                          fontSize: '12.5px',
+                          fontWeight: 650,
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                        }}
+                        onClick={() => openSmartStoreLink(item.url, deal.store || 'Store', undefined, false, subId)}
+                      >
+                        <span>🛍️ Buy {item.label.split(' ')[0]} ↗</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Signature Animated 30-Day Price History Graph */}
             <SignaturePriceGraph
               currentPrice={price}
