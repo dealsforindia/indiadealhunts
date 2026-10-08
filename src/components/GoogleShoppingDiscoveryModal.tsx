@@ -663,7 +663,7 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
                               Close
                             </button>
                           </div>
-                          <ProductPriceHistory url={offer.raw_url || offer.url} />
+                          <ProductPriceHistory url={offer.raw_url || offer.url} currentPrice={offer.price ?? undefined} />
                         </div>
                       )}
 

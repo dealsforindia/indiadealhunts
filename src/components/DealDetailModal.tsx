@@ -714,7 +714,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               regularPrice={deal.regular_price || deal.usually_price || undefined}
               mrp={mrp}
             />
-            <ProductPriceHistory url={deal.url} dealId={deal.fp_hash || deal.id} />
+            <ProductPriceHistory url={deal.url} dealId={deal.fp_hash || deal.id} currentPrice={price} mrp={mrp} />
             <ProductReviews url={deal.url} id={deal.id} />
 
             {/* Multi-Store Real-Time Live Check Matrix */}
