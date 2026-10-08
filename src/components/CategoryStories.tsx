@@ -31,7 +31,7 @@ const FALLBACK_STORIES: CategoryStoryCollection[] = [
         mrp: 2999,
         discount_pct: 95,
         store: 'Zepto',
-        image: 'https://images.desidime.com/deals/1758550186.jpg',
+        image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80',
         url: '/out/zepto_beardo_teeth_whitening_haul_2166146',
       },
       {

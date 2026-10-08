@@ -93,7 +93,7 @@ export const INITIAL_VERIFIED_DEALS: PublicDeal[] = [
     worth_label: 'Historic Low',
     is_lowest_price: true,
     cluster_count: 7,
-    cluster_channels: ['@dealspoint', 'DesiDime Hot', 'Genie Loot'],
+    cluster_channels: ['@dealspoint', 'DealsTrendz', 'Genie Loot'],
     consensus_badge: 'Historic Low',
   },
   {
