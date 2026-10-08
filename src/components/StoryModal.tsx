@@ -320,19 +320,21 @@ export const StoryModal: React.FC<StoryModalProps> = ({
 
               {/* Price & Savings */}
               <div className="mt-2.5 flex items-baseline gap-2.5">
-                <span className="text-2xl font-black text-emerald-400 font-mono tracking-tight">
-                  ₹{currentItem.price.toLocaleString('en-IN')}
-                </span>
-                {currentItem.mrp > currentItem.price && (
+                {currentItem.price ? (
+                  <span className="text-2xl font-black text-emerald-400 font-mono tracking-tight">
+                    ₹{currentItem.price.toLocaleString('en-IN')}
+                  </span>
+                ) : null}
+                {currentItem.mrp && currentItem.price && currentItem.mrp > currentItem.price ? (
                   <span className="text-sm font-medium text-white/40 line-through font-mono">
                     ₹{currentItem.mrp.toLocaleString('en-IN')} less than MRP
                   </span>
-                )}
-                {currentItem.mrp > currentItem.price && (
+                ) : null}
+                {currentItem.mrp && currentItem.price && currentItem.mrp > currentItem.price ? (
                   <span className="text-xs font-semibold text-amber-300/90 font-mono">
                     ₹{(currentItem.mrp - currentItem.price).toLocaleString('en-IN')}
                   </span>
-                )}
+                ) : null}
               </div>
 
               {/* Anti-Fake Guarantee Chip */}

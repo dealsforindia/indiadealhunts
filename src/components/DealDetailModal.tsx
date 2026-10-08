@@ -146,15 +146,6 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   const isB2BEligible = isTechOrAppliance && price >= 1500;
   const isFashion = catLower.includes('fashion') || /\b(shoes|sneakers|shirt|t-shirt|jeans|dress|saree|kurta|trousers|sandals|handbag|jacket)\b/i.test(titleLower);
   const isGroceryBeauty = catLower.includes('grocery') || catLower.includes('beauty') || /\b(face wash|cream|shampoo|soap|atta|oil|tea|coffee|biscuit|dry fruits)\b/i.test(titleLower);
-  // This cheap calculation must not add a hook after the closed-state return.
-  const bestCardSavings = (() => {
-    if (!price || price <= 0) return null;
-    const instant10 = Math.max(0, Math.min(1500, price * 0.1) - 117);
-    const cashback5 = price * 0.05;
-    const bestRoute = price > 30000 ? '5% Unlimited Cashback' : '10% Instant Bank Card';
-    const bestAmount = Math.round(Math.max(instant10, cashback5));
-    return { bestRoute, bestAmount, instant10: Math.round(instant10), cashback5: Math.round(cashback5) };
-  })();
 
   const handleCopyCoupon = () => {
     if (coupon?.kind !== 'code') return;

@@ -57,7 +57,8 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
   // Special Exchange bonus if deal is flagship (> ₹20k)
   const exchangeBonus = Math.max(0, Number(bonusQuote) || 0);
   const totalExchangeSavings = exchangeBaseValue + exchangeBonus;
-  const netUpgradePrice = Math.max(0, deal.price - totalExchangeSavings);
+  const cleanDealPrice = Number(deal.price ?? deal.sale_price ?? deal.prices?.sale) || 0;
+  const netUpgradePrice = Math.max(0, cleanDealPrice - totalExchangeSavings);
 
   return (
     <AnimatePresence>
@@ -106,7 +107,7 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
               <div className="min-w-0 flex-1">
                 <span className="text-[10px] font-mono font-bold text-indigo-700 uppercase tracking-wider">Purchase target:</span>
                 <p className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] truncate">{deal.title}</p>
-                <p className="text-base font-black text-slate-900 dark:text-[#F1F5F9] mt-0.5">₹{deal.price.toLocaleString('en-IN')}</p>
+                <p className="text-base font-black text-slate-900 dark:text-[#F1F5F9] mt-0.5">{cleanDealPrice > 0 ? `₹${cleanDealPrice.toLocaleString('en-IN')}` : 'Check store'}</p>
               </div>
             </div>
 
@@ -164,7 +165,7 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
             <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50 via-purple-50/40 to-white border border-indigo-200 shadow-xs space-y-2">
               <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400">
                 <span>Listed product price:</span>
-                <span>₹{deal.price.toLocaleString('en-IN')}</span>
+                <span>{cleanDealPrice > 0 ? `₹${cleanDealPrice.toLocaleString('en-IN')}` : 'Check store'}</span>
               </div>
               <div className="flex justify-between text-xs font-semibold text-indigo-700">
                 <span>Entered trade-in quote:</span>

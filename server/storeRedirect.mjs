@@ -2,7 +2,7 @@ export function merchantDestination(value) {
   try {
     const url = new URL(value);
     const host = url.hostname.toLowerCase();
-    if (url.protocol !== 'https:' || url.username || url.password || !host.includes('.') || host === 'api.rudranil.me' || /^(?:localhost|127\.|10\.|192\.168\.|169\.254\.|172\.(?:1[6-9]|2\d|3[01])\.)/.test(host) || host.includes(':')) return null;
+    if (url.protocol !== 'https:' || url.username || url.password || !host.includes('.') || host === 'api.rudranil.me' || host.includes('desidime') || host.includes('ddime') || /^(?:localhost|127\.|10\.|192\.168\.|169\.254\.|172\.(?:1[6-9]|2\d|3[01])\.)/.test(host) || host.includes(':')) return null;
     return url.href;
   } catch { return null; }
 }

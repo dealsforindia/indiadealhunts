@@ -39,6 +39,8 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
   const modalSurface = useModalSurface(isOpen && !!deal, onClose);
   if (!isOpen || !deal) return null;
 
+  const cleanPrice = Number(deal.price ?? deal.sale_price ?? deal.prices?.sale) || 0;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanContact = contact.trim().toLowerCase();
@@ -158,7 +160,7 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] truncate">{deal.title}</p>
                     <p className="text-xs text-slate-500">
-                      Listed price: <span className="font-bold text-slate-800 dark:text-[#F8FAFC]">₹{deal.price.toLocaleString('en-IN')}</span>
+                      Listed price: <span className="font-bold text-slate-800 dark:text-[#F8FAFC]">{cleanPrice > 0 ? `₹${cleanPrice.toLocaleString('en-IN')}` : 'Check store'}</span>
                     </p>
                   </div>
                 </div>
