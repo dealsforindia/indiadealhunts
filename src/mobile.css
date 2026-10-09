@@ -106,7 +106,7 @@
   .deal-detail-sheet{max-width:100%!important;max-height:calc(100dvh - 10px)!important;border-radius:24px 24px 0 0!important;padding-bottom:env(safe-area-inset-bottom,0px)}
   .deal-detail-sheet-head{position:sticky;top:0;z-index:3;background:#fffffffa!important;backdrop-filter:blur(12px);padding:10px 16px!important}
   .deal-detail-sheet-head button{min-height:44px!important;min-width:44px!important}
-  .deal-detail-layout{grid-template-columns:minmax(0,1fr)!important;flex:none!important}
+  .deal-detail-layout{grid-template-columns:minmax(0,1fr)!important;flex:1 1 auto!important;min-height:0;overflow-y:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch}.deal-detail-sheet-head{flex-shrink:0}
   .deal-detail-media{height:190px!important;aspect-ratio:auto!important;align-self:stretch!important;border-right:0!important}
   .deal-detail-sheet h2{font-size:20px!important;line-height:1.4!important}
   .deal-detail-sheet button,.deal-detail-sheet a{min-height:44px}

@@ -217,7 +217,7 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
 
   return (
     <section
-      className="proper-price-history mt-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/60 dark:bg-[#070b14] p-4 sm:p-5 shadow-sm text-slate-800 dark:text-slate-100 min-w-0 transition-colors"
+      className="proper-price-history premium-history mt-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/60 dark:bg-[#070b14] p-4 sm:p-5 shadow-sm text-slate-800 dark:text-slate-100 min-w-0 transition-colors"
       aria-label="Recorded product price history"
       aria-busy={loading}
     >
@@ -333,22 +333,22 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
         >
           <svg
             viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-            className="w-full block overflow-visible"
+            className="price-history-chart w-full block overflow-visible"
             role="img"
             aria-label={`Price trend from ${rupees(rawLow)} to ${rupees(rawHigh)} across ${visible.length} points`}
           >
             <defs>
               {/* Luminous Area Fill Gradient */}
               <linearGradient id={`${gradientId}-area`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={isLowestEver ? '#10b981' : '#38bdf8'} stopOpacity="0.28" />
-                <stop offset="50%" stopColor={isLowestEver ? '#10b981' : '#38bdf8'} stopOpacity="0.08" />
-                <stop offset="100%" stopColor={isLowestEver ? '#10b981' : '#38bdf8'} stopOpacity="0.0" />
+                <stop offset="0%" stopColor={'#8b5cf6'} stopOpacity="0.28" />
+                <stop offset="50%" stopColor={'#8b5cf6'} stopOpacity="0.08" />
+                <stop offset="100%" stopColor={'#8b5cf6'} stopOpacity="0.0" />
               </linearGradient>
 
               {/* Stroke Gradient */}
               <linearGradient id={`${gradientId}-stroke`} x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor={isLowestEver ? '#10b981' : '#0284c7'} />
-                <stop offset="100%" stopColor={isLowestEver ? '#34d399' : '#38bdf8'} />
+                <stop offset="0%" stopColor={'#7c3aed'} />
+                <stop offset="100%" stopColor={'#a78bfa'} />
               </linearGradient>
 
               {/* Drop Shadow Glow Filter */}
@@ -357,7 +357,7 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
                   dx="0"
                   dy="2"
                   stdDeviation="3"
-                  floodColor={isLowestEver ? '#10b981' : '#0284c7'}
+                  floodColor={'#7c3aed'}
                   floodOpacity="0.25"
                 />
               </filter>
@@ -430,8 +430,8 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
                     cx={pt.x}
                     cy={pt.y}
                     r={isHovered ? 5.5 : 3}
-                    fill={isHovered ? '#ffffff' : (isLowestEver ? '#10b981' : '#38bdf8')}
-                    stroke={isHovered ? (isLowestEver ? '#10b981' : '#0284c7') : '#ffffff'}
+                    fill={isHovered ? '#ffffff' : ('#8b5cf6')}
+                    stroke={isHovered ? ('#7c3aed') : '#ffffff'}
                     strokeWidth={isHovered ? 2.5 : 1.5}
                     className="transition-all duration-150"
                   />
@@ -448,7 +448,7 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
                   y1={chartTop}
                   x2={activePt.x}
                   y2={chartBottom}
-                  stroke="#38bdf8"
+                  stroke="#a78bfa"
                   strokeDasharray="3 3"
                   strokeWidth="1.5"
                   className="opacity-75"
@@ -460,7 +460,7 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
                   cy={activePt.y}
                   r="10"
                   fill="none"
-                  stroke="#38bdf8"
+                  stroke="#a78bfa"
                   strokeWidth="1.5"
                   className="animate-ping opacity-40"
                 />
@@ -469,7 +469,7 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
                   cy={activePt.y}
                   r="5"
                   fill="#ffffff"
-                  stroke="#0284c7"
+                  stroke="#7c3aed"
                   strokeWidth="2.5"
                 />
               </g>
@@ -485,8 +485,8 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
                 top: `${Math.max(12, (activePt.y / chartHeight) * 100 - 6)}%`,
               }}
             >
-              <div className="bg-slate-900/95 dark:bg-black/95 backdrop-blur-md text-white border border-white/20 shadow-xl rounded-xl px-3 py-2 text-xs flex flex-col gap-0.5 whitespace-nowrap min-w-[120px]">
-                <div className="text-[10px] text-slate-400 font-medium">
+              <div className="price-history-tooltip bg-violet-600 text-white border border-white/20 shadow-xl rounded-xl px-3 py-2 text-xs flex flex-col gap-0.5 whitespace-nowrap min-w-[120px]">
+                <div className="text-[10px] text-violet-100 font-medium">
                   {new Date(activePt.time).toLocaleDateString('en-IN', {
                     weekday: 'short',
                     day: 'numeric',
@@ -498,10 +498,10 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
                     minute: '2-digit',
                   })}
                 </div>
-                <div className="text-base font-extrabold text-emerald-400 tracking-tight">
+                <div className="text-base font-extrabold text-white tracking-tight">
                   {rupees(activePt.price)}
                 </div>
-                <div className="text-[9.5px] font-semibold text-sky-300">
+                <div className="text-[9.5px] font-semibold text-violet-100">
                   {activePt.price <= rawLow ? '🟢 Lowest price recorded' : `+₹${(activePt.price - rawLow).toLocaleString('en-IN')} vs lowest`}
                 </div>
               </div>
