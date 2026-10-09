@@ -944,6 +944,16 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               </div>
             </div>
 
+            {isMobile && (
+              <div className="deal-detail-secondary-actions">
+                {asin && <button type="button" onClick={handleLockInCart}>Add to Amazon cart</button>}
+                {bundle && <label><input type="checkbox" checked={includeBundle} onChange={e => setIncludeBundle(e.target.checked)} /> Include accessory · Check price</label>}
+                <button type="button" onClick={() => openGoogleShoppingModal(deal.title)}>Compare stores</button>
+                <button type="button" onClick={handleShare}>{copyLink ? 'Copied!' : 'Copy link'}</button>
+                <button type="button" onClick={handleReportExpired} disabled={reportSent}>{reportSent ? 'Marked expired' : 'Report expired offer'}</button>
+              </div>
+            )}
+
             {/* Editorial verification note */}
             <p style={{
               fontSize: '11px',
@@ -959,8 +969,9 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Footer Actions - Pinned Sticky Dock */}
-        <div style={{
+        {isMobile && <div className="deal-detail-mobile-buy"><button type="button" onClick={handleOpenStore}>View deal on {storeName} ↗</button></div>}
+        {/* Desktop actions */}
+        <div className="deal-detail-desktop-actions" style={{
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
