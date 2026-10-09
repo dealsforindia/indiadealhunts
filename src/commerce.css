@@ -134,3 +134,13 @@ html.dark .deal-detail-sheet-head{background:var(--surface-2)!important}
 .premium-history button[aria-pressed=true]{color:#7c3aed;border-bottom:2px solid #7c3aed}
 html.dark .premium-history button[aria-pressed=true]{color:#c4b5fd;border-color:#a78bfa}
 .premium-history .price-history-tooltip{background:#7c3aed;color:white}
+
+.price-history-plot{border:0;background:transparent;padding:0;min-width:0}
+.price-history-grid{stroke:#e5e7eb;stroke-width:1}
+.price-history-axis{fill:#64748b;font-family:var(--font-body);font-weight:500}
+.price-history-line{stroke:#7c3aed}
+.price-history-marker{fill:var(--bg-surface-card);stroke:#7c3aed}
+.price-history-guide{stroke:#a78bfa;stroke-width:1;stroke-dasharray:3 4;opacity:.5}
+html.dark .price-history-grid{stroke:#334155;opacity:.6}
+html.dark .price-history-axis{fill:#b5c0d2}
+html.dark .price-history-line,html.dark .price-history-marker{stroke:#a78bfa}
