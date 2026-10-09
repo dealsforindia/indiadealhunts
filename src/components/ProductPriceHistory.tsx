@@ -142,9 +142,9 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
   // Chart Canvas Dimensions
   const chartWidth = 360;
   const chartHeight = 230;
-  const chartLeft = 12;
-  const chartRight = 290; // Reserve room for readable rupee labels.
-  const chartTop = 24;
+  const chartLeft = 58;
+  const chartRight = 348;
+  const chartTop = 42;
   const chartBottom = 194;
   const innerWidth = chartRight - chartLeft;
   const innerHeight = chartBottom - chartTop;
@@ -194,6 +194,10 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
   // Active point for scrubbing
   const activePt = hoverIdx !== null && mappedPoints[hoverIdx] ? mappedPoints[hoverIdx] : null;
   const displayedPrice = activePt ? activePt.price : latestPrice;
+  const marker = activePt || mappedPoints[mappedPoints.length - 1];
+  const markerWidth = marker ? Math.max(66, rupees(marker.price).length * 8 + 20) : 66;
+  const markerX = marker ? Math.max(chartLeft, Math.min(chartRight - markerWidth, marker.x - markerWidth / 2)) : chartLeft;
+  const markerY = marker ? Math.max(4, marker.y - 38) : 4;
   const isLowestEver = rawLow > 0 && latestPrice <= rawLow;
 
   // Mouse & Touch Scrubbing Handlers
@@ -323,7 +327,7 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
       ) : visible.length >= 2 ? (
         <div
           ref={chartRef}
-          className="relative select-none touch-pan-y rounded-xl border border-slate-200/60 dark:border-white/5 bg-gradient-to-b from-white/40 to-slate-100/30 dark:from-white/[0.02] dark:to-transparent p-2 sm:p-3 overflow-hidden"
+          className="price-history-plot relative select-none touch-pan-y"
           onMouseMove={e => handlePointerMove(e.clientX)}
           onMouseLeave={() => setHoverIdx(null)}
           onTouchStart={e => e.touches[0] && handlePointerMove(e.touches[0].clientX)}
@@ -338,175 +342,29 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
             aria-label={`Price trend from ${rupees(rawLow)} to ${rupees(rawHigh)} across ${visible.length} points`}
           >
             <defs>
-              {/* Luminous Area Fill Gradient */}
               <linearGradient id={`${gradientId}-area`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={'#8b5cf6'} stopOpacity="0.28" />
-                <stop offset="50%" stopColor={'#8b5cf6'} stopOpacity="0.08" />
-                <stop offset="100%" stopColor={'#8b5cf6'} stopOpacity="0.0" />
+                <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.24" />
+                <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
               </linearGradient>
-
-              {/* Stroke Gradient */}
-              <linearGradient id={`${gradientId}-stroke`} x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor={'#7c3aed'} />
-                <stop offset="100%" stopColor={'#a78bfa'} />
-              </linearGradient>
-
-              {/* Drop Shadow Glow Filter */}
-              <filter id={`${gradientId}-glow`} x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow
-                  dx="0"
-                  dy="2"
-                  stdDeviation="3"
-                  floodColor={'#7c3aed'}
-                  floodOpacity="0.25"
-                />
-              </filter>
             </defs>
-
-            {/* Horizontal Gridlines & Right Y-Axis Price Labels */}
             {yTicks.map((tick, i) => (
               <g key={i}>
-                <line
-                  x1={chartLeft}
-                  y1={tick.y}
-                  x2={chartRight}
-                  y2={tick.y}
-                  stroke="currentColor"
-                  strokeDasharray="4 4"
-                  strokeWidth="1"
-                  className="text-slate-200 dark:text-slate-800/80"
-                />
-                <text
-                  x={chartRight + 8}
-                  y={tick.y + 3.5}
-                  fontSize="12"
-                  fontWeight="600"
-                  className="fill-slate-400 dark:fill-slate-500 font-mono select-none"
-                >
-                  ₹{tick.price.toLocaleString('en-IN')}
+                <line x1={chartLeft} x2={chartRight} y1={tick.y} y2={tick.y} className="price-history-grid" />
+                <text x={chartLeft - 10} y={tick.y + 4} textAnchor="end" fontSize="12" className="price-history-axis">
+                  {new Intl.NumberFormat('en-IN', { notation: 'compact', maximumFractionDigits: 1 }).format(tick.price).replace(/^/, '₹')}
                 </text>
               </g>
             ))}
-
-            {/* High / Low Threshold Guide Lines if variable */}
-            {rawHigh !== rawLow && (
-              <line
-                x1={chartLeft}
-                y1={mappedPoints.find(p => p.price === rawLow)?.y ?? chartBottom}
-                x2={chartRight}
-                y2={mappedPoints.find(p => p.price === rawLow)?.y ?? chartBottom}
-                stroke="#10b981"
-                strokeDasharray="2 3"
-                strokeWidth="1"
-                opacity="0.4"
-              />
-            )}
-
-            {/* Smooth Gradient Area Fill */}
-            {areaPath && (
-              <path
-                d={areaPath}
-                fill={`url(#${gradientId}-area)`}
-              />
-            )}
-
-            {/* Smooth Curved Trend Line */}
-            <path
-              d={linePath}
-              fill="none"
-              stroke={`url(#${gradientId}-stroke)`}
-              strokeWidth="2.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              filter={`url(#${gradientId}-glow)`}
-            />
-
-            {/* Historical Observation Anchor Dots */}
-            {mappedPoints.map((pt, index) => {
-              const isHovered = hoverIdx === index;
-              return (
-                <g key={index}>
-                  <circle
-                    cx={pt.x}
-                    cy={pt.y}
-                    r={isHovered ? 5.5 : 3}
-                    fill={isHovered ? '#ffffff' : ('#8b5cf6')}
-                    stroke={isHovered ? ('#7c3aed') : '#ffffff'}
-                    strokeWidth={isHovered ? 2.5 : 1.5}
-                    className="transition-all duration-150"
-                  />
-                </g>
-              );
-            })}
-
-            {/* Active Scrubbing Crosshair & Target Focus */}
-            {activePt && (
-              <g className="pointer-events-none">
-                {/* Vertical Crosshair Guide Line */}
-                <line
-                  x1={activePt.x}
-                  y1={chartTop}
-                  x2={activePt.x}
-                  y2={chartBottom}
-                  stroke="#a78bfa"
-                  strokeDasharray="3 3"
-                  strokeWidth="1.5"
-                  className="opacity-75"
-                />
-
-                {/* Glowing Target Pulsing Rings */}
-                <circle
-                  cx={activePt.x}
-                  cy={activePt.y}
-                  r="10"
-                  fill="none"
-                  stroke="#a78bfa"
-                  strokeWidth="1.5"
-                  className="animate-ping opacity-40"
-                />
-                <circle
-                  cx={activePt.x}
-                  cy={activePt.y}
-                  r="5"
-                  fill="#ffffff"
-                  stroke="#7c3aed"
-                  strokeWidth="2.5"
-                />
-              </g>
-            )}
+            {areaPath && <path d={areaPath} fill={`url(#${gradientId}-area)`} />}
+            <path d={linePath} fill="none" className="price-history-line" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            {marker && <g className="pointer-events-none">
+              <line x1={marker.x} x2={marker.x} y1={marker.y + 6} y2={chartBottom} className="price-history-guide" />
+              <circle cx={marker.x} cy={marker.y} r="4" className="price-history-marker" strokeWidth="2" />
+              <path d={`M ${markerX + markerWidth / 2 - 4} ${markerY + 27} L ${marker.x} ${marker.y - 7} L ${markerX + markerWidth / 2 + 4} ${markerY + 27}`} fill="#7c3aed" />
+              <rect x={markerX} y={markerY} width={markerWidth} height="28" rx="6" fill="#7c3aed" />
+              <text x={markerX + markerWidth / 2} y={markerY + 18} textAnchor="middle" fill="white" fontSize="13" fontWeight="600">{rupees(marker.price)}</text>
+            </g>}
           </svg>
-
-          {/* Interactive Floating Tooltip Overlay */}
-          {activePt && (
-            <div
-              className="absolute pointer-events-none z-20 -translate-x-1/2 -translate-y-full transition-all duration-75"
-              style={{
-                left: `${Math.max(12, Math.min(88, (activePt.x / chartWidth) * 100))}%`,
-                top: `${Math.max(12, (activePt.y / chartHeight) * 100 - 6)}%`,
-              }}
-            >
-              <div className="price-history-tooltip bg-violet-600 text-white border border-white/20 shadow-xl rounded-xl px-3 py-2 text-xs flex flex-col gap-0.5 whitespace-nowrap min-w-[120px]">
-                <div className="text-[10px] text-violet-100 font-medium">
-                  {new Date(activePt.time).toLocaleDateString('en-IN', {
-                    weekday: 'short',
-                    day: 'numeric',
-                    month: 'short',
-                  })}{' '}
-                  ·{' '}
-                  {new Date(activePt.time).toLocaleTimeString('en-IN', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </div>
-                <div className="text-base font-extrabold text-white tracking-tight">
-                  {rupees(activePt.price)}
-                </div>
-                <div className="text-[9.5px] font-semibold text-violet-100">
-                  {activePt.price <= rawLow ? '🟢 Lowest price recorded' : `+₹${(activePt.price - rawLow).toLocaleString('en-IN')} vs lowest`}
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* X-Axis Timeline Markers */}
           <div className="flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 pt-2 px-1 border-t border-slate-200/50 dark:border-white/5">
