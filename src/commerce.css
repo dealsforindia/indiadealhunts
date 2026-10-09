@@ -125,3 +125,12 @@ html.dark .deal-detail-sheet-head{background:var(--surface-2)!important}
   .deal-detail-sheet-head>div:first-child{flex-wrap:wrap;gap:4px!important}
 }
 @media(prefers-reduced-motion:reduce){.commerce-card-reveal,.commerce-spinner{animation:none}.commerce-load-more{transition:none}.commerce-load-more:active{transform:none}}
+
+/* Recorded price chart: restrained purple treatment in both themes. */
+.premium-history{background:var(--bg-surface-card);box-shadow:none;padding:20px 16px}
+.premium-history .price-history-chart{min-height:200px}
+.premium-history header{border-bottom:0}
+.premium-history button[aria-pressed]{min-height:44px;border-radius:0;background:transparent;border:0;box-shadow:none}
+.premium-history button[aria-pressed=true]{color:#7c3aed;border-bottom:2px solid #7c3aed}
+html.dark .premium-history button[aria-pressed=true]{color:#c4b5fd;border-color:#a78bfa}
+.premium-history .price-history-tooltip{background:#7c3aed;color:white}
