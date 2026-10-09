@@ -272,3 +272,13 @@ html.dark .phone-card-time {
   color: #64748B !important;
 }
 
+
+.deal-detail-secondary-actions{display:flex;flex-wrap:wrap;gap:8px;padding:16px 0}
+.deal-detail-secondary-actions button,.deal-detail-secondary-actions label{padding:10px 12px;border:1px solid var(--border-subtle);border-radius:10px;color:var(--text-primary);background:var(--surface-2);font-size:12px;min-height:44px}
+.deal-detail-secondary-actions label{display:flex;align-items:center;gap:8px;width:100%}
+.deal-detail-mobile-buy{flex-shrink:0;padding:10px 16px max(10px,env(safe-area-inset-bottom));border-top:1px solid var(--border-subtle);background:var(--bg-surface-card)}
+.deal-detail-mobile-buy button{width:100%;min-height:46px;border-radius:12px;background:#2563eb;color:white;font-size:14px;font-weight:650}
+@media(max-width:767px){
+ .deal-detail-layout>div:first-child{position:static!important;top:auto!important}
+ .deal-detail-desktop-actions{display:none!important}
+}
