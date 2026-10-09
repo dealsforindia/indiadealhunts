@@ -24,21 +24,8 @@ function createSmoothPath(points: Array<{ x: number; y: number }>): string {
     return `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`;
   }
 
-  let path = `M ${points[0].x} ${points[0].y}`;
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[Math.max(0, i - 1)];
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const p3 = points[Math.min(points.length - 1, i + 2)];
-
-    // Catmull-Rom to Cubic Bezier spline conversion
-    const cp1x = p1.x + (p2.x - p0.x) / 6;
-    const cp1y = p1.y + (p2.y - p0.y) / 6;
-    const cp2x = p2.x - (p3.x - p1.x) / 6;
-    const cp2y = p2.y - (p3.y - p1.y) / 6;
-
-    path += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
-  }
+  // Recorded samples use straight segments: do not invent smooth price swings.
+  const path = points.map((point, index) => `${index ? 'L' : 'M'} ${point.x} ${point.y}`).join(' ');
   return path;
 }
 
@@ -153,12 +140,12 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
   const latestPrice = values.length ? values[values.length - 1] : rawLow;
 
   // Chart Canvas Dimensions
-  const chartWidth = 600;
-  const chartHeight = 210;
-  const chartLeft = 24;
-  const chartRight = 515; // leaves 515 to 595 for right-hand Y-axis price labels
+  const chartWidth = 360;
+  const chartHeight = 230;
+  const chartLeft = 12;
+  const chartRight = 290; // Reserve room for readable rupee labels.
   const chartTop = 24;
-  const chartBottom = 166;
+  const chartBottom = 194;
   const innerWidth = chartRight - chartLeft;
   const innerHeight = chartBottom - chartTop;
 
@@ -212,7 +199,8 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
   // Mouse & Touch Scrubbing Handlers
   const handlePointerMove = (clientX: number) => {
     if (!chartRef.current || mappedPoints.length < 2) return;
-    const rect = chartRef.current.getBoundingClientRect();
+    const rect = chartRef.current.querySelector('svg')?.getBoundingClientRect();
+    if (!rect) return;
     const mouseX = ((clientX - rect.left) / rect.width) * chartWidth;
 
     let closestIdx = 0;
@@ -246,7 +234,7 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
               </h3>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Live Verified
+                {loading ? 'Loading' : points.length >= 2 ? 'Recorded history' : points.length === 1 ? 'One observation' : 'Unavailable'}
               </span>
             </div>
             <span className="block text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
@@ -263,7 +251,7 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
                 ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/25'
                 : 'bg-sky-500/10 text-sky-600 dark:text-sky-300 border border-sky-500/25'
             }`}>
-              {isLowestEver ? '🔥 Lowest Recorded Price' : rawHigh === rawLow ? '⚖️ Stable at Current Level' : '📉 Verified Dropped Deal'}
+              {isLowestEver ? 'Lowest in this period' : rawHigh === rawLow ? '⚖️ Stable at Current Level' : 'Recorded price range'}
             </div>
           )}
           <button
@@ -316,6 +304,16 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
         )}
       </div>
 
+      {!loading && visible.length >= 2 && (
+        <div className="mb-4 flex items-end justify-between gap-3">
+          <div>
+            <span className="block text-[11px] text-slate-500 dark:text-slate-400">{activePt ? 'Selected observation' : 'Latest recorded price'}</span>
+            <strong className="block text-3xl font-bold tracking-tight text-slate-900 dark:text-white">{rupees(displayedPrice)}</strong>
+          </div>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400">Touch to inspect · Swipe to scroll</span>
+        </div>
+      )}
+
       {/* 3. Main Chart Canvas / States */}
       {loading ? (
         <div className="min-h-[190px] flex flex-col items-center justify-center gap-3 text-slate-400 dark:text-slate-500 py-10" role="status">
@@ -325,9 +323,11 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
       ) : visible.length >= 2 ? (
         <div
           ref={chartRef}
-          className="relative select-none touch-none rounded-xl border border-slate-200/60 dark:border-white/5 bg-gradient-to-b from-white/40 to-slate-100/30 dark:from-white/[0.02] dark:to-transparent p-2 sm:p-3 overflow-hidden"
+          className="relative select-none touch-pan-y rounded-xl border border-slate-200/60 dark:border-white/5 bg-gradient-to-b from-white/40 to-slate-100/30 dark:from-white/[0.02] dark:to-transparent p-2 sm:p-3 overflow-hidden"
           onMouseMove={e => handlePointerMove(e.clientX)}
           onMouseLeave={() => setHoverIdx(null)}
+          onTouchStart={e => e.touches[0] && handlePointerMove(e.touches[0].clientX)}
+          onTouchCancel={() => setHoverIdx(null)}
           onTouchMove={e => e.touches[0] && handlePointerMove(e.touches[0].clientX)}
           onTouchEnd={() => setHoverIdx(null)}
         >
@@ -379,7 +379,7 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
                 <text
                   x={chartRight + 8}
                   y={tick.y + 3.5}
-                  fontSize="9.5"
+                  fontSize="12"
                   fontWeight="600"
                   className="fill-slate-400 dark:fill-slate-500 font-mono select-none"
                 >
@@ -524,7 +524,7 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
                 {timeSpan >= 86400000 * 3 && (
                   <span>{new Date(start + timeSpan / 2).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</span>
                 )}
-                <span>Today ({new Date(end).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })})</span>
+                <span>Latest ({new Date(end).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })})</span>
               </>
             )}
           </div>
@@ -561,7 +561,7 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
             {rawLow > 0 ? rupees(rawLow) : '—'}
           </strong>
           <span className="text-[9.5px] text-emerald-600/80 dark:text-emerald-400/70 font-medium mt-0.5">
-            {isLowestEver ? '🎯 Current offer' : 'Historical floor'}
+            {isLowestEver ? '🎯 Current offer' : 'Selected period low'}
           </span>
         </div>
 
@@ -583,7 +583,7 @@ export function ProductPriceHistory({ url, dealId, currentPrice }: ProductPriceH
             {visible.length} {visible.length === 1 ? 'check' : 'checks'}
           </strong>
           <span className="text-[9.5px] text-sky-600/80 dark:text-sky-400/70 font-medium mt-0.5">
-            {days ? `Last ${days} days` : 'All observations'}
+            {days ? `Selected ${days} days` : 'All observations'}
           </span>
         </div>
       </div>
