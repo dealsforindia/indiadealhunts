@@ -378,6 +378,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
           gridTemplateColumns: 'minmax(180px, 260px) 1fr',
           gap: '0',
           flex: 1,
+          minHeight: 0,
+          touchAction: 'pan-y',
           overflowY: 'auto',
           overscrollBehavior: 'contain',
         }}>
