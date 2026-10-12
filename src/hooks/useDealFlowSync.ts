@@ -18,6 +18,7 @@ export interface UseDealFlowSyncOptions {
   onDealUnpublished?: (id: string) => void;
   onDealEdited?: (deal: PublicDeal) => void;
   enableAlerts?: boolean;
+  onReconnect?: () => void;
 }
 
 export function useDealFlowSync({
@@ -27,6 +28,7 @@ export function useDealFlowSync({
   onDealUnpublished,
   onDealEdited,
   enableAlerts = false,
+  onReconnect,
 }: UseDealFlowSyncOptions = {}) {
   const [status, setStatus] = useState<'connected' | 'connecting' | 'disconnected'>('connecting');
   const [snapshot, setSnapshot] = useState<DealFlowEngineSnapshot | null>(null);
@@ -36,6 +38,8 @@ export function useDealFlowSync({
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectAttempts = useRef<number>(0);
+  const callbacks = useRef({ onDealReceived, onDealStatusChange, onDealDeleted, onDealUnpublished, onDealEdited, enableAlerts, onReconnect });
+  callbacks.current = { onDealReceived, onDealStatusChange, onDealDeleted, onDealUnpublished, onDealEdited, enableAlerts, onReconnect };
 
   const formatIncomingDeal = useCallback((raw: Record<string, any>): PublicDeal => {
     const id = String(raw.id || raw.fp_hash || raw._id || (raw.ts ? String(raw.ts) : Date.now()));
@@ -100,6 +104,7 @@ export function useDealFlowSync({
 
     if (wsRef.current) {
       try {
+        wsRef.current.onclose = null;
         wsRef.current.close();
       } catch {}
     }
@@ -120,6 +125,7 @@ export function useDealFlowSync({
 
       ws.onopen = () => {
         setStatus('connected');
+        if (reconnectAttempts.current > 0) callbacks.current.onReconnect?.();
         reconnectAttempts.current = 0;
         console.log('⚡ DealFlow Engine WebSocket connected:', wsUrl);
       };
@@ -153,24 +159,20 @@ export function useDealFlowSync({
             setLatestDrop(formatted);
             setNewDropsCount((prev) => prev + 1);
 
-            if (enableAlerts) {
+            if (callbacks.current.enableAlerts) {
               try {
                 playSuccessChime();
               } catch {}
             }
 
-            if (onDealReceived) {
-              onDealReceived(formatted);
-            }
+            callbacks.current.onDealReceived?.(formatted);
             return;
           }
 
           // 3. Deal Deleted (Real-time removal without reload)
           if (data.event === 'deal_deleted' || (data.event === 'deal_status_change' && data.status === 'deleted')) {
             const id = data.fp_hash || data.id;
-            if (id && onDealDeleted) {
-              onDealDeleted(id);
-            }
+            if (id) callbacks.current.onDealDeleted?.(id);
             return;
           }
 
@@ -178,8 +180,8 @@ export function useDealFlowSync({
           if (data.event === 'deal_unpublished' || (data.event === 'deal_status_change' && data.status === 'unpublished')) {
             const id = data.fp_hash || data.id;
             if (id) {
-              if (onDealUnpublished) onDealUnpublished(id);
-              if (onDealDeleted) onDealDeleted(id);
+              if (callbacks.current.onDealUnpublished) callbacks.current.onDealUnpublished(id);
+              else callbacks.current.onDealDeleted?.(id);
             }
             return;
           }
@@ -188,15 +190,13 @@ export function useDealFlowSync({
           if (data.event === 'deal_edited') {
             const rawDeal = data.deal || data;
             const formatted = formatIncomingDeal(rawDeal);
-            if (onDealEdited) {
-              onDealEdited(formatted);
-            }
+            callbacks.current.onDealEdited?.(formatted);
             return;
           }
 
           // 6. Status changes (out of stock, expired, rejected)
-          if ((data.event === 'deal_status_change' || data.event === 'deal_rejected') && onDealStatusChange) {
-            onDealStatusChange({
+          if ((data.event === 'deal_status_change' || data.event === 'deal_rejected') && callbacks.current.onDealStatusChange) {
+            callbacks.current.onDealStatusChange({
               id: data.fp_hash || data.id,
               status: data.status || (data.event === 'deal_rejected' ? 'rejected' : 'updated'),
             });
@@ -227,7 +227,7 @@ export function useDealFlowSync({
     } catch {
       setStatus('disconnected');
     }
-  }, [formatIncomingDeal, onDealReceived, onDealStatusChange, onDealDeleted, onDealUnpublished, onDealEdited, enableAlerts]);
+  }, [formatIncomingDeal]);
 
   useEffect(() => {
     connect();
@@ -236,7 +236,9 @@ export function useDealFlowSync({
       if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
       if (wsRef.current) {
         try {
+          wsRef.current.onclose = null;
           wsRef.current.close();
+          wsRef.current = null;
         } catch {}
       }
     };

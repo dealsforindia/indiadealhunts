@@ -387,10 +387,13 @@ export const App: React.FC = () => {
 
 
   const feedRequest = useRef<AbortController | null>(null);
+  const loadedSkip = useRef(0);
   useEffect(() => () => feedRequest.current?.abort(), []);
   // Fetch Deals from Backend
   const fetchDeals = useCallback(
     async (currentSkip = 0, isAppend = false, isSilent = false) => {
+      // Background checks must never cancel a search or pagination request.
+      if (isSilent && feedRequest.current) return;
       feedRequest.current?.abort();
       const controller = new AbortController();
       feedRequest.current = controller;
@@ -448,29 +451,33 @@ export const App: React.FC = () => {
         if (selectedStore !== 'all') params.append('store', selectedStore);
         if (selectedCategory !== 'all') params.append('category', selectedCategory);
 
-        let res: Response | null = null;
-        try {
-          res = await fetch(`${API_BASE}/api/v1/deals/public?${params.toString()}`, { signal: controller.signal, cache: 'no-store' });
-        } catch {
-          res = null;
-        }
-
-        if (controller.signal.aborted) { if (timedOut) throw new Error('Request timed out'); return; }
-        if (!res || !res.ok) {
+        const pageSize = debouncedSearch ? 80 : PAGE_SIZE;
+        const lastPage = isSilent ? loadedSkip.current : currentSkip;
+        let data: PublicDealsResponse | undefined;
+        const refreshedDeals: PublicDeal[] = [];
+        // Reconcile every loaded page: retain pagination, remove withdrawn deals,
+        // and pick up edits/new offers even when the WebSocket missed an event.
+        for (let page = currentSkip; page <= lastPage; page += pageSize) {
+          params.set('skip', String(page));
+          let res: Response | null = null;
           try {
-            res = await fetch(`${EDGE_API}/deals?${params.toString()}`, { signal: controller.signal, cache: 'no-store' });
+            res = await fetch(`${API_BASE}/api/v1/deals/public?${params.toString()}`, { signal: controller.signal, cache: 'no-store' });
           } catch {
             res = null;
           }
+          if (controller.signal.aborted) { if (timedOut) throw new Error('Request timed out'); return; }
+          if (!res || !res.ok) {
+            res = await fetch(`${EDGE_API}/deals?${params.toString()}`, { signal: controller.signal, cache: 'no-store' });
+          }
+          if (!res.ok) throw new Error(`API returned status ${res.status}`);
+          data = await res.json() as PublicDealsResponse;
+          refreshedDeals.push(...(data.deals || []));
+          if (data.has_more === false) break;
         }
-
-        if (!res || !res.ok) {
-          throw new Error(`API returned status ${res ? res.status : 'network error'}`);
-        }
-
-        const data: PublicDealsResponse = await res.json();
+        if (!data) return;
         if (controller.signal.aborted) { if (timedOut) throw new Error('Request timed out'); return; }
-        const incomingDeals: PublicDeal[] = (data.deals || []).filter(isDisplayableOffer).map((deal: PublicDeal) => {
+        const uniqueDeals = [...new Map(refreshedDeals.map(deal => [deal.id, deal])).values()];
+        const incomingDeals: PublicDeal[] = uniqueDeals.filter(isDisplayableOffer).map((deal: PublicDeal) => {
           const score = typeof deal.worth_score === 'number' ? deal.worth_score : calculateWorthScore(deal).score;
           return {
             ...publicDeal(deal),
@@ -496,7 +503,10 @@ export const App: React.FC = () => {
 
         setTotalDeals(data.total || incomingDeals.length);
         setHasMore(data.has_more ?? (data.deals || []).length === (debouncedSearch ? 80 : PAGE_SIZE));
-        setSkip(currentSkip);
+        if (!isSilent) {
+          loadedSkip.current = currentSkip;
+          setSkip(currentSkip);
+        }
       } catch (err: unknown) {
         if (feedRequest.current !== controller) return;
         if (controller.signal.aborted && !timedOut) return;
@@ -511,6 +521,7 @@ export const App: React.FC = () => {
       } finally {
         clearTimeout(requestTimeout);
         if (feedRequest.current === controller) {
+          feedRequest.current = null;
           if (!isSilent) {
             setLoading(false);
             setLoadingMore(false);
@@ -661,6 +672,11 @@ export const App: React.FC = () => {
     }
   }, [handleDealDeleted]);
 
+  // Recover missed events only after reconnecting; ordinary updates are pushed.
+  const handleLiveReconnect = useCallback(() => {
+    void fetchDeals(0, false, true);
+  }, [fetchDeals]);
+
   // DealFlow Live WebSocket Sync
   useDealFlowSync({
     onDealReceived: handleDealReceived,
@@ -668,31 +684,9 @@ export const App: React.FC = () => {
     onDealUnpublished: handleDealUnpublished,
     onDealEdited: handleDealEdited,
     onDealStatusChange: handleDealStatusChange,
+    onReconnect: handleLiveReconnect,
     enableAlerts: false,
   });
-
-  // Background focus & visibility sync (Reconcile updates automatically without manual page reload)
-  useEffect(() => {
-    const handleRevalidate = () => {
-      if (document.visibilityState === 'visible' && !searchQuery.trim()) {
-        fetchDeals(0, false, true); // silent background fetch
-      }
-    };
-    window.addEventListener('focus', handleRevalidate);
-    document.addEventListener('visibilitychange', handleRevalidate);
-
-    const heartbeat = setInterval(() => {
-      if (document.visibilityState === 'visible' && !searchQuery.trim()) {
-        fetchDeals(0, false, true);
-      }
-    }, 45000);
-
-    return () => {
-      window.removeEventListener('focus', handleRevalidate);
-      document.removeEventListener('visibilitychange', handleRevalidate);
-      clearInterval(heartbeat);
-    };
-  }, [fetchDeals, searchQuery]);
 
   // Load More Handler
   const handleLoadMore = () => {

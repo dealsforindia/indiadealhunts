@@ -103,6 +103,22 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     }
   });
 
+  const [userName, setUserName] = useState<string>(() => {
+    try {
+      return localStorage.getItem('idh_user_name') || '';
+    } catch {
+      return '';
+    }
+  });
+
+  const [userAvatar, setUserAvatar] = useState<string>(() => {
+    try {
+      return localStorage.getItem('idh_user_avatar') || '';
+    } catch {
+      return '';
+    }
+  });
+
   // Auth dialog state
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authStep, setAuthStep] = useState<'email' | 'code'>('email');
@@ -110,6 +126,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const [inputCode, setInputCode] = useState('');
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [isVerifyingCode, setIsVerifyingCode] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
 
@@ -121,6 +138,53 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     }, 1000);
     return () => clearInterval(interval);
   }, [resendCooldown]);
+
+  // Google Identity Services (GSI) Client Loader
+  useEffect(() => {
+    if (!showAuthModal) return;
+    const clientId = (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID || '101548199807788-dummy.apps.googleusercontent.com';
+
+    const initGsi = () => {
+      if ((window as any).google?.accounts?.id) {
+        try {
+          (window as any).google.accounts.id.initialize({
+            client_id: clientId,
+            callback: (res: any) => {
+              if (res?.credential) {
+                handleGoogleSuccess(res.credential);
+              }
+            },
+            auto_select: false,
+            cancel_on_tap_outside: true,
+          });
+          const container = document.getElementById('googleSignInBtnContainer');
+          if (container) {
+            container.innerHTML = '';
+            (window as any).google.accounts.id.renderButton(container, {
+              theme: 'outline',
+              size: 'large',
+              width: 320,
+              shape: 'pill',
+              text: 'continue_with',
+            });
+          }
+        } catch (e) {
+          console.warn('Google GSI init warning:', e);
+        }
+      }
+    };
+
+    if (!(window as any).google?.accounts?.id) {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = initGsi;
+      document.body.appendChild(script);
+    } else {
+      initGsi();
+    }
+  }, [showAuthModal]);
 
   // Alert preferences
   const [emailAlerts, setEmailAlerts] = useState<boolean>(() => {
@@ -273,12 +337,63 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     }
   };
 
+  const handleGoogleSuccess = async (credential: string) => {
+    setIsGoogleLoading(true);
+    setAuthError(null);
+    try {
+      const res = await fetch(`${PUBLIC_API_BASE}/api/v1/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.detail || data.message || 'Google authentication failed');
+      }
+
+      if (data.token) {
+        try {
+          localStorage.setItem('idh_auth_token', data.token);
+        } catch {}
+      }
+      const email = data.user.email;
+      const name = data.user.display_name;
+      const avatar = data.user.avatar_url;
+
+      setUserEmail(email);
+      if (name) {
+        setUserName(name);
+        try { localStorage.setItem('idh_user_name', name); } catch {}
+      }
+      if (avatar) {
+        setUserAvatar(avatar);
+        try { localStorage.setItem('idh_user_avatar', avatar); } catch {}
+      }
+      setInputScraperEmail(email);
+      try { localStorage.setItem('idh_user_email', email); } catch {}
+
+      playSuccessChime();
+      setShowAuthModal(false);
+      fetchUserAlerts(email);
+      onShowToast?.(`Signed in with Google as ${name || email}`);
+    } catch (err: any) {
+      setAuthError(err.message || 'Google authentication failed');
+      onShowToast?.(err.message || 'Google sign-in error');
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
   const handleSignOut = () => {
     playTactileClick();
     setUserEmail('');
+    setUserName('');
+    setUserAvatar('');
     setTrackedAlerts([]);
     try {
       localStorage.removeItem('idh_user_email');
+      localStorage.removeItem('idh_user_name');
+      localStorage.removeItem('idh_user_avatar');
       localStorage.removeItem('idh_auth_token');
     } catch {}
     onShowToast?.('Signed out of Deal Hunter session');
@@ -463,10 +578,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4 sm:gap-5">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-0.5 shadow-xl flex items-center justify-center shrink-0">
-              <div className="w-full h-full rounded-[14px] bg-slate-950 flex items-center justify-center text-white">
-                {userEmail ? (
-                  <span className="text-2xl font-black uppercase text-emerald-400">{userEmail.charAt(0)}</span>
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-0.5 shadow-xl flex items-center justify-center shrink-0 overflow-hidden">
+              <div className="w-full h-full rounded-[14px] bg-slate-950 flex items-center justify-center text-white overflow-hidden">
+                {userAvatar ? (
+                  <img src={userAvatar} alt="Profile" className="w-full h-full object-cover" />
+                ) : userEmail ? (
+                  <span className="text-2xl font-black uppercase text-emerald-400">
+                    {(userName || userEmail).charAt(0)}
+                  </span>
                 ) : (
                   <User size={30} className="text-emerald-400" />
                 )}
@@ -476,7 +595,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <h1 className="text-lg sm:text-2xl font-extrabold tracking-tight">
-                  {userEmail ? userEmail.split('@')[0] : 'Guest Shopper'}
+                  {userName || (userEmail ? userEmail.split('@')[0] : 'Guest Shopper')}
                 </h1>
                 {userEmail ? (
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 flex items-center gap-1">
@@ -491,7 +610,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               <p className="text-slate-300 text-xs sm:text-sm max-w-lg leading-relaxed">
                 {userEmail
                   ? `Signed in as ${userEmail} · 24/7 personal price drop radar active.`
-                  : 'Sign in with your email to track custom products, receive instant price drop alerts, and sync saved deals.'}
+                  : 'Sign in with Google or Email to track custom products, receive instant price drop alerts, and sync saved deals.'}
               </p>
             </div>
           </div>
@@ -514,7 +633,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 }}
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-xs sm:text-sm shadow-lg transition-transform active:scale-95 flex items-center gap-2 cursor-pointer"
               >
-                <LogIn size={15} /> Sign In with Email
+                <LogIn size={15} /> Sign In / Join
               </button>
             )}
           </div>
@@ -1054,57 +1173,92 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               )}
 
               {authStep === 'email' ? (
-                <form onSubmit={handleRequestCode} className="space-y-4">
+                <div className="space-y-4">
+                  {/* Google One-Click Auth */}
                   <div>
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
-                      Your Email Address
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      autoFocus
-                      value={inputEmail}
-                      onChange={(e) => {
-                        setInputEmail(e.target.value);
-                        if (authError) setAuthError(null);
+                    <div id="googleSignInBtnContainer" className="flex justify-center w-full min-h-[44px]" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if ((window as any).google?.accounts?.id) {
+                          (window as any).google.accounts.id.prompt();
+                        } else {
+                          onShowToast?.("Connecting to Google identity services...");
+                        }
                       }}
-                      placeholder="e.g. yourname@gmail.com"
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
-                    {suggestEmailDomain(inputEmail) && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const suggested = suggestEmailDomain(inputEmail);
-                          if (suggested) {
-                            setInputEmail(suggested);
-                            setAuthError(null);
-                          }
-                        }}
-                        className="mt-2 text-xs text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer font-medium"
-                      >
-                        <span>💡 Did you mean <strong>{suggestEmailDomain(inputEmail)}</strong>?</span>
-                        <span className="font-bold underline ml-1">Use this</span>
-                      </button>
-                    )}
+                      disabled={isGoogleLoading}
+                      className="w-full mt-2 py-3 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-white/15 text-slate-800 dark:text-slate-100 font-semibold text-xs sm:text-sm shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors flex items-center justify-center gap-3 cursor-pointer disabled:opacity-50"
+                    >
+                      <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                      </svg>
+                      <span>{isGoogleLoading ? "Connecting to Google..." : "Continue with Google"}</span>
+                    </button>
+
+                    <div className="flex items-center my-4">
+                      <div className="flex-1 border-t border-slate-200 dark:border-white/10" />
+                      <span className="px-3 text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                        or sign in with email
+                      </span>
+                      <div className="flex-1 border-t border-slate-200 dark:border-white/10" />
+                    </div>
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={isSendingCode}
-                    className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-sm shadow hover:from-emerald-400 hover:to-teal-400 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                  >
-                    {isSendingCode ? (
-                      <>
-                        <RefreshCw size={16} className="animate-spin" /> Sending Verification Code...
-                      </>
-                    ) : (
-                      <>
-                        <Mail size={16} /> Send 6-Digit Code
-                      </>
-                    )}
-                  </button>
-                </form>
+                  <form onSubmit={handleRequestCode} className="space-y-4">
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                        Your Email Address
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        autoFocus
+                        value={inputEmail}
+                        onChange={(e) => {
+                          setInputEmail(e.target.value);
+                          if (authError) setAuthError(null);
+                        }}
+                        placeholder="e.g. yourname@gmail.com"
+                        className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                      {suggestEmailDomain(inputEmail) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const suggested = suggestEmailDomain(inputEmail);
+                            if (suggested) {
+                              setInputEmail(suggested);
+                              setAuthError(null);
+                            }
+                          }}
+                          className="mt-2 text-xs text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer font-medium"
+                        >
+                          <span>💡 Did you mean <strong>{suggestEmailDomain(inputEmail)}</strong>?</span>
+                          <span className="font-bold underline ml-1">Use this</span>
+                        </button>
+                      )}
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSendingCode}
+                      className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-sm shadow hover:from-emerald-400 hover:to-teal-400 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      {isSendingCode ? (
+                        <>
+                          <RefreshCw size={16} className="animate-spin" /> Sending Verification Code...
+                        </>
+                      ) : (
+                        <>
+                          <Mail size={16} /> Send 6-Digit Code
+                        </>
+                      )}
+                    </button>
+                  </form>
+                </div>
               ) : (
                 <form onSubmit={handleVerifyCode} className="space-y-4">
                   <div>
