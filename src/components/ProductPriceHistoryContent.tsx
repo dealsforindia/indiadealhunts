@@ -74,7 +74,7 @@ export default function ProductPriceHistoryContent({ url, dealId, currentPrice }
   const tick = (time: number) => span < 86400000 ? new Date(time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : dateLabel(time, true);
   const padding = low !== null && high !== null ? Math.max((high - low) * .15, high * .03, 1) : 1;
   return (
-    <section className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/50 p-4 sm:p-5 min-w-0" aria-label="Product price history">
+    <section className="proper-price-history premium-history mt-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/50 p-4 sm:p-5 min-w-0" aria-label="Product price history">
       <header className="flex items-start justify-between gap-3">
         <div><h3 className="flex items-center gap-2 text-base font-bold text-slate-900 dark:text-white"><History size={18} className="text-sky-500" />Price history & trend</h3><p className="mt-1 text-xs text-slate-600 dark:text-slate-300">{source}</p></div>
         <button type="button" onClick={() => setAttempt(a => a + 1)} disabled={loading} aria-label="Reload price history" className="h-11 w-11 shrink-0 rounded-xl border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-600 dark:text-slate-200 disabled:opacity-50"><RefreshCw size={16} className={loading ? 'animate-spin' : ''} /></button>
@@ -87,12 +87,12 @@ export default function ProductPriceHistoryContent({ url, dealId, currentPrice }
         {visible.length > 1 ? <div className="h-64 w-full min-w-0" role="img" aria-label={`Price chart: ${visible.length} observations, low ${rupees(low)}, high ${rupees(high)}`}>
           <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             <AreaChart data={data} margin={{ top: 12, right: 6, left: 0, bottom: 8 }} accessibilityLayer>
-              <defs><linearGradient id={`history-${id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#38bdf8" stopOpacity={.25}/><stop offset="100%" stopColor="#38bdf8" stopOpacity={0}/></linearGradient></defs>
+              <defs><linearGradient id={`history-${id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#a78bfa" stopOpacity={.25}/><stop offset="100%" stopColor="#a78bfa" stopOpacity={0}/></linearGradient></defs>
               <CartesianGrid vertical={false} stroke="currentColor" className="text-slate-200 dark:text-slate-700" strokeDasharray="3 5" />
               <XAxis dataKey="time" type="number" domain={['dataMin', 'dataMax']} tickFormatter={tick} tick={{ fill: '#94a3b8', fontSize: 11 }} tickLine={false} axisLine={false} minTickGap={35} />
               <YAxis domain={[Math.max(0, (low || 0) - padding), (high || 0) + padding]} tickFormatter={value => `₹${Number(value).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`} width={66} tick={{ fill: '#94a3b8', fontSize: 11 }} tickLine={false} axisLine={false} />
-              <Tooltip labelFormatter={label => `${dateLabel(Number(label))} · ${new Date(Number(label)).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`} formatter={value => [rupees(Number(value)), 'Recorded price']} contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 12, color: '#f8fafc', fontSize: 12 }} itemStyle={{ color: '#7dd3fc' }} cursor={{ stroke: '#38bdf8', strokeDasharray: '4 4' }} />
-              <Area type="stepAfter" dataKey="price" stroke="#38bdf8" strokeWidth={2.5} fill={`url(#history-${id})`} dot={false} activeDot={{ r: 5, strokeWidth: 2, fill: '#0f172a' }} isAnimationActive={false} />
+              <Tooltip labelFormatter={label => `${dateLabel(Number(label))} · ${new Date(Number(label)).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`} formatter={value => [rupees(Number(value)), 'Recorded price']} contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 12, color: '#f8fafc', fontSize: 12 }} itemStyle={{ color: '#ddd6fe' }} cursor={{ stroke: '#a78bfa', strokeDasharray: '4 4' }} />
+              <Area type="stepAfter" dataKey="price" stroke="#a78bfa" strokeWidth={2.5} fill={`url(#history-${id})`} dot={false} activeDot={{ r: 5, strokeWidth: 2, fill: '#0f172a' }} isAnimationActive={false} />
             </AreaChart>
           </ResponsiveContainer>
         </div> : <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 p-5 text-sm text-slate-600 dark:text-slate-300 mt-4" role="status">{visible.length === 1 ? `One recorded price on ${dateLabel(visible[0][0])}. More observations are needed to show a trend.` : points.length ? `No recorded prices in the last ${days} days. Select All to see available observations.` : message || 'No recorded price history is available for this product.'}</div>}
