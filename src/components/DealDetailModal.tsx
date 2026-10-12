@@ -84,6 +84,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
 
   const [visible, setVisible] = useState(false);
   const [saved, setSaved] = useState(() => (deal ? isDealSaved(deal.id) : false));
+  const [survivalData, setSurvivalData] = useState<any>(null);
 
   const arbitrage = useMemo(() => (deal ? analyzeArbitrage(deal) : null), [deal]);
 
@@ -97,8 +98,19 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
       setSaved(isDealSaved(deal.id));
       // Small delay for entrance animation
       requestAnimationFrame(() => setVisible(true));
+
+      // Fetch live Weibull survival analysis for deal
+      const controller = new AbortController();
+      fetch(`https://api.rudranil.me/api/v1/deals/${deal.id}/survival`, { signal: controller.signal })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data && data.survival) setSurvivalData(data.survival);
+        })
+        .catch(() => {});
+      return () => controller.abort();
     } else {
       setVisible(false);
+      setSurvivalData(null);
     }
   }, [deal]);
 
@@ -575,6 +587,46 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                 </span>
               )}
             </div>
+
+            {/* Weibull Survival Analysis & Flash Loot Urgency Indicator */}
+            {survivalData && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                backgroundColor: survivalData.urgency_score >= 80 ? 'rgba(239, 68, 68, 0.08)' : 'rgba(16, 185, 129, 0.08)',
+                border: `1px solid ${survivalData.urgency_score >= 80 ? 'rgba(239, 68, 68, 0.25)' : 'rgba(16, 185, 129, 0.25)'}`,
+                transition: 'all 200ms ease',
+              }}>
+                <span style={{ fontSize: '16px' }}>{survivalData.urgency_score >= 80 ? '⚡' : '⏱️'}</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '6px' }}>
+                    <span style={{
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      fontFamily: 'var(--font-heading)',
+                      color: survivalData.urgency_score >= 80 ? '#DC2626' : '#059669',
+                      letterSpacing: '0.02em',
+                    }}>
+                      {survivalData.urgency_badge}
+                    </span>
+                    <span style={{
+                      fontSize: '10px',
+                      color: 'var(--text-secondary)',
+                      fontFamily: 'var(--font-mono)',
+                      fontWeight: 600,
+                    }}>
+                      Est. Half-Life: {survivalData.half_life_minutes} mins
+                    </span>
+                  </div>
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)', lineHeight: 1.3 }}>
+                    Stock Expectancy: <strong style={{ color: 'var(--text-primary)' }}>{survivalData.estimated_remaining_text}</strong>
+                  </span>
+                </div>
+              </div>
+            )}
 
             {/* Key Features & Highlights */}
             {deal.highlights && deal.highlights.length > 0 && (
