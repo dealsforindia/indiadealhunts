@@ -801,6 +801,157 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               </div>
             )}
 
+            {/* Step-by-Step Trick Offer Checklist */}
+            {deal.trick_steps && deal.trick_steps.length > 0 && (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+                padding: '14px',
+                borderRadius: '14px',
+                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(217, 119, 6, 0.04))',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '18px' }}>🎯</span>
+                    <span style={{ fontFamily: 'var(--font-heading)', fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)' }}>
+                      How to Avail This Trick ({deal.trick_steps.length} Steps)
+                    </span>
+                  </div>
+                  <span style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    color: '#D97706',
+                    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                  }}>
+                    Loot Trick
+                  </span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {deal.trick_steps.map((step, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '10px',
+                        padding: '8px 10px',
+                        borderRadius: '8px',
+                        backgroundColor: 'var(--surface-1)',
+                        border: '1px solid var(--border-subtle)',
+                        fontSize: '12px',
+                        lineHeight: 1.5,
+                        color: 'var(--text-primary)',
+                      }}
+                    >
+                      <span style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '50%',
+                        backgroundColor: '#F59E0B',
+                        color: '#FFFFFF',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        flexShrink: 0,
+                      }}>
+                        {idx + 1}
+                      </span>
+                      <span>{step}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Guaranteed Cash Buyback Arbitrage Flip Guide */}
+            {deal.is_arbitrage && deal.arbitrage && (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                padding: '16px',
+                borderRadius: '14px',
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.04))',
+                border: '1px solid rgba(16, 185, 129, 0.35)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '20px' }}>💰</span>
+                    <div>
+                      <div style={{ fontFamily: 'var(--font-heading)', fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)' }}>
+                        Guaranteed Cash Arbitrage Opportunity
+                      </div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                        Instant Buyback on {deal.arbitrage.buyback_platform || 'Cashify / CeX India'}
+                      </div>
+                    </div>
+                  </div>
+                  <span style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    color: '#059669',
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    padding: '3px 8px',
+                    borderRadius: '6px',
+                  }}>
+                    +{deal.arbitrage.roi_pct}% ROI
+                  </span>
+                </div>
+
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '8px',
+                  padding: '10px',
+                  borderRadius: '10px',
+                  backgroundColor: 'var(--surface-1)',
+                  border: '1px solid var(--border-subtle)',
+                  textAlign: 'center',
+                }}>
+                  <div>
+                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Buy Price</div>
+                    <div style={{ fontFamily: 'var(--font-heading)', fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>
+                      ₹{Number(deal.arbitrage.sale_price || price).toLocaleString('en-IN')}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Buyback Quote</div>
+                    <div style={{ fontFamily: 'var(--font-heading)', fontSize: '14px', fontWeight: 800, color: '#059669' }}>
+                      ₹{Number(deal.arbitrage.buyback_price || 0).toLocaleString('en-IN')}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Net Cash Profit</div>
+                    <div style={{ fontFamily: 'var(--font-heading)', fontSize: '14px', fontWeight: 800, color: '#10B981' }}>
+                      +₹{Number(deal.arbitrage.net_profit || 0).toLocaleString('en-IN')}
+                    </div>
+                  </div>
+                </div>
+
+                {deal.arbitrage.flip_guide && (
+                  <div style={{
+                    fontSize: '11.5px',
+                    lineHeight: 1.5,
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                    color: 'var(--text-primary)',
+                    border: '1px dashed rgba(16, 185, 129, 0.3)',
+                  }}>
+                    ⚡ <strong>Flip Strategy:</strong> {deal.arbitrage.flip_guide}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Verified Multi-Store Price History & Trends Graph */}
             <ProductPriceHistory url={deal.url} dealId={deal.fp_hash || deal.id} currentPrice={price} mrp={mrp} />
             <ProductReviews url={deal.url} id={deal.id} />

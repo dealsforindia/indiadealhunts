@@ -62,11 +62,11 @@ export interface PublicDeal {
   is_multi_deal?: boolean;
   multi_deal_count?: number;
   multi_items?: MultiDealItem[];
-  arbitrage?: {
-    winnerStore: string;
-    savingsVsOthers: number;
-    stores: Array<{ store: string; price: number; inStock: boolean; url?: string }>;
-  } | null;
+  is_arbitrage?: boolean;
+  trick_steps?: string[];
+  deal_subtype?: string;
+  velocity_prediction?: any;
+  arbitrage?: any;
   sellout_prediction?: {
     predicted_remaining_hours: number;
     survival_probability: number;

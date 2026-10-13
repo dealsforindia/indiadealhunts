@@ -80,6 +80,32 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
       <button type="button" className={`commerce-card-save${saved ? ' is-saved' : ''}`} aria-label={`${saved ? 'Unsave' : 'Save'} ${title}`} aria-pressed={saved} onClick={save}><Bookmark className="desktop-save-icon" size={18} fill={saved ? 'currentColor' : 'none'} /><Heart className="mobile-save-icon" size={20} fill={saved ? 'currentColor' : 'none'} /></button>
       {expired ? (
         <span className="commerce-discount">Ended</span>
+      ) : deal.is_arbitrage && deal.arbitrage?.net_profit ? (
+        <span
+          className="commerce-discount"
+          style={{
+            background: 'linear-gradient(135deg, #059669, #10b981)',
+            color: '#ffffff',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            fontWeight: 700,
+            boxShadow: '0 2px 8px rgba(16, 185, 129, 0.35)',
+          }}
+        >
+          💰 ₹{Number(deal.arbitrage.net_profit).toLocaleString('en-IN')} Flip Profit
+        </span>
+      ) : deal.trick_steps && deal.trick_steps.length > 0 ? (
+        <span
+          className="commerce-discount"
+          style={{
+            background: 'linear-gradient(135deg, #d97706, #f59e0b)',
+            color: '#ffffff',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            fontWeight: 700,
+            boxShadow: '0 2px 8px rgba(245, 158, 11, 0.35)',
+          }}
+        >
+          🎯 Trick ({deal.trick_steps.length} Steps)
+        </span>
       ) : isMulti ? (
         <span
           className="commerce-discount"
@@ -95,11 +121,11 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
         </span>
       ) : discount != null && discount > 0 ? (
         <span className="commerce-discount">{discount}% below MRP</span>
-      ) : deal.sellout_prediction?.urgency_label && (
+      ) : (deal.sellout_prediction?.urgency_label || deal.velocity_prediction?.urgency_label) ? (
         <span className="commerce-discount is-urgent" title="Estimated by the deal model, not merchant-confirmed stock">
-          Estimate: {deal.sellout_prediction.urgency_label}
+          {deal.velocity_prediction?.urgency_label || deal.sellout_prediction?.urgency_label}
         </span>
-      )}
+      ) : null}
     </div>
     <div className="commerce-card-body">
       <button type="button" className="commerce-card-title" onClick={details}>{title}</button>
@@ -108,7 +134,18 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
         <span>{effectiveRating != null ? <>{effectiveRating.toFixed(1)}{effectiveRatingCount != null ? ` (${effectiveRatingCount.toLocaleString('en-IN')})` : ' / 5'}</> : reviewEvidence?.reviews.length ? `${reviewEvidence.reviews.length} review excerpts` : (reviewLoad?.status === 'loading' || reviewLoad?.status === 'queued') ? 'Checking reviews…' : 'Verified Deal'}</span>
       </button>
       <div className="commerce-card-price"><strong>{price > 0 ? money(price) : (isMulti ? 'Multiple prices' : 'Check price')}</strong>{mrp && <s>{money(mrp)}</s>}</div>
-      <p className="commerce-card-note">{expired ? 'This offer has ended' : (isMulti ? `${deal.multi_items?.length} items with direct links` : 'Confirm price at checkout')}</p>
+      {deal.is_arbitrage && deal.arbitrage?.buyback_platform ? (
+        <div className="mt-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+          <span>🔁 Flip on {deal.arbitrage.buyback_platform}</span>
+          <span className="opacity-70">• {deal.arbitrage.roi_pct}% ROI</span>
+        </div>
+      ) : deal.trick_steps && deal.trick_steps.length > 0 ? (
+        <div className="mt-0.5 flex items-center gap-1.5 text-[11px] font-medium text-amber-600 dark:text-amber-400">
+          <span className="truncate">🎯 {deal.trick_steps[0]}</span>
+        </div>
+      ) : (
+        <p className="commerce-card-note">{expired ? 'This offer has ended' : (isMulti ? `${deal.multi_items?.length} items with direct links` : 'Confirm price at checkout')}</p>
+      )}
       <div className="commerce-card-actions">
         {isMulti ? (
           <button
