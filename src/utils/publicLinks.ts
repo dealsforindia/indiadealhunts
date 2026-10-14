@@ -41,7 +41,8 @@ export function isAssetUrl(url: string): boolean {
 
 export function sanitizeStoreUrl(value: string, title?: string, store?: string): string {
   if (!value) return '';
-  if (isAssetUrl(value)) {
+  const low = value.toLowerCase();
+  if (isAssetUrl(value) || low.includes('ambhedeal.in.net')) {
     if (store?.toLowerCase().includes('amazon')) {
       return `https://www.amazon.in/s?k=${encodeURIComponent(title || 'deals')}&tag=rudranil0a-21`;
     }
