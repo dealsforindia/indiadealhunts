@@ -9,10 +9,11 @@ export function CheckoutPlanner({ offer }: { offer: IntelligenceOffer }) {
   const [delivery, setDelivery] = useState('');
   const [discount, setDiscount] = useState('');
   const [cashback, setCashback] = useState('');
+  const [eligibilityConfirmed, setEligibilityConfirmed] = useState(false);
   const id = useId();
   const result = calculateCheckout(offer.price, {
     delivery: checkoutAmount(delivery), instantDiscount: checkoutAmount(discount) ?? 0,
-    cashback: checkoutAmount(cashback) ?? 0, eligibilityConfirmed: true,
+    cashback: checkoutAmount(cashback) ?? 0, eligibilityConfirmed,
   });
   const missingPrice = offer.price == null || !Number.isFinite(offer.price) || offer.price <= 0;
   return <details className="mine-checkout">
@@ -25,11 +26,14 @@ export function CheckoutPlanner({ offer }: { offer: IntelligenceOffer }) {
         <label htmlFor={`${id}-delivery`}>Delivery fee (₹)<input id={`${id}-delivery`} inputMode="decimal" value={delivery} onChange={e => setDelivery(e.target.value)} placeholder="0 if free delivery" /></label>
         <label htmlFor={`${id}-cashback`}>Cashback / rewards (₹)<input id={`${id}-cashback`} inputMode="decimal" value={cashback} onChange={e => setCashback(e.target.value)} placeholder="e.g. 200 Amazon Pay" /></label>
       </div>
+      <label htmlFor={`${id}-eligibility`}><input id={`${id}-eligibility`} type="checkbox" checked={eligibilityConfirmed} onChange={e => setEligibilityConfirmed(e.target.checked)} /> I confirmed I qualify for these discounts and cashback at the store.</label>
       <div className="mine-checkout-total" aria-live="polite">
         {!result ? <p>{missingPrice ? 'Confirm listed price at store to calculate checkout.' : 'Enter valid positive numbers.'}</p> : <>
-          <div><span>Pay at checkout</span><strong>{money(result.payNow ?? result.subtotal)}</strong></div>
-          {result.discount > 0 && <p className="text-emerald-500 font-medium">✨ You save {money(result.discount)} instantly at payment.</p>}
-          {result.cashback > 0 && <p>{money(result.cashback)} post-purchase cashback (Effective cost: <strong>{money(result.afterCashback ?? result.subtotal)}</strong>)</p>}
+          <div><span>{result.payNow === null ? 'Subtotal before delivery' : 'Estimated pay at checkout'}</span><strong>{money(result.payNow ?? result.subtotal)}</strong></div>
+          {result.payNow === null && <p>Enter the delivery fee (0 if confirmed free) to estimate the checkout total.</p>}
+          {!eligibilityConfirmed && (Number(discount) > 0 || Number(cashback) > 0) && <p>Discounts and cashback are excluded until you confirm eligibility.</p>}
+          {result.discount > 0 && <p className="text-emerald-500 font-medium">Estimated instant discount: {money(result.discount)}.</p>}
+          {result.cashback > 0 && <p>{money(result.cashback)} possible post-purchase cashback{result.afterCashback !== null && <> (Estimated effective cost: <strong>{money(result.afterCashback)}</strong>)</>}</p>}
         </>}
       </div>
     </div>
