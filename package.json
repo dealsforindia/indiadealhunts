@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "test": "node --test tests/*.test.mjs",
     "test:intelligence": "node --test tests/shopping-intelligence.test.mjs tests/checkout.test.mjs",
     "test:ui": "node --test tests/modal-hooks.test.mjs",
     "test:storefront": "node --test tests/public-storefront.test.mjs tests/price-evidence.test.mjs",

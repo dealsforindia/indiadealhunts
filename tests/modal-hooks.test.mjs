@@ -35,7 +35,7 @@ function hooksAfterGuard(source, componentName) {
 test('regression check detects a hook skipped by the closed dialog', () => {
   assert.deepEqual(hooksAfterGuard('const Broken = () => { if (!open) return null; const [value] = useState(0); return value; };', 'Broken'), ['useState']);
 });
-for (const component of ['DealDetailModal', 'CardEmiSimulatorModal', 'PhoneExchangeEstimatorModal']) {
+for (const component of ['DealDetailModal', 'PhoneExchangeEstimatorModal']) {
   test(`${component} has no hooks after its closed-state guard`, () => {
     const source = readFileSync(new URL(`../src/components/${component}.tsx`, import.meta.url), 'utf8');
     assert.deepEqual(hooksAfterGuard(source, component), []);

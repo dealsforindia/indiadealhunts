@@ -13,7 +13,7 @@ test('merchant affiliate destinations remain intact; private redirects stay on t
   assert.equal(publicStoreUrl('https://api.rudranil.me/r/deal_1?subid=hero'), '/out/deal_1?subid=hero');
   assert.equal(lookupTargetUrl('/out/deal_1'), 'https://api.rudranil.me/r/deal_1');
   for (const value of ['javascript:alert(1)', '#', '', 'not a URL', '/out/deal_1/unexpected', 'https://api.rudranil.me/admin']) assert.equal(publicStoreUrl(value), '');
-  assert.equal(publicShareUrl('/out/deal_1'), 'https://indiadealhunts.vercel.app/out/deal_1');
+  assert.equal(publicShareUrl('/out/deal_1'), 'https://www.indiadealhunts.me/out/deal_1');
 });
 
 test('nested haul and comparison links receive the same public normalization', () => {

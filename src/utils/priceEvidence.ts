@@ -11,11 +11,21 @@ export function priceFreshness(data: { price_verified?: boolean; price_source?: 
 export function normalizeLookup(data: Record<string, any>): Record<string, any> {
   const evidence = priceFreshness(data);
   const number = Number(data.price);
-  const price = Number.isFinite(number) && number > 0 ? number : null;
-  const isAvailable = Boolean(price && (evidence.current || data.price_verified));
-  return { ...data, reported_price: price, price: price,
-    pendingLivePrice: !isAvailable, price_evidence_label: evidence.label,
-    price_verified: isAvailable, last_checked_at: evidence.checked ?? undefined,
-    // Discounts must share the same observation as the price.
-    mrp: data.mrp, discount_pct: data.discount_pct };
+  const rawPrice = Number.isFinite(number) && number > 0 ? number : null;
+  const isAvailable = Boolean(rawPrice && (evidence.current || data.price_verified === true));
+  const verifiedPrice = isAvailable ? rawPrice : null;
+  const verifiedMrp = isAvailable ? data.mrp : null;
+  const verifiedDiscount = isAvailable ? data.discount_pct : null;
+
+  return {
+    ...data,
+    reported_price: rawPrice,
+    price: verifiedPrice,
+    pendingLivePrice: !isAvailable,
+    price_evidence_label: evidence.label,
+    price_verified: isAvailable,
+    last_checked_at: evidence.checked ?? undefined,
+    mrp: verifiedMrp,
+    discount_pct: verifiedDiscount,
+  };
 }
