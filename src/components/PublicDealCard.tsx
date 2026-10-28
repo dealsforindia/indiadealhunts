@@ -45,7 +45,17 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
   const mrp = rawMrp && rawMrp > price && price > 0 ? rawMrp : null;
   const discount = deal.discount_pct ?? (mrp ? Math.round((mrp - price) / mrp * 100) : null);
   const expired = Boolean(deal.is_expired || deal.is_over || deal.status === 'expired');
-  const isMulti = Boolean(deal.is_multi_deal && deal.multi_items && deal.multi_items.length >= 2);
+  const validMultiItems = useMemo(() => {
+    if (!deal.multi_items || deal.multi_items.length === 0) return [];
+    return deal.multi_items.filter(item => {
+      const u = (item.url || '').toLowerCase();
+      const l = (item.label || '').trim();
+      if (/preview\?token|ambhedeal|static-assets|\.(png|jpg|jpeg|webp|gif)($|\?)/.test(u)) return false;
+      if (l === '[' || l === ']' || l === '[](' || !l) return false;
+      return true;
+    });
+  }, [deal.multi_items]);
+  const isMulti = Boolean(deal.is_multi_deal && validMultiItems.length >= 2);
   // This upstream soundbar photo is a phone advertisement, so show an honest fallback.
   const photo = deal.image?.includes('amz_B0H4VQX4CC.jpg') ? null : getCleanImageUrl(deal.image);
   const asin = /amazon/i.test(store) ? extractAmazonAsin(deal.url || deal.id) : null;
@@ -117,7 +127,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
             boxShadow: '0 2px 8px rgba(79, 70, 229, 0.35)',
           }}
         >
-          📦 Multiple Deals ({deal.multi_items?.length} Items)
+          📦 Multiple Deals ({validMultiItems.length} Items)
         </span>
       ) : discount != null && discount > 0 ? (
         <span className="commerce-discount">{discount}% below MRP</span>
@@ -204,20 +214,20 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
       <div className="commerce-sheet-handle" aria-hidden="true" />
       <header>
         <div>
-          <small style={{ color: '#6366f1', fontWeight: 700, letterSpacing: '0.05em' }}>📦 MULTIPLE DEALS AVAILABLE ({deal.multi_items?.length} OPTIONS)</small>
+          <small style={{ color: '#6366f1', fontWeight: 700, letterSpacing: '0.05em' }}>📦 MULTIPLE DEALS AVAILABLE ({validMultiItems.length} OPTIONS)</small>
           <h2>{title}</h2>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '4px 0 0' }}>Select any item or variant below to purchase directly with discount:</p>
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '4px 0 0' }}>Choose an item to view at the store. Confirm its price and offer before buying.</p>
         </div>
         <button type="button" aria-label="Close options" onClick={() => setMultiSheetOpen(false)}><X size={22} /></button>
       </header>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '16px 0' }}>
-        {deal.multi_items?.map((item, idx) => (
+        {validMultiItems.map((item, idx) => (
           <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '12px 14px', borderRadius: '12px', backgroundColor: 'var(--surface-2, #f8fafc)', border: '1px solid var(--border-subtle, #e2e8f0)', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontWeight: 650, fontSize: '14px', color: 'var(--text-primary, #0f172a)' }}>{item.label}</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '3px' }}>
                 {item.price ? <span style={{ fontWeight: 700, color: 'var(--color-primary, #0066cc)', fontSize: '13px' }}>₹{item.price.toLocaleString('en-IN')}</span> : null}
-                {item.discount ? <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px', backgroundColor: '#dcfce7', color: '#15803d' }}>Flat {item.discount}% OFF</span> : null}
+                {item.discount ? <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px', backgroundColor: '#dcfce7', color: '#15803d' }}>Listed {item.discount}% off</span> : null}
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -242,7 +252,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
                   openSmartStoreLink(item.url, store, undefined, false, subId);
                 }}
               >
-                <span>🛍️ Buy {item.label.split(' ')[0]} ↗</span>
+                <span>View at store ↗</span>
               </button>
               <button
                 type="button"

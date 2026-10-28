@@ -158,6 +158,32 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   const isFashion = catLower.includes('fashion') || /\b(shoes|sneakers|shirt|t-shirt|jeans|dress|saree|kurta|trousers|sandals|handbag|jacket)\b/i.test(titleLower);
   const isGroceryBeauty = catLower.includes('grocery') || catLower.includes('beauty') || /\b(face wash|cream|shampoo|soap|atta|oil|tea|coffee|biscuit|dry fruits)\b/i.test(titleLower);
 
+  // Filter and sanitize multi_items to ensure only real, valid product purchase links with clean labels
+  const validMultiItems = (deal.multi_items || [])
+    .map((item, idx) => {
+      let label = (item.label || '').trim();
+      label = label.replace(/[\[\]\(\)\*\_~`]/g, '').trim();
+      label = label.replace(/^[:\-–—\s]+|[:\-–—\s]+$/g, '').trim();
+
+      const rawUrl = (item.url || '').trim();
+      const url = rawUrl.replace(/\)\*\*.*$/, '').replace(/[\)\*\_~`]+$/, '').trim();
+      const isPreviewOrAsset = /preview\?token|ambhedeal|static-assets|\.(png|jpg|jpeg|webp|gif)($|\?)/i.test(url);
+
+      if (!label || /^Option\s*\d+$/i.test(label) || label === '[' || label === ']') {
+        label = `Option ${idx + 1}`;
+      }
+
+      return {
+        ...item,
+        label,
+        url,
+        isPreviewOrAsset,
+      };
+    })
+    .filter(item => Boolean(item.url) && !item.isPreviewOrAsset && item.label !== '[' && item.label !== ']');
+
+  const hasValidMultiDeals = Boolean(deal.is_multi_deal && validMultiItems.length >= 2);
+
   const handleCopyCoupon = () => {
     if (coupon?.kind !== 'code') return;
     if (!navigator.clipboard?.writeText) { onShowToast?.('Clipboard unavailable. Select and copy the code.'); return; }
@@ -472,9 +498,9 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                 <span>Direct merchant drop</span>
               </div>
               {discount > 0 && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#D97706', fontWeight: 650 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent-amber, #D97706)', fontWeight: 650 }}>
                   <span>🔥</span>
-                  <span>{discount}% price drop</span>
+                  <span>{discount}% off MRP</span>
                 </div>
               )}
             </div>
@@ -722,21 +748,21 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             )}
 
             {/* Universal Multi-Deal Options Deck */}
-            {deal.is_multi_deal && deal.multi_items && deal.multi_items.length >= 2 && (
+            {hasValidMultiDeals && (
               <div style={{
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '10px',
                 padding: '16px',
                 borderRadius: '14px',
-                backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                backgroundColor: 'rgba(99, 102, 241, 0.08)',
                 border: '1px solid rgba(99, 102, 241, 0.25)',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: '13px', fontWeight: 800, color: '#4338ca' }}>
-                    📦 MULTIPLE DEALS INSIDE ({deal.multi_items.length} ITEMS)
+                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: '13px', fontWeight: 800, color: 'var(--accent-blue, #3b82f6)' }}>
+                    📦 MULTIPLE DEALS INSIDE ({validMultiItems.length} ITEMS)
                   </span>
-                  <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '999px', backgroundColor: '#e0e7ff', color: '#4338ca' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '999px', backgroundColor: 'rgba(59, 130, 246, 0.15)', color: 'var(--accent-blue, #3b82f6)' }}>
                     Direct Links
                   </span>
                 </div>
@@ -744,59 +770,63 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   This curated drop includes multiple direct purchase options. Pick any item below to shop with verified discounts:
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
-                  {deal.multi_items.map((item, idx) => (
-                    <div
-                      key={idx}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: '10px',
-                        padding: '10px 12px',
-                        borderRadius: '10px',
-                        backgroundColor: 'var(--surface-primary, #ffffff)',
-                        border: '1px solid var(--border-subtle, #e2e8f0)',
-                      }}
-                    >
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 650, fontSize: '13.5px', color: 'var(--text-primary)' }}>
-                          {item.label}
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
-                          {item.price ? (
-                            <span style={{ fontWeight: 700, color: '#0066cc', fontSize: '12.5px' }}>
-                              ₹{item.price.toLocaleString('en-IN')}
-                            </span>
-                          ) : null}
-                          {item.discount ? (
-                            <span style={{ fontSize: '10.5px', fontWeight: 700, padding: '1px 5px', borderRadius: '4px', backgroundColor: '#dcfce7', color: '#15803d' }}>
-                              Flat {item.discount}% OFF
-                            </span>
-                          ) : null}
-                        </div>
-                      </div>
-                      <button
-                        type="button"
+                  {validMultiItems.map((item, idx) => {
+                    const firstWord = item.label.split(' ')[0];
+                    const buttonLabel = /^Option/i.test(firstWord) || !firstWord ? 'Buy Option' : `Buy ${firstWord}`;
+                    return (
+                      <div
+                        key={idx}
                         style={{
-                          display: 'inline-flex',
+                          display: 'flex',
                           alignItems: 'center',
-                          gap: '4px',
-                          padding: '7px 12px',
-                          borderRadius: '7px',
-                          background: 'linear-gradient(135deg, #0066cc, #2563eb)',
-                          color: '#ffffff',
-                          border: 'none',
-                          fontSize: '12.5px',
-                          fontWeight: 650,
-                          cursor: 'pointer',
-                          whiteSpace: 'nowrap',
+                          justifyContent: 'space-between',
+                          gap: '10px',
+                          padding: '10px 12px',
+                          borderRadius: '10px',
+                          backgroundColor: 'var(--bg-surface-elevated, var(--bg-surface, #ffffff))',
+                          border: '1px solid var(--border-subtle)',
                         }}
-                        onClick={() => openSmartStoreLink(item.url, deal.store || 'Store', undefined, false, subId)}
                       >
-                        <span>🛍️ Buy {item.label.split(' ')[0]} ↗</span>
-                      </button>
-                    </div>
-                  ))}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: 650, fontSize: '13.5px', color: 'var(--text-primary)' }}>
+                            {item.label}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                            {item.price ? (
+                              <span style={{ fontWeight: 700, color: 'var(--accent-blue, #3b82f6)', fontSize: '12.5px' }}>
+                                ₹{item.price.toLocaleString('en-IN')}
+                              </span>
+                            ) : null}
+                            {item.discount ? (
+                              <span style={{ fontSize: '10.5px', fontWeight: 700, padding: '1px 5px', borderRadius: '4px', backgroundColor: 'rgba(16, 185, 129, 0.12)', color: 'var(--accent-emerald, #10b981)' }}>
+                                Flat {item.discount}% OFF
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            padding: '7px 12px',
+                            borderRadius: '7px',
+                            background: 'linear-gradient(135deg, #0066cc, #2563eb)',
+                            color: '#ffffff',
+                            border: 'none',
+                            fontSize: '12.5px',
+                            fontWeight: 650,
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap',
+                          }}
+                          onClick={() => openSmartStoreLink(item.url, deal.store || 'Store', undefined, false, subId)}
+                        >
+                          <span>🛍️ {buttonLabel} ↗</span>
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
