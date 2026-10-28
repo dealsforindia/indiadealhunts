@@ -771,8 +771,10 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
                   {validMultiItems.map((item, idx) => {
-                    const firstWord = item.label.split(' ')[0];
-                    const buttonLabel = /^Option/i.test(firstWord) || !firstWord ? 'Buy Option' : `Buy ${firstWord}`;
+                    const isStepOrPromo = /^(step|add|buy|get|free|coupon|click|claim|apply|order)/i.test(item.label.trim());
+                    const buttonLabel = isStepOrPromo
+                      ? (item.price ? `Shop · ₹${item.price.toLocaleString('en-IN')}` : 'View Offer ↗')
+                      : (item.price ? `Buy · ₹${item.price.toLocaleString('en-IN')}` : 'Shop Now ↗');
                     return (
                       <div
                         key={idx}
@@ -788,8 +790,15 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                         }}
                       >
                         <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            {isStepOrPromo && (
+                              <span style={{ fontSize: '10px', fontWeight: 800, padding: '1px 6px', borderRadius: '4px', backgroundColor: 'rgba(99, 102, 241, 0.15)', color: '#6366f1' }}>
+                                STEP {idx + 1}
+                              </span>
+                            )}
                           <div style={{ fontWeight: 650, fontSize: '13.5px', color: 'var(--text-primary)' }}>
                             {item.label}
+                          </div>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
                             {item.price ? (
@@ -799,7 +808,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                             ) : null}
                             {item.discount ? (
                               <span style={{ fontSize: '10.5px', fontWeight: 700, padding: '1px 5px', borderRadius: '4px', backgroundColor: 'rgba(16, 185, 129, 0.12)', color: 'var(--accent-emerald, #10b981)' }}>
-                                Flat {item.discount}% OFF
+                                Listed {item.discount}% OFF
                               </span>
                             ) : null}
                           </div>
@@ -822,7 +831,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                           }}
                           onClick={() => openSmartStoreLink(item.url, deal.store || 'Store', undefined, false, subId)}
                         >
-                          <span>🛍️ {buttonLabel} ↗</span>
+                          <span>🛍️ {buttonLabel}</span>
                         </button>
                       </div>
                     );

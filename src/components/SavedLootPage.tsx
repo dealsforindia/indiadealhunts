@@ -56,7 +56,7 @@ export const SavedLootPage: React.FC<SavedLootPageProps> = ({
       <div className="mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200/80 text-amber-800 text-xs font-semibold mb-3">
           <span>❤️</span>
-          <span>SAVED LOOT VAULT</span>
+          <span>SAVED DEALS</span>
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -172,7 +172,7 @@ export const SavedLootPage: React.FC<SavedLootPageProps> = ({
         /* ── Empty State (Apple / Mobbin Design Language) ── */
         <div className="max-w-md mx-auto my-12 text-center p-8 sm:p-10 rounded-3xl bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 shadow-sm">
           <ShoppingArtwork className="shopping-artwork-empty" />
-          <h2 className="text-xl font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">{savedDealIds.length ? 'Your earlier bookmarks are still saved' : 'Your Loot Vault is Empty'}</h2>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">{savedDealIds.length ? 'Your earlier bookmarks are still saved' : 'Your Saved Deals are Empty'}</h2>
           <p className="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
             {savedDealIds.length ? 'These older bookmarks contain IDs only. Load their original offers again to recover the product cards. New bookmarks now retain their product details.' : 'Save a deal with the bookmark icon to revisit and compare it here. Saved prices are snapshots; confirm them before buying.'}
           </p>

@@ -55,6 +55,12 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
       return true;
     });
   }, [deal.multi_items]);
+  const isTechOrPhone = useMemo(() => {
+    const cat = (deal.category || '').toLowerCase();
+    const t = (deal.title || '').toLowerCase();
+    if (/phone|mobile|smartphone|electronic|laptop|tablet|smartwatch|gadget/i.test(cat)) return true;
+    return /\b(phone|smartphone|iphone|galaxy|oneplus|redmi|realme|pixel|motorola|laptop|macbook|ipad|tablet|smartwatch)\b/i.test(t);
+  }, [deal.category, deal.title]);
   const isMulti = Boolean(deal.is_multi_deal && validMultiItems.length >= 2);
   // This upstream soundbar photo is a phone advertisement, so show an honest fallback.
   const photo = deal.image?.includes('amz_B0H4VQX4CC.jpg') ? null : getCleanImageUrl(deal.image);
@@ -203,7 +209,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
         <button type="button" onClick={() => action(() => openGoogleShoppingModal(title))}><ShoppingBag size={19} /><span>Compare across stores (Google Radar)</span><ArrowUpRight size={16} /></button>
         {onToggleCompare && <button type="button" onClick={() => action(() => onToggleCompare(deal))}>{isComparing ? <Check size={19} /> : <Layers size={19} />}<span>{isComparing ? 'Remove from comparison' : 'Add to comparison'}</span></button>}
         {onOpenPriceAlert && <button type="button" onClick={() => action(() => onOpenPriceAlert(deal))}><Bell size={19} /><span>Set a price alert</span></button>}
-        {onOpenExchange && <button type="button" onClick={() => action(() => onOpenExchange(deal))}><Repeat2 size={19} /><span>Exchange calculator</span></button>}
+        {onOpenExchange && isTechOrPhone && <button type="button" onClick={() => action(() => onOpenExchange(deal))}><Repeat2 size={19} /><span>Exchange calculator</span></button>}
         {onOpenImage && <button type="button" onClick={() => action(() => onOpenImage(deal))}><Image size={19} /><span>View product photo</span></button>}
         {asin && !expired && <button type="button" onClick={() => action(cart)}><ShoppingCart size={19} /><span>Open Amazon cart{includeBundle ? ' with add-on' : ''}</span><ArrowUpRight size={16} /></button>}
       </div>

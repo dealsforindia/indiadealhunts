@@ -27,7 +27,7 @@ const TRUST_POINTS = [
       </svg>
     ),
     title: 'Build your shortlist',
-    description: 'Save discoveries to My Mine and compare the products that interest you.',
+    description: 'Save discoveries to Saved Deals and compare the products that interest you.',
   },
   {
     icon: (

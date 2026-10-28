@@ -132,7 +132,7 @@ const FALLBACK_STORIES: CategoryStoryCollection[] = [
     emoji: '🏷️',
     ring_color: 'from-yellow-400 via-orange-500 to-red-600',
     badge: 'BUDGET',
-    category_filter: 'all',
+    category_filter: 'budget499',
     items: [
       {
         id: 'real-under199-1',
@@ -250,7 +250,7 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
         emoji: '🏷️',
         ring_color: 'from-teal-400 via-emerald-500 to-green-600',
         badge: 'BUDGET',
-        category_filter: 'all',
+        category_filter: 'budget499',
         items: liveBudget,
       });
     }

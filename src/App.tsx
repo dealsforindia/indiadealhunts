@@ -998,8 +998,16 @@ export const App: React.FC = () => {
                   <CategoryStories
                     deals={discoveryDeals}
                     onSelectCategoryFilter={(cat) => {
-                      setCollectionFilter('all');
-                      setSelectedCategory(cat);
+                      if (cat === 'budget499' || cat === 'under199' || cat === 'under499') {
+                        setCollectionFilter('budget499');
+                        setSelectedCategory('All');
+                      } else if (cat === 'loot70') {
+                        setCollectionFilter('loot70');
+                        setSelectedCategory('All');
+                      } else {
+                        setCollectionFilter('all');
+                        setSelectedCategory(cat);
+                      }
                       const dealGrid = document.getElementById('deals-section');
                       if (dealGrid) {
                         dealGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
