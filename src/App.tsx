@@ -258,7 +258,7 @@ export const App: React.FC = () => {
             category: 'Fashion',
             url: 'https://flipkart.com/sample',
             image: 'https://rukminim2.flixcart.com/image/612/612/xif0q/shoe/c/u/1/6-dripwave-boldfit-white-navy-original-imah4e2yggfxkfyh.jpeg',
-            source_channel: 'Crazy Deals',
+            source_channel: 'IndiaDealHunts',
             score: 95,
             posted_at: Date.now() - 3600000,
           } as any;
@@ -283,7 +283,7 @@ export const App: React.FC = () => {
             category: 'Fashion',
             url: 'https://flipkart.com/sample',
             image: 'https://rukminim2.flixcart.com/image/612/612/xif0q/shoe/c/u/1/6-dripwave-boldfit-white-navy-original-imah4e2yggfxkfyh.jpeg',
-            source_channel: 'Crazy Deals',
+            source_channel: 'IndiaDealHunts',
             score: 95,
             posted_at: Date.now() - 3600000,
           } as any;
