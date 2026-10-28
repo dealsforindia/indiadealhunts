@@ -43,14 +43,26 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanContact = contact.trim().toLowerCase();
+    const cleanContact = contact.trim();
     if (!cleanContact) {
-      setErrorMsg('Please enter your Telegram handle or Email');
+      setErrorMsg(contactType === 'telegram' ? 'Please enter your Telegram handle (e.g. @username)' : 'Please enter your email address');
       return;
     }
-    if (cleanContact.includes('@') && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanContact)) {
-      setErrorMsg('Please enter a valid email address (e.g. name@gmail.com)');
-      return;
+    let normalizedContact = cleanContact;
+    if (contactType === 'email') {
+      const emailLower = cleanContact.toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailLower)) {
+        setErrorMsg('Please enter a valid email address (e.g. name@gmail.com)');
+        return;
+      }
+      normalizedContact = emailLower;
+    } else {
+      const handle = cleanContact.startsWith('@') ? cleanContact.slice(1) : cleanContact;
+      if (!/^[a-zA-Z0-9_]{5,32}$/.test(handle)) {
+        setErrorMsg('Please enter a valid Telegram username (5-32 characters, letters, numbers, underscores)');
+        return;
+      }
+      normalizedContact = `@${handle}`;
     }
     const tPrice = parseFloat(targetPrice);
     if (isNaN(tPrice) || tPrice <= 0) {
@@ -65,7 +77,8 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
       const payload = {
         product_url: deal.url,
         target_price: tPrice,
-        contact: contact.trim(),
+        contact: normalizedContact,
+        contact_type: contactType,
         product_title: deal.title,
         current_price: deal.price,
         store: deal.store || 'Store',
@@ -230,6 +243,11 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                     placeholder={contactType === 'telegram' ? '@your_telegram_username' : 'you@example.com'}
                     required
                   />
+                  {contactType === 'telegram' && (
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 flex items-center gap-1">
+                      <span>💡</span> Make sure to click <a href="https://t.me/dealsforindiabot" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline font-semibold">Start on @dealsforindiabot</a> on Telegram so we can DM your alerts!
+                    </p>
+                  )}
                 </div>
 
                 {errorMsg && (

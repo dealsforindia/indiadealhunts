@@ -26,7 +26,7 @@ const BRAND_DIRECTORY: Record<string, { supportUrl: string; tollFree: string }> 
   Dell: { supportUrl: 'https://www.dell.com/support/home/en-in', tollFree: '1800 425 0088' },
 };
 
-const INITIAL_ITEMS: WarrantyItem[] = [
+const DEMO_ITEMS: WarrantyItem[] = [
   {
     id: 'w1',
     productName: 'Sony WH-1000XM5 Wireless Headphones',
@@ -56,9 +56,9 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
   const [items, setItems] = useState<WarrantyItem[]>(() => {
     try {
       const saved = localStorage.getItem('dealflow_user_warranties');
-      return saved ? JSON.parse(saved) : INITIAL_ITEMS;
+      return saved ? JSON.parse(saved) : [];
     } catch {
-      return INITIAL_ITEMS;
+      return [];
     }
   });
 
@@ -373,8 +373,15 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
       {/* Items List */}
       <div className="mt-5 flex flex-col gap-3">
         {filteredItems.length === 0 ? (
-          <div className="py-12 text-center text-xs text-slate-400 bg-slate-50/50 dark:bg-[#070A11]/50 rounded-2xl border border-dashed border-slate-200 dark:border-white/10">
-            No warranty records matching your criteria. Tap &ldquo;+ Add Product&rdquo; to log your first appliance or gadget.
+          <div className="py-12 text-center text-xs text-slate-400 bg-slate-50/50 dark:bg-[#070A11]/50 rounded-2xl border border-dashed border-slate-200 dark:border-white/10 flex flex-col items-center justify-center gap-2">
+            <p>Your warranty vault is empty. Tap &ldquo;+ Add Product&rdquo; to log your first appliance or gadget.</p>
+            <button
+              type="button"
+              onClick={() => setItems(DEMO_ITEMS)}
+              className="mt-1 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 cursor-pointer"
+            >
+              📋 Load Example Purchases (Demo)
+            </button>
           </div>
         ) : (
           filteredItems.map((item) => (

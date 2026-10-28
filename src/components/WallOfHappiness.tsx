@@ -190,7 +190,7 @@ export const WallOfHappiness: React.FC<WallOfHappinessProps> = ({ onBackToHome }
                 Reported savings in this community feed
               </div>
               <div className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 dark:text-[#F1F5F9] font-mono tracking-tight mt-1">
-                {stats?.formatted_savings ?? '₹5,20,000+'}
+                {stats?.formatted_savings ?? '₹0'}
 
               </div>
             </div>

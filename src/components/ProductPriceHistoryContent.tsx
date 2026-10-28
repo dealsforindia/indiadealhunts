@@ -53,22 +53,6 @@ export default function ProductPriceHistoryContent({ url, dealId, currentPrice, 
           }
         }
 
-        // Zero-Cold-Start Guarantee: If observations has < 2 points, anchor baseline from MRP vs Verified Price
-        if (observations.length < 2 && currentPrice && currentPrice > 0) {
-          const now = Date.now();
-          const basePrice = (mrp && mrp > currentPrice) ? mrp : currentPrice;
-          const dropPrice = currentPrice;
-          const pointTime = observations.length === 1 ? observations[0][0] : now;
-          observations = [
-            [pointTime - (30 * 86400000), basePrice],
-            [pointTime - (14 * 86400000), basePrice],
-            [pointTime - (1 * 86400000), Math.round((basePrice * 0.95 + dropPrice * 0.05))],
-            [pointTime, dropPrice]
-          ];
-          historySource = (mrp && mrp > currentPrice)
-            ? 'Catalog MRP vs Verified Drop Price'
-            : 'Verified Live Price Point';
-        }
       } catch { if (!observations.length) setMessage('Price history could not be loaded. Try again.'); }
       finally {
         clearTimeout(timer);
@@ -88,6 +72,14 @@ export default function ProductPriceHistoryContent({ url, dealId, currentPrice, 
   const high = prices.length ? Math.max(...prices) : null;
   const latest = visible[visible.length - 1];
   const span = visible.length > 1 ? visible[visible.length - 1][0] - visible[0][0] : 0;
+  const formatCoverage = (spanMs: number, count: number) => {
+    if (count <= 0) return '—';
+    if (count === 1 || spanMs <= 0) return '1 check';
+    const hours = Math.round(spanMs / 3600000);
+    if (hours < 24) return `${Math.max(1, hours)} hr${hours === 1 ? '' : 's'}`;
+    const days = Math.round(spanMs / 86400000);
+    return `${Math.max(1, days)} day${days === 1 ? '' : 's'}`;
+  };
   const tick = (time: number) => span < 86400000 ? new Date(time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : dateLabel(time, true);
   const padding = low !== null && high !== null ? Math.max((high - low) * .15, high * .03, 1) : 1;
   return (
@@ -113,7 +105,7 @@ export default function ProductPriceHistoryContent({ url, dealId, currentPrice, 
             </AreaChart>
           </ResponsiveContainer>
         </div> : <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 p-5 text-sm text-slate-600 dark:text-slate-300 mt-4" role="status">{visible.length === 1 ? `One recorded price on ${dateLabel(visible[0][0])}. More observations are needed to show a trend.` : points.length ? `No recorded prices in the last ${days} days. Select All to see available observations.` : message || 'No recorded price history is available for this product.'}</div>}
-        <div className="grid grid-cols-3 gap-2 mt-4">{[['Recorded low', rupees(low)], ['Recorded high', rupees(high)], ['Coverage', visible.length ? `${Math.max(1, Math.ceil(span / 86400000))} day${span > 86400000 ? 's' : ''}` : '—']].map(([label, value]) => <div key={label} className="rounded-xl bg-slate-50 dark:bg-white/5 p-3 min-w-0"><p className="text-xs text-slate-600 dark:text-slate-300">{label}</p><p className="text-sm font-bold text-slate-900 dark:text-white mt-1 break-words">{value === 'Price unavailable' ? '—' : value}</p></div>)}</div>
+        <div className="grid grid-cols-3 gap-2 mt-4">{[['Recorded low', rupees(low)], ['Recorded high', rupees(high)], ['Coverage', formatCoverage(span, visible.length)]].map(([label, value]) => <div key={label} className="rounded-xl bg-slate-50 dark:bg-white/5 p-3 min-w-0"><p className="text-xs text-slate-600 dark:text-slate-300">{label}</p><p className="text-sm font-bold text-slate-900 dark:text-white mt-1 break-words">{value === 'Price unavailable' ? '—' : value}</p></div>)}</div>
       </>}
       <p className="mt-4 text-xs leading-relaxed text-slate-600 dark:text-slate-300">Periods filter available observations; they do not guarantee that many days of history. {currentPrice ? `Directory price: ${rupees(currentPrice)}. ` : ''}Confirm the current price and variant at checkout.</p>
     </section>

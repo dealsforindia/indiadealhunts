@@ -155,7 +155,7 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
                       <td className="py-3 px-3 font-semibold text-slate-500 font-mono">Deal Price</td>
                       {compareDeals.map((d) => (
                         <td key={d.id} className="py-3 px-3 font-mono font-black text-slate-900 dark:text-[#F1F5F9] text-base text-center">
-                          ₹{d.price ? Number(d.price).toLocaleString('en-IN') : 'Check Store'}
+                          {d.price ? `₹${Number(d.price).toLocaleString('en-IN')}` : 'Check Store'}
                         </td>
                       ))}
                     </tr>
@@ -166,11 +166,15 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
                       {compareDeals.map((d) => (
                         <td key={d.id} className="py-3 px-3 text-center">
                           <span className="font-mono text-slate-400 line-through mr-1.5">
-                            ₹{d.mrp ? Number(d.mrp).toLocaleString('en-IN') : '—'}
+                            {d.mrp ? `₹${Number(d.mrp).toLocaleString('en-IN')}` : '—'}
                           </span>
-                          <span className="font-mono font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
-                            {d.discount_pct || 0}% OFF
-                          </span>
+                          {typeof d.discount_pct === 'number' && d.discount_pct > 0 ? (
+                            <span className="font-mono font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/40 px-1.5 py-0.5 rounded">
+                              {d.discount_pct}% OFF
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 font-mono text-[11px]">—</span>
+                          )}
                         </td>
                       ))}
                     </tr>
@@ -180,7 +184,7 @@ export const CompareDrawer: React.FC<CompareDrawerProps> = ({
                       <td className="py-3 px-3 font-semibold text-slate-500 font-mono">Total Savings</td>
                       {compareDeals.map((d) => (
                         <td key={d.id} className="py-3 px-3 font-mono font-bold text-emerald-700 text-center">
-                          {d.mrp && d.price ? `₹${(d.mrp - d.price).toLocaleString('en-IN')}` : '—'}
+                          {d.mrp && d.price && d.mrp > d.price ? `₹${(d.mrp - d.price).toLocaleString('en-IN')}` : '—'}
                         </td>
                       ))}
                     </tr>

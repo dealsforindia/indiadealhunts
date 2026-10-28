@@ -126,7 +126,6 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const [inputCode, setInputCode] = useState('');
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [isVerifyingCode, setIsVerifyingCode] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
 
@@ -139,51 +138,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     return () => clearInterval(interval);
   }, [resendCooldown]);
 
-  // Google Identity Services (GSI) Client Loader
+  // Close auth modal on Escape
   useEffect(() => {
     if (!showAuthModal) return;
-    const clientId = (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID || '101548199807788-dummy.apps.googleusercontent.com';
-
-    const initGsi = () => {
-      if ((window as any).google?.accounts?.id) {
-        try {
-          (window as any).google.accounts.id.initialize({
-            client_id: clientId,
-            callback: (res: any) => {
-              if (res?.credential) {
-                handleGoogleSuccess(res.credential);
-              }
-            },
-            auto_select: false,
-            cancel_on_tap_outside: true,
-          });
-          const container = document.getElementById('googleSignInBtnContainer');
-          if (container) {
-            container.innerHTML = '';
-            (window as any).google.accounts.id.renderButton(container, {
-              theme: 'outline',
-              size: 'large',
-              width: 320,
-              shape: 'pill',
-              text: 'continue_with',
-            });
-          }
-        } catch (e) {
-          console.warn('Google GSI init warning:', e);
-        }
-      }
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowAuthModal(false);
     };
-
-    if (!(window as any).google?.accounts?.id) {
-      const script = document.createElement('script');
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.async = true;
-      script.defer = true;
-      script.onload = initGsi;
-      document.body.appendChild(script);
-    } else {
-      initGsi();
-    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showAuthModal]);
 
   // Alert preferences
@@ -233,7 +195,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     if (!emailToFetch.trim() || !emailToFetch.includes('@')) return;
     setLoadingAlerts(true);
     try {
-      const res = await fetch(`${PUBLIC_API_BASE}/api/v1/alerts?contact=${encodeURIComponent(emailToFetch.trim().toLowerCase())}`);
+      const token = localStorage.getItem('idh_auth_token');
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(`${PUBLIC_API_BASE}/api/v1/alerts?contact=${encodeURIComponent(emailToFetch.trim().toLowerCase())}`, {
+        headers,
+      });
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data.alerts)) {
@@ -337,55 +304,19 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     }
   };
 
-  const handleGoogleSuccess = async (credential: string) => {
-    setIsGoogleLoading(true);
-    setAuthError(null);
-    try {
-      const res = await fetch(`${PUBLIC_API_BASE}/api/v1/auth/google`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ credential }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.detail || data.message || 'Google authentication failed');
-      }
-
-      if (data.token) {
-        try {
-          localStorage.setItem('idh_auth_token', data.token);
-        } catch {}
-      }
-      const email = data.user.email;
-      const name = data.user.display_name;
-      const avatar = data.user.avatar_url;
-
-      setUserEmail(email);
-      if (name) {
-        setUserName(name);
-        try { localStorage.setItem('idh_user_name', name); } catch {}
-      }
-      if (avatar) {
-        setUserAvatar(avatar);
-        try { localStorage.setItem('idh_user_avatar', avatar); } catch {}
-      }
-      setInputScraperEmail(email);
-      try { localStorage.setItem('idh_user_email', email); } catch {}
-
-      playSuccessChime();
-      setShowAuthModal(false);
-      fetchUserAlerts(email);
-      onShowToast?.(`Signed in with Google as ${name || email}`);
-    } catch (err: any) {
-      setAuthError(err.message || 'Google authentication failed');
-      onShowToast?.(err.message || 'Google sign-in error');
-    } finally {
-      setIsGoogleLoading(false);
-    }
-  };
-
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     playTactileClick();
+    const token = localStorage.getItem('idh_auth_token');
+    if (token) {
+      try {
+        await fetch(`${PUBLIC_API_BASE}/api/v1/auth/logout`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      } catch (e) {
+        console.debug('Logout sync warning:', e);
+      }
+    }
     setUserEmail('');
     setUserName('');
     setUserAvatar('');
@@ -399,13 +330,28 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     onShowToast?.('Signed out of Deal Hunter session');
   };
 
-  const handleToggleEmailAlerts = () => {
+  const handleToggleEmailAlerts = async () => {
     playTactileClick();
     const next = !emailAlerts;
     setEmailAlerts(next);
     try {
       localStorage.setItem('idh_email_alerts', String(next));
     } catch {}
+    const token = localStorage.getItem('idh_auth_token');
+    if (token) {
+      try {
+        await fetch(`${PUBLIC_API_BASE}/api/v1/user/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ email_alerts: next })
+        });
+      } catch (e) {
+        console.warn('Failed to sync email alerts preference:', e);
+      }
+    }
     onShowToast?.(next ? 'Email price drop alerts enabled' : 'Email alerts paused');
   };
 
@@ -1133,6 +1079,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         {showAuthModal && (
           <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md">
             <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="auth-modal-title"
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -1143,11 +1092,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
                     <User size={20} />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Sign In to IndiaDealHunts</h3>
+                  <h3 id="auth-modal-title" className="text-lg font-bold text-slate-900 dark:text-white">Sign In to IndiaDealHunts</h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowAuthModal(false)}
+                  aria-label="Close sign in dialog"
                   className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center text-sm cursor-pointer"
                 >
                   ✕
@@ -1173,92 +1123,57 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               )}
 
               {authStep === 'email' ? (
-                <div className="space-y-4">
-                  {/* Google One-Click Auth */}
+                <form onSubmit={handleRequestCode} className="space-y-4">
                   <div>
-                    <div id="googleSignInBtnContainer" className="flex justify-center w-full min-h-[44px]" />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if ((window as any).google?.accounts?.id) {
-                          (window as any).google.accounts.id.prompt();
-                        } else {
-                          onShowToast?.("Connecting to Google identity services...");
-                        }
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                      Your Email Address
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      autoFocus
+                      value={inputEmail}
+                      onChange={(e) => {
+                        setInputEmail(e.target.value);
+                        if (authError) setAuthError(null);
                       }}
-                      disabled={isGoogleLoading}
-                      className="w-full mt-2 py-3 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-white/15 text-slate-800 dark:text-slate-100 font-semibold text-xs sm:text-sm shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors flex items-center justify-center gap-3 cursor-pointer disabled:opacity-50"
-                    >
-                      <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
-                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
-                        <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
-                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-                      </svg>
-                      <span>{isGoogleLoading ? "Connecting to Google..." : "Continue with Google"}</span>
-                    </button>
-
-                    <div className="flex items-center my-4">
-                      <div className="flex-1 border-t border-slate-200 dark:border-white/10" />
-                      <span className="px-3 text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                        or sign in with email
-                      </span>
-                      <div className="flex-1 border-t border-slate-200 dark:border-white/10" />
-                    </div>
+                      placeholder="e.g. yourname@gmail.com"
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                    {suggestEmailDomain(inputEmail) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const suggested = suggestEmailDomain(inputEmail);
+                          if (suggested) {
+                            setInputEmail(suggested);
+                            setAuthError(null);
+                          }
+                        }}
+                        className="mt-2 text-xs text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer font-medium"
+                      >
+                        <span>💡 Did you mean <strong>{suggestEmailDomain(inputEmail)}</strong>?</span>
+                        <span className="font-bold underline ml-1">Use this</span>
+                      </button>
+                    )}
                   </div>
 
-                  <form onSubmit={handleRequestCode} className="space-y-4">
-                    <div>
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
-                        Your Email Address
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        autoFocus
-                        value={inputEmail}
-                        onChange={(e) => {
-                          setInputEmail(e.target.value);
-                          if (authError) setAuthError(null);
-                        }}
-                        placeholder="e.g. yourname@gmail.com"
-                        className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      />
-                      {suggestEmailDomain(inputEmail) && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const suggested = suggestEmailDomain(inputEmail);
-                            if (suggested) {
-                              setInputEmail(suggested);
-                              setAuthError(null);
-                            }
-                          }}
-                          className="mt-2 text-xs text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer font-medium"
-                        >
-                          <span>💡 Did you mean <strong>{suggestEmailDomain(inputEmail)}</strong>?</span>
-                          <span className="font-bold underline ml-1">Use this</span>
-                        </button>
-                      )}
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={isSendingCode}
-                      className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-sm shadow hover:from-emerald-400 hover:to-teal-400 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                    >
-                      {isSendingCode ? (
-                        <>
-                          <RefreshCw size={16} className="animate-spin" /> Sending Verification Code...
-                        </>
-                      ) : (
-                        <>
-                          <Mail size={16} /> Send 6-Digit Code
-                        </>
-                      )}
-                    </button>
-                  </form>
-                </div>
+                  <button
+                    type="submit"
+                    disabled={isSendingCode}
+                    className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-md transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isSendingCode ? (
+                      <>
+                        <RefreshCw size={16} className="animate-spin" /> Sending Verification Code...
+                      </>
+                    ) : (
+                      <>
+                        <Mail size={16} /> Send 6-Digit Code
+                      </>
+                    )}
+                  </button>
+                </form>
               ) : (
                 <form onSubmit={handleVerifyCode} className="space-y-4">
                   <div>
@@ -1287,7 +1202,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   <button
                     type="submit"
                     disabled={isVerifyingCode || inputCode.length !== 6}
-                    className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-sm shadow hover:from-emerald-400 hover:to-teal-400 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-md transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {isVerifyingCode ? (
                       <>

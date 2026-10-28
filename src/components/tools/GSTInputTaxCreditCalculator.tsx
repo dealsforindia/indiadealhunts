@@ -321,8 +321,8 @@ Generated via IndiaDealHunts GST Engine`;
 
             {/* Income Tax Depreciation Checkbox */}
             <label className="flex gap-3 items-center p-3 rounded-xl border border-slate-200 dark:border-white/10 text-xs mb-3"><input type="checkbox" checked={eligibleItc} onChange={event => setEligibleItc(event.target.checked)} />I have confirmed eligibility to claim the entered GST as input credit.</label>
-            <div className="pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
-            <div>
+            <label htmlFor="claim-depreciation-checkbox" className="pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between cursor-pointer">
+              <div>
                 <span className="text-xs font-bold text-slate-800 dark:text-[#F8FAFC] block">
                   Add Year-1 Income Tax Depreciation (Sec 32)
                 </span>
@@ -331,12 +331,14 @@ Generated via IndiaDealHunts GST Engine`;
                 </span>
               </div>
               <input
+                id="claim-depreciation-checkbox"
                 type="checkbox"
+                aria-label="Add Year-1 Income Tax Depreciation (Sec 32)"
                 checked={claimDepreciation}
                 onChange={(e) => setClaimDepreciation(e.target.checked)}
                 className="w-4 h-4 rounded text-blue-600 cursor-pointer"
               />
-            </div>
+            </label>
 
             {claimDepreciation && (
               <div className="flex items-center justify-between pt-1">

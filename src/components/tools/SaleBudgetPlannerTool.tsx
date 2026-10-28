@@ -28,9 +28,9 @@ export const SaleBudgetPlannerTool: React.FC = () => {
 
   // Pre-sale readiness checklist
   const [checklist, setChecklist] = useState({
-    creditCardLimit: true,
-    priceTrackerReady: true,
-    deliveryAddressSet: true,
+    creditCardLimit: false,
+    priceTrackerReady: false,
+    deliveryAddressSet: false,
     returnPolicyChecked: false,
     sleepRoutineGuarded: false,
   });

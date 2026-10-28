@@ -32,8 +32,13 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!url.trim() && !tip.trim()) {
-      setError('Please provide either a product link or deal description.');
+    let cleanUrl = url.trim();
+    if (!cleanUrl && tip.trim()) {
+      const match = tip.match(/https?:\/\/[^\s<>"']+/);
+      if (match) cleanUrl = match[0];
+    }
+    if (!cleanUrl || !cleanUrl.startsWith('http')) {
+      setError('Please provide a valid product link starting with http/https');
       return;
     }
 
@@ -41,7 +46,7 @@ export const SubmitDeal: React.FC<SubmitDealProps> = ({ onBackToHome }) => {
     setError(null);
 
     try {
-      const targetUrl = url.trim() || tip.trim();
+      const targetUrl = cleanUrl;
       let res: Response;
       
       if (file) {
