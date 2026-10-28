@@ -7,7 +7,7 @@ import { resolveStoreRedirect, unavailableOfferPage } from './server/storeRedire
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-const BACKEND_URL = process.env.VITE_BACKEND_URL || 'http://74.225.250.0:8000'
+const BACKEND_URL = process.env.VITE_BACKEND_URL || 'https://api.rudranil.me'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -33,6 +33,22 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+    },
+  },
+  preview: {
+    port: 4173,
+    host: true,
+    proxy: {
+      '/api': {
+        target: BACKEND_URL,
+        changeOrigin: true,
+        secure: false,
+      },
+      '/images': {
+        target: BACKEND_URL,
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
   server: {

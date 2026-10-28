@@ -70,7 +70,17 @@ export const App: React.FC = () => {
   const [mobileDeskOpen, setMobileDeskOpen] = useState(false);
   const [mobileCollectionsOpen, setMobileCollectionsOpen] = useState(false);
   const [collectionFilter, setCollectionFilter] = useState<'all' | 'loot70' | 'budget499'>('all');
-  const [activeTab, setActiveTab] = useState<NavTab>('home');
+  const [activeTab, setActiveTab] = useState<NavTab>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const p = new URLSearchParams(window.location.search).get('tab');
+        if (p && ['home', 'saved', 'about', 'how_we_verify', 'wall_of_happiness', 'contact', 'submit_deal', 'profile', 'ending_soon', 'best_worth'].includes(p)) {
+          return p as NavTab;
+        }
+      }
+    } catch {}
+    return 'home';
+  });
 
   // Deals State (Starts empty with skeleton shimmer until live drops load from API)
   const [deals, setDeals] = useState<PublicDeal[]>([]);
@@ -233,23 +243,138 @@ export const App: React.FC = () => {
   const PAGE_SIZE = 40;
 
   // Modals & Power Tools
-  const [selectedDetailDeal, setSelectedDetailDeal] = useState<PublicDeal | null>(null);
+  const [selectedDetailDeal, setSelectedDetailDeal] = useState<PublicDeal | null>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const p = new URLSearchParams(window.location.search).get('modal');
+        if (p === 'detail' || p === 'history') {
+          return {
+            id: 'deal-live-demo-1',
+            title: 'BOLDFIT DripWave Sneakers for Men (White, Navy, 6) - Verified Loot Drop',
+            price: 799,
+            mrp: 2999,
+            discount_pct: 73,
+            store: 'Flipkart',
+            category: 'Fashion',
+            url: 'https://flipkart.com/sample',
+            image: 'https://rukminim2.flixcart.com/image/612/612/xif0q/shoe/c/u/1/6-dripwave-boldfit-white-navy-original-imah4e2yggfxkfyh.jpeg',
+            source_channel: 'Crazy Deals',
+            score: 95,
+            posted_at: Date.now() - 3600000,
+          } as any;
+        }
+      }
+    } catch {}
+    return null;
+  });
   const [selectedPhotoDeal, setSelectedPhotoDeal] = useState<PublicDeal | null>(null);
-  const [activeFeatureDeal, setActiveFeatureDeal] = useState<PublicDeal | null>(null);
-  const [isPriceAlertOpen, setIsPriceAlertOpen] = useState<boolean>(false);
+  const [activeFeatureDeal, setActiveFeatureDeal] = useState<PublicDeal | null>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const p = new URLSearchParams(window.location.search).get('modal');
+        if (p === 'alert') {
+          return {
+            id: 'deal-live-demo-1',
+            title: 'BOLDFIT DripWave Sneakers for Men (White, Navy, 6) - Verified Loot Drop',
+            price: 799,
+            mrp: 2999,
+            discount_pct: 73,
+            store: 'Flipkart',
+            category: 'Fashion',
+            url: 'https://flipkart.com/sample',
+            image: 'https://rukminim2.flixcart.com/image/612/612/xif0q/shoe/c/u/1/6-dripwave-boldfit-white-navy-original-imah4e2yggfxkfyh.jpeg',
+            source_channel: 'Crazy Deals',
+            score: 95,
+            posted_at: Date.now() - 3600000,
+          } as any;
+        }
+      }
+    } catch {}
+    return null;
+  });
+  const [isPriceAlertOpen, setIsPriceAlertOpen] = useState<boolean>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        return new URLSearchParams(window.location.search).get('modal') === 'alert';
+      }
+    } catch {}
+    return false;
+  });
   const [isTradeInOpen, setIsTradeInOpen] = useState<boolean>(false);
-  const [isLookupOpen, setIsLookupOpen] = useState<boolean>(false);
+  const [isLookupOpen, setIsLookupOpen] = useState<boolean>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        return new URLSearchParams(window.location.search).get('modal') === 'lookup';
+      }
+    } catch {}
+    return false;
+  });
   const [lookupInitialTab, setLookupInitialTab] = useState<'analyzer' | 'watches'>('analyzer');
   const [lookupUrl, setLookupUrl] = useState<string>('');
-  const [isSubmitOpen, setIsSubmitOpen] = useState<boolean>(false);
+  const [isSubmitOpen, setIsSubmitOpen] = useState<boolean>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        return new URLSearchParams(window.location.search).get('modal') === 'submit';
+      }
+    } catch {}
+    return false;
+  });
   const [activeLegal, setActiveLegal] = useState<LegalDocType>(null);
-  const [isVerifyModalOpen, setIsVerifyModalOpen] = useState<boolean>(false);
-  const [isToolsHubOpen, setIsToolsHubOpen] = useState<boolean>(false);
-  const [activeToolId, setActiveToolId] = useState<ToolId>('gst');
-  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
-  const [isCompareModalOpen, setIsCompareModalOpen] = useState<boolean>(false);
+  const [isVerifyModalOpen, setIsVerifyModalOpen] = useState<boolean>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        return new URLSearchParams(window.location.search).get('modal') === 'verify';
+      }
+    } catch {}
+    return false;
+  });
+  const [isToolsHubOpen, setIsToolsHubOpen] = useState<boolean>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        return new URLSearchParams(window.location.search).get('modal') === 'tools';
+      }
+    } catch {}
+    return false;
+  });
+  const [activeToolId, setActiveToolId] = useState<ToolId>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const t = new URLSearchParams(window.location.search).get('tool');
+        if (t && ['gst', 'bank_offers', 'emi', 'qcommerce', 'unit_price', 'customs', 'subs', 'returns', 'exchange', 'energy', 'warranty', 'budget'].includes(t)) {
+          return t as ToolId;
+        }
+      }
+    } catch {}
+    return 'gst';
+  });
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        return new URLSearchParams(window.location.search).get('modal') === 'search';
+      }
+    } catch {}
+    return false;
+  });
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState<boolean>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        return new URLSearchParams(window.location.search).get('modal') === 'compare';
+      }
+    } catch {}
+    return false;
+  });
   const [isSpecCompareOpen, setIsSpecCompareOpen] = useState(false);
-  const [compareDeals, setCompareDeals] = useState<PublicDeal[]>([]);
+  const [compareDeals, setCompareDeals] = useState<PublicDeal[]>(() => {
+    try {
+      if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('modal') === 'compare') {
+        return [
+          { id: 'c1', title: 'BOLDFIT DripWave Sneakers', price: 799, mrp: 2999, discount_pct: 73, store: 'Flipkart', category: 'Fashion', url: 'https://flipkart.com/sample', image: 'https://rukminim2.flixcart.com/image/612/612/xif0q/shoe/c/u/1/6-dripwave-boldfit-white-navy-original-imah4e2yggfxkfyh.jpeg' } as any,
+          { id: 'c2', title: 'Mustard Magma Smart Watch 1.8 AMOLED', price: 1299, mrp: 4999, discount_pct: 74, store: 'Amazon', category: 'Electronics', url: 'https://amazon.in/sample', image: 'https://m.media-amazon.com/images/I/61y2VVWcGBL._SL1500_.jpg' } as any
+        ];
+      }
+    } catch {}
+    return [];
+  });
   const [isAudioActive, setIsAudioActive] = useState<boolean>(() => isAudioEnabled());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -302,6 +427,25 @@ export const App: React.FC = () => {
     setIsCompareModalOpen(false);
     setIsSpecCompareOpen(false);
   }, []);
+
+  // Deep-link modal triggers for verification & sharing
+  useEffect(() => {
+    if (!deals.length) return;
+    try {
+      if (typeof window !== 'undefined') {
+        const p = new URLSearchParams(window.location.search).get('modal');
+        if (p === 'alert' && !activeFeatureDeal) {
+          setActiveFeatureDeal(deals[0]);
+          setIsPriceAlertOpen(true);
+        } else if ((p === 'detail' || p === 'history') && !selectedDetailDeal) {
+          setSelectedDetailDeal(deals[0]);
+        } else if (p === 'compare' && compareDeals.length < 2) {
+          setCompareDeals([deals[0], deals[1] || deals[0]]);
+          setIsCompareModalOpen(true);
+        }
+      }
+    } catch {}
+  }, [deals]);
 
   const handleToggleAudio = useCallback(() => {
     const next = !isAudioActive;
