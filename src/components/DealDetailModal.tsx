@@ -283,7 +283,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               if (cLower === sLower || cLower.includes(sLower) || sLower.includes(cLower)) return null;
               return (
                 <>
-                  <span style={{ color: '#94A3B8', fontSize: '10px' }}>›</span>
+                  <span style={{ color: '#94A3B8', fontSize: '11.5px' }}>›</span>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
                     {cat}
                   </span>
@@ -299,7 +299,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               border: '1px solid #A7F3D0',
               borderRadius: '6px',
               fontFamily: 'var(--font-mono)',
-              fontSize: '10px',
+              fontSize: '11.5px',
               fontWeight: 700,
               color: '#059669',
             }}>
@@ -473,7 +473,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   bottom: '8px',
                   right: '8px',
                   fontFamily: 'var(--font-mono)',
-                  fontSize: '9px',
+                  fontSize: '11px',
                   color: '#94A3B8',
                   letterSpacing: '0.04em',
                 }}>
@@ -641,7 +641,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                       {survivalData.urgency_badge}
                     </span>
                     <span style={{
-                      fontSize: '10px',
+                      fontSize: '11.5px',
                       color: 'var(--text-secondary)',
                       fontFamily: 'var(--font-mono)',
                       fontWeight: 600,
@@ -700,7 +700,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             {/* Coupon code */}
             {coupon && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11.5px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
                   {coupon.kind === 'code' ? 'PROMO CODE' : 'STORE COUPON'}
                 </span>
                 <div style={{
@@ -792,7 +792,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             {isStepOrPromo && (
-                              <span style={{ fontSize: '10px', fontWeight: 800, padding: '1px 6px', borderRadius: '4px', backgroundColor: 'rgba(99, 102, 241, 0.15)', color: '#6366f1' }}>
+                              <span style={{ fontSize: '11.5px', fontWeight: 800, padding: '1px 6px', borderRadius: '4px', backgroundColor: 'rgba(99, 102, 241, 0.15)', color: '#6366f1' }}>
                                 STEP {idx + 1}
                               </span>
                             )}
@@ -807,7 +807,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                               </span>
                             ) : null}
                             {item.discount ? (
-                              <span style={{ fontSize: '10.5px', fontWeight: 700, padding: '1px 5px', borderRadius: '4px', backgroundColor: 'rgba(16, 185, 129, 0.12)', color: 'var(--accent-emerald, #10b981)' }}>
+                              <span style={{ fontSize: '12px', fontWeight: 700, padding: '1px 5px', borderRadius: '4px', backgroundColor: 'rgba(16, 185, 129, 0.12)', color: 'var(--accent-emerald, #10b981)' }}>
                                 Listed {item.discount}% OFF
                               </span>
                             ) : null}
@@ -860,7 +860,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   </div>
                   <span style={{
                     fontFamily: 'var(--font-mono)',
-                    fontSize: '10px',
+                    fontSize: '11.5px',
                     fontWeight: 700,
                     color: '#D97706',
                     backgroundColor: 'rgba(245, 158, 11, 0.15)',
@@ -956,19 +956,19 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   textAlign: 'center',
                 }}>
                   <div>
-                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Buy Price</div>
+                    <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Buy Price</div>
                     <div style={{ fontFamily: 'var(--font-heading)', fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>
                       ₹{Number(deal.arbitrage.sale_price || price).toLocaleString('en-IN')}
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Buyback Quote</div>
+                    <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Buyback Quote</div>
                     <div style={{ fontFamily: 'var(--font-heading)', fontSize: '14px', fontWeight: 800, color: '#059669' }}>
                       ₹{Number(deal.arbitrage.buyback_price || 0).toLocaleString('en-IN')}
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Net Cash Profit</div>
+                    <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Net Cash Profit</div>
                     <div style={{ fontFamily: 'var(--font-heading)', fontSize: '14px', fontWeight: 800, color: '#10B981' }}>
                       +₹{Number(deal.arbitrage.net_profit || 0).toLocaleString('en-IN')}
                     </div>
@@ -1012,7 +1012,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   </span>
                   <span style={{
                     fontFamily: 'var(--font-mono)',
-                    fontSize: '10px',
+                    fontSize: '11.5px',
                     fontWeight: 700,
                     color: '#059669',
                     backgroundColor: '#ECFDF5',
@@ -1047,7 +1047,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                         </span>
                         <span style={{
                           fontFamily: 'var(--font-mono)',
-                          fontSize: '9.5px',
+                          fontSize: '11.5px',
                           fontWeight: 700,
                           color: q.isVerifiedDeal ? '#065F46' : '#475569',
                           backgroundColor: q.isVerifiedDeal ? '#ECFDF5' : '#E2E8F0',
@@ -1076,7 +1076,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                             onClick={() => openGoogleShoppingModal(deal?.title || '')}
                             style={{
                               fontFamily: 'var(--font-mono)',
-                              fontSize: '10.5px',
+                              fontSize: '12px',
                               fontWeight: 700,
                               color: '#2563EB',
                               backgroundColor: '#EFF6FF',
@@ -1090,7 +1090,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                             }}
                           >
                             <span>{q.actionText}</span>
-                            <span style={{ fontSize: '9px', backgroundColor: '#DBEAFE', padding: '1px 4px', borderRadius: '4px' }}>IN-APP</span>
+                            <span style={{ fontSize: '11px', backgroundColor: '#DBEAFE', padding: '1px 4px', borderRadius: '4px' }}>IN-APP</span>
                           </button>
                         ) : (
                           <a
@@ -1099,7 +1099,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                             rel="noopener noreferrer"
                             style={{
                               fontFamily: 'var(--font-mono)',
-                              fontSize: '10.5px',
+                              fontSize: '12px',
                               fontWeight: 700,
                               color: q.isVerifiedDeal ? '#059669' : '#2563EB',
                               textDecoration: 'none',
@@ -1119,7 +1119,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                 </div>
 
                 <p style={{
-                  fontSize: '10.5px',
+                  fontSize: '12px',
                   fontFamily: 'var(--font-body)',
                   color: 'var(--text-secondary)',
                   margin: '2px 0 0',
@@ -1372,7 +1372,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             title="Scan all Indian stores on Google Shopping Radar"
           >
             <span>🛍️ Scan Stores</span>
-            <span style={{ fontSize: '9px', backgroundColor: '#DBEAFE', padding: '1px 5px', borderRadius: '4px', fontWeight: 800 }}>IN-APP</span>
+            <span style={{ fontSize: '11px', backgroundColor: '#DBEAFE', padding: '1px 5px', borderRadius: '4px', fontWeight: 800 }}>IN-APP</span>
           </button>
 
           <button

@@ -360,13 +360,13 @@ export const App: React.FC = () => {
   const handleToggleSaveDeal = useCallback((deal: PublicDeal) => {
     const { isSaved, list } = toggleSavedDealId(deal.id, deal);
     setSavedDealIds(list);
-    showToast(isSaved ? 'Saved to your Loot Bookmarks!' : 'Removed from saved deals');
+    showToast(isSaved ? 'Saved to your bookmarks!' : 'Removed from saved deals');
   }, [showToast]);
 
   const handleClearAllSaved = useCallback(() => {
     clearAllSavedDealIds();
     setSavedDealIds([]);
-    showToast('Cleared all saved loot bookmarks');
+    showToast('Cleared all saved bookmarks');
   }, [showToast]);
 
   const flashLootCount = useMemo(() => {

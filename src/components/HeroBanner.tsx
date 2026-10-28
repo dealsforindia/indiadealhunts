@@ -36,7 +36,6 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ searchQuery, onSearch, o
   const discount = reference && spotlight ? Math.round((reference - spotlight.price) / reference * 100) : null;
   return <section className="premium-hero" aria-label="Discover your next deal">
     <div className={`premium-hero-frame${!spotlight ? ' has-no-spotlight' : ''}`}>
-      <img className="mobile-hero-art" src="/brand/mobile-product-collage-v1.webp" alt="" aria-hidden="true" width="600" height="600" fetchPriority="high" />
       <div className="premium-hero-copy">
         <div className="premium-kicker"><span aria-hidden="true" />THE SMARTER WAY TO SHOP</div>
         <h1>Great finds.<br /><span>Smarter savings.</span></h1>
