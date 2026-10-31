@@ -37,9 +37,9 @@ interface ExternalSearchResultsProps {
 }
 
 const STORE_LINKS = [
-  { name: 'Google Shopping', url: (q: string) => `https://www.google.com/search?q=${encodeURIComponent(q)}&udm=28#ip=1`, tone: 'border-slate-300 dark:border-white/20 bg-slate-900 text-white hover:bg-black', icon: '🛍️' },
+  { name: 'Google Shopping', url: (q: string) => `https://www.google.com/search?q=${encodeURIComponent(q)}&udm=28#ip=1`, tone: 'border-[var(--border-subtle)] dark:border-white/20 bg-[var(--idh-action-solid)] text-white hover:bg-black', icon: '🛍️' },
   { name: 'Amazon India', url: (q: string) => `https://www.amazon.in/s?k=${encodeURIComponent(q)}&tag=rudranil0a-21`, tone: 'border-amber-200 bg-amber-50 text-amber-900 hover:bg-amber-100', icon: '📦' },
-  { name: 'Flipkart', url: (q: string) => `https://www.flipkart.com/search?q=${encodeURIComponent(q)}`, tone: 'border-blue-200 bg-blue-50 text-blue-900 hover:bg-blue-100', icon: '⚡' },
+  { name: 'Flipkart', url: (q: string) => `https://www.flipkart.com/search?q=${encodeURIComponent(q)}`, tone: 'border-[var(--border-subtle)] bg-[var(--surface-2)] text-[var(--idh-accent)] hover:bg-[var(--surface-2)]', icon: '⚡' },
   { name: 'Myntra', url: (q: string) => `https://www.myntra.com/search?q=${encodeURIComponent(q)}`, tone: 'border-pink-200 bg-pink-50 text-pink-900 hover:bg-pink-100', icon: '👗' },
 ];
 
@@ -48,12 +48,12 @@ const money = (value: number | null) =>
 
 const sc = (store: string) => {
   const s = (store || '').toLowerCase();
-  if (s.includes('flipkart')) return { badge: 'bg-blue-50 text-blue-700 border-blue-200', btn: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-400' };
+  if (s.includes('flipkart')) return { badge: 'bg-[var(--surface-2)] text-[var(--idh-accent)] border-[var(--border-subtle)]', btn: 'bg-[var(--idh-action-solid)] hover:bg-[var(--idh-action-solid)] focus:ring-blue-400' };
   if (s.includes('amazon')) return { badge: 'bg-amber-50 text-amber-800 border-amber-200', btn: 'bg-amber-500 hover:bg-amber-600 focus:ring-amber-300' };
   if (s.includes('jiomart')) return { badge: 'bg-teal-50 text-teal-700 border-teal-200', btn: 'bg-teal-600 hover:bg-teal-700 focus:ring-teal-400' };
   if (s.includes('myntra')) return { badge: 'bg-pink-50 text-pink-700 border-pink-200', btn: 'bg-pink-600 hover:bg-pink-700 focus:ring-pink-400' };
   if (s.includes('croma')) return { badge: 'bg-cyan-50 text-cyan-700 border-cyan-200', btn: 'bg-cyan-600 hover:bg-cyan-700 focus:ring-cyan-400' };
-  return { badge: 'bg-slate-50 dark:bg-[#070A11] text-slate-700 dark:text-slate-200 border-slate-200 dark:border-white/10', btn: 'bg-slate-800 hover:bg-slate-900 focus:ring-slate-400' };
+  return { badge: 'bg-[var(--surface)] dark:bg-[var(--bg)] text-[var(--text-primary)] dark:text-[var(--text-secondary)] border-[var(--border-subtle)] dark:border-white/10', btn: 'bg-[var(--surface)] hover:bg-[var(--surface)] focus:ring-slate-400' };
 };
 
 export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ query, deals, loading, error, onCheckHistory, onOpenGoogleShopping }) => {
@@ -94,26 +94,26 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
   const hasOther = deals.some((d) => !d.store?.toLowerCase().includes('flipkart') && !d.store?.toLowerCase().includes('amazon'));
 
   return (
-    <section className="mt-8 rounded-3xl border border-slate-200/90 dark:border-white/10 bg-white/95 dark:bg-[#0D1527]/95 p-4 sm:p-6 shadow-sm backdrop-blur-md" aria-label="Live multi-store and Google Shopping results">
+    <section className="mt-8 rounded-3xl border border-[var(--border-subtle)]/90 dark:border-white/10 bg-white/95 dark:bg-[var(--surface)]/95 p-4 sm:p-6 shadow-sm backdrop-blur-md" aria-label="Live multi-store and Google Shopping results">
       {/* Top Header */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <h2 className="font-heading text-lg sm:text-xl font-black text-slate-900 dark:text-[#F1F5F9]">
+            <h2 className="font-heading text-lg sm:text-xl font-black text-[var(--text-primary)] dark:text-[var(--text-primary)]">
               Store Search & Shopping Discoveries
             </h2>
             <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-mono font-bold text-emerald-700">
               SOURCE-REPORTED OFFERS
             </span>
           </div>
-          <p className="mt-1 text-xs text-slate-500 max-w-2xl">
-            Offers returned from the deal directory and external store search for &ldquo;<span className="font-semibold text-slate-700 dark:text-slate-200">{cleanQuery}</span>&rdquo;. Check matching models, history and checkout eligibility before buying.
+          <p className="mt-1 text-xs text-[var(--text-secondary)] max-w-2xl">
+            Offers returned from the deal directory and external store search for &ldquo;<span className="font-semibold text-[var(--text-primary)] dark:text-[var(--text-secondary)]">{cleanQuery}</span>&rdquo;. Check matching models, history and checkout eligibility before buying.
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {hasDeals && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#070A11] px-3 py-1 text-xs font-mono font-bold text-slate-700 dark:text-slate-200 shadow-2xs">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border-subtle)] dark:border-white/10 bg-[var(--surface)] dark:bg-[var(--bg)] px-3 py-1 text-xs font-mono font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] shadow-2xs">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
               {deals.length} offers · {new Set(deals.map(d => d.store)).size} stores
             </span>
@@ -145,10 +145,10 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                   {minPriceDeal.store}
                 </span>
               </div>
-              <p className="text-xs font-bold text-slate-800 dark:text-[#F8FAFC]">
+              <p className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                 Found for <span className="font-black text-emerald-700 text-sm">{money(minPriceDeal.price)}</span>
                 {priceSpread > 0 && (
-                  <span className="text-slate-600 dark:text-slate-400">
+                  <span className="text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">
                     {' '}· Prices span different products and variants; this is not a same-product savings comparison.
                   </span>
                 )}
@@ -189,10 +189,10 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
 
       {/* Filter Chips & View Mode Toggle */}
       {hasDeals && (
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-y border-slate-100 dark:border-white/5 py-3">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-y border-[var(--border-subtle)] dark:border-white/5 py-3">
           <div className="flex flex-wrap items-center gap-2">
             {[
-              { key: 'all', label: `All Offers (${deals.length})`, cls: 'bg-slate-900 text-white', inactiveCls: 'border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-[#070A11]' },
+              { key: 'all', label: `All Offers (${deals.length})`, cls: 'bg-[var(--idh-action-solid)] text-white', inactiveCls: 'border border-[var(--border-subtle)] dark:border-white/10 bg-white dark:bg-[var(--surface)] text-[var(--text-primary)] dark:text-[var(--text-secondary)] hover:bg-[var(--surface)] dark:bg-[var(--bg)]' },
               { key: 'lowest', label: '🏆 Lowest Listed Price', cls: 'bg-emerald-600 text-white', inactiveCls: 'border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100' },
             ].map(({ key, label, cls, inactiveCls }) => (
               <button
@@ -209,8 +209,8 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                 type="button"
                 onClick={() => setStoreFilter('flipkart')}
                 className={`rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${storeFilter === 'flipkart'
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'border border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100'
+                    ? 'bg-[var(--idh-action-solid)] text-white shadow-xs'
+                    : 'border border-[var(--border-subtle)] bg-[var(--surface-2)] text-[var(--idh-accent)] hover:bg-[var(--surface-2)]'
                   }`}
               >
                 ⚡ Flipkart ({deals.filter((d) => d.store?.toLowerCase().includes('flipkart')).length})
@@ -241,11 +241,11 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
               </button>
             )}
           </div>
-          <div className="flex items-center gap-1 rounded-xl bg-slate-100 dark:bg-[#111C33] p-1">
+          <div className="flex items-center gap-1 rounded-xl bg-[var(--surface-2)] dark:bg-[var(--surface-2)] p-1">
             <button
               type="button"
               onClick={() => setViewMode('cards')}
-              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer ${viewMode === 'cards' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-xs' : 'text-slate-500 hover:text-slate-900 dark:text-[#F1F5F9]'
+              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer ${viewMode === 'cards' ? 'bg-white dark:bg-[var(--surface)] text-[var(--text-primary)] dark:text-[var(--text-primary)] shadow-xs' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-primary)]'
                 }`}
             >
               Product Cards
@@ -253,7 +253,7 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
             <button
               type="button"
               onClick={() => setViewMode('matrix')}
-              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer ${viewMode === 'matrix' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-xs' : 'text-slate-500 hover:text-slate-900 dark:text-[#F1F5F9]'
+              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer ${viewMode === 'matrix' ? 'bg-white dark:bg-[var(--surface)] text-[var(--text-primary)] dark:text-[var(--text-primary)] shadow-xs' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-primary)]'
                 }`}
             >
               Comparison Table
@@ -265,39 +265,39 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
       {/* Main Content Area */}
       {loading ? (
         <div className="mt-5 space-y-3">
-          <div className="flex items-center justify-center gap-2 py-4 text-xs font-bold text-slate-500">
+          <div className="flex items-center justify-center gap-2 py-4 text-xs font-bold text-[var(--text-secondary)]">
             <span className="h-3 w-3 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
             Requesting available directory and external shopping results...
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex flex-col gap-2 rounded-2xl border border-slate-100 dark:border-white/5 p-3">
-                <div className="h-32 animate-pulse rounded-xl bg-slate-100 dark:bg-[#111C33]" />
-                <div className="h-3 w-2/3 animate-pulse rounded bg-slate-100 dark:bg-[#111C33]" />
-                <div className="h-3 w-1/2 animate-pulse rounded bg-slate-100 dark:bg-[#111C33]" />
-                <div className="h-7 animate-pulse rounded-xl bg-slate-100 dark:bg-[#111C33]" />
+              <div key={i} className="flex flex-col gap-2 rounded-2xl border border-[var(--border-subtle)] dark:border-white/5 p-3">
+                <div className="h-32 animate-pulse rounded-xl bg-[var(--surface-2)] dark:bg-[var(--surface-2)]" />
+                <div className="h-3 w-2/3 animate-pulse rounded bg-[var(--surface-2)] dark:bg-[var(--surface-2)]" />
+                <div className="h-3 w-1/2 animate-pulse rounded bg-[var(--surface-2)] dark:bg-[var(--surface-2)]" />
+                <div className="h-7 animate-pulse rounded-xl bg-[var(--surface-2)] dark:bg-[var(--surface-2)]" />
               </div>
             ))}
           </div>
         </div>
       ) : !hasDeals ? (
-        <div className="mt-5 rounded-2xl border border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#070A11] p-6 text-center">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+        <div className="mt-5 rounded-2xl border border-dashed border-[var(--border-subtle)] dark:border-white/10 bg-[var(--surface)] dark:bg-[var(--bg)] p-6 text-center">
+          <p className="text-xs font-medium text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">
             No direct store offers returned yet for &ldquo;{cleanQuery}&rdquo;. Explore live merchant links or Google Shopping Radar below.
           </p>
         </div>
       ) : viewMode === 'matrix' ? (
         /* Matrix Comparison Table View */
-        <div className="mt-5 overflow-x-auto rounded-2xl border border-slate-200 dark:border-white/10">
+        <div className="mt-5 overflow-x-auto rounded-2xl border border-[var(--border-subtle)] dark:border-white/10">
           <table className="w-full text-xs">
             <thead>
-              <tr className="border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#070A11]">
-                <th className="px-4 py-3 text-left font-black text-slate-700 dark:text-slate-200 w-1/2">Product</th>
-                <th className="px-4 py-3 text-center font-black text-slate-700 dark:text-slate-200">Store</th>
-                <th className="px-4 py-3 text-right font-black text-slate-700 dark:text-slate-200">Price</th>
-                <th className="px-4 py-3 text-right font-black text-slate-700 dark:text-slate-200">MRP</th>
-                <th className="px-4 py-3 text-center font-black text-slate-700 dark:text-slate-200">Discount</th>
-                <th className="px-4 py-3 text-center font-black text-slate-700 dark:text-slate-200">Action</th>
+              <tr className="border-b border-[var(--border-subtle)] dark:border-white/5 bg-[var(--surface)] dark:bg-[var(--bg)]">
+                <th className="px-4 py-3 text-left font-black text-[var(--text-primary)] dark:text-[var(--text-secondary)] w-1/2">Product</th>
+                <th className="px-4 py-3 text-center font-black text-[var(--text-primary)] dark:text-[var(--text-secondary)]">Store</th>
+                <th className="px-4 py-3 text-right font-black text-[var(--text-primary)] dark:text-[var(--text-secondary)]">Price</th>
+                <th className="px-4 py-3 text-right font-black text-[var(--text-primary)] dark:text-[var(--text-secondary)]">MRP</th>
+                <th className="px-4 py-3 text-center font-black text-[var(--text-primary)] dark:text-[var(--text-secondary)]">Discount</th>
+                <th className="px-4 py-3 text-center font-black text-[var(--text-primary)] dark:text-[var(--text-secondary)]">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -307,7 +307,7 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                 return (
                   <tr
                     key={deal.id}
-                    className={`border-b border-slate-50 transition hover:bg-slate-50 dark:hover:bg-[#0E1729]/80 dark:bg-[#070A11]/80 ${isLowest ? 'bg-emerald-50/60' : idx % 2 === 0 ? 'bg-white dark:bg-[#0D1527]' : 'bg-slate-50/30 dark:bg-[#070A11]/30'
+                    className={`border-b border-[var(--border-subtle)] transition hover:bg-[var(--surface)] dark:hover:bg-[#0E1729]/80 dark:bg-[var(--bg)]/80 ${isLowest ? 'bg-emerald-50/60' : idx % 2 === 0 ? 'bg-white dark:bg-[var(--surface)]' : 'bg-[var(--surface)]/30 dark:bg-[var(--bg)]/30'
                       }`}
                   >
                     <td className="px-4 py-3">
@@ -316,14 +316,14 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                           <img
                             src={deal.image}
                             alt=""
-                            className="h-10 w-10 flex-shrink-0 rounded-lg object-contain bg-white dark:bg-[#0D1527] border border-slate-100 dark:border-white/5 p-0.5"
+                            className="h-10 w-10 flex-shrink-0 rounded-lg object-contain bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)] dark:border-white/5 p-0.5"
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
                             }}
                           />
                         )}
                         <div className="min-w-0">
-                          <p className="line-clamp-2 font-semibold text-slate-800 dark:text-[#F8FAFC] leading-snug" title={deal.title}>
+                          <p className="line-clamp-2 font-semibold text-[var(--text-primary)] dark:text-[var(--text-primary)] leading-snug" title={deal.title}>
                             {deal.title}
                           </p>
                           <div className="mt-0.5 flex items-center gap-1.5">
@@ -339,7 +339,7 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                             )}
                           </div>
                           {deal.verdict && (
-                            <p className="mt-1 text-[10px] leading-tight text-slate-500 max-w-xs">
+                            <p className="mt-1 text-[10px] leading-tight text-[var(--text-secondary)] max-w-xs">
                               {deal.verdict}
                             </p>
                           )}
@@ -352,22 +352,22 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <span className={`font-black text-sm ${isLowest ? 'text-emerald-700' : 'text-slate-900 dark:text-[#F1F5F9]'}`}>
+                      <span className={`font-black text-sm ${isLowest ? 'text-emerald-700' : 'text-[var(--text-primary)] dark:text-[var(--text-primary)]'}`}>
                         {deal.price ? money(deal.price) : 'N/A'}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <span className="text-slate-400 line-through text-xs">
+                      <span className="text-[var(--text-secondary)] line-through text-xs">
                         {deal.mrp && deal.mrp > (deal.price || 0) ? money(deal.mrp) : '—'}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-center">
                       {deal.discount_pct && deal.discount_pct > 0 ? (
-                        <span className="rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-black text-white">
+                        <span className="rounded-full bg-[var(--idh-action-solid)] px-2 py-0.5 text-[10px] font-black text-white">
                           {deal.discount_pct}% off
                         </span>
                       ) : (
-                        <span className="text-slate-400">—</span>
+                        <span className="text-[var(--text-secondary)]">—</span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-center">
@@ -407,7 +407,7 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                           <button
                             type="button"
                             onClick={() => onCheckHistory(deal.raw_url || deal.url)}
-                            className="text-[9px] font-semibold text-slate-500 hover:text-emerald-600 transition cursor-pointer"
+                            className="text-[9px] font-semibold text-[var(--text-secondary)] hover:text-emerald-600 transition cursor-pointer"
                           >
                             📊 History
                           </button>
@@ -429,11 +429,11 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
             return (
               <article
                 key={deal.id}
-                className={`group flex flex-col justify-between overflow-hidden rounded-2xl border bg-white dark:bg-[#0D1527] transition hover:-translate-y-0.5 hover:shadow-md ${isLowest ? 'border-emerald-400 ring-2 ring-emerald-500/30' : 'border-slate-200 dark:border-white/10 hover:border-emerald-300'
+                className={`group flex flex-col justify-between overflow-hidden rounded-2xl border bg-white dark:bg-[var(--surface)] transition hover:-translate-y-0.5 hover:shadow-md ${isLowest ? 'border-emerald-400 ring-2 ring-emerald-500/30' : 'border-[var(--border-subtle)] dark:border-white/10 hover:border-emerald-300'
                   }`}
               >
                 <div>
-                  <div className="relative flex h-36 items-center justify-center bg-slate-50/70 dark:bg-[#070A11]/70 p-3">
+                  <div className="relative flex h-36 items-center justify-center bg-[var(--surface)]/70 dark:bg-[var(--bg)]/70 p-3">
                     {deal.image ? (
                       <img
                         src={deal.image}
@@ -454,7 +454,7 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                         LOWEST LISTED
                       </span>
                     ) : deal.discount_pct && deal.discount_pct > 0 ? (
-                      <span className="absolute left-2 top-2 rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-black text-white shadow-xs">
+                      <span className="absolute left-2 top-2 rounded-full bg-[var(--idh-action-solid)] px-2 py-0.5 text-[10px] font-black text-white shadow-xs">
                         {deal.discount_pct}% OFF
                       </span>
                     ) : null}
@@ -465,23 +465,23 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                         {deal.store || 'Store'}
                       </span>
                       <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-600">
-                        <span className="h-1.5 w-1.5 rounded-full bg-slate-400" /> {deal.in_stock === true ? 'Stock reported' : deal.in_stock === false ? 'Out of stock' : 'Check stock'}
+                        <span className="h-1.5 w-1.5 rounded-full bg-[var(--surface-2)]" /> {deal.in_stock === true ? 'Stock reported' : deal.in_stock === false ? 'Out of stock' : 'Check stock'}
                       </span>
                     </div>
-                    <h3 className="line-clamp-2 min-h-9 text-xs font-bold leading-snug text-slate-900 dark:text-[#F1F5F9]" title={deal.title}>
+                    <h3 className="line-clamp-2 min-h-9 text-xs font-bold leading-snug text-[var(--text-primary)] dark:text-[var(--text-primary)]" title={deal.title}>
                       {deal.title}
                     </h3>
                     {deal.history_badge && (
-                      <p className="mt-1 text-[10px] font-medium text-slate-500 truncate" title={deal.verdict}>
+                      <p className="mt-1 text-[10px] font-medium text-[var(--text-secondary)] truncate" title={deal.verdict}>
                         {deal.history_badge}
                       </p>
                     )}
                     <div className="mt-2 flex items-baseline gap-2">
-                      <span className={`text-base font-black ${isLowest ? 'text-emerald-700' : 'text-slate-900 dark:text-[#F1F5F9]'}`}>
+                      <span className={`text-base font-black ${isLowest ? 'text-emerald-700' : 'text-[var(--text-primary)] dark:text-[var(--text-primary)]'}`}>
                         {money(deal.price)}
                       </span>
                       {deal.mrp && deal.mrp > (deal.price || 0) && (
-                        <span className="text-[10px] text-slate-400 line-through">
+                        <span className="text-[10px] text-[var(--text-secondary)] line-through">
                           {money(deal.mrp)}
                         </span>
                       )}
@@ -493,9 +493,9 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                     <button
                       type="button"
                       onClick={() => onCheckHistory(deal.raw_url || deal.url)}
-                      className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#070A11] hover:bg-slate-100 dark:bg-[#111C33] py-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-200 transition cursor-pointer"
+                      className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 bg-[var(--surface)] dark:bg-[var(--bg)] hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)] py-1.5 text-[11px] font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] transition cursor-pointer"
                     >
-                      📊 90-Day History
+                      📊 Available price history
                     </button>
                   )}
                   {deal.url && (() => {
@@ -520,7 +520,7 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
                           <button
                             type="button"
                             onClick={() => openSmartStoreLink(deal.url, deal.store, asin, false, subId)}
-                            className="rounded-xl border border-slate-300 dark:border-white/20 bg-slate-50 dark:bg-[#070A11] hover:bg-slate-100 dark:bg-[#111C33] px-3 py-2 text-center text-[11px] font-bold text-slate-800 dark:text-[#F8FAFC] transition cursor-pointer"
+                            className="rounded-xl border border-[var(--border-subtle)] dark:border-white/20 bg-[var(--surface)] dark:bg-[var(--bg)] hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)] px-3 py-2 text-center text-[11px] font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] transition cursor-pointer"
                             title={isMobile ? "Open in Amazon App" : "View on Amazon in new tab"}
                           >
                             {isMobile ? "⚡ App" : "View Store ↗"}
@@ -548,15 +548,15 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
       )}
 
       {/* Paste Link Verification Bar */}
-      <div className="mt-6 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/80 dark:bg-[#070A11]/80 p-4">
+      <div className="mt-6 rounded-2xl border border-[var(--border-subtle)] dark:border-white/10 bg-[var(--surface)]/80 dark:bg-[var(--bg)]/80 p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="text-xl">🔍</span>
             <div>
-              <h4 className="text-xs font-black text-slate-900 dark:text-[#F1F5F9]">
+              <h4 className="text-xs font-black text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                 Found It Cheaper on Google Shopping or Any Other Store?
               </h4>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-[var(--text-secondary)]">
                 Paste a supported product link to check available price history and affiliate conversion. History coverage varies by product.
               </p>
             </div>
@@ -576,12 +576,12 @@ export const ExternalSearchResults: React.FC<ExternalSearchResultsProps> = ({ qu
             value={pastedUrl}
             onChange={(e) => setPastedUrl(e.target.value)}
             placeholder="Paste Google Shopping, Amazon, Flipkart, or store link to verify price history..."
-            className="flex-1 rounded-xl border border-slate-300 dark:border-white/20 bg-white dark:bg-[#0D1527] px-3.5 py-2 text-xs text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 focus:border-emerald-500 focus:outline-hidden"
+            className="flex-1 rounded-xl border border-[var(--border-subtle)] dark:border-white/20 bg-white dark:bg-[var(--surface)] px-3.5 py-2 text-xs text-[var(--text-primary)] dark:text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:border-emerald-500 focus:outline-hidden"
           />
           <button
             type="submit"
             disabled={!pastedUrl.trim()}
-            className="rounded-xl bg-slate-900 hover:bg-emerald-600 disabled:opacity-50 disabled:pointer-events-none px-4 py-2 text-xs font-bold text-white transition cursor-pointer shrink-0 shadow-2xs"
+            className="rounded-xl bg-[var(--idh-action-solid)] hover:bg-emerald-600 disabled:opacity-50 disabled:pointer-events-none px-4 py-2 text-xs font-bold text-white transition cursor-pointer shrink-0 shadow-2xs"
           >
             Verify Price
           </button>

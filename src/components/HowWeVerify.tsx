@@ -10,15 +10,15 @@ export const HowWeVerify: React.FC<HowWeVerifyProps> = ({ onBackToHome }) => {
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 flex flex-col gap-8">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs text-slate-400">
+      <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
         <button
           onClick={onBackToHome}
-          className="hover:text-blue-600 transition-colors cursor-pointer bg-transparent border-0 p-0 font-medium"
+          className="hover:text-[var(--idh-accent)] transition-colors cursor-pointer bg-transparent border-0 p-0 font-medium"
         >
           Home
         </button>
         <span>/</span>
-        <span className="text-slate-800 dark:text-[#F8FAFC] font-semibold">Understanding offer evidence</span>
+        <span className="text-[var(--text-primary)] dark:text-[var(--text-primary)] font-semibold">Understanding offer evidence</span>
       </div>
 
       {/* Header */}
@@ -26,10 +26,10 @@ export const HowWeVerify: React.FC<HowWeVerifyProps> = ({ onBackToHome }) => {
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-mono text-[11px] font-bold w-fit">
           <span>🛡️ KNOW WHAT YOU ARE BUYING</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-heading font-black tracking-tight text-slate-900 dark:text-[#F1F5F9] leading-tight">
+        <h1 className="text-3xl sm:text-4xl font-heading font-black tracking-tight text-[var(--text-primary)] dark:text-[var(--text-primary)] leading-tight">
           How Deals Are Verified
         </h1>
-        <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed max-w-2xl">
+        <p className="text-[var(--text-secondary)] dark:text-[var(--text-secondary)] text-sm sm:text-base leading-relaxed max-w-2xl">
           Use source labels, recorded prices and merchant links to assess an offer. Directory inclusion is different from a confirmed historical low, and evidence coverage varies by product.
         </p>
       </div>
@@ -70,21 +70,21 @@ export const HowWeVerify: React.FC<HowWeVerifyProps> = ({ onBackToHome }) => {
         ].map((step) => (
           <div
             key={step.num}
-            className="p-5 rounded-2xl bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 hover:border-slate-300 dark:border-white/20 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row gap-4 sm:items-start"
+            className="p-5 rounded-2xl bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)]/90 dark:border-white/10 hover:border-[var(--border-subtle)] dark:border-white/20 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row gap-4 sm:items-start"
           >
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center font-mono font-bold text-blue-600 text-sm flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[var(--surface-2)] border border-[var(--border-subtle)] flex items-center justify-center font-mono font-bold text-[var(--idh-accent)] text-sm flex-shrink-0">
               {step.num}
             </div>
             <div className="flex-1 flex flex-col gap-1.5">
               <div className="flex items-center gap-2.5">
-                <h3 className="text-sm font-bold font-heading text-slate-900 dark:text-[#F1F5F9]">
+                <h3 className="text-sm font-bold font-heading text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                   {step.title}
                 </h3>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-100 dark:bg-[#111C33] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 font-semibold">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--surface-2)] dark:bg-[var(--surface-2)] text-[var(--text-secondary)] dark:text-[var(--text-secondary)] border border-[var(--border-subtle)] dark:border-white/10 font-semibold">
                   {step.tag}
                 </span>
               </div>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-xs text-[var(--text-secondary)] dark:text-[var(--text-secondary)] leading-relaxed">
                 {step.desc}
               </p>
             </div>
@@ -93,18 +93,18 @@ export const HowWeVerify: React.FC<HowWeVerifyProps> = ({ onBackToHome }) => {
       </div>
 
       {/* Try Tool Banner */}
-      <div className="p-6 rounded-2xl bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow">
+      <div className="p-6 rounded-2xl bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)]/90 dark:border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow">
         <div>
-          <h3 className="text-base font-bold font-heading text-slate-900 dark:text-[#F1F5F9]">
+          <h3 className="text-base font-bold font-heading text-[var(--text-primary)] dark:text-[var(--text-primary)]">
             Want to test a product link yourself?
           </h3>
-          <p className="text-xs text-slate-500 mt-1 max-w-xl">
+          <p className="text-xs text-[var(--text-secondary)] mt-1 max-w-xl">
             Use our interactive Price Lookup tool to paste a specific Amazon, Flipkart, or Myntra product link and inspect available evidence.
           </p>
         </div>
         <button
           onClick={onBackToHome}
-          className="h-10 px-5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer flex-shrink-0 transition-all shadow-sm active:scale-95"
+          className="h-10 px-5 rounded-xl bg-[var(--idh-action-solid)] hover:bg-black text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer flex-shrink-0 transition-all shadow-sm active:scale-95"
         >
           <span>Explore Live Drops</span>
           <IconChevronRight size={14} />

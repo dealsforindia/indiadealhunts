@@ -144,31 +144,31 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
 
   return (
     <AnimatePresence>
-      <div ref={modalSurface} role="dialog" aria-modal="true" aria-label="Compare product specifications" className="shopper-tool-modal fixed inset-0 z-[110] flex items-center justify-center p-3 sm:p-6 bg-slate-900/70 backdrop-blur-md">
+      <div ref={modalSurface} role="dialog" aria-modal="true" aria-label="Compare product specifications" className="shopper-tool-modal fixed inset-0 z-[110] flex items-center justify-center p-3 sm:p-6 bg-[var(--surface)]/70 backdrop-blur-md">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-5xl max-h-[92vh] flex flex-col bg-white dark:bg-[#0D1527] rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden"
+          className="relative w-full max-w-5xl max-h-[92vh] flex flex-col bg-white dark:bg-[var(--surface)] rounded-3xl shadow-2xl border border-[var(--border-subtle)] dark:border-white/10 overflow-hidden"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/80 dark:bg-[#070A11]/80">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-subtle)] dark:border-white/5 bg-[var(--surface)]/80 dark:bg-[var(--bg)]/80">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-lg font-bold shadow-sm">
+              <div className="w-10 h-10 rounded-2xl bg-[var(--idh-action-solid)] text-white flex items-center justify-center text-lg font-bold shadow-sm">
                 ⚖️
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-[#F1F5F9]">
+                <h2 className="text-lg sm:text-xl font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                   Side-by-Side Product Comparison
                 </h2>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-[var(--text-secondary)]">
                   Listed prices, supplied specifications and source scores
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              {onBack && <button type="button" onClick={onBack} className="min-h-11 px-3 rounded-xl border border-slate-200 text-xs font-bold">Offer prices</button>}
+              {onBack && <button type="button" onClick={onBack} className="min-h-11 px-3 rounded-xl border border-[var(--border-subtle)] text-xs font-bold">Offer prices</button>}
               {deals.length > 0 && (
                 <button
                   type="button"
@@ -181,7 +181,7 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
               <button
                 type="button"
                 onClick={onClose}
-                aria-label="Close dialog" className="w-11 h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#1E293B]/60 dark:bg-[#172440]/60 transition-colors cursor-pointer"
+                aria-label="Close dialog" className="w-11 h-11 rounded-xl flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-secondary)] hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-2)]/60 dark:bg-[var(--surface-2)]/60 transition-colors cursor-pointer"
               >
                 ✕
               </button>
@@ -191,50 +191,50 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
           {/* Comparison Grid Content */}
           <div className="flex-1 overflow-x-auto overflow-y-auto p-6">
             {deals.length === 0 ? (
-              <div className="py-16 text-center text-slate-400">
+              <div className="py-16 text-center text-[var(--text-secondary)]">
                 <span className="text-4xl block mb-2">⚖️</span>
-                <p className="text-base font-semibold text-slate-600 dark:text-slate-400">No items selected for comparison</p>
-                <p className="text-xs text-slate-400 mt-1">Click the "Compare" button on any deal card to compare specs side by side.</p>
+                <p className="text-base font-semibold text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">No items selected for comparison</p>
+                <p className="text-xs text-[var(--text-secondary)] mt-1">Click the "Compare" button on any deal card to compare specs side by side.</p>
               </div>
             ) : (
               <div className="min-w-[650px]">
                 <table className="w-full border-collapse">
                   <thead>
                     <tr>
-                      <th className="w-44 p-3 text-left text-xs font-mono uppercase text-slate-400 bg-slate-50 dark:bg-[#070A11] rounded-l-xl">
+                      <th className="w-44 p-3 text-left text-xs font-mono uppercase text-[var(--text-secondary)] bg-[var(--surface)] dark:bg-[var(--bg)] rounded-l-xl">
                         Product Details
                       </th>
                       {deals.map((deal) => {
                         const isLowest = deal.price === lowestPrice;
                         return (
-                          <th key={deal.id} className="p-3 text-left relative bg-slate-50 dark:bg-[#070A11] first:rounded-l-xl last:rounded-r-xl">
+                          <th key={deal.id} className="p-3 text-left relative bg-[var(--surface)] dark:bg-[var(--bg)] first:rounded-l-xl last:rounded-r-xl">
                             <div className="flex items-start justify-between gap-2 mb-2">
                               {isLowest ? (
                                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
                                   👑 Best Price
                                 </span>
                               ) : (
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 dark:bg-[#172440] text-slate-700 dark:text-slate-200">
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--surface-2)] dark:bg-[var(--surface-2)] text-[var(--text-primary)] dark:text-[var(--text-secondary)]">
                                   {deal.store || 'Verified'}
                                 </span>
                               )}
                               <button
                                 type="button"
                                 onClick={() => onRemoveDeal(deal.id)}
-                                className="text-slate-400 hover:text-rose-600 text-xs cursor-pointer p-1"
+                                className="text-[var(--text-secondary)] hover:text-rose-600 text-xs cursor-pointer p-1"
                                 title="Remove item"
                               >
                                 ✕
                               </button>
                             </div>
-                            <div className="w-20 h-20 mx-auto mb-2 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 flex items-center justify-center p-2 overflow-hidden shadow-2xs">
+                            <div className="w-20 h-20 mx-auto mb-2 rounded-xl bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)] dark:border-white/10 flex items-center justify-center p-2 overflow-hidden shadow-2xs">
                               {deal.image ? (
                                 <img src={deal.image} alt={deal.title} className="w-full h-full object-contain" />
                               ) : (
                                 <span className="text-2xl">📦</span>
                               )}
                             </div>
-                            <p className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] line-clamp-2 leading-snug text-center">
+                            <p className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] line-clamp-2 leading-snug text-center">
                               {deal.title}
                             </p>
                           </th>
@@ -246,16 +246,16 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
                   <tbody className="divide-y divide-slate-100 text-sm">
                     {/* Live Sale Price */}
                     <tr>
-                      <td className="p-3 font-semibold text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-[#070A11]/50">Deal Price</td>
+                      <td className="p-3 font-semibold text-[var(--text-secondary)] dark:text-[var(--text-secondary)] bg-[var(--surface)]/50 dark:bg-[var(--bg)]/50">Deal Price</td>
                       {deals.map((deal) => (
                         <td key={deal.id} className="p-3">
                           <div className="flex items-baseline gap-2">
                             {(() => {
                             const p = Number(deal.price ?? deal.sale_price ?? deal.prices?.sale) || 0;
-                            return <span className="text-lg font-black text-slate-900 dark:text-[#F1F5F9]">{p > 0 ? `₹${p.toLocaleString('en-IN')}` : 'Check store'}</span>;
+                            return <span className="text-lg font-black text-[var(--text-primary)] dark:text-[var(--text-primary)]">{p > 0 ? `₹${p.toLocaleString('en-IN')}` : 'Check store'}</span>;
                           })()}
                             {deal.mrp && deal.mrp > deal.price && (
-                              <span className="text-xs text-slate-400 line-through">₹{deal.mrp.toLocaleString('en-IN')}</span>
+                              <span className="text-xs text-[var(--text-secondary)] line-through">₹{deal.mrp.toLocaleString('en-IN')}</span>
                             )}
                           </div>
                           {deal.discount_pct && deal.discount_pct > 0 ? (
@@ -271,15 +271,15 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
 
                     {/* Real Product Specification Row 1 */}
                     <tr>
-                      <td className="p-3 font-semibold text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-[#070A11]/50">
+                      <td className="p-3 font-semibold text-[var(--text-secondary)] dark:text-[var(--text-secondary)] bg-[var(--surface)]/50 dark:bg-[var(--bg)]/50">
                         Specifications
                       </td>
                       {deals.map((deal) => {
                         const attrs = getProductAttributes(deal);
                         return (
-                          <td key={deal.id} className="p-3 text-slate-800 dark:text-[#F8FAFC]">
-                            <span className="font-bold text-xs block text-slate-500 uppercase">{attrs.specRow1Label}</span>
-                            <span className="text-xs font-semibold text-slate-800 dark:text-[#F8FAFC]">{attrs.specRow1Value}</span>
+                          <td key={deal.id} className="p-3 text-[var(--text-primary)] dark:text-[var(--text-primary)]">
+                            <span className="font-bold text-xs block text-[var(--text-secondary)] uppercase">{attrs.specRow1Label}</span>
+                            <span className="text-xs font-semibold text-[var(--text-primary)] dark:text-[var(--text-primary)]">{attrs.specRow1Value}</span>
                           </td>
                         );
                       })}
@@ -287,15 +287,15 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
 
                     {/* Real Product Specification Row 2 */}
                     <tr>
-                      <td className="p-3 font-semibold text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-[#070A11]/50">
+                      <td className="p-3 font-semibold text-[var(--text-secondary)] dark:text-[var(--text-secondary)] bg-[var(--surface)]/50 dark:bg-[var(--bg)]/50">
                         Feature / Highlights
                       </td>
                       {deals.map((deal) => {
                         const attrs = getProductAttributes(deal);
                         return (
-                          <td key={deal.id} className="p-3 text-slate-800 dark:text-[#F8FAFC]">
-                            <span className="font-bold text-xs block text-slate-500 uppercase">{attrs.specRow2Label}</span>
-                            <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">{attrs.specRow2Value}</span>
+                          <td key={deal.id} className="p-3 text-[var(--text-primary)] dark:text-[var(--text-primary)]">
+                            <span className="font-bold text-xs block text-[var(--text-secondary)] uppercase">{attrs.specRow2Label}</span>
+                            <span className="text-xs font-semibold text-[var(--text-primary)] dark:text-[var(--text-secondary)]">{attrs.specRow2Value}</span>
                           </td>
                         );
                       })}
@@ -303,25 +303,25 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
 
                     {/* Store & Authenticity */}
                     <tr>
-                      <td className="p-3 font-semibold text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-[#070A11]/50">Retailer & Source</td>
+                      <td className="p-3 font-semibold text-[var(--text-secondary)] dark:text-[var(--text-secondary)] bg-[var(--surface)]/50 dark:bg-[var(--bg)]/50">Retailer & Source</td>
                       {deals.map((deal) => (
                         <td key={deal.id} className="p-3 text-xs">
-                          <span className="font-bold text-slate-900 dark:text-[#F1F5F9]">{deal.store || 'Verified Store'}</span>
-                          <span className="block text-slate-500 font-semibold mt-0.5">Confirm seller and authenticity at the store</span>
+                          <span className="font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]">{deal.store || 'Verified Store'}</span>
+                          <span className="block text-[var(--text-secondary)] font-semibold mt-0.5">Confirm seller and authenticity at the store</span>
                         </td>
                       ))}
                     </tr>
 
                     {/* Worth Score */}
                     <tr>
-                      <td className="p-3 font-semibold text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-[#070A11]/50">Deal Worth Score</td>
+                      <td className="p-3 font-semibold text-[var(--text-secondary)] dark:text-[var(--text-secondary)] bg-[var(--surface)]/50 dark:bg-[var(--bg)]/50">Deal Worth Score</td>
                       {deals.map((deal) => (
                         <td key={deal.id} className="p-3">
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 font-black text-xs flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-lg bg-[var(--surface-2)] border border-[var(--border-subtle)] text-[var(--idh-accent)] font-black text-xs flex items-center justify-center">
                               {deal.worth_score ?? '—'}
                             </div>
-                            <span className="text-xs text-slate-500 font-medium">{deal.worth_score != null ? '/ 100 · source score' : 'Not supplied'}</span>
+                            <span className="text-xs text-[var(--text-secondary)] font-medium">{deal.worth_score != null ? '/ 100 · source score' : 'Not supplied'}</span>
                           </div>
                         </td>
                       ))}
@@ -329,14 +329,14 @@ export const ProductSpecCompareModal: React.FC<ProductSpecCompareModalProps> = (
 
                     {/* Buy Action */}
                     <tr>
-                      <td className="p-3 font-semibold text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-[#070A11]/50">Buy Link</td>
+                      <td className="p-3 font-semibold text-[var(--text-secondary)] dark:text-[var(--text-secondary)] bg-[var(--surface)]/50 dark:bg-[var(--bg)]/50">Buy Link</td>
                       {deals.map((deal) => (
                         <td key={deal.id} className="p-3">
                           <a
                             href={deal.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs tracking-wide shadow-sm transition-all cursor-pointer text-center"
+                            className="inline-flex items-center justify-center w-full py-2.5 px-4 rounded-xl bg-[var(--idh-action-solid)] hover:bg-[var(--idh-action-solid)] text-white font-bold text-xs tracking-wide shadow-sm transition-all cursor-pointer text-center"
                           >
                             <span>Claim on {deal.store || 'Store'}</span>
                             <span className="ml-1">→</span>

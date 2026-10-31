@@ -123,31 +123,31 @@ export const EMICalculatorTool: React.FC = () => {
   }, [productPrice, downPayment, selectedTenure, interestRate, isNoCostEmi, selectedBank]);
 
   return (
-    <div className="w-full bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-sm p-5 md:p-7 text-slate-800 dark:text-[#F8FAFC]">
+    <div className="w-full bg-white dark:bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)]/90 dark:border-white/10 shadow-sm p-5 md:p-7 text-[var(--text-primary)] dark:text-[var(--text-primary)]">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100 dark:border-white/5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-[var(--border-subtle)] dark:border-white/5">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xl">💳</span>
-            <h3 className="font-heading font-extrabold text-lg sm:text-xl text-slate-900 dark:text-[#F1F5F9] tracking-tight">
+            <h3 className="font-heading font-extrabold text-lg sm:text-xl text-[var(--text-primary)] dark:text-[var(--text-primary)] tracking-tight">
               India No-Cost EMI & Hidden Cost Analyzer
             </h3>
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
               REALITY CHECK
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-[var(--text-secondary)] mt-1">
             Calculates 18% GST on interest & bank processing fees that Indian banks quietly charge even on &ldquo;0% Interest&rdquo; schemes.
           </p>
         </div>
 
         {/* No-Cost Toggle */}
-        <div className="flex items-center gap-2 bg-slate-100 dark:bg-[#111C33] p-1 rounded-xl self-start sm:self-auto">
+        <div className="flex items-center gap-2 bg-[var(--surface-2)] dark:bg-[var(--surface-2)] p-1 rounded-xl self-start sm:self-auto">
           <button
             type="button"
             onClick={() => setIsNoCostEmi(true)}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              isNoCostEmi ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-xs' : 'text-slate-500 hover:text-slate-800 dark:text-[#F8FAFC]'
+              isNoCostEmi ? 'bg-white dark:bg-[var(--surface)] text-[var(--text-primary)] dark:text-[var(--text-primary)] shadow-xs' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-primary)]'
             }`}
           >
             No-Cost EMI (0%)
@@ -156,7 +156,7 @@ export const EMICalculatorTool: React.FC = () => {
             type="button"
             onClick={() => setIsNoCostEmi(false)}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              !isNoCostEmi ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-xs' : 'text-slate-500 hover:text-slate-800 dark:text-[#F8FAFC]'
+              !isNoCostEmi ? 'bg-white dark:bg-[var(--surface)] text-[var(--text-primary)] dark:text-[var(--text-primary)] shadow-xs' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-primary)]'
             }`}
           >
             Standard Interest
@@ -171,10 +171,10 @@ export const EMICalculatorTool: React.FC = () => {
           {/* Product Price */}
           <div>
             <div className="flex justify-between items-center mb-1.5">
-              <label htmlFor="emi-product-price" className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">
+              <label htmlFor="emi-product-price" className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] uppercase tracking-wide">
                 Product Price (MRP or Deal Price)
               </label>
-              <span className="text-sm font-extrabold font-mono text-slate-900 dark:text-[#F1F5F9]">
+              <span className="text-sm font-extrabold font-mono text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                 ₹{productPrice.toLocaleString('en-IN')}
               </span>
             </div>
@@ -186,9 +186,9 @@ export const EMICalculatorTool: React.FC = () => {
               step="500"
               value={productPrice}
               onChange={(e) => setProductPrice(Number(e.target.value))}
-              className="w-full h-2 bg-slate-200 dark:bg-[#172440] rounded-lg appearance-none cursor-pointer accent-blue-600"
+              className="w-full h-2 bg-[var(--surface-2)] dark:bg-[var(--surface-2)] rounded-lg appearance-none cursor-pointer accent-blue-600"
             />
-            <div className="flex justify-between text-[10px] text-slate-400 font-mono mt-1">
+            <div className="flex justify-between text-[10px] text-[var(--text-secondary)] font-mono mt-1">
               <span>₹2,000</span>
               <span>₹50,000</span>
               <span>₹1,00,000</span>
@@ -198,7 +198,7 @@ export const EMICalculatorTool: React.FC = () => {
 
           {/* Quick presets */}
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] font-semibold text-slate-500 mr-1">Presets:</span>
+            <span className="text-[11px] font-semibold text-[var(--text-secondary)] mr-1">Presets:</span>
             {[15000, 30000, 55000, 85000, 130000].map((val) => (
               <button
                 key={val}
@@ -206,8 +206,8 @@ export const EMICalculatorTool: React.FC = () => {
                 onClick={() => setProductPrice(val)}
                 className={`px-2.5 py-1 text-xs rounded-lg border font-mono transition-colors ${
                   productPrice === val
-                    ? 'bg-blue-50 border-blue-300 text-blue-700 font-bold'
-                    : 'bg-white dark:bg-[#0D1527] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:bg-[#070A11]'
+                    ? 'bg-[var(--surface-2)] border-[var(--border-subtle)] text-[var(--idh-accent)] font-bold'
+                    : 'bg-white dark:bg-[var(--surface)] border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-secondary)] dark:text-[var(--text-secondary)] hover:bg-[var(--surface)] dark:bg-[var(--bg)]'
                 }`}
               >
                 ₹{val >= 100000 ? `${val / 100000}L` : `${val / 1000}k`}
@@ -217,7 +217,7 @@ export const EMICalculatorTool: React.FC = () => {
 
           {/* Tenure Selection */}
           <div>
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide block mb-2">
+            <label className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] uppercase tracking-wide block mb-2">
               Select Tenure (Months)
             </label>
             <div className="grid grid-cols-6 gap-2">
@@ -228,8 +228,8 @@ export const EMICalculatorTool: React.FC = () => {
                   onClick={() => setSelectedTenure(t)}
                   className={`py-2 px-1 rounded-xl text-center border font-bold text-xs transition-all ${
                     selectedTenure === t
-                      ? 'bg-slate-900 border-slate-900 text-white shadow-xs'
-                      : 'bg-white dark:bg-[#0D1527] border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-[#070A11]'
+                      ? 'bg-[var(--idh-action-solid)] border-[var(--border-subtle)] text-white shadow-xs'
+                      : 'bg-white dark:bg-[var(--surface)] border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-primary)] dark:text-[var(--text-secondary)] hover:bg-[var(--surface)] dark:bg-[var(--bg)]'
                   }`}
                 >
                   <div>{t}M</div>
@@ -244,7 +244,7 @@ export const EMICalculatorTool: React.FC = () => {
           {/* Bank Selection */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="emi-bank-select" className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide block mb-1.5">
+              <label htmlFor="emi-bank-select" className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] uppercase tracking-wide block mb-1.5">
                 Issuing Credit Card Bank
               </label>
               <select
@@ -254,7 +254,7 @@ export const EMICalculatorTool: React.FC = () => {
                   setSelectedBankId(e.target.value);
                   setUseCustomRate(false);
                 }}
-                className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-xs font-medium text-slate-800 dark:text-[#F8FAFC] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-10 px-3 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 bg-white dark:bg-[var(--surface)] text-xs font-medium text-[var(--text-primary)] dark:text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {INDIAN_BANKS.map((bank) => (
                   <option key={bank.id} value={bank.id}>
@@ -265,11 +265,11 @@ export const EMICalculatorTool: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="emi-down-payment" className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide block mb-1.5">
+              <label htmlFor="emi-down-payment" className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] uppercase tracking-wide block mb-1.5">
                 Down Payment (Optional)
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-bold">₹</span>
+                <span className="absolute left-3 top-2.5 text-xs text-[var(--text-secondary)] font-bold">₹</span>
                 <input
                   id="emi-down-payment"
                   type="number"
@@ -279,7 +279,7 @@ export const EMICalculatorTool: React.FC = () => {
                   value={downPayment || ''}
                   placeholder="0"
                   onChange={(e) => setDownPayment(Math.min(productPrice, Math.max(0, Number(e.target.value))))}
-                  className="w-full h-10 pl-7 pr-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-xs font-medium text-slate-800 dark:text-[#F8FAFC] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full h-10 pl-7 pr-3 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 bg-white dark:bg-[var(--surface)] text-xs font-medium text-[var(--text-primary)] dark:text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
@@ -287,23 +287,23 @@ export const EMICalculatorTool: React.FC = () => {
         </div>
 
         {/* Right: Analysis & Cost Verdict (5 cols) */}
-        <div className="lg:col-span-5 bg-slate-50/80 dark:bg-[#070A11]/80 rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-[var(--surface)]/80 dark:bg-[var(--bg)]/80 rounded-2xl border border-[var(--border-subtle)]/80 dark:border-white/10 p-5 flex flex-col justify-between">
           <div>
-            <span className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider block mb-1">
+            <span className="text-[10px] font-mono font-bold uppercase text-[var(--text-secondary)] tracking-wider block mb-1">
               Monthly Outflow
             </span>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-heading font-black text-slate-900 dark:text-[#F1F5F9] tracking-tight">
+              <span className="text-3xl font-heading font-black text-[var(--text-primary)] dark:text-[var(--text-primary)] tracking-tight">
                 ₹{calculations.monthlyEmi.toLocaleString('en-IN')}
               </span>
-              <span className="text-xs text-slate-500 font-semibold">/ month for {selectedTenure} mos</span>
+              <span className="text-xs text-[var(--text-secondary)] font-semibold">/ month for {selectedTenure} mos</span>
             </div>
 
             {/* Hidden Cost Breakdown */}
-            <div className="mt-4 pt-4 border-t border-slate-200/60 dark:border-white/10 flex flex-col gap-2.5 text-xs">
-              <div className="flex justify-between items-center text-slate-600 dark:text-slate-400">
+            <div className="mt-4 pt-4 border-t border-[var(--border-subtle)]/60 dark:border-white/10 flex flex-col gap-2.5 text-xs">
+              <div className="flex justify-between items-center text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">
                 <span>Sticker Product Price</span>
-                <span className="font-mono font-semibold text-slate-900 dark:text-[#F1F5F9]">
+                <span className="font-mono font-semibold text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                   ₹{productPrice.toLocaleString('en-IN')}
                 </span>
               </div>
@@ -317,9 +317,9 @@ export const EMICalculatorTool: React.FC = () => {
                 </div>
               )}
 
-              <div className="flex justify-between items-center text-slate-600 dark:text-slate-400">
+              <div className="flex justify-between items-center text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">
                 <span>Bank Interest ({interestRate}% p.a.)</span>
-                <span className="font-mono font-semibold text-slate-900 dark:text-[#F1F5F9]">
+                <span className="font-mono font-semibold text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                   +₹{calculations.totalInterest.toLocaleString('en-IN')}
                 </span>
               </div>
@@ -344,9 +344,9 @@ export const EMICalculatorTool: React.FC = () => {
                 </span>
               </div>
 
-              <div className="pt-2 border-t border-slate-300/80 dark:border-white/20 flex justify-between items-center text-sm font-extrabold text-slate-900 dark:text-[#F1F5F9]">
+              <div className="pt-2 border-t border-[var(--border-subtle)]/80 dark:border-white/20 flex justify-between items-center text-sm font-extrabold text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                 <span>Net Actual Amount Paid</span>
-                <span className="font-mono text-base text-blue-700">
+                <span className="font-mono text-base text-[var(--idh-accent)]">
                   ₹{calculations.netEffectiveCost.toLocaleString('en-IN')}
                 </span>
               </div>
@@ -354,14 +354,14 @@ export const EMICalculatorTool: React.FC = () => {
           </div>
 
           {/* Reality Verdict Pill */}
-          <div className="mt-5 p-3 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-[#F1F5F9] mb-1">
+          <div className="mt-5 p-3 rounded-xl bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)] dark:border-white/10">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] mb-1">
               <span>{calculations.extraCostOverSticker > 0 ? '⚠️ Hidden Extra Cost:' : '✅ Zero Extra Cost:'}</span>
               <span className="text-rose-600 font-mono font-extrabold">
                 ₹{calculations.extraCostOverSticker.toLocaleString('en-IN')}
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 leading-relaxed">
+            <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
               {isNoCostEmi
                 ? `Even with "0% Interest", you will pay ₹${calculations.extraCostOverSticker.toLocaleString('en-IN')} extra in non-refundable government GST and bank processing charges.`
                 : `Taking standard EMI adds ₹${calculations.extraCostOverSticker.toLocaleString('en-IN')} to your final purchase bill.`}
@@ -371,21 +371,21 @@ export const EMICalculatorTool: React.FC = () => {
       </div>
 
       {/* Amortization Table Accordion */}
-      <details className="mt-6 pt-4 border-t border-slate-100 dark:border-white/5 group">
-        <summary className="cursor-pointer text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:text-[#F1F5F9] flex items-center justify-between list-none">
+      <details className="mt-6 pt-4 border-t border-[var(--border-subtle)] dark:border-white/5 group">
+        <summary className="cursor-pointer text-xs font-bold text-[var(--text-secondary)] dark:text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] dark:text-[var(--text-primary)] flex items-center justify-between list-none">
           <span className="flex items-center gap-2">
             <span>📊 View Month-by-Month Bank Amortization Schedule</span>
-            <span className="text-[10px] font-mono bg-slate-100 dark:bg-[#111C33] text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-mono bg-[var(--surface-2)] dark:bg-[var(--surface-2)] text-[var(--text-secondary)] dark:text-[var(--text-secondary)] px-2 py-0.5 rounded-full">
               {calculations.amortization.length} payments
             </span>
           </span>
-          <span className="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+          <span className="text-[var(--text-secondary)] group-open:rotate-180 transition-transform">▼</span>
         </summary>
 
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-left text-xs font-mono">
             <thead>
-              <tr className="border-b border-slate-200 dark:border-white/10 text-[11px] uppercase tracking-wider text-slate-400">
+              <tr className="border-b border-[var(--border-subtle)] dark:border-white/10 text-[11px] uppercase tracking-wider text-[var(--text-secondary)]">
                 <th className="py-2 px-3">Mo</th>
                 <th className="py-2 px-3">Opening</th>
                 <th className="py-2 px-3">Principal</th>
@@ -397,14 +397,14 @@ export const EMICalculatorTool: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {calculations.amortization.map((row) => (
-                <tr key={row.month} className="hover:bg-slate-50 dark:bg-[#070A11] transition-colors">
-                  <td className="py-2 px-3 font-bold text-slate-700 dark:text-slate-200">{row.month}</td>
-                  <td className="py-2 px-3 text-slate-600 dark:text-slate-400">₹{row.openingBalance.toLocaleString('en-IN')}</td>
+                <tr key={row.month} className="hover:bg-[var(--surface)] dark:bg-[var(--bg)] transition-colors">
+                  <td className="py-2 px-3 font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)]">{row.month}</td>
+                  <td className="py-2 px-3 text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">₹{row.openingBalance.toLocaleString('en-IN')}</td>
                   <td className="py-2 px-3 text-emerald-700 font-semibold">₹{row.principal.toLocaleString('en-IN')}</td>
                   <td className="py-2 px-3 text-amber-600">₹{row.interest.toLocaleString('en-IN')}</td>
                   <td className="py-2 px-3 text-rose-600">₹{row.gst.toLocaleString('en-IN')}</td>
-                  <td className="py-2 px-3 font-bold text-slate-900 dark:text-[#F1F5F9]">₹{(row.emi + row.gst).toLocaleString('en-IN')}</td>
-                  <td className="py-2 px-3 text-right text-slate-500">₹{row.closingBalance.toLocaleString('en-IN')}</td>
+                  <td className="py-2 px-3 font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]">₹{(row.emi + row.gst).toLocaleString('en-IN')}</td>
+                  <td className="py-2 px-3 text-right text-[var(--text-secondary)]">₹{row.closingBalance.toLocaleString('en-IN')}</td>
                 </tr>
               ))}
             </tbody>

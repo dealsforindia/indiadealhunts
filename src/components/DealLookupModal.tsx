@@ -249,27 +249,27 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
   return createPortal(
     <div
       ref={modalSurface} role="dialog" aria-modal="true" aria-label="Product price lookup"
-      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-[var(--surface)]/40 backdrop-blur-sm"
       onClick={onClose}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
-        className="w-full max-w-2xl rounded-2xl bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[calc(100dvh-2rem)] overscroll-contain"
+        className="w-full max-w-2xl rounded-2xl bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)]/90 dark:border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[calc(100dvh-2rem)] overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#070A11] flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-subtle)] dark:border-white/10 bg-[var(--surface)] dark:bg-[var(--bg)] flex-shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+            <div className="w-8 h-8 rounded-lg bg-[var(--surface-2)] border border-[var(--border-subtle)] flex items-center justify-center text-[var(--idh-accent)]">
               <IconSearch size={16} />
             </div>
             <div>
-              <h2 className="font-heading text-base font-extrabold text-slate-900 dark:text-[#F1F5F9] m-0">
+              <h2 className="font-heading text-base font-extrabold text-[var(--text-primary)] dark:text-[var(--text-primary)] m-0">
                 Product price lookup
               </h2>
-              <span className="text-[10.5px] font-mono text-slate-500 uppercase">
+              <span className="text-[10.5px] font-mono text-[var(--text-secondary)] uppercase">
                 Inspect available evidence · Save price goals
               </span>
             </div>
@@ -277,14 +277,14 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
 
           <div className="flex items-center gap-2">
             {/* View Selector Tabs */}
-            <div className="flex items-center gap-1 bg-slate-200/70 dark:bg-[#172440]/70 p-1 rounded-xl">
+            <div className="flex items-center gap-1 bg-[var(--surface-2)]/70 dark:bg-[var(--surface-2)]/70 p-1 rounded-xl">
               <button
                 type="button"
                 onClick={() => setActiveTab('analyzer')}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                   activeTab === 'analyzer'
-                    ? 'bg-white dark:bg-sky-500/20 text-slate-900 dark:text-sky-300 shadow-sm border border-slate-300/40 dark:border-sky-500/30'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                    ? 'bg-white dark:bg-sky-500/20 text-[var(--text-primary)] dark:text-sky-300 shadow-sm border border-[var(--border-subtle)]/40 dark:border-sky-500/30'
+                    : 'text-[var(--text-secondary)] dark:text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:hover:text-[var(--text-secondary)]'
                 }`}
               >
                 Analyzer
@@ -294,13 +294,13 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                 onClick={() => setActiveTab('watches')}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                   activeTab === 'watches'
-                    ? 'bg-white dark:bg-sky-500/20 text-slate-900 dark:text-sky-300 shadow-sm border border-slate-300/40 dark:border-sky-500/30'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                    ? 'bg-white dark:bg-sky-500/20 text-[var(--text-primary)] dark:text-sky-300 shadow-sm border border-[var(--border-subtle)]/40 dark:border-sky-500/30'
+                    : 'text-[var(--text-secondary)] dark:text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:hover:text-[var(--text-secondary)]'
                 }`}
               >
                 <span>Watches</span>
                 {watches.length > 0 && (
-                  <span className="w-4 h-4 rounded-full bg-blue-600 text-white text-[9px] flex items-center justify-center font-bold">
+                  <span className="w-4 h-4 rounded-full bg-[var(--idh-action-solid)] text-white text-[9px] flex items-center justify-center font-bold">
                     {watches.length}
                   </span>
                 )}
@@ -311,7 +311,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
               <button
                 onClick={onClose}
                 aria-label="Close price lookup"
-                className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 hover:dark:bg-[#172440] text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                className="w-10 h-10 rounded-lg bg-[var(--surface-2)] dark:bg-[var(--surface-2)] hover:bg-[var(--surface-2)] hover:dark:bg-[var(--surface-2)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-secondary)] dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer"
               >
                 <IconClose size={16} />
               </button>
@@ -337,12 +337,12 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                   onChange={(e) => setUrl(e.target.value)}
                   placeholder="Paste Amazon, Flipkart, or Myntra link..."
                   required
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--surface)] dark:bg-[var(--bg)] border border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-primary)] dark:text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-sm focus:outline-none focus:bg-white dark:bg-[var(--surface)] focus:border-[var(--border-subtle)] focus:ring-2 focus:ring-blue-100 transition-colors"
                 />
                 <button
                   type="submit"
                   disabled={loading}
-                  className="h-11 px-6 rounded-xl bg-slate-900 hover:bg-black text-white font-extrabold text-xs tracking-wide shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60 whitespace-nowrap"
+                  className="h-11 px-6 rounded-xl bg-[var(--idh-action-solid)] hover:bg-black text-white font-extrabold text-xs tracking-wide shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60 whitespace-nowrap"
                 >
                   {loading ? (
                     <>
@@ -365,7 +365,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
               )}
 
               {result && (
-                <div className="rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 p-4 flex flex-col gap-3.5">
+                <div className="rounded-xl bg-[var(--surface)] dark:bg-[var(--bg)] border border-[var(--border-subtle)] dark:border-white/10 p-4 flex flex-col gap-3.5">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-mono font-bold uppercase text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
                       {result.store || 'Source store'}
@@ -376,18 +376,18 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                     </span>
                   </div>
 
-                  <h4 className="font-heading text-sm font-bold text-slate-900 dark:text-[#F1F5F9] line-clamp-2 m-0">
+                  <h4 className="font-heading text-sm font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] line-clamp-2 m-0">
                     {result.title || result.product_name || 'Product Analysis Complete'}
                   </h4>
 
                   <div className="flex items-baseline gap-2.5">
                     {result.price > 0 && (
-                      <span className="font-mono text-2xl font-extrabold text-slate-900 dark:text-[#F1F5F9]">
+                      <span className="font-mono text-2xl font-extrabold text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                         ₹{Number(result.price).toLocaleString('en-IN')}
                       </span>
                     )}
                     {result.mrp && result.mrp > result.price && (
-                      <span className="font-mono text-xs text-slate-400 line-through">
+                      <span className="font-mono text-xs text-[var(--text-secondary)] line-through">
                         ₹{Number(result.mrp).toLocaleString('en-IN')}
                       </span>
                     )}
@@ -397,14 +397,14 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-500 leading-relaxed m-0" role="status">{result.price_evidence_label || 'Current price unconfirmed'}{result.last_checked_at ? ` · ${new Date(result.last_checked_at).toLocaleString('en-IN')}` : '. A merchant observation timestamp was not supplied.'} Confirm your variant and final price at checkout.</p>
-                  {!result.price && result.historical_price > 0 && result.historical_price_at && <p className="text-xs text-slate-500 m-0">Historical observation: ₹{Number(result.historical_price).toLocaleString('en-IN')} on {new Date(result.historical_price_at < 1e11 ? result.historical_price_at * 1000 : result.historical_price_at).toLocaleDateString('en-IN')}. This is not the current price.</p>}
+                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed m-0" role="status">{result.price_evidence_label || 'Current price unconfirmed'}{result.last_checked_at ? ` · ${new Date(result.last_checked_at).toLocaleString('en-IN')}` : '. A merchant observation timestamp was not supplied.'} Confirm your variant and final price at checkout.</p>
+                  {!result.price && result.historical_price > 0 && result.historical_price_at && <p className="text-xs text-[var(--text-secondary)] m-0">Historical observation: ₹{Number(result.historical_price).toLocaleString('en-IN')} on {new Date(result.historical_price_at < 1e11 ? result.historical_price_at * 1000 : result.historical_price_at).toLocaleDateString('en-IN')}. This is not the current price.</p>}
 
                   {/* Multi-Store Arbitrage / Verification Table */}
                   {arbitrageData && (
-                    <div className="mt-1 p-3.5 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 flex flex-col gap-2.5 shadow-2xs">
+                    <div className="mt-1 p-3.5 rounded-xl bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)] dark:border-white/10 flex flex-col gap-2.5 shadow-2xs">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-heading font-extrabold text-slate-900 dark:text-[#F1F5F9] flex items-center gap-1">
+                        <span className="text-xs font-heading font-extrabold text-[var(--text-primary)] dark:text-[var(--text-primary)] flex items-center gap-1">
                           <span>Price evidence & store checks</span>
                         </span>
                         <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
@@ -419,11 +419,11 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                             className={`p-2.5 rounded-lg border flex flex-col gap-1 transition-all ${
                               q.isVerifiedDeal
                                 ? 'bg-emerald-50/50 border-emerald-300 ring-1 ring-emerald-200'
-                                : 'bg-slate-50 dark:bg-[#070A11] border-slate-200 dark:border-white/10'
+                                : 'bg-[var(--surface)] dark:bg-[var(--bg)] border-[var(--border-subtle)] dark:border-white/10'
                             }`}
                           >
                             <div className="flex items-center justify-between">
-                              <span className="text-[11px] font-bold text-slate-800 dark:text-[#F8FAFC]">{q.store}</span>
+                              <span className="text-[11px] font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]">{q.store}</span>
                               {q.isVerifiedDeal && (
                                 <span className="text-[9px] font-mono font-extrabold text-emerald-700 uppercase bg-emerald-100 px-1 py-0.2 rounded">
                                   SOURCE
@@ -431,32 +431,32 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                               )}
                             </div>
                             {q.price !== undefined && q.price > 0 ? (
-                              <div className="text-sm font-mono font-black text-slate-900 dark:text-[#F1F5F9]">
+                              <div className="text-sm font-mono font-black text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                                 ₹{q.price.toLocaleString('en-IN')}
                               </div>
                             ) : (
-                              <div className="text-xs font-mono font-bold text-slate-500">
+                              <div className="text-xs font-mono font-bold text-[var(--text-secondary)]">
                                 {q.statusText}
                               </div>
                             )}
-                            <span className="text-[9.5px] font-mono text-slate-500">
+                            <span className="text-[9.5px] font-mono text-[var(--text-secondary)]">
                               {q.badge}
                             </span>
                             {q.store === 'Google Shopping' ? (
                               <button
                                 type="button"
                                 onClick={() => openGoogleShoppingModal(result?.title || url || '')}
-                                className="mt-1 text-[10px] font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 flex items-center justify-between cursor-pointer"
+                                className="mt-1 text-[10px] font-semibold text-[var(--idh-accent)] dark:text-[var(--idh-accent)] hover:text-[var(--idh-accent)] flex items-center justify-between cursor-pointer"
                               >
                                 <span>{q.actionText}</span>
-                                <span className="text-[9px] font-mono font-bold bg-blue-100 dark:bg-blue-900/60 px-1 py-0.2 rounded">IN-APP</span>
+                                <span className="text-[9px] font-mono font-bold bg-[var(--surface-2)] dark:bg-[var(--idh-action-solid)]/60 px-1 py-0.2 rounded">IN-APP</span>
                               </button>
                             ) : (
                               <a
                                 href={publicStoreUrl(q.url) || undefined}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="mt-1 text-[10px] font-semibold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1"
+                                className="mt-1 text-[10px] font-semibold text-[var(--idh-accent)] hover:text-[var(--idh-accent)] hover:underline flex items-center gap-1"
                               >
                                 <span>{q.actionText}</span>
                                 <IconExternalLink size={10} />
@@ -466,18 +466,18 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                         ))}
                       </div>
 
-                      <p className="text-[11px] text-slate-600 dark:text-slate-400 m-0 leading-relaxed font-sans">
+                      <p className="text-[11px] text-[var(--text-secondary)] dark:text-[var(--text-secondary)] m-0 leading-relaxed font-sans">
                         {arbitrageData.verdict}
                       </p>
                     </div>
                   )}
 
                   {/* Price Drop Tracker Setup Form */}
-                  <div className="p-3.5 rounded-xl bg-blue-50/60 border border-blue-200 flex flex-col gap-2.5">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-blue-900">
+                  <div className="p-3.5 rounded-xl bg-[var(--surface-2)]/60 border border-[var(--border-subtle)] flex flex-col gap-2.5">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--idh-accent)]">
                       <span>🔔 Save a price goal</span>
                     </div>
-                    <p className="text-[11px] text-blue-700 m-0 leading-relaxed">
+                    <p className="text-[11px] text-[var(--idh-accent)] m-0 leading-relaxed">
                       Save a target on this device. For notification alerts, use Set price target in the product intelligence inspector.
                     </p>
 
@@ -489,7 +489,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                     ) : (
                       <form onSubmit={handleSaveWatch} className="flex flex-col sm:flex-row gap-2">
                         <div className="relative flex-1">
-                          <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-mono">₹</span>
+                          <span className="absolute left-3 top-2.5 text-xs text-[var(--text-secondary)] font-mono">₹</span>
                           <input
                             type="number"
                             min="0.01" step="0.01"
@@ -498,7 +498,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                             onChange={(e) => setTargetPrice(e.target.value)}
                             placeholder="Target price..."
                             required
-                            className="w-full pl-7 pr-3 py-2 rounded-lg bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] text-xs font-mono font-bold focus:outline-none focus:border-blue-600"
+                            className="w-full pl-7 pr-3 py-2 rounded-lg bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-primary)] dark:text-[var(--text-primary)] text-xs font-mono font-bold focus:outline-none focus:border-[var(--border-subtle)]"
                           />
                         </div>
                         <input
@@ -506,11 +506,11 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                           value={contactInfo}
                           onChange={(e) => setContactInfo(e.target.value)}
                           placeholder="Optional contact note (device only)" aria-label="Optional contact note stored on this device"
-                          className="flex-1 px-3 py-2 rounded-lg bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] text-xs focus:outline-none focus:border-blue-600"
+                          className="flex-1 px-3 py-2 rounded-lg bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-primary)] dark:text-[var(--text-primary)] text-xs focus:outline-none focus:border-[var(--border-subtle)]"
                         />
                         <button
                           type="submit"
-                          className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer whitespace-nowrap"
+                          className="px-4 py-2 rounded-lg bg-[var(--idh-action-solid)] hover:bg-[var(--idh-action-solid)] text-white font-bold text-xs shadow-xs transition-colors cursor-pointer whitespace-nowrap"
                         >
                           Save price goal
                         </button>
@@ -523,7 +523,7 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                       href={publicStoreUrl(result.clean_url || result.url) || undefined}
                       target="_blank"
                       rel="noopener noreferrer sponsored"
-                      className="w-full h-10 rounded-xl bg-slate-900 hover:bg-black text-white font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-xs"
+                      className="w-full h-10 rounded-xl bg-[var(--idh-action-solid)] hover:bg-black text-white font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-xs"
                     >
                       <span>Open Product on {result.store || 'Store'}</span>
                       <IconExternalLink size={14} />
@@ -536,23 +536,23 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
             /* Watches Tab */
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase font-mono tracking-wider">
+                <span className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] uppercase font-mono tracking-wider">
                   Saved Price Goals ({watches.length})
                 </span>
                 <button
                   type="button"
                   onClick={() => setActiveTab('analyzer')}
-                  className="text-xs font-semibold text-blue-600 hover:underline cursor-pointer"
+                  className="text-xs font-semibold text-[var(--idh-accent)] hover:underline cursor-pointer"
                 >
                   + Add New Link
                 </button>
               </div>
 
               {watches.length === 0 ? (
-                <div className="p-8 text-center rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 flex flex-col items-center gap-2">
+                <div className="p-8 text-center rounded-xl bg-[var(--surface)] dark:bg-[var(--bg)] border border-[var(--border-subtle)] dark:border-white/10 flex flex-col items-center gap-2">
                   <span className="text-2xl">🔔</span>
-                  <div className="text-xs font-bold text-slate-800 dark:text-[#F8FAFC]">No saved price goals</div>
-                  <p className="text-[11px] text-slate-500 max-w-xs m-0">
+                  <div className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]">No saved price goals</div>
+                  <p className="text-[11px] text-[var(--text-secondary)] max-w-xs m-0">
                     Paste a product link in the Analyzer tab to save a target on this device.
                   </p>
                 </div>
@@ -561,19 +561,19 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                   {watches.map((w) => (
                     <div
                       key={w.id}
-                      className="p-3.5 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+                      className="p-3.5 rounded-xl bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)]/90 dark:border-white/10 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
                     >
                       <div className="flex flex-col gap-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-[10px] font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
                             {w.store}
                           </span>
-                          <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] truncate">{w.title}</span>
+                          <span className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] truncate">{w.title}</span>
                         </div>
                         <div className="flex flex-wrap items-center gap-3 text-[11px] font-mono">
-                          <span className="text-slate-500">Saved price: {w.currentPrice > 0 ? `₹${w.currentPrice.toLocaleString('en-IN')}` : 'Unconfirmed'}</span>
+                          <span className="text-[var(--text-secondary)]">Saved price: {w.currentPrice > 0 ? `₹${w.currentPrice.toLocaleString('en-IN')}` : 'Unconfirmed'}</span>
                           <span className="font-bold text-emerald-600">Target: ₹{w.targetPrice.toLocaleString('en-IN')}</span>
-                          <span className="text-slate-400 text-[10px]">Note: {w.contact}</span>
+                          <span className="text-[var(--text-secondary)] text-[10px]">Note: {w.contact}</span>
                         </div>
                       </div>
 
@@ -582,14 +582,14 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
                           href={publicStoreUrl(w.url) || undefined}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-700 dark:text-slate-200 text-xs font-semibold"
+                          className="px-2.5 py-1.5 rounded-lg bg-[var(--surface-2)] dark:bg-[var(--surface-2)] hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)] text-[var(--text-primary)] dark:text-[var(--text-secondary)] text-xs font-semibold"
                         >
                           Open ↗
                         </a>
                         <button
                           type="button"
                           onClick={() => handleRemoveWatch(w.id)}
-                          aria-label={`Remove price goal for ${w.title}`} className="w-11 h-11 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer"
+                          aria-label={`Remove price goal for ${w.title}`} className="w-11 h-11 rounded-lg text-[var(--text-secondary)] hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer"
                           title="Remove watch"
                         >
                           ✕

@@ -27,3 +27,13 @@ tests/.python-deps/
 tests/artifacts/
 .build-check/
 .revert-snapshots/
+.npm-cache/
+
+# Agent tooling & local skills
+.agents/
+.claude/
+.codex/
+.impeccable/
+agent/
+skills/
+skills-lock.json

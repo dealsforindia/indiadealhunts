@@ -1,7 +1,7 @@
 import { RecoveryBoundary } from './components/RecoveryBoundary';
 import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicDeal, publicStoreUrl, lookupTargetUrl, isDisplayableOffer } from './utils/publicLinks';
 import { ArrowDown, LoaderCircle, X } from 'lucide-react';
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Navbar } from './components/Navbar';
 import { motion, AnimatePresence } from 'motion/react';
 import { HeroBanner } from './components/HeroBanner';
@@ -17,10 +17,10 @@ import { ImageModal } from './components/ImageModal';
 import { DealLookupModal } from './components/DealLookupModal';
 import { SubmitDeal } from './components/SubmitDeal';
 import { LegalModal, LegalDocType } from './components/LegalModal';
-import { AboutPage } from './components/AboutPage';
-import { HowWeVerify } from './components/HowWeVerify';
-import { ContactPage } from './components/ContactPage';
-import { WallOfHappiness } from './components/WallOfHappiness';
+
+
+
+
 import { DealSkeletonGrid } from './components/DealSkeleton';
 import { MarqueeTicker } from './components/MarqueeTicker';
 import { HowDealsWorkModal } from './components/HowDealsWorkModal';
@@ -32,10 +32,10 @@ import { PriceDropAlertModal } from './components/PriceDropAlertModal';
 import { PhoneExchangeEstimatorModal } from './components/PhoneExchangeEstimatorModal';
 import type { ToolId } from './components/tools/ToolsHubModal';
 import { DeferredToolsHub } from './components/DeferredToolsHub';
-import { TopDiscountsPage } from './components/TopDiscountsPage';
-import { WorthScorePage } from './components/WorthScorePage';
-import { ProfilePage } from './components/ProfilePage';
-import { SavedLootPage } from './components/SavedLootPage';
+
+
+
+
 import { ExternalSearchResults, ExternalSearchDeal } from './components/ExternalSearchResults';
 import { GoogleShoppingDiscoveryModal } from './components/GoogleShoppingDiscoveryModal';
 import { openGoogleShoppingModal } from './utils/googleShopping';
@@ -52,7 +52,15 @@ import { useTheme } from './utils/themeManager';
 const EDGE_API = PUBLIC_EDGE_BASE;
 const API_BASE = PUBLIC_API_BASE;
 
-export const App: React.FC = () => {
+export const AboutPage = lazy(() => import('./components/AboutPage').then(module => ({ default: module.AboutPage })));
+const HowWeVerify = lazy(() => import('./components/HowWeVerify').then(module => ({ default: module.HowWeVerify })));
+const ContactPage = lazy(() => import('./components/ContactPage').then(module => ({ default: module.ContactPage })));
+const ProfilePage = lazy(() => import('./components/ProfilePage').then(module => ({ default: module.ProfilePage })));
+const SavedLootPage = lazy(() => import('./components/SavedLootPage').then(module => ({ default: module.SavedLootPage })));
+const TopDiscountsPage = lazy(() => import('./components/TopDiscountsPage').then(module => ({ default: module.TopDiscountsPage })));
+const WorthScorePage = lazy(() => import('./components/WorthScorePage').then(module => ({ default: module.WorthScorePage })));
+
+const App: React.FC = () => {
   // Theme Manager Engine (System vs Dark vs Light with OS sync)
   useTheme();
 
@@ -74,7 +82,7 @@ export const App: React.FC = () => {
     try {
       if (typeof window !== 'undefined') {
         const p = new URLSearchParams(window.location.search).get('tab');
-        if (p && ['home', 'saved', 'about', 'how_we_verify', 'wall_of_happiness', 'contact', 'submit_deal', 'profile', 'ending_soon', 'best_worth'].includes(p)) {
+        if (p && ['home', 'saved', 'about', 'how_we_verify', 'contact', 'submit_deal', 'profile', 'ending_soon', 'best_worth'].includes(p)) {
           return p as NavTab;
         }
       }
@@ -1023,8 +1031,10 @@ export const App: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full flex-1 flex flex-col"
+          className="idh-page-content w-full flex-1 flex flex-col"
+          data-page={activeTab}
         >
+          <Suspense fallback={<div role="status" className="mx-auto w-full max-w-7xl px-6 py-12 text-sm text-[var(--text-secondary)]">Loading your shopping space…</div>}>
           {activeTab === 'ending_soon' ? (
             <TopDiscountsPage
               deals={deals}
@@ -1089,13 +1099,6 @@ export const App: React.FC = () => {
             <div className="flex-1 w-full max-w-[1080px] mx-auto px-4 sm:px-6 pt-8 pb-28 md:pb-12">
               <HowWeVerify />
             </div>
-          ) : activeTab === 'wall_of_happiness' ? (
-            <div className="flex-1 w-full">
-              <WallOfHappiness
-                onBackToHome={() => setActiveTab('home')}
-                onNavigateTab={(tab) => setActiveTab(tab)}
-              />
-            </div>
           ) : activeTab === 'contact' ? (
             <div className="flex-1 w-full max-w-[1080px] mx-auto px-4 sm:px-6 pt-8 pb-28 md:pb-12">
               <ContactPage />
@@ -1134,6 +1137,7 @@ export const App: React.FC = () => {
                     onFilterFlashLoot={handleFilterFlashLoot}
                     spotlightDeal={spotlightDeal}
                     spotlightAlternatives={discoveryDeals}
+                    onSelectDeal={setSelectedDetailDeal}
                   />
 
                   {/* ── 2.5 Flash Category Stories Rail (live deals only) ── */}
@@ -1170,11 +1174,6 @@ export const App: React.FC = () => {
               {/* ── 4. Deal Toolbar (Store, Category, Sort, Deal Count, View Toggle) ── */}
               <div className={`mobile-shopping-controls ${searchFullScreen ? 'is-search' : ''}`}>
                 {!searchFullScreen && <div className="mobile-drops-title"><h2>Latest Drops <span aria-hidden="true">🔥</span></h2><p>Latest directory offers · Check price evidence before buying</p></div>}
-                {!searchFullScreen && <button type="button" className="mobile-desk-toggle" aria-expanded={mobileDeskOpen}
-                  aria-controls="shopping-desk" onClick={() => setMobileDeskOpen(v => !v)}>
-                  <span><strong>Compare & shopping tools</strong><small>Price evidence, shortlists & checkout costs</small></span>
-                  <span aria-hidden="true">{mobileDeskOpen ? '−' : '+'}</span>
-                </button>}
                 <div id="shopping-desk" className={`shopping-desk ${searchFullScreen || mobileDeskOpen ? 'is-open' : ''}`}>
                   {!searchFullScreen && mobileDeskOpen && <div className="shopping-desk-dismiss"><span>Compare & shopping tools</span><button type="button" aria-label="Close compare and shopping tools" onClick={() => setMobileDeskOpen(false)}><X size={20} /><span>Close</span></button></div>}
                   <IntelligenceWorkspace
@@ -1218,23 +1217,23 @@ export const App: React.FC = () => {
                   <motion.div
                     initial={{ opacity: 0, y: -8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-5 p-3.5 sm:p-4 rounded-2xl border border-blue-200/80 bg-gradient-to-r from-blue-50/90 via-sky-50/70 to-indigo-50/90 flex flex-wrap items-center justify-between gap-3 shadow-xs"
+                    className="mb-5 p-3.5 sm:p-4 rounded-2xl border border-[var(--border-subtle)]/80 bg-gradient-to-r from-blue-50/90 via-sky-50/70 to-indigo-50/90 flex flex-wrap items-center justify-between gap-3 shadow-xs"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-base shadow-xs shrink-0">
+                      <div className="w-9 h-9 rounded-xl bg-[var(--idh-action-solid)] text-white flex items-center justify-center font-bold text-base shadow-xs shrink-0">
                         {searchMode === 'live' ? '🌐' : '⚡'}
                       </div>
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-[#F1F5F9] font-heading">
+                          <span className="text-xs sm:text-sm font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] font-heading">
                             {searchMode === 'live' ? 'External Store Search' : 'Deal Directory'}
                           </span>
-                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-300">
+                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[var(--surface-2)] text-[var(--idh-accent)] border border-[var(--border-subtle)]">
                             {filteredDeals.length} Directory Match{filteredDeals.length === 1 ? '' : 'es'}
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-600 dark:text-slate-400 m-0 mt-0.5">
-                          Query: <span className="font-semibold text-blue-900 font-mono">"{searchQuery}"</span>
+                        <p className="text-[11px] text-[var(--text-secondary)] dark:text-[var(--text-secondary)] m-0 mt-0.5">
+                          Query: <span className="font-semibold text-[var(--idh-accent)] font-mono">"{searchQuery}"</span>
                           {searchMode === 'db'
                             ? ' • Natural language budget and device matching across directory offers'
                             : ' • Store coverage and price evidence vary by product'}
@@ -1250,14 +1249,14 @@ export const App: React.FC = () => {
                           setSearchMode(next);
                           showToast(next === 'live' ? '🌐 External Store Search Selected' : '⚡ Deal Directory Active');
                         }}
-                        className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#0D1527] hover:bg-slate-50 dark:bg-[#070A11] border border-slate-300 dark:border-white/20 text-slate-700 dark:text-slate-200 text-xs font-bold cursor-pointer transition-colors shadow-2xs"
+                        className="px-3 py-1.5 rounded-xl bg-white dark:bg-[var(--surface)] hover:bg-[var(--surface)] dark:bg-[var(--bg)] border border-[var(--border-subtle)] dark:border-white/20 text-[var(--text-primary)] dark:text-[var(--text-secondary)] text-xs font-bold cursor-pointer transition-colors shadow-2xs"
                       >
                         {searchMode === 'db' ? '🌐 Switch to Live Crawler' : '⚡ Switch to Deal Directory'}
                       </button>
                       <button
                         type="button"
                         onClick={() => setSearchQuery('')}
-                        className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold cursor-pointer transition-colors"
+                        className="px-3 py-1.5 rounded-xl bg-[var(--idh-action-solid)] hover:bg-black text-white text-xs font-bold cursor-pointer transition-colors"
                       >
                         Clear ✕
                       </button>
@@ -1273,21 +1272,20 @@ export const App: React.FC = () => {
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                       </span>
-                      <h2 className="font-heading text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-[#F1F5F9] m-0">
-                        <span className="hidden sm:inline">Latest finds</span>
-                        <span className="sm:hidden">Latest Drops</span>
+                      <h2 className="font-heading text-xl sm:text-2xl font-black tracking-tight text-[var(--text-primary)] dark:text-[var(--text-primary)] m-0">
+                        Latest finds
                       </h2>
                       <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                         DIRECTORY
                       </span>
                     </div>
-                    <p className="text-slate-500 text-xs sm:text-sm mt-1">
+                    <p className="text-[var(--text-secondary)] text-xs sm:text-sm mt-1">
                       Latest directory offers · Check price evidence before buying
                     </p>
                   </div>
 
                   {/* Deal count */}
-                  <span className="font-mono text-xs sm:text-sm text-slate-500 font-semibold">
+                  <span className="font-mono text-xs sm:text-sm text-[var(--text-secondary)] font-semibold">
                     {totalDeals
                       ? `${totalDeals.toLocaleString('en-IN')} drops`
                       : loading
@@ -1317,19 +1315,19 @@ export const App: React.FC = () => {
                         onOpenGoogleShopping={handleOpenGoogleShopping}
                       />
                     )}
-                    <div className="py-12 px-6 text-center max-w-md mx-auto rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] shadow-sm">
+                    <div className="py-12 px-6 text-center max-w-md mx-auto rounded-2xl border border-[var(--border-subtle)] dark:border-white/10 bg-white dark:bg-[var(--surface)] shadow-sm">
                       <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto mb-3 text-xl">
                         ⚡
                       </div>
-                      <h3 className="font-heading font-bold text-slate-900 dark:text-[#F1F5F9] mb-1">
+                      <h3 className="font-heading font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] mb-1">
                         Connecting to Deal Stream
                       </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+                      <p className="text-xs text-[var(--text-secondary)] dark:text-[var(--text-secondary)] mb-4">
                         Fetching the latest verified loot drops and discounts...
                       </p>
                       <button
                         onClick={() => fetchDeals(0, false)}
-                        className="px-5 py-2.5 bg-slate-900 dark:bg-emerald-600 hover:bg-black dark:hover:bg-emerald-500 text-white font-bold text-xs rounded-xl cursor-pointer shadow-sm transition-colors"
+                        className="px-5 py-2.5 bg-[var(--idh-action-solid)] dark:bg-emerald-600 hover:bg-black dark:hover:bg-emerald-500 text-white font-bold text-xs rounded-xl cursor-pointer shadow-sm transition-colors"
                       >
                         Refresh Offers
                       </button>
@@ -1352,11 +1350,11 @@ export const App: React.FC = () => {
                       />
                     )}
 
-                    <div className="py-10 px-6 text-center max-w-md mx-auto rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] shadow-sm">
-                      <h3 className="font-heading font-bold text-slate-900 dark:text-[#F1F5F9] mb-2">
+                    <div className="py-10 px-6 text-center max-w-md mx-auto rounded-2xl border border-[var(--border-subtle)] dark:border-white/10 bg-white dark:bg-[var(--surface)] shadow-sm">
+                      <h3 className="font-heading font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] mb-2">
                         {loading ? 'Finding matching offers…' : 'No directory deals found'}
                       </h3>
-                      <p className="text-xs text-slate-500 mb-4">
+                      <p className="text-xs text-[var(--text-secondary)] mb-4">
                         {loading ? 'Your filters are applied. Matching products are on their way.' : 'Try a broader product name, clear a filter, or search the stores above.'}
                       </p>
                       <button
@@ -1365,7 +1363,7 @@ export const App: React.FC = () => {
                           setSelectedCategory('all');
                           setSearchQuery('');
                         }}
-                        className="px-5 py-2.5 bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-900 dark:text-[#F1F5F9] font-bold text-xs rounded-xl border border-slate-300 dark:border-white/20 cursor-pointer transition-colors"
+                        className="px-5 py-2.5 bg-[var(--surface-2)] dark:bg-[var(--surface-2)] hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)] text-[var(--text-primary)] dark:text-[var(--text-primary)] font-bold text-xs rounded-xl border border-[var(--border-subtle)] dark:border-white/20 cursor-pointer transition-colors"
                       >
                         Clear Filters
                       </button>
@@ -1387,14 +1385,14 @@ export const App: React.FC = () => {
                           }}
                           onOpenGoogleShopping={handleOpenGoogleShopping}
                         />
-                        <div className="mt-8 mb-4 flex items-center justify-between border-t border-slate-200/80 dark:border-white/10 pt-6">
+                        <div className="mt-8 mb-4 flex items-center justify-between border-t border-[var(--border-subtle)]/80 dark:border-white/10 pt-6">
                           <div className="flex items-center gap-2">
                             <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-50 text-xs font-bold text-indigo-700">⚡</span>
-                            <h3 className="font-heading text-base font-black text-slate-900 dark:text-[#F1F5F9]">
+                            <h3 className="font-heading text-base font-black text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                               Directory offers ({filteredDeals.length})
                             </h3>
                           </div>
-                          <span className="text-xs text-slate-500 font-medium">Directory offers matching “{searchQuery}”</span>
+                          <span className="text-xs text-[var(--text-secondary)] font-medium">Directory offers matching “{searchQuery}”</span>
                         </div>
                       </div>
                     )}
@@ -1460,6 +1458,7 @@ export const App: React.FC = () => {
               <TrustStrip />
             </div>
           )}
+          </Suspense>
         </motion.div>
       </AnimatePresence>
 
@@ -1605,7 +1604,7 @@ export const App: React.FC = () => {
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-[calc(76px+env(safe-area-inset-bottom,0px))] md:bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-6 md:translate-x-0 z-[200] bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 flex items-center gap-2 text-white text-xs font-heading font-semibold shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-150 max-w-[calc(100vw-32px)]"
+          className="fixed bottom-[calc(76px+env(safe-area-inset-bottom,0px))] md:bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-6 md:translate-x-0 z-[200] bg-[var(--idh-action-solid)] border border-[var(--border-subtle)] rounded-xl px-4 py-2.5 flex items-center gap-2 text-white text-xs font-heading font-semibold shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-150 max-w-[calc(100vw-32px)]"
         >
           <span className="text-emerald-400 font-bold">✓</span>
           <span className="truncate">{toastMessage}</span>

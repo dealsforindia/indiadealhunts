@@ -568,17 +568,15 @@ html.dark .hover\:text-slate-900:hover {
 
 html.dark dialog,
 html.dark [role="dialog"] {
-  background-color: #0E1729 !important;
-  color: #F1F5F9 !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  background-color: var(--surface, #0E1729) !important;
+  color: var(--text-primary, #F1F5F9) !important;
+  border-color: var(--border-subtle, rgba(255, 255, 255, 0.1)) !important;
 }
 
-html.dark input:not([type="checkbox"]):not([type="range"]),
-html.dark select,
-html.dark textarea {
-  background-color: #111C33 !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
-  color: #F1F5F9 !important;
+html.dark :where(input:not([type="checkbox"]):not([type="range"]), select, textarea) {
+  background-color: var(--surface-2, #111C33) !important;
+  border-color: var(--border-subtle, rgba(255, 255, 255, 0.12)) !important;
+  color: var(--text-primary, #F1F5F9) !important;
 }
 
 html.dark input::placeholder {

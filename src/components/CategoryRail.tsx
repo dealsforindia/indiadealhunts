@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { motion, useAnimationControls, useReducedMotion } from 'motion/react';
-import { Car, Dumbbell, Grid2X2, Headphones, House, MoreHorizontal, Plane, Shirt, ShoppingBasket, Sparkles } from 'lucide-react';
+import { Car, Dumbbell, Grid2X2, ChevronRight, Headphones, House, MoreHorizontal, Plane, Shirt, ShoppingBasket, Sparkles } from 'lucide-react';
 interface CategoryRailProps { selectedCategory: string; onSelectCategory: (cat: string) => void; categoryCounts?: Record<string, number>; }
 const CATEGORIES = [
   { id: 'all', label: 'All Deals', Icon: Grid2X2 },
@@ -15,6 +15,7 @@ const CATEGORIES = [
 ];
 export function CategoryRail({ selectedCategory, onSelectCategory }: CategoryRailProps) {
   const rail = useRef<HTMLDivElement>(null);
+  const [canScroll, setCanScroll] = useState(false);
   const buttons = useRef(new Map<string, HTMLButtonElement>());
   const selected = selectedCategory || 'all';
   const reducedMotion = useReducedMotion();
@@ -27,12 +28,21 @@ export function CategoryRail({ selectedCategory, onSelectCategory }: CategoryRai
       const next = { left: button.offsetLeft, top: button.offsetTop, width: button.offsetWidth, height: button.offsetHeight };
       setBounds(previous => Object.keys(next).every(key => previous[key as keyof typeof next] === next[key as keyof typeof next]) ? previous : next);
     };
-    measure();
-    const observer = new ResizeObserver(measure);
+    const ensureVisible = () => {
+      const list=rail.current, button=buttons.current.get(selected);
+      if (!list || !button) return;
+      const visibleWidth=list.clientWidth-48;
+      if(button.offsetLeft+button.offsetWidth > list.scrollLeft+visibleWidth) list.scrollTo({left:button.offsetLeft+button.offsetWidth-visibleWidth+12,behavior:reducedMotion?'instant':'smooth'});
+      else if(button.offsetLeft < list.scrollLeft+8) list.scrollTo({left:Math.max(0,button.offsetLeft-8),behavior:reducedMotion?'instant':'smooth'});
+    };
+    const checkScroll=()=>{ const list=rail.current;if(list)setCanScroll(list.scrollWidth-list.clientWidth-list.scrollLeft>8); };
+    measure(); ensureVisible(); checkScroll();
+    rail.current?.addEventListener('scroll',checkScroll,{passive:true});
+    const observer = new ResizeObserver(() => { measure(); ensureVisible(); checkScroll(); });
     if (rail.current) observer.observe(rail.current);
     buttons.current.forEach(button => observer.observe(button));
-    return () => observer.disconnect();
-  }, [selected]);
+    return () => { observer.disconnect();rail.current?.removeEventListener('scroll',checkScroll); };
+  }, [selected, reducedMotion]);
   useEffect(() => {
     if (!bounds.width) return;
     controls.stop();
@@ -49,6 +59,7 @@ export function CategoryRail({ selectedCategory, onSelectCategory }: CategoryRai
       <motion.div className="liquid-category-indicator" initial={{ opacity: 0 }} animate={controls} aria-hidden="true"><span /></motion.div>
       {CATEGORIES.map(({ id, label, Icon }) => <button ref={node => { if (node) buttons.current.set(id, node); else buttons.current.delete(id); }} type="button" key={id} className={`liquid-category-button${selected === id ? ' is-selected' : ''}`} aria-pressed={selected === id} onClick={() => onSelectCategory(id)}><Icon size={17} aria-hidden="true" /><span>{label}</span></button>)}
     </div>
+    {canScroll && <button type="button" className="category-scroll-next" aria-label="Scroll to more categories" onClick={() => rail.current?.scrollBy({left:200,behavior:reducedMotion?'instant':'smooth'})}><ChevronRight size={17}/><ChevronRight size={17}/></button>}
     <button type="button" className="mobile-category-more" aria-label="More shopping tools and categories" onClick={() => window.dispatchEvent(new Event('idh-open-mobile-menu'))}><MoreHorizontal size={20} /><span>More</span></button>
   </nav>;
 }

@@ -223,19 +223,19 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="bg-white dark:bg-[#0D1527] p-5 sm:p-6 rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-xs">
+      <div className="bg-white dark:bg-[var(--surface)] p-5 sm:p-6 rounded-2xl border border-[var(--border-subtle)]/90 dark:border-white/10 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="text-xl">📱</span>
-              <h3 className="font-heading font-black text-lg text-slate-900 dark:text-[#F1F5F9] tracking-tight">
+              <h3 className="font-heading font-black text-lg text-[var(--text-primary)] dark:text-[var(--text-primary)] tracking-tight">
                 Phone Exchange vs. Cashify Valuation Sentinel
               </h3>
               <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-violet-50 text-violet-700 border border-violet-200">
                 TRADE-IN REALITY CHECK
               </span>
             </div>
-            <p className="text-xs text-slate-500 max-w-2xl">
+            <p className="text-xs text-[var(--text-secondary)] max-w-2xl">
               Should you exchange your old phone on Flipkart/Amazon or sell for direct cash on Cashify?
               Model doorstep physical deductions, screen scratches, missing chargers, and festive bonus bumps.
             </p>
@@ -245,7 +245,7 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
             <button
               type="button"
               onClick={handleCopyMemo}
-              className="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white cursor-pointer shadow-xs active:scale-95"
+              className="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-[var(--idh-action-solid)] hover:bg-[var(--idh-action-solid)] text-white cursor-pointer shadow-xs active:scale-95"
             >
               <span>{copiedMemo ? '✓ Copied' : '📋 Copy Valuation Audit'}</span>
             </button>
@@ -254,12 +254,12 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
       </div>
 
       {/* Preset Model Buttons */}
-      <div className="bg-white dark:bg-[#0D1527] p-5 sm:p-6 rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-xs space-y-4">
+      <div className="bg-white dark:bg-[var(--surface)] p-5 sm:p-6 rounded-2xl border border-[var(--border-subtle)]/90 dark:border-white/10 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
             Select Popular Indian Handsets
           </span>
-          <label className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-400 cursor-pointer">
+          <label className="flex items-center gap-2 text-xs font-medium text-[var(--text-secondary)] dark:text-[var(--text-secondary)] cursor-pointer">
             <input
               type="checkbox"
               checked={useCustomPhone}
@@ -282,20 +282,20 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
                   className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                     isSelected
                       ? 'border-violet-600 bg-violet-50/50 shadow-xs ring-1 ring-violet-500/20'
-                      : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:border-white/20 hover:bg-slate-50 dark:bg-[#070A11]'
+                      : 'border-[var(--border-subtle)] dark:border-white/10 hover:border-[var(--border-subtle)] dark:border-white/20 hover:bg-[var(--surface)] dark:bg-[var(--bg)]'
                   }`}
                 >
                   <div>
-                    <div className="text-[10px] font-mono font-bold text-slate-400 uppercase">
+                    <div className="text-[10px] font-mono font-bold text-[var(--text-secondary)] uppercase">
                       {p.brand}
                     </div>
-                    <div className="font-bold text-xs text-slate-800 dark:text-[#F8FAFC] line-clamp-1 mt-0.5">
+                    <div className="font-bold text-xs text-[var(--text-primary)] dark:text-[var(--text-primary)] line-clamp-1 mt-0.5">
                       {p.model}
                     </div>
-                    <div className="text-[10px] text-slate-500 font-mono">{p.storage}</div>
+                    <div className="text-[10px] text-[var(--text-secondary)] font-mono">{p.storage}</div>
                   </div>
-                  <div className="mt-2 pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px]">
-                    <span className="font-mono text-slate-500">Base</span>
+                  <div className="mt-2 pt-2 border-t border-[var(--border-subtle)] dark:border-white/5 flex items-center justify-between text-[11px]">
+                    <span className="font-mono text-[var(--text-secondary)]">Base</span>
                     <span className="font-mono font-bold text-violet-700">
                       ₹{p.baseMarketFairValue.toLocaleString('en-IN')}
                     </span>
@@ -307,7 +307,7 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl bg-violet-50/50 border border-violet-200">
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
+              <label className="block text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] mb-1">
                 Phone Brand &amp; Model Name
               </label>
               <input
@@ -315,18 +315,18 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
                 value={customPhoneName}
                 onChange={(e) => setCustomPhoneName(e.target.value)}
                 placeholder="e.g. Pixel 7 128GB"
-                className="w-full px-3 py-1.5 rounded-lg border border-slate-300 dark:border-white/20 text-xs bg-white dark:bg-[#0D1527]"
+                className="w-full px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] dark:border-white/20 text-xs bg-white dark:bg-[var(--surface)]"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
+              <label className="block text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] mb-1">
                 Estimated Pristine Value (₹)
               </label>
               <input
                 type="number"
                 value={customBaseValue}
                 onChange={(e) => setCustomBaseValue(Number(e.target.value))}
-                className="w-full px-3 py-1.5 rounded-lg border border-slate-300 dark:border-white/20 text-xs font-mono bg-white dark:bg-[#0D1527]"
+                className="w-full px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] dark:border-white/20 text-xs font-mono bg-white dark:bg-[var(--surface)]"
               />
             </div>
           </div>
@@ -337,8 +337,8 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Form: Condition Diagnostics */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-white dark:bg-[#0D1527] p-5 rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-xs space-y-4">
-            <div className="font-bold text-sm text-slate-800 dark:text-[#F8FAFC] flex items-center justify-between">
+          <div className="bg-white dark:bg-[var(--surface)] p-5 rounded-2xl border border-[var(--border-subtle)]/90 dark:border-white/10 shadow-xs space-y-4">
+            <div className="font-bold text-sm text-[var(--text-primary)] dark:text-[var(--text-primary)] flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <span>🔍</span>
                 <span>Doorstep Inspection Diagnostics</span>
@@ -350,13 +350,13 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
 
             {/* Screen Condition */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
+              <label className="block text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] mb-1">
                 Touchscreen &amp; Display Glass
               </label>
               <select
                 value={screenCondition}
                 onChange={(e) => setScreenCondition(e.target.value as any)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-medium bg-slate-50 dark:bg-[#070A11] focus:bg-white dark:bg-[#0D1527]"
+                className="w-full px-3 py-2 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 text-xs font-medium bg-[var(--surface)] dark:bg-[var(--bg)] focus:bg-white dark:bg-[var(--surface)]"
               >
                 <option value="flawless">Flawless (No scratches under light) [0% penalty]</option>
                 <option value="minor_scratches">Micro-scratches on glass [-5% penalty]</option>
@@ -368,13 +368,13 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
 
             {/* Body Condition */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
+              <label className="block text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] mb-1">
                 Chassis, Frame &amp; Back Panel
               </label>
               <select
                 value={bodyCondition}
                 onChange={(e) => setBodyCondition(e.target.value as any)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-medium bg-slate-50 dark:bg-[#070A11] focus:bg-white dark:bg-[#0D1527]"
+                className="w-full px-3 py-2 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 text-xs font-medium bg-[var(--surface)] dark:bg-[var(--bg)] focus:bg-white dark:bg-[var(--surface)]"
               >
                 <option value="flawless">Pristine / Flawless (No scuffs) [0% penalty]</option>
                 <option value="minor_scratches">Minor paint scuffs or bumper marks [-5% penalty]</option>
@@ -384,8 +384,8 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
             </div>
 
             {/* Checkboxes for accessories & health */}
-            <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-white/5 text-xs">
-              <label className="flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer">
+            <div className="space-y-2 pt-2 border-t border-[var(--border-subtle)] dark:border-white/5 text-xs">
+              <label className="flex items-center gap-2 text-[var(--text-primary)] dark:text-[var(--text-secondary)] cursor-pointer">
                 <input
                   type="checkbox"
                   checked={hasOriginalBoxAndBill}
@@ -395,7 +395,7 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
                 <span>I have original box &amp; purchase invoice (No ₹500 penalty)</span>
               </label>
 
-              <label className="flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer">
+              <label className="flex items-center gap-2 text-[var(--text-primary)] dark:text-[var(--text-secondary)] cursor-pointer">
                 <input
                   type="checkbox"
                   checked={hasOriginalCharger}
@@ -405,7 +405,7 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
                 <span>Original power adapter &amp; charging cable included</span>
               </label>
 
-              <label className="flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer">
+              <label className="flex items-center gap-2 text-[var(--text-primary)] dark:text-[var(--text-secondary)] cursor-pointer">
                 <input
                   type="checkbox"
                   checked={batteryHealthUnder80}
@@ -415,7 +415,7 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
                 <span>Battery degraded / Health below 80% (Service warning)</span>
               </label>
 
-              <label className="flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer">
+              <label className="flex items-center gap-2 text-[var(--text-primary)] dark:text-[var(--text-secondary)] cursor-pointer">
                 <input
                   type="checkbox"
                   checked={functionalDefects}
@@ -427,7 +427,7 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
             </div>
 
             {/* Festive Bonus Toggle */}
-            <div className="pt-2 border-t border-slate-100 dark:border-white/5">
+            <div className="pt-2 border-t border-[var(--border-subtle)] dark:border-white/5">
               <label className="flex items-center gap-2 text-xs font-bold text-violet-900 cursor-pointer">
                 <input
                   type="checkbox"
@@ -437,7 +437,7 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
                 />
                 <span>Apply Festive Exchange Bonus (+₹{conditionMath.festiveBonus.toLocaleString('en-IN')})</span>
               </label>
-              <p className="text-[11px] text-slate-400 mt-0.5 ml-6">
+              <p className="text-[11px] text-[var(--text-secondary)] mt-0.5 ml-6">
                 Offered by Flipkart / Amazon during Great Indian Festival &amp; Big Billion Days on flagship new carts.
               </p>
             </div>
@@ -446,8 +446,8 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
 
         {/* Right Form: Valuation Comparison Ledger */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-slate-900 text-white p-5 sm:p-6 rounded-2xl shadow-xl space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="bg-[var(--idh-action-solid)] text-white p-5 sm:p-6 rounded-2xl shadow-xl space-y-5">
+            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
               <div>
                 <div className="text-xs uppercase tracking-wider font-mono text-violet-400 font-bold">
                   Recommended Selling Channel
@@ -460,7 +460,7 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
                 <div className="text-2xl font-black font-mono text-emerald-400">
                   ₹{conditionMath.bestOffer.val.toLocaleString('en-IN')}
                 </div>
-                <div className="text-[10px] text-slate-400 font-mono">
+                <div className="text-[10px] text-[var(--text-secondary)] font-mono">
                   {conditionMath.bestOffer.type}
                 </div>
               </div>
@@ -468,10 +468,10 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
 
             {/* Platform Comparison Bars */}
             <div className="space-y-3">
-              <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-between text-xs">
+              <div className="p-3 rounded-xl bg-[var(--surface)]/80 border border-[var(--border-subtle)] flex items-center justify-between text-xs">
                 <div>
-                  <div className="font-bold text-slate-200">Flipkart Exchange</div>
-                  <div className="text-[10px] text-slate-400">
+                  <div className="font-bold text-[var(--text-secondary)]">Flipkart Exchange</div>
+                  <div className="text-[10px] text-[var(--text-secondary)]">
                     Includes ₹{conditionMath.festiveBonus} Festive Bonus
                   </div>
                 </div>
@@ -479,14 +479,14 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
                   <div className="font-mono font-bold text-white text-sm">
                     ₹{conditionMath.finalFlipkart.toLocaleString('en-IN')}
                   </div>
-                  <div className="text-[10px] text-blue-400 font-mono">Immediate Cart Rebate</div>
+                  <div className="text-[10px] text-[var(--idh-accent)] font-mono">Immediate Cart Rebate</div>
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-between text-xs">
+              <div className="p-3 rounded-xl bg-[var(--surface)]/80 border border-[var(--border-subtle)] flex items-center justify-between text-xs">
                 <div>
-                  <div className="font-bold text-slate-200">Amazon Trade-In</div>
-                  <div className="text-[10px] text-slate-400">Doorstep diagnostic check</div>
+                  <div className="font-bold text-[var(--text-secondary)]">Amazon Trade-In</div>
+                  <div className="text-[10px] text-[var(--text-secondary)]">Doorstep diagnostic check</div>
                 </div>
                 <div className="text-right">
                   <div className="font-mono font-bold text-white text-sm">
@@ -496,10 +496,10 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-between text-xs">
+              <div className="p-3 rounded-xl bg-[var(--surface)]/80 border border-[var(--border-subtle)] flex items-center justify-between text-xs">
                 <div>
-                  <div className="font-bold text-slate-200">Cashify Doorstep Cash</div>
-                  <div className="text-[10px] text-slate-400">No purchase needed, technician visits home</div>
+                  <div className="font-bold text-[var(--text-secondary)]">Cashify Doorstep Cash</div>
+                  <div className="text-[10px] text-[var(--text-secondary)]">No purchase needed, technician visits home</div>
                 </div>
                 <div className="text-right">
                   <div className="font-mono font-bold text-emerald-400 text-sm">
@@ -509,16 +509,16 @@ Generated via IndiaDealHunts Mobile Trade-In Lab`;
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-between text-xs">
+              <div className="p-3 rounded-xl bg-[var(--surface)]/80 border border-[var(--border-subtle)] flex items-center justify-between text-xs">
                 <div>
-                  <div className="font-bold text-slate-200">OLX / P2P Direct Sale</div>
-                  <div className="text-[10px] text-slate-400">Direct buyer meetup (Scam risk caution)</div>
+                  <div className="font-bold text-[var(--text-secondary)]">OLX / P2P Direct Sale</div>
+                  <div className="text-[10px] text-[var(--text-secondary)]">Direct buyer meetup (Scam risk caution)</div>
                 </div>
                 <div className="text-right">
-                  <div className="font-mono font-bold text-slate-300 text-sm">
+                  <div className="font-mono font-bold text-[var(--text-secondary)] text-sm">
                     ₹{conditionMath.finalP2P.toLocaleString('en-IN')}
                   </div>
-                  <div className="text-[10px] text-slate-400 font-mono">Paper Cash / UPI</div>
+                  <div className="text-[10px] text-[var(--text-secondary)] font-mono">Paper Cash / UPI</div>
                 </div>
               </div>
             </div>

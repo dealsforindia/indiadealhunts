@@ -164,20 +164,20 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
   };
 
   return (
-    <div className="w-full bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-sm p-5 md:p-7 text-slate-800 dark:text-[#F8FAFC]">
+    <div className="w-full bg-white dark:bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)]/90 dark:border-white/10 shadow-sm p-5 md:p-7 text-[var(--text-primary)] dark:text-[var(--text-primary)]">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100 dark:border-white/5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-[var(--border-subtle)] dark:border-white/5">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xl">🛡️</span>
-            <h3 className="font-heading font-extrabold text-lg sm:text-xl text-slate-900 dark:text-[#F1F5F9] tracking-tight">
+            <h3 className="font-heading font-extrabold text-lg sm:text-xl text-[var(--text-primary)] dark:text-[var(--text-primary)] tracking-tight">
               Gadget &amp; Appliance Warranty Vault
             </h3>
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
               OFFLINE SECURE
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-[var(--text-secondary)] mt-1">
             Track purchase dates, warranty expiry alerts &amp; official Indian brand support links for all your gear.
           </p>
         </div>
@@ -187,14 +187,14 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
             type="button"
             onClick={handleExportJson}
             title="Download JSON backup"
-            className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] hover:bg-slate-50 dark:bg-[#070A11] text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
+            className="px-3 py-1.5 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 bg-white dark:bg-[var(--surface)] hover:bg-[var(--surface)] dark:bg-[var(--bg)] text-xs font-semibold text-[var(--text-primary)] dark:text-[var(--text-secondary)] transition-colors"
           >
             💾 Export
           </button>
           <button
             type="button"
             onClick={() => setIsAddOpen(true)}
-            className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all shadow-xs"
+            className="px-3.5 py-1.5 rounded-xl bg-[var(--idh-action-solid)] hover:bg-black text-white text-xs font-bold transition-all shadow-xs"
           >
             + Add Product
           </button>
@@ -203,14 +203,14 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
 
       {/* Filter Tabs & Search */}
       <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-[#111C33] p-1 rounded-xl w-full sm:w-auto">
+        <div className="flex items-center gap-1.5 bg-[var(--surface-2)] dark:bg-[var(--surface-2)] p-1 rounded-xl w-full sm:w-auto">
           {(['all', 'active', 'expiring', 'expired'] as const).map((st) => (
             <button
               key={st}
               type="button"
               onClick={() => setFilterStatus(st)}
               className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${
-                filterStatus === st ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-xs' : 'text-slate-500 hover:text-slate-800 dark:text-[#F8FAFC]'
+                filterStatus === st ? 'bg-white dark:bg-[var(--surface)] text-[var(--text-primary)] dark:text-[var(--text-primary)] shadow-xs' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-primary)]'
               }`}
             >
               {st === 'expiring' ? 'Expiring (<30d)' : st}
@@ -224,24 +224,24 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
             placeholder="Search gear or brand..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-9 pl-8 pr-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] text-xs text-slate-800 dark:text-[#F8FAFC] focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full h-9 pl-8 pr-3 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 bg-white dark:bg-[var(--surface)] text-xs text-[var(--text-primary)] dark:text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-          <span className="absolute left-2.5 top-2.5 text-xs text-slate-400">🔍</span>
+          <span className="absolute left-2.5 top-2.5 text-xs text-[var(--text-secondary)]">🔍</span>
         </div>
       </div>
 
       {/* Add Product Modal Overlay */}
       {isAddOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-white/10 p-6 max-w-md w-full shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--surface)]/40 backdrop-blur-xs">
+          <div className="bg-white dark:bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] dark:border-white/10 p-6 max-w-md w-full shadow-xl">
             <div className="flex justify-between items-center mb-4">
-              <h4 className="font-heading font-extrabold text-base text-slate-900 dark:text-[#F1F5F9]">
+              <h4 className="font-heading font-extrabold text-base text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                 Log New Gear Warranty
               </h4>
               <button
                 type="button"
                 onClick={() => setIsAddOpen(false)}
-                className="text-slate-400 hover:text-slate-700 dark:text-slate-200"
+                className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-secondary)]"
               >
                 ✕
               </button>
@@ -249,24 +249,24 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
 
             <form onSubmit={handleAddItem} className="flex flex-col gap-3 text-xs">
               <div>
-                <label className="font-bold text-slate-700 dark:text-slate-200 block mb-1">Product Title</label>
+                <label className="font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] block mb-1">Product Title</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. MacBook Air M3, iPad Pro, Sony TV"
                   value={newProduct}
                   onChange={(e) => setNewProduct(e.target.value)}
-                  className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700 dark:text-slate-200 block mb-1">Brand</label>
+                  <label className="font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] block mb-1">Brand</label>
                   <select
                     value={newBrand}
                     onChange={(e) => setNewBrand(e.target.value)}
-                    className="w-full h-9 px-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527]"
+                    className="w-full h-9 px-2 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 bg-white dark:bg-[var(--surface)]"
                   >
                     {Object.keys(BRAND_DIRECTORY).map((b) => (
                       <option key={b} value={b}>{b}</option>
@@ -275,33 +275,33 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 dark:text-slate-200 block mb-1">Store / Retailer</label>
+                  <label className="font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] block mb-1">Store / Retailer</label>
                   <input
                     type="text"
                     value={newStore}
                     onChange={(e) => setNewStore(e.target.value)}
-                    className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-white/10"
+                    className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] dark:border-white/10"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700 dark:text-slate-200 block mb-1">Purchase Date</label>
+                  <label className="font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] block mb-1">Purchase Date</label>
                   <input
                     type="date"
                     required
                     value={newPurchaseDate}
                     onChange={(e) => setNewPurchaseDate(e.target.value)}
-                    className="w-full h-9 px-2 rounded-xl border border-slate-200 dark:border-white/10"
+                    className="w-full h-9 px-2 rounded-xl border border-[var(--border-subtle)] dark:border-white/10"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 dark:text-slate-200 block mb-1">Standard Warranty</label>
+                  <label className="font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] block mb-1">Standard Warranty</label>
                   <select
                     value={newWarrantyMonths}
                     onChange={(e) => setNewWarrantyMonths(Number(e.target.value))}
-                    className="w-full h-9 px-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527]"
+                    className="w-full h-9 px-2 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 bg-white dark:bg-[var(--surface)]"
                   >
                     <option value={6}>6 Months</option>
                     <option value={12}>1 Year (12M)</option>
@@ -317,20 +317,20 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
                   id="ext-warr"
                   checked={newExtended}
                   onChange={(e) => setNewExtended(e.target.checked)}
-                  className="rounded border-slate-300 dark:border-white/20 text-blue-600"
+                  className="rounded border-[var(--border-subtle)] dark:border-white/20 text-[var(--idh-accent)]"
                 />
-                <label htmlFor="ext-warr" className="font-medium text-slate-700 dark:text-slate-200">
+                <label htmlFor="ext-warr" className="font-medium text-[var(--text-primary)] dark:text-[var(--text-secondary)]">
                   Bought Extended Warranty (e.g. AppleCare+, OneAssist)
                 </label>
               </div>
 
               {newExtended && (
                 <div>
-                  <label className="font-bold text-slate-700 dark:text-slate-200 block mb-1">Extended Duration</label>
+                  <label className="font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] block mb-1">Extended Duration</label>
                   <select
                     value={newExtendedMonths}
                     onChange={(e) => setNewExtendedMonths(Number(e.target.value))}
-                    className="w-full h-9 px-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527]"
+                    className="w-full h-9 px-2 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 bg-white dark:bg-[var(--surface)]"
                   >
                     <option value={12}>+1 Year (12M)</option>
                     <option value={24}>+2 Years (24M)</option>
@@ -340,27 +340,27 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
               )}
 
               <div>
-                <label className="font-bold text-slate-700 dark:text-slate-200 block mb-1">Invoice / Order # (Optional)</label>
+                <label className="font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] block mb-1">Invoice / Order # (Optional)</label>
                 <input
                   type="text"
                   placeholder="e.g. INV-2024-00129"
                   value={newInvoice}
                   onChange={(e) => setNewInvoice(e.target.value)}
-                  className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-white/10"
+                  className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] dark:border-white/10"
                 />
               </div>
 
-              <div className="flex gap-2 justify-end pt-3 border-t border-slate-100 dark:border-white/5">
+              <div className="flex gap-2 justify-end pt-3 border-t border-[var(--border-subtle)] dark:border-white/5">
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 font-bold"
+                  className="px-4 py-2 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-secondary)] dark:text-[var(--text-secondary)] font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-slate-900 text-white font-bold"
+                  className="px-5 py-2 rounded-xl bg-[var(--idh-action-solid)] text-white font-bold"
                 >
                   Save Gear
                 </button>
@@ -373,12 +373,12 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
       {/* Items List */}
       <div className="mt-5 flex flex-col gap-3">
         {filteredItems.length === 0 ? (
-          <div className="py-12 text-center text-xs text-slate-400 bg-slate-50/50 dark:bg-[#070A11]/50 rounded-2xl border border-dashed border-slate-200 dark:border-white/10 flex flex-col items-center justify-center gap-2">
+          <div className="py-12 text-center text-xs text-[var(--text-secondary)] bg-[var(--surface)]/50 dark:bg-[var(--bg)]/50 rounded-2xl border border-dashed border-[var(--border-subtle)] dark:border-white/10 flex flex-col items-center justify-center gap-2">
             <p>Your warranty vault is empty. Tap &ldquo;+ Add Product&rdquo; to log your first appliance or gadget.</p>
             <button
               type="button"
               onClick={() => setItems(DEMO_ITEMS)}
-              className="mt-1 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 cursor-pointer"
+              className="mt-1 px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] dark:border-white/15 bg-white dark:bg-[var(--surface)] text-xs font-semibold text-[var(--text-primary)] dark:text-[var(--text-secondary)] hover:bg-[var(--surface-2)] cursor-pointer"
             >
               📋 Load Example Purchases (Demo)
             </button>
@@ -387,19 +387,19 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
           filteredItems.map((item) => (
             <div
               key={item.id}
-              className="p-4 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white dark:bg-[#0D1527] hover:border-slate-300 dark:border-white/20 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              className="p-4 rounded-2xl border border-[var(--border-subtle)]/90 dark:border-white/10 bg-white dark:bg-[var(--surface)] hover:border-[var(--border-subtle)] dark:border-white/20 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
             >
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-[#111C33] flex items-center justify-center text-lg flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-[var(--surface-2)] dark:bg-[var(--surface-2)] flex items-center justify-center text-lg flex-shrink-0">
                   {item.category === 'Appliances' ? '🧊' : '📱'}
                 </div>
 
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-heading font-bold text-sm text-slate-900 dark:text-[#F1F5F9]">
+                    <span className="font-heading font-bold text-sm text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                       {item.productName}
                     </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#111C33] text-slate-600 dark:text-slate-400 font-semibold">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-[var(--surface-2)] dark:bg-[var(--surface-2)] text-[var(--text-secondary)] dark:text-[var(--text-secondary)] font-semibold">
                       {item.brand}
                     </span>
                     {item.hasExtendedWarranty && (
@@ -409,7 +409,7 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-3 text-xs text-slate-500 mt-1 flex-wrap">
+                  <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)] mt-1 flex-wrap">
                     <span>Bought: {item.purchaseDate} ({item.store})</span>
                     {item.invoiceNumber && (
                       <span className="font-mono text-[11px]">Inv: {item.invoiceNumber}</span>
@@ -431,7 +431,7 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
                       {item.status === 'active' ? `${item.diffDays} Days Left` : item.status === 'expiring' ? `${item.diffDays}d (Expiring!)` : 'Expired'}
                     </span>
                   </div>
-                  <span className="text-[10px] text-slate-400 font-mono block">
+                  <span className="text-[10px] text-[var(--text-secondary)] font-mono block">
                     Valid till {item.expiryDate}
                   </span>
                 </div>
@@ -442,7 +442,7 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     title={`Call ${item.brand} support: ${item.brandInfo.tollFree}`}
-                    className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#070A11] hover:bg-slate-100 dark:bg-[#111C33] text-slate-700 dark:text-slate-200 text-xs font-medium flex items-center gap-1"
+                    className="h-8 px-2.5 rounded-lg border border-[var(--border-subtle)] dark:border-white/10 bg-[var(--surface)] dark:bg-[var(--bg)] hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)] text-[var(--text-primary)] dark:text-[var(--text-secondary)] text-xs font-medium flex items-center gap-1"
                   >
                     <span>Support</span>
                     <span className="text-[10px]">↗</span>
@@ -452,7 +452,7 @@ export const WarrantyExpiryTrackerTool: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleDeleteItem(item.id)}
-                  className="w-8 h-8 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors flex items-center justify-center text-xs"
+                  className="w-8 h-8 rounded-lg hover:bg-rose-50 text-[var(--text-secondary)] hover:text-rose-600 transition-colors flex items-center justify-center text-xs"
                   title="Remove from vault"
                 >
                   🗑️

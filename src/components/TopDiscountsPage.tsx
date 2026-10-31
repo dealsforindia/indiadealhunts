@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { motion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
+import { ArrowDownRight, ArrowUpRight, Search, SlidersHorizontal, LayoutGrid, List, X, Tag } from 'lucide-react';
 import { PublicDeal } from '../types';
 import { PublicDealCard } from './PublicDealCard';
 import { DealSkeletonGrid } from './DealSkeleton';
@@ -17,7 +18,7 @@ interface TopDiscountsPageProps {
   onShowToast?: (msg: string) => void;
 }
 
-const STORES = ['all', 'amazon', 'flipkart', 'myntra', 'ajio', 'swiggy', 'zepto'];
+
 
 export const TopDiscountsPage: React.FC<TopDiscountsPageProps> = ({
   deals,
@@ -47,7 +48,7 @@ export const TopDiscountsPage: React.FC<TopDiscountsPageProps> = ({
     }
 
     if (searchFilter.trim()) {
-      const q = searchFilter.toLowerCase();
+      const q = searchFilter.trim().toLowerCase();
       list = list.filter(
         (d) =>
           d.title.toLowerCase().includes(q) ||
@@ -59,160 +60,39 @@ export const TopDiscountsPage: React.FC<TopDiscountsPageProps> = ({
     return list;
   }, [deals, discountThreshold, selectedStore, searchFilter]);
 
-  return (
-    <div className="w-full max-w-[1340px] mx-auto px-4 md:px-6 pt-6 pb-28 md:pb-12">
-      {/* ── Page Header (Mobbin / Apple Inspired) ── */}
-      <div className="mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 border border-rose-200/80 text-rose-700 text-xs font-semibold mb-3">
-          <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-          <span>STEEPEST PRICE DROPS</span>
-        </div>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-[#F1F5F9] tracking-tight">
-          Top Discounts & Flash Loots
-        </h1>
-        <p className="mt-2 text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
-          Offers ranked by their listed discount from MRP. Inspect recorded history where available and confirm the price at checkout.
-        </p>
+  const reduced = useReducedMotion();
+  const stores = useMemo(() => [...new Set(deals.map(d => d.store?.trim()).filter((s): s is string => Boolean(s)))].sort(), [deals]);
+  const tiers = [0, 50, 70, 80];
+  const counts = tiers.map(t => deals.filter(d => (d.discount_pct || 0) >= t).length);
+  const reset = () => { setDiscountThreshold(0); setSelectedStore('all'); setSearchFilter(''); };
+  const filtered = discountThreshold > 0 || selectedStore !== 'all' || Boolean(searchFilter.trim());
+  return <section className="discount-studio">
+    <header className="discount-intro">
+      <div className="discount-intro-copy"><span className="discount-eyebrow"><ArrowDownRight size={16} /> THE DISCOUNT EDIT</span>
+        <h1>A little less.<br /><span>A lot to discover.</span></h1>
+        <p>Explore offers by their listed reduction from MRP. Find your range, then check the price story.</p>
+        <span className="discount-footnote">Listed discounts are not verified price drops.</span>
       </div>
-
-      {/* ── Filters & Controls Toolbar ── */}
-      <div className="bg-white/80 dark:bg-[#0D1527]/80 backdrop-blur-md rounded-2xl border border-slate-200/90 dark:border-white/10 p-4 mb-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        {/* Left: Discount Threshold Pills */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">
-            Min Discount:
-          </span>
-          {[
-            { label: 'All Discounts', value: 0 },
-            { label: '🔥 80%+ OFF', value: 80 },
-            { label: '⚡ 70%+ OFF', value: 70 },
-            { label: '🏷️ 50%+ OFF', value: 50 },
-          ].map((tier) => (
-            <button
-              key={tier.value}
-              onClick={() => setDiscountThreshold(tier.value)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                discountThreshold === tier.value
-                  ? 'bg-rose-600 text-white shadow-xs'
-                  : 'bg-slate-100 dark:bg-[#111C33] text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#1E293B]/70 dark:bg-[#172440]/70 hover:text-slate-900 dark:text-[#F1F5F9]'
-              }`}
-            >
-              {tier.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Right: Search + Store Filter + View Toggle */}
-        <div className="flex items-center gap-2 w-full md:w-auto flex-wrap">
-          <input
-            type="text"
-            placeholder="Filter discounts..."
-            value={searchFilter}
-            onChange={(e) => setSearchFilter(e.target.value)}
-            className="px-3.5 py-1.5 rounded-full bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-800 dark:text-[#F8FAFC] focus:outline-none focus:border-blue-500 focus:bg-white dark:bg-[#0D1527] w-full sm:w-44 transition-all"
-          />
-
-          <select
-            value={selectedStore}
-            onChange={(e) => setSelectedStore(e.target.value)}
-            className="px-3 py-1.5 rounded-full bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 capitalize cursor-pointer"
-          >
-            {STORES.map((s) => (
-              <option key={s} value={s}>
-                {s === 'all' ? 'All Stores' : s}
-              </option>
-            ))}
-          </select>
-
-          <div className="hidden sm:flex items-center rounded-full bg-slate-100 dark:bg-[#111C33] p-0.5 border border-slate-200 dark:border-white/10">
-            <button
-              onClick={() => onViewModeChange('grid')}
-              className={`p-1.5 rounded-full transition-colors ${
-                viewMode === 'grid' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-2xs' : 'text-slate-500 hover:text-slate-800 dark:text-[#F8FAFC]'
-              }`}
-              title="Grid View"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="7" height="7" />
-                <rect x="14" y="3" width="7" height="7" />
-                <rect x="14" y="14" width="7" height="7" />
-                <rect x="3" y="14" width="7" height="7" />
-              </svg>
-            </button>
-            <button
-              onClick={() => onViewModeChange('list')}
-              className={`p-1.5 rounded-full transition-colors ${
-                viewMode === 'list' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-2xs' : 'text-slate-500 hover:text-slate-800 dark:text-[#F8FAFC]'
-              }`}
-              title="List View"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="8" y1="6" x2="21" y2="6" />
-                <line x1="8" y1="12" x2="21" y2="12" />
-                <line x1="8" y1="18" x2="21" y2="18" />
-                <line x1="3" y1="6" x2="3.01" y2="6" />
-                <line x1="3" y1="12" x2="3.01" y2="12" />
-                <line x1="3" y1="18" x2="3.01" y2="18" />
-              </svg>
-            </button>
-          </div>
-        </div>
+      <div className="discount-lens" aria-label="Browse minimum listed discount">
+        <div className="discount-lens-heading"><span>Your discount lens</span><SlidersHorizontal size={17} /></div>
+        <div className="discount-bands">{tiers.map((tier, i) => <button type="button" key={tier} aria-pressed={discountThreshold === tier} onClick={() => setDiscountThreshold(tier)}>
+          <span className="discount-band-top"><span>{tier ? 'AT LEAST' : 'THE FULL EDIT'}</span><ArrowUpRight size={16} /></span>
+          <strong>{tier ? <>{tier}<small>%</small></> : 'All'}</strong>
+          <span className="discount-band-track"><span style={{ width: `${counts[0] ? counts[i] / counts[0] * 100 : 0}%` }} /></span>
+          <span className="discount-band-count">{loading && !deals.length ? 'Loading…' : `${counts[i]} offers`}</span>
+        </button>)}</div>
+        <p>Based on the offers currently loaded. Final prices may change.</p>
       </div>
-
-      {/* ── Status Bar ── */}
-      <div className="flex items-center justify-between text-xs text-slate-500 mb-4 px-1">
-        <span>
-          Showing <strong className="text-slate-800 dark:text-[#F8FAFC] font-semibold">{sortedDeals.length}</strong> directory offers
-          {discountThreshold > 0 && <span> with &ge;{discountThreshold}% off</span>}
-        </span>
-        <span className="text-[11px] font-mono text-emerald-600 font-semibold">
-          ⚡ 24/7 Live Feed
-        </span>
-      </div>
-
-      {/* ── Deal Grid ── */}
-      {loading && sortedDeals.length === 0 ? (
-        <DealSkeletonGrid count={8} />
-      ) : sortedDeals.length > 0 ? (
-        <motion.div
-          layout
-          className={
-            viewMode === 'grid'
-              ? 'grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5'
-              : 'commerce-deal-list flex flex-col gap-3'
-          }
-        >
-          {sortedDeals.map((deal, idx) => (
-            <PublicDealCard
-              key={deal.id}
-              deal={deal}
-              index={idx}
-              onSelectDeal={onSelectDeal}
-              onToggleSave={onToggleSaveDeal}
-              isSaved={savedDealIds.includes(deal.id)}
-              onToggleCompare={onToggleCompare}
-              isComparing={compareDeals.some((d) => d.id === deal.id)}
-              onShowToast={onShowToast}
-            />
-          ))}
-        </motion.div>
-      ) : (
-        <div className="text-center py-16 px-4 bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-white/10">
-          <div className="text-4xl mb-3">🏷️</div>
-          <h3 className="text-base font-bold text-slate-800 dark:text-[#F8FAFC]">No deals match this discount filter</h3>
-          <p className="text-xs text-slate-500 mt-1">Try lowering the minimum discount threshold or selecting All Stores.</p>
-          <button
-            onClick={() => {
-              setDiscountThreshold(0);
-              setSelectedStore('all');
-              setSearchFilter('');
-            }}
-            className="mt-4 px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition-colors"
-          >
-            Reset Filters
-          </button>
-        </div>
-      )}
+    </header>
+    <div className="discount-controls">
+      <label className="discount-search"><Search size={18} /><span className="sr-only">Search discount offers</span><input type="search" placeholder="A brand, a product, a little inspiration…" value={searchFilter} onChange={e => setSearchFilter(e.target.value)} /></label>
+      <label className="discount-store"><span>Store</span><select aria-label="Filter by store" value={selectedStore} onChange={e => setSelectedStore(e.target.value)}><option value="all">All stores</option>{stores.map(store => <option key={store} value={store}>{store}</option>)}</select></label>
+      <div className="discount-view" role="group" aria-label="Offer layout">{(['grid','list'] as const).map(mode => <button type="button" key={mode} aria-label={`${mode} view`} aria-pressed={viewMode === mode} onClick={() => onViewModeChange(mode)}>{mode === 'grid' ? <LayoutGrid size={18} /> : <List size={18} />}</button>)}</div>
     </div>
-  );
+    <div className="discount-results-heading"><div><h2>{discountThreshold ? `${discountThreshold}% and beyond` : 'The latest edit'}</h2><span role="status" aria-live="polite">{sortedDeals.length} matching offers · highest listed discount first</span></div>{filtered && <button className="discount-reset" type="button" onClick={reset}><X size={14} />Clear filters</button>}</div>
+    {loading && !sortedDeals.length ? <DealSkeletonGrid count={8} /> : sortedDeals.length ? <motion.div layout={!reduced} className={viewMode === 'grid' ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5' : 'commerce-deal-list flex flex-col gap-3'}>
+      {sortedDeals.map((deal, idx) => <PublicDealCard key={deal.id} deal={deal} index={idx} onSelectDeal={onSelectDeal} onToggleSave={onToggleSaveDeal} isSaved={savedDealIds.includes(deal.id)} onToggleCompare={onToggleCompare} isComparing={compareDeals.some(d => d.id === deal.id)} onShowToast={onShowToast} />)}
+    </motion.div> : <div className="discount-empty"><Tag size={32} /><h2>A different lens, perhaps?</h2><p>No offers match this combination. Try another store or widen your discount range.</p><button type="button" onClick={reset}>Explore all offers <ArrowUpRight size={16} /></button></div>}
+    <p className="discount-evidence-note">A large MRP discount is a starting point. Inspect recorded price history where available, and confirm eligibility and the final price with the store.</p>
+  </section>;
 };

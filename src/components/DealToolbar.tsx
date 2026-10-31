@@ -2,6 +2,7 @@ import { useModalSurface } from '../utils/useModalSurface';
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
+import { LayoutGrid, Rows3, ArrowLeftRight } from 'lucide-react';
 import { SortOption } from '../types';
 
 interface DealToolbarProps {
@@ -143,8 +144,8 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
               aria-expanded={storeOpen}
               className={`h-8.5 px-4 rounded-full text-[12.5px] font-medium flex items-center gap-2 border transition-all cursor-pointer ${
                 selectedStore !== 'all'
-                  ? 'bg-[#0066cc]/10 text-[#0066cc] border-[#0066cc]/30 font-semibold shadow-xs'
-                  : 'bg-white dark:bg-[#0D1527] hover:bg-slate-50 dark:bg-[#070A11] text-slate-700 dark:text-slate-200 border-slate-200/90 dark:border-white/10 hover:border-slate-300 dark:border-white/20 shadow-2xs'
+                  ? 'bg-[var(--idh-accent)]/10 text-[var(--idh-accent)] border-[var(--idh-accent)]/30 font-semibold shadow-xs'
+                  : 'bg-white dark:bg-[var(--surface)] hover:bg-[var(--surface)] dark:bg-[var(--bg)] text-[var(--text-primary)] dark:text-[var(--text-secondary)] border-[var(--border-subtle)]/90 dark:border-white/10 hover:border-[var(--border-subtle)] dark:border-white/20 shadow-2xs'
               }`}
             >
               <span>{desktopStoreLabel}</span>
@@ -160,7 +161,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 6, scale: 0.98 }}
                   transition={{ duration: 0.12 }}
-                  className="absolute top-full left-0 mt-2 w-48 max-h-72 overflow-y-auto rounded-2xl bg-white/95 dark:bg-[#0D1527]/95 backdrop-blur-md border border-slate-200/80 dark:border-white/10 p-1.5 shadow-xl z-50"
+                  className="absolute top-full left-0 mt-2 w-48 max-h-72 overflow-y-auto rounded-2xl bg-white/95 dark:bg-[var(--surface)]/95 backdrop-blur-md border border-[var(--border-subtle)]/80 dark:border-white/10 p-1.5 shadow-xl z-50"
                 >
                   {storeList.map((s) => (
                     <button
@@ -168,12 +169,12 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                       onClick={() => { onSelectStore(s.id); setStoreOpen(false); }}
                       className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-colors text-left ${
                         selectedStore.toLowerCase() === s.id.toLowerCase()
-                          ? 'bg-[#0066cc]/10 text-[#0066cc] font-semibold'
-                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                          ? 'bg-[var(--idh-accent)]/10 text-[var(--idh-accent)] font-semibold'
+                          : 'text-[var(--text-primary)] dark:text-[var(--text-secondary)] hover:bg-[var(--surface)] dark:hover:bg-[var(--surface)]/50'
                       }`}
                     >
                       <span className="truncate">{s.label}</span>
-                      {selectedStore.toLowerCase() === s.id.toLowerCase() && <span className="text-[#0066cc] ml-1">✓</span>}
+                      {selectedStore.toLowerCase() === s.id.toLowerCase() && <span className="text-[var(--idh-accent)] ml-1">✓</span>}
                     </button>
                   ))}
                 </motion.div>
@@ -189,8 +190,8 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
               aria-expanded={catOpen}
               className={`h-8.5 px-4 rounded-full text-[12.5px] font-medium flex items-center gap-2 border transition-all cursor-pointer ${
                 selectedCategory !== 'all'
-                  ? 'bg-[#0066cc]/10 text-[#0066cc] border-[#0066cc]/30 font-semibold shadow-xs'
-                  : 'bg-white dark:bg-[#0D1527] hover:bg-slate-50 dark:bg-[#070A11] text-slate-700 dark:text-slate-200 border-slate-200/90 dark:border-white/10 hover:border-slate-300 dark:border-white/20 shadow-2xs'
+                  ? 'bg-[var(--idh-accent)]/10 text-[var(--idh-accent)] border-[var(--idh-accent)]/30 font-semibold shadow-xs'
+                  : 'bg-white dark:bg-[var(--surface)] hover:bg-[var(--surface)] dark:bg-[var(--bg)] text-[var(--text-primary)] dark:text-[var(--text-secondary)] border-[var(--border-subtle)]/90 dark:border-white/10 hover:border-[var(--border-subtle)] dark:border-white/20 shadow-2xs'
               }`}
             >
               <span>{desktopCatLabel}</span>
@@ -206,7 +207,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 6, scale: 0.98 }}
                   transition={{ duration: 0.12 }}
-                  className="absolute top-full left-0 mt-2 w-48 rounded-2xl bg-white/95 dark:bg-[#0D1527]/95 backdrop-blur-md border border-slate-200/80 dark:border-white/10 p-1.5 shadow-xl z-50"
+                  className="absolute top-full left-0 mt-2 w-48 rounded-2xl bg-white/95 dark:bg-[var(--surface)]/95 backdrop-blur-md border border-[var(--border-subtle)]/80 dark:border-white/10 p-1.5 shadow-xl z-50"
                 >
                   {CATEGORIES.map((c) => (
                     <button
@@ -214,12 +215,12 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                       onClick={() => { onSelectCategory(c.id); setCatOpen(false); }}
                       className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-colors text-left ${
                         selectedCategory === c.id
-                          ? 'bg-[#0066cc]/10 text-[#0066cc] font-semibold'
-                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-[#070A11]'
+                          ? 'bg-[var(--idh-accent)]/10 text-[var(--idh-accent)] font-semibold'
+                          : 'text-[var(--text-primary)] dark:text-[var(--text-secondary)] hover:bg-[var(--surface)] dark:bg-[var(--bg)]'
                       }`}
                     >
                       <span>{c.label}</span>
-                      {selectedCategory === c.id && <span className="text-[#0066cc]">✓</span>}
+                      {selectedCategory === c.id && <span className="text-[var(--idh-accent)]">✓</span>}
                     </button>
                   ))}
                 </motion.div>
@@ -235,8 +236,8 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
               aria-expanded={sortOpen}
               className={`h-8.5 px-4 rounded-full text-[12.5px] font-medium flex items-center gap-2 border transition-all cursor-pointer ${
                 sortBy !== 'newest'
-                  ? 'bg-[#0066cc]/10 text-[#0066cc] border-[#0066cc]/30 font-semibold shadow-xs'
-                  : 'bg-white dark:bg-[#0D1527] hover:bg-slate-50 dark:bg-[#070A11] text-slate-700 dark:text-slate-200 border-slate-200/90 dark:border-white/10 hover:border-slate-300 dark:border-white/20 shadow-2xs'
+                  ? 'bg-[var(--idh-accent)]/10 text-[var(--idh-accent)] border-[var(--idh-accent)]/30 font-semibold shadow-xs'
+                  : 'bg-white dark:bg-[var(--surface)] hover:bg-[var(--surface)] dark:bg-[var(--bg)] text-[var(--text-primary)] dark:text-[var(--text-secondary)] border-[var(--border-subtle)]/90 dark:border-white/10 hover:border-[var(--border-subtle)] dark:border-white/20 shadow-2xs'
               }`}
             >
               <span>{desktopSortLabel}</span>
@@ -252,7 +253,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 6, scale: 0.98 }}
                   transition={{ duration: 0.12 }}
-                  className="absolute top-full left-0 mt-2 w-56 rounded-2xl bg-white/95 dark:bg-[#0D1527]/95 backdrop-blur-md border border-slate-200/80 dark:border-white/10 p-1.5 shadow-xl z-50"
+                  className="absolute top-full left-0 mt-2 w-56 rounded-2xl bg-white/95 dark:bg-[var(--surface)]/95 backdrop-blur-md border border-[var(--border-subtle)]/80 dark:border-white/10 p-1.5 shadow-xl z-50"
                 >
                   {SORT_OPTIONS.map((o) => (
                     <button
@@ -260,12 +261,12 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
                       onClick={() => { onSortChange(o.value); setSortOpen(false); }}
                       className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-colors text-left ${
                         sortBy === o.value
-                          ? 'bg-[#0066cc]/10 text-[#0066cc] font-semibold'
-                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-[#070A11]'
+                          ? 'bg-[var(--idh-accent)]/10 text-[var(--idh-accent)] font-semibold'
+                          : 'text-[var(--text-primary)] dark:text-[var(--text-secondary)] hover:bg-[var(--surface)] dark:bg-[var(--bg)]'
                       }`}
                     >
                       <span>{o.label}</span>
-                      {sortBy === o.value && <span className="text-[#0066cc]">✓</span>}
+                      {sortBy === o.value && <span className="text-[var(--idh-accent)]">✓</span>}
                     </button>
                   ))}
                 </motion.div>
@@ -282,7 +283,7 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
             aria-haspopup="dialog"
             aria-expanded={mobileDrawerOpen}
             onClick={openMobileDrawer}
-            className="h-9 px-3.5 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-800 dark:text-[#F8FAFC] flex items-center gap-2 cursor-pointer shadow-2xs"
+            className="h-9 px-3.5 rounded-xl bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)] dark:border-white/10 text-xs font-semibold text-[var(--text-primary)] dark:text-[var(--text-primary)] flex items-center gap-2 cursor-pointer shadow-2xs"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="4" y1="21" x2="4" y2="14" />
@@ -293,55 +294,22 @@ export const DealToolbar: React.FC<DealToolbarProps> = ({
               <line x1="20" y1="12" x2="20" y2="3" />
             </svg>
             <span>Filter & Sort</span>
-            <span className="text-slate-400">›</span>
+            <span className="text-[var(--text-secondary)]">›</span>
           </button>
 
-          <span className="font-mono text-xs text-slate-500 font-semibold">
+          <span className="font-mono text-xs text-[var(--text-secondary)] font-semibold">
             {totalDeals.toLocaleString('en-IN')} drops
           </span>
         </div>
 
         {/* ── Desktop Right: Deals Count & View Grid/List Toggles ── */}
         <div className="hidden md:flex items-center gap-3.5 ml-auto">
-          <span className="font-mono text-xs font-semibold text-slate-500">
+          <span className="font-mono text-xs font-semibold text-[var(--text-secondary)]">
             {totalDeals.toLocaleString('en-IN')} loaded offers
           </span>
 
           {onViewModeChange && (
-            <div className="flex items-center bg-slate-100 dark:bg-[#111C33] rounded-xl p-0.5 gap-0.5 border border-slate-200 dark:border-white/10">
-              <button
-                type="button"
-                onClick={() => onViewModeChange('grid')}
-                title="Grid view"
-                aria-label="Grid view"
-                className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors cursor-pointer ${
-                  viewMode === 'grid' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-2xs' : 'text-slate-500 hover:text-slate-900 dark:text-[#F1F5F9]'
-                }`}
-              >
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
-                  <rect x="2" y="2" width="5" height="5" rx="1" />
-                  <rect x="9" y="2" width="5" height="5" rx="1" />
-                  <rect x="2" y="9" width="5" height="5" rx="1" />
-                  <rect x="9" y="9" width="5" height="5" rx="1" />
-                </svg>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => onViewModeChange('list')}
-                title="List view"
-                aria-label="List view"
-                className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors cursor-pointer ${
-                  viewMode === 'list' ? 'bg-white dark:bg-[#0D1527] text-slate-900 dark:text-[#F1F5F9] shadow-2xs' : 'text-slate-500 hover:text-slate-900 dark:text-[#F1F5F9]'
-                }`}
-              >
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
-                  <line x1="3" y1="5" x2="13" y2="5" strokeLinecap="round" />
-                  <line x1="3" y1="8" x2="13" y2="8" strokeLinecap="round" />
-                  <line x1="3" y1="11" x2="13" y2="11" strokeLinecap="round" />
-                </svg>
-              </button>
-            </div>
+            <button type="button" className="layout-switch" aria-label={viewMode === 'grid' ? 'Switch to list view' : 'Switch to grid view'} onClick={() => onViewModeChange(viewMode === 'grid' ? 'list' : 'grid')}><span className="layout-switch-symbol" aria-hidden="true">{viewMode === 'grid' ? <LayoutGrid size={17}/> : <Rows3 size={17}/>}</span><span>{viewMode === 'grid' ? 'Grid' : 'List'}</span><ArrowLeftRight size={13} aria-hidden="true"/></button>
           )}
         </div>
       </div>

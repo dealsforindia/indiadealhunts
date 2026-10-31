@@ -218,7 +218,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
 
   return createPortal(
     <div ref={modalSurface}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-[var(--surface)]/60 backdrop-blur-sm animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-label="Shopping Utilities & Tools Hub"
@@ -231,25 +231,25 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.96, opacity: 0, y: 10 }}
         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        className="relative w-full max-w-6xl max-h-[calc(100dvh-1.5rem)] flex flex-col bg-white dark:bg-[#0D1527] rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden overscroll-contain"
+        className="idh-tools-hub relative w-full max-w-6xl max-h-[calc(100dvh-1.5rem)] flex flex-col bg-white dark:bg-[var(--surface)] rounded-3xl border border-[var(--border-subtle)] dark:border-white/10 shadow-2xl overflow-hidden overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527]">
+        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-[var(--border-subtle)] dark:border-white/10 bg-white dark:bg-[var(--surface)]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-black text-lg shadow-sm">
+            <div className="w-10 h-10 rounded-2xl bg-[var(--idh-action-solid)] text-white flex items-center justify-center font-black text-lg shadow-sm">
               🧰
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-heading font-extrabold text-base sm:text-lg text-slate-900 dark:text-[#F1F5F9] tracking-tight">
+                <h2 className="font-heading font-extrabold text-base sm:text-lg text-[var(--text-primary)] dark:text-[var(--text-primary)] tracking-tight">
                   Shopping Utilities &amp; Loot Lab
                 </h2>
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                   12 PLANNING TOOLS
                 </span>
               </div>
-              <p className="text-xs text-slate-500 font-medium line-clamp-1">
+              <p className="text-xs text-[var(--text-secondary)] font-medium line-clamp-1">
                 Use entered values and example assumptions. These calculators do not supply live bank offers or merchant quotes.
               </p>
             </div>
@@ -262,14 +262,14 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search 12 tools..."
-                className="w-full pl-7 pr-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs bg-slate-50 dark:bg-[#070A11] focus:bg-white dark:bg-[#0D1527] focus:outline-none focus:border-slate-400"
+                className="w-full pl-7 pr-3 py-1.5 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 text-xs bg-[var(--surface)] dark:bg-[var(--bg)] focus:bg-white dark:bg-[var(--surface)] focus:outline-none focus:border-[var(--border-subtle)]"
               />
-              <span className="absolute left-2.5 text-xs text-slate-400">🔍</span>
+              <span className="absolute left-2.5 text-xs text-[var(--text-secondary)]">🔍</span>
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2 text-xs text-slate-400 hover:text-slate-600 dark:text-slate-400"
+                  className="absolute right-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text-secondary)] dark:text-[var(--text-secondary)]"
                 >
                   ✕
                 </button>
@@ -280,7 +280,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
               type="button"
               onClick={onClose}
               aria-label="Close dialog"
-              className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-500 hover:text-slate-800 dark:text-[#F8FAFC] transition-colors flex items-center justify-center cursor-pointer text-sm font-bold"
+              className="w-9 h-9 rounded-xl bg-[var(--surface-2)] dark:bg-[var(--surface-2)] hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-primary)] transition-colors flex items-center justify-center cursor-pointer text-sm font-bold"
             >
               ✕
             </button>
@@ -288,7 +288,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
         </div>
 
         {/* Category Filter Chips Bar */}
-        <div className="px-5 sm:px-6 py-2 bg-slate-100/70 dark:bg-[#111C33]/70 border-b border-slate-200/80 dark:border-white/10 flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+        <div className="px-5 sm:px-6 py-2 bg-[var(--surface-2)]/70 dark:bg-[var(--surface-2)]/70 border-b border-[var(--border-subtle)]/80 dark:border-white/10 flex items-center gap-1.5 overflow-x-auto scrollbar-none">
           {CATEGORIES.map((cat) => {
             const isCatActive = activeCategory === cat.id;
             return (
@@ -298,8 +298,8 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
                 onClick={() => setActiveCategory(cat.id)}
                 className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                   isCatActive
-                    ? 'bg-slate-900 text-white shadow-2xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-[#F1F5F9] hover:bg-slate-200 dark:hover:bg-[#1E293B]/60 dark:bg-[#172440]/60'
+                    ? 'bg-[var(--idh-action-solid)] text-white shadow-2xs'
+                    : 'text-[var(--text-secondary)] dark:text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-primary)] hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-2)]/60 dark:bg-[var(--surface-2)]/60'
                 }`}
               >
                 {cat.name}
@@ -309,7 +309,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
         </div>
 
         {/* Tool Navigation Pill Strip */}
-        <div className="px-5 sm:px-6 py-2.5 bg-slate-50/90 dark:bg-[#070A11]/90 border-b border-slate-200/80 dark:border-white/10 overflow-x-auto flex items-center gap-2 scrollbar-none">
+        <div className="px-5 sm:px-6 py-2.5 bg-[var(--surface)]/90 dark:bg-[var(--bg)]/90 border-b border-[var(--border-subtle)]/80 dark:border-white/10 overflow-x-auto flex items-center gap-2 scrollbar-none">
           {filteredTools.map((tool) => {
             const isActive = tool.id === activeToolId;
             return (
@@ -319,8 +319,8 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
                 onClick={() => setActiveToolId(tool.id)}
                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-slate-900 text-white shadow-xs'
-                    : 'bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-[#F1F5F9] hover:bg-slate-100 dark:bg-[#111C33]'
+                    ? 'bg-[var(--idh-action-solid)] text-white shadow-xs'
+                    : 'bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)]/90 dark:border-white/10 text-[var(--text-secondary)] dark:text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-primary)] hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)]'
                 }`}
               >
                 <span className="text-sm">{tool.icon}</span>
@@ -329,7 +329,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
                   <span
                     className={`text-[9px] font-mono px-1 py-0.2 rounded font-extrabold ${
                       isActive
-                        ? 'bg-emerald-400 text-slate-950'
+                        ? 'bg-emerald-400 text-[var(--text-primary)]'
                         : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                     }`}
                   >
@@ -345,7 +345,7 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
         </div>
 
         {/* Scrollable Tool Workspace */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50/40 dark:bg-[#070A11]/40">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[var(--surface)]/40 dark:bg-[var(--bg)]/40">
           <p role="note" className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 dark:bg-amber-900/20 dark:text-amber-200 dark:border-amber-800">Planning scenarios. Preset bank rates, fees, valuations, tax rules and service terms are examples, not current verified offers. Confirm applicable terms and enter your own values before relying on the result.</p>
           <AnimatePresence mode="wait">
             <motion.div
@@ -372,23 +372,23 @@ export const ToolsHubModal: React.FC<ToolsHubModalProps> = ({
         </div>
 
         {/* Bottom Status Footer */}
-        <div className="px-5 sm:px-6 py-3 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500">
+        <div className="px-5 sm:px-6 py-3 border-t border-[var(--border-subtle)] dark:border-white/10 bg-white dark:bg-[var(--surface)] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-[var(--text-secondary)]">
           <div className="flex items-center gap-2">
-            <span className="text-slate-400">Active Engine:</span>
-            <span className="font-bold text-slate-800 dark:text-[#F8FAFC]">{activeTool.title}</span>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#111C33] text-slate-600 dark:text-slate-400">
+            <span className="text-[var(--text-secondary)]">Active Engine:</span>
+            <span className="font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]">{activeTool.title}</span>
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface-2)] dark:bg-[var(--surface-2)] text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">
               {activeTool.badge}
             </span>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-[11px] text-slate-400 font-mono hidden sm:inline">
+            <span className="text-[11px] text-[var(--text-secondary)] font-mono hidden sm:inline">
               100% Client-Side • Verified Indian Retail Formulas
             </span>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-1.5 rounded-lg bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-700 dark:text-slate-200 font-bold transition-colors cursor-pointer text-xs"
+              className="px-4 py-1.5 rounded-lg bg-[var(--surface-2)] dark:bg-[var(--surface-2)] hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)] text-[var(--text-primary)] dark:text-[var(--text-secondary)] font-bold transition-colors cursor-pointer text-xs"
             >
               Done
             </button>

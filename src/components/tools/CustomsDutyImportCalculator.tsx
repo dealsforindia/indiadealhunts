@@ -247,19 +247,19 @@ Generated via IndiaDealHunts Customs & Import Lab`;
   return (
     <div className="space-y-6">
       {/* Intro Header */}
-      <div className="bg-white dark:bg-[#0D1527] p-5 sm:p-6 rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-xs">
+      <div className="bg-white dark:bg-[var(--surface)] p-5 sm:p-6 rounded-2xl border border-[var(--border-subtle)]/90 dark:border-white/10 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="text-xl">🛃</span>
-              <h3 className="font-heading font-black text-lg text-slate-900 dark:text-[#F1F5F9] tracking-tight">
+              <h3 className="font-heading font-black text-lg text-[var(--text-primary)] dark:text-[var(--text-primary)] tracking-tight">
                 Cross-Border Tech Import &amp; Customs Duty Sentinel
               </h3>
               <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
                 CBIC TARIFF 2024-25
               </span>
             </div>
-            <p className="text-xs text-slate-500 max-w-2xl">
+            <p className="text-xs text-[var(--text-secondary)] max-w-2xl">
               Buying mechanical keyboards, laptops, IEMs, or electronics from AliExpress, Epomaker, Drop, or Amazon US?
               Compute exact Basic Customs Duty (BCD), 10% Social Welfare Surcharge, IGST, and courier clearance fees before shipping.
             </p>
@@ -269,7 +269,7 @@ Generated via IndiaDealHunts Customs & Import Lab`;
             <button
               type="button"
               onClick={handleCopySummary}
-              className="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white cursor-pointer shadow-xs active:scale-95"
+              className="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-[var(--idh-action-solid)] hover:bg-[var(--idh-action-solid)] text-white cursor-pointer shadow-xs active:scale-95"
             >
               <span>{copiedSummary ? '✓ Copied' : '📋 Copy Customs Memo'}</span>
             </button>
@@ -278,14 +278,14 @@ Generated via IndiaDealHunts Customs & Import Lab`;
       </div>
 
       {/* Preset Selector Grid */}
-      <div className="bg-white dark:bg-[#0D1527] p-5 sm:p-6 rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-xs space-y-4">
+      <div className="bg-white dark:bg-[var(--surface)] p-5 sm:p-6 rounded-2xl border border-[var(--border-subtle)]/90 dark:border-white/10 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
               Select Product Category (Official HSN Slabs)
             </span>
           </div>
-          <label className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-400 cursor-pointer">
+          <label className="flex items-center gap-2 text-xs font-medium text-[var(--text-secondary)] dark:text-[var(--text-secondary)] cursor-pointer">
             <input
               type="checkbox"
               checked={useCustomRates}
@@ -310,19 +310,19 @@ Generated via IndiaDealHunts Customs & Import Lab`;
                 className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                   isSelected
                     ? 'border-indigo-600 bg-indigo-50/50 shadow-xs ring-1 ring-indigo-500/20'
-                    : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:border-white/20 hover:bg-slate-50 dark:bg-[#070A11]'
+                    : 'border-[var(--border-subtle)] dark:border-white/10 hover:border-[var(--border-subtle)] dark:border-white/20 hover:bg-[var(--surface)] dark:bg-[var(--bg)]'
                 }`}
               >
                 <div>
-                  <div className="text-[10px] font-mono font-bold text-slate-400 uppercase">
+                  <div className="text-[10px] font-mono font-bold text-[var(--text-secondary)] uppercase">
                     {preset.category}
                   </div>
-                  <div className="font-bold text-xs text-slate-800 dark:text-[#F8FAFC] line-clamp-1 mt-0.5">
+                  <div className="font-bold text-xs text-[var(--text-primary)] dark:text-[var(--text-primary)] line-clamp-1 mt-0.5">
                     {preset.name}
                   </div>
                 </div>
-                <div className="mt-2 pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px]">
-                  <span className="font-mono text-slate-500">BCD {preset.bcdPercent}%</span>
+                <div className="mt-2 pt-2 border-t border-[var(--border-subtle)] dark:border-white/5 flex items-center justify-between text-[11px]">
+                  <span className="font-mono text-[var(--text-secondary)]">BCD {preset.bcdPercent}%</span>
                   <span className="font-mono font-bold text-indigo-700">IGST {preset.igstPercent}%</span>
                 </div>
               </button>
@@ -332,12 +332,12 @@ Generated via IndiaDealHunts Customs & Import Lab`;
 
         {/* Selected Preset Details Note */}
         {!useCustomRates && (
-          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200/80 dark:border-white/10 flex items-start gap-3 text-xs">
+          <div className="p-3.5 rounded-xl bg-[var(--surface)] dark:bg-[var(--bg)] border border-[var(--border-subtle)]/80 dark:border-white/10 flex items-start gap-3 text-xs">
             <span className="text-base mt-0.5">📌</span>
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-slate-800 dark:text-[#F8FAFC]">{activePreset.name}</span>
-                <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400">
+                <span className="font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]">{activePreset.name}</span>
+                <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">
                   HSN {activePreset.hsn}
                 </span>
                 {activePreset.bisRequired && (
@@ -346,7 +346,7 @@ Generated via IndiaDealHunts Customs & Import Lab`;
                   </span>
                 )}
               </div>
-              <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-[11.5px]">
+              <p className="text-[var(--text-secondary)] dark:text-[var(--text-secondary)] leading-relaxed text-[11.5px]">
                 {activePreset.notes}
               </p>
             </div>
@@ -359,32 +359,32 @@ Generated via IndiaDealHunts Customs & Import Lab`;
             <div className="font-bold text-xs text-indigo-900">Custom Tariff &amp; HSN Override</div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1">HSN Tariff Code</label>
+                <label className="text-[11px] font-bold text-[var(--text-secondary)] dark:text-[var(--text-secondary)] block mb-1">HSN Tariff Code</label>
                 <input
                   type="text"
                   value={customHsn}
                   onChange={(e) => setCustomHsn(e.target.value)}
                   placeholder="e.g. 8471 30 10"
-                  className="w-full px-3 py-1.5 rounded-lg border border-slate-300 dark:border-white/20 text-xs font-mono bg-white dark:bg-[#0D1527]"
+                  className="w-full px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] dark:border-white/20 text-xs font-mono bg-white dark:bg-[var(--surface)]"
                 />
               </div>
               <div>
-                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1">Basic Customs Duty (BCD %)</label>
+                <label className="text-[11px] font-bold text-[var(--text-secondary)] dark:text-[var(--text-secondary)] block mb-1">Basic Customs Duty (BCD %)</label>
                 <input
                   type="number"
                   min="0"
                   max="100"
                   value={customBcd}
                   onChange={(e) => setCustomBcd(Number(e.target.value))}
-                  className="w-full px-3 py-1.5 rounded-lg border border-slate-300 dark:border-white/20 text-xs font-mono bg-white dark:bg-[#0D1527]"
+                  className="w-full px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] dark:border-white/20 text-xs font-mono bg-white dark:bg-[var(--surface)]"
                 />
               </div>
               <div>
-                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1">IGST Rate (%)</label>
+                <label className="text-[11px] font-bold text-[var(--text-secondary)] dark:text-[var(--text-secondary)] block mb-1">IGST Rate (%)</label>
                 <select
                   value={customIgst}
                   onChange={(e) => setCustomIgst(Number(e.target.value))}
-                  className="w-full px-3 py-1.5 rounded-lg border border-slate-300 dark:border-white/20 text-xs font-mono bg-white dark:bg-[#0D1527]"
+                  className="w-full px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] dark:border-white/20 text-xs font-mono bg-white dark:bg-[var(--surface)]"
                 >
                   <option value={0}>0% (Books / Exempt)</option>
                   <option value={5}>5% (Concessional)</option>
@@ -402,8 +402,8 @@ Generated via IndiaDealHunts Customs & Import Lab`;
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Form: Inputs */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-white dark:bg-[#0D1527] p-5 rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-xs space-y-4">
-            <div className="font-bold text-sm text-slate-800 dark:text-[#F8FAFC] flex items-center gap-2">
+          <div className="bg-white dark:bg-[var(--surface)] p-5 rounded-2xl border border-[var(--border-subtle)]/90 dark:border-white/10 shadow-xs space-y-4">
+            <div className="font-bold text-sm text-[var(--text-primary)] dark:text-[var(--text-primary)] flex items-center gap-2">
               <span>💵</span>
               <span>Purchase Price &amp; Currency</span>
             </div>
@@ -417,8 +417,8 @@ Generated via IndiaDealHunts Customs & Import Lab`;
                   onClick={() => setSelectedCurrency(c.code)}
                   className={`py-1.5 px-2 rounded-lg text-xs font-bold font-mono transition-all cursor-pointer ${
                     selectedCurrency === c.code
-                      ? 'bg-slate-900 text-white shadow-xs'
-                      : 'bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:bg-[#111C33]'
+                      ? 'bg-[var(--idh-action-solid)] text-white shadow-xs'
+                      : 'bg-[var(--surface)] dark:bg-[var(--bg)] border border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-secondary)] dark:text-[var(--text-secondary)] hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)]'
                   }`}
                 >
                   {c.symbol} {c.code}
@@ -428,7 +428,7 @@ Generated via IndiaDealHunts Customs & Import Lab`;
 
             {/* Foreign Price */}
             <div>
-              <div className="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">
+              <div className="flex justify-between items-center text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] mb-1.5">
                 <span>Item Price ({curr.code})</span>
                 <span className="font-mono text-indigo-700 font-extrabold text-sm">
                   {curr.symbol} {foreignItemPrice.toLocaleString()} (≈ ₹{Math.round(calculation.fobInr).toLocaleString('en-IN')})
@@ -440,15 +440,15 @@ Generated via IndiaDealHunts Customs & Import Lab`;
                 step="any"
                 value={foreignItemPrice}
                 onChange={(e) => setForeignItemPrice(Math.max(0, Number(e.target.value)))}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 font-mono text-sm bg-slate-50/50 dark:bg-[#070A11]/50 focus:bg-white dark:bg-[#0D1527] focus:border-indigo-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 font-mono text-sm bg-[var(--surface)]/50 dark:bg-[var(--bg)]/50 focus:bg-white dark:bg-[var(--surface)] focus:border-indigo-500 focus:outline-none"
               />
             </div>
 
             {/* Foreign Shipping */}
             <div>
-              <div className="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">
+              <div className="flex justify-between items-center text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] mb-1.5">
                 <span>International Shipping / Freight ({curr.code})</span>
-                <span className="font-mono text-slate-600 dark:text-slate-400 text-xs">
+                <span className="font-mono text-[var(--text-secondary)] dark:text-[var(--text-secondary)] text-xs">
                   {curr.symbol} {foreignShippingCost} (≈ ₹{Math.round(calculation.shippingInr).toLocaleString('en-IN')})
                 </span>
               </div>
@@ -458,16 +458,16 @@ Generated via IndiaDealHunts Customs & Import Lab`;
                 step="any"
                 value={foreignShippingCost}
                 onChange={(e) => setForeignShippingCost(Math.max(0, Number(e.target.value)))}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 font-mono text-sm bg-slate-50/50 dark:bg-[#070A11]/50 focus:bg-white dark:bg-[#0D1527] focus:border-indigo-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 font-mono text-sm bg-[var(--surface)]/50 dark:bg-[var(--bg)]/50 focus:bg-white dark:bg-[var(--surface)] focus:border-indigo-500 focus:outline-none"
               />
-              <p className="text-[11px] text-slate-400 mt-1">
+              <p className="text-[11px] text-[var(--text-secondary)] mt-1">
                 Indian Customs caps assessable freight at 20% of FOB value if actual freight is disproportionate.
               </p>
             </div>
 
             {/* Insurance Checkbox */}
-            <div className="pt-2 border-t border-slate-100 dark:border-white/5 space-y-2">
-              <label className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-200 cursor-pointer">
+            <div className="pt-2 border-t border-[var(--border-subtle)] dark:border-white/5 space-y-2">
+              <label className="flex items-center gap-2 text-xs font-medium text-[var(--text-primary)] dark:text-[var(--text-secondary)] cursor-pointer">
                 <input
                   type="checkbox"
                   checked={isInsuranceKnown}
@@ -486,15 +486,15 @@ Generated via IndiaDealHunts Customs & Import Lab`;
                     value={foreignInsuranceCost}
                     onChange={(e) => setForeignInsuranceCost(Math.max(0, Number(e.target.value)))}
                     placeholder={`Insurance in ${curr.code}`}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-white/10 font-mono text-xs bg-slate-50/50 dark:bg-[#070A11]/50"
+                    className="w-full px-3 py-2 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 font-mono text-xs bg-[var(--surface)]/50 dark:bg-[var(--bg)]/50"
                   />
                 </div>
               )}
             </div>
 
             {/* Shipping Carrier Type */}
-            <div className="pt-2 border-t border-slate-100 dark:border-white/5 space-y-2">
-              <label className="text-xs font-bold text-slate-700 dark:text-slate-200 block">
+            <div className="pt-2 border-t border-[var(--border-subtle)] dark:border-white/5 space-y-2">
+              <label className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] block">
                 Shipping Carrier / Delivery Channel
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -504,11 +504,11 @@ Generated via IndiaDealHunts Customs & Import Lab`;
                   className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                     carrierType === 'courier_dhl_fedex'
                       ? 'border-indigo-600 bg-indigo-50/50 shadow-xs ring-1 ring-indigo-500/20'
-                      : 'border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:bg-[#070A11]'
+                      : 'border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface)] dark:bg-[var(--bg)]'
                   }`}
                 >
-                  <div className="font-bold text-xs text-slate-800 dark:text-[#F8FAFC]">DHL / FedEx / UPS</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">Express courier handling (₹850 + 18% GST)</div>
+                  <div className="font-bold text-xs text-[var(--text-primary)] dark:text-[var(--text-primary)]">DHL / FedEx / UPS</div>
+                  <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">Express courier handling (₹850 + 18% GST)</div>
                 </button>
 
                 <button
@@ -517,11 +517,11 @@ Generated via IndiaDealHunts Customs & Import Lab`;
                   className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                     carrierType === 'india_post'
                       ? 'border-indigo-600 bg-indigo-50/50 shadow-xs ring-1 ring-indigo-500/20'
-                      : 'border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:bg-[#070A11]'
+                      : 'border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface)] dark:bg-[var(--bg)]'
                   }`}
                 >
-                  <div className="font-bold text-xs text-slate-800 dark:text-[#F8FAFC]">India Post (EMS)</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">SpeedPost postal presentation (₹100 flat)</div>
+                  <div className="font-bold text-xs text-[var(--text-primary)] dark:text-[var(--text-primary)]">India Post (EMS)</div>
+                  <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">SpeedPost postal presentation (₹100 flat)</div>
                 </button>
               </div>
             </div>
@@ -530,8 +530,8 @@ Generated via IndiaDealHunts Customs & Import Lab`;
 
         {/* Right Form: Complete Itemized Ledger */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-slate-900 text-white p-5 sm:p-6 rounded-2xl shadow-xl space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="bg-[var(--idh-action-solid)] text-white p-5 sm:p-6 rounded-2xl shadow-xl space-y-5">
+            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
               <div>
                 <div className="text-xs uppercase tracking-wider font-mono text-indigo-400 font-bold">
                   Final Landed Cost in India
@@ -544,7 +544,7 @@ Generated via IndiaDealHunts Customs & Import Lab`;
                 <span className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800">
                   +{calculation.effectiveDutyRateOnFob.toFixed(1)}% Tax Impact
                 </span>
-                <div className="text-[11px] text-slate-400 font-mono mt-1">
+                <div className="text-[11px] text-[var(--text-secondary)] font-mono mt-1">
                   Extra ₹{Math.round(calculation.extraOverRetailPrice).toLocaleString('en-IN')}
                 </div>
               </div>
@@ -552,59 +552,59 @@ Generated via IndiaDealHunts Customs & Import Lab`;
 
             {/* Step-by-Step Indian Customs Math */}
             <div className="space-y-2.5 text-xs font-mono">
-              <div className="flex justify-between items-center text-slate-300">
-                <span className="text-slate-400">1. FOB Item Cost:</span>
+              <div className="flex justify-between items-center text-[var(--text-secondary)]">
+                <span className="text-[var(--text-secondary)]">1. FOB Item Cost:</span>
                 <span>₹{Math.round(calculation.fobInr).toLocaleString('en-IN')}</span>
               </div>
 
-              <div className="flex justify-between items-center text-slate-300">
-                <span className="text-slate-400">2. Freight for Assessment:</span>
+              <div className="flex justify-between items-center text-[var(--text-secondary)]">
+                <span className="text-[var(--text-secondary)]">2. Freight for Assessment:</span>
                 <span>₹{Math.round(calculation.freightForCustoms).toLocaleString('en-IN')}</span>
               </div>
 
-              <div className="flex justify-between items-center text-slate-300">
-                <span className="text-slate-400">3. Notional Insurance (1.125%):</span>
+              <div className="flex justify-between items-center text-[var(--text-secondary)]">
+                <span className="text-[var(--text-secondary)]">3. Notional Insurance (1.125%):</span>
                 <span>₹{Math.round(calculation.insuranceInr).toLocaleString('en-IN')}</span>
               </div>
 
-              <div className="flex justify-between items-center text-indigo-300 font-bold pt-1 border-t border-slate-800">
+              <div className="flex justify-between items-center text-indigo-300 font-bold pt-1 border-t border-[var(--border-subtle)]">
                 <span>Assessable CIF Value:</span>
                 <span>₹{Math.round(calculation.cifAssessableValue).toLocaleString('en-IN')}</span>
               </div>
 
-              <div className="flex justify-between items-center text-slate-300">
-                <span className="text-slate-400">4. Basic Customs Duty ({bcdRate}%):</span>
+              <div className="flex justify-between items-center text-[var(--text-secondary)]">
+                <span className="text-[var(--text-secondary)]">4. Basic Customs Duty ({bcdRate}%):</span>
                 <span>₹{Math.round(calculation.bcdAmount).toLocaleString('en-IN')}</span>
               </div>
 
-              <div className="flex justify-between items-center text-slate-300">
-                <span className="text-slate-400">5. Social Welfare Surcharge (10% on BCD):</span>
+              <div className="flex justify-between items-center text-[var(--text-secondary)]">
+                <span className="text-[var(--text-secondary)]">5. Social Welfare Surcharge (10% on BCD):</span>
                 <span>₹{Math.round(calculation.swsAmount).toLocaleString('en-IN')}</span>
               </div>
 
-              <div className="flex justify-between items-center text-slate-300">
-                <span className="text-slate-400">6. IGST ({igstRate}% on CIF + Duties):</span>
+              <div className="flex justify-between items-center text-[var(--text-secondary)]">
+                <span className="text-[var(--text-secondary)]">6. IGST ({igstRate}% on CIF + Duties):</span>
                 <span>₹{Math.round(calculation.igstAmount).toLocaleString('en-IN')}</span>
               </div>
 
-              <div className="flex justify-between items-center text-amber-300 font-bold pt-1 border-t border-slate-800">
+              <div className="flex justify-between items-center text-amber-300 font-bold pt-1 border-t border-[var(--border-subtle)]">
                 <span>Total Customs Duty &amp; Taxes:</span>
                 <span>₹{Math.round(calculation.totalGovernmentDuty).toLocaleString('en-IN')}</span>
               </div>
 
-              <div className="flex justify-between items-center text-slate-400 text-[11px]">
+              <div className="flex justify-between items-center text-[var(--text-secondary)] text-[11px]">
                 <span>7. Carrier Clearance / Documentation Fee:</span>
                 <span>₹{Math.round(calculation.carrierFee).toLocaleString('en-IN')}</span>
               </div>
             </div>
 
             {/* Verdict Box */}
-            <div className="p-3.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs space-y-1">
-              <div className="font-bold text-slate-200 flex items-center gap-1.5">
+            <div className="p-3.5 rounded-xl bg-[var(--surface)]/80 border border-[var(--border-subtle)]/80 text-xs space-y-1">
+              <div className="font-bold text-[var(--text-secondary)] flex items-center gap-1.5">
                 <span>💡</span>
                 <span>Import Reality Check</span>
               </div>
-              <p className="text-slate-400 text-[11px] leading-relaxed">
+              <p className="text-[var(--text-secondary)] text-[11px] leading-relaxed">
                 {calculation.effectiveDutyRateOnFob < 25
                   ? 'Favorable tax slab. Products like laptops (0% BCD) carry minimal customs duty, making international purchases cost-effective.'
                   : calculation.effectiveDutyRateOnFob < 45

@@ -161,24 +161,24 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Header Banner */}
-      <div className="bg-white dark:bg-[#0D1527] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)] dark:border-white/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xl">🛵</span>
-            <h3 className="font-heading font-extrabold text-base sm:text-lg text-slate-900 dark:text-[#F1F5F9] m-0">
+            <h3 className="font-heading font-extrabold text-base sm:text-lg text-[var(--text-primary)] dark:text-[var(--text-primary)] m-0">
               Quick Commerce Surcharge &amp; Cart Filler Optimizer
             </h3>
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-pink-50 text-pink-700 border border-pink-200">
               BLINKIT • ZEPTO • INSTAMART
             </span>
           </div>
-          <p className="text-xs text-slate-500 m-0 leading-relaxed">
+          <p className="text-xs text-[var(--text-secondary)] m-0 leading-relaxed">
             Never pay ₹65 extra in delivery and small-cart fees on an ₹80 grocery order. Find the exact item to add so you get food for free!
           </p>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <label className="flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-[#070A11] px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 cursor-pointer">
+          <label className="flex items-center gap-1.5 text-xs text-[var(--text-primary)] dark:text-[var(--text-secondary)] bg-[var(--surface)] dark:bg-[var(--bg)] px-3 py-1.5 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 cursor-pointer">
             <input
               type="checkbox"
               checked={isNightSurge}
@@ -187,12 +187,12 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
             />
             <span className="font-semibold">🌙 Late Night Surge</span>
           </label>
-          <label className="flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-[#070A11] px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 cursor-pointer">
+          <label className="flex items-center gap-1.5 text-xs text-[var(--text-primary)] dark:text-[var(--text-secondary)] bg-[var(--surface)] dark:bg-[var(--bg)] px-3 py-1.5 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 cursor-pointer">
             <input
               type="checkbox"
               checked={isRaining}
               onChange={(e) => setIsRaining(e.target.checked)}
-              className="rounded text-blue-600"
+              className="rounded text-[var(--idh-accent)]"
             />
             <span className="font-semibold">🌧️ Rain Surge Active</span>
           </label>
@@ -203,13 +203,13 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
         {/* Left Column: Cart Input & Pass Settings */}
         <div className="lg:col-span-5 space-y-5">
           {/* Cart Amount Input */}
-          <div className="bg-white dark:bg-[#0D1527] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm space-y-4">
+          <div className="bg-white dark:bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)] dark:border-white/10 shadow-sm space-y-4">
             <label className="block">
-              <span className="text-xs font-mono uppercase font-bold text-slate-500">
+              <span className="text-xs font-mono uppercase font-bold text-[var(--text-secondary)]">
                 Your Current Grocery Cart Value
               </span>
               <div className="relative mt-2">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold font-mono text-base">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] font-bold font-mono text-base">
                   ₹
                 </span>
                 <input
@@ -219,7 +219,7 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
                   value={cartValue || ''}
                   onChange={(e) => setCartValue(Number(e.target.value))}
                   placeholder="e.g. 85"
-                  className="w-full h-11 pl-9 pr-4 rounded-xl border border-slate-300 dark:border-white/20 text-base font-mono font-bold text-slate-900 dark:text-[#F1F5F9] focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-600 transition-all"
+                  className="w-full h-11 pl-9 pr-4 rounded-xl border border-[var(--border-subtle)] dark:border-white/20 text-base font-mono font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-600 transition-all"
                 />
               </div>
             </label>
@@ -234,7 +234,7 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
                   className={`px-2.5 py-1.5 rounded-lg text-xs font-mono border transition-all cursor-pointer ${
                     cartValue === val
                       ? 'bg-pink-50 text-pink-700 border-pink-300 font-bold'
-                      : 'bg-slate-50 dark:bg-[#070A11] text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:bg-[#111C33]'
+                      : 'bg-[var(--surface)] dark:bg-[var(--bg)] text-[var(--text-secondary)] dark:text-[var(--text-secondary)] border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)]'
                   }`}
                 >
                   ₹{val}
@@ -244,18 +244,18 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
           </div>
 
           {/* Active Memberships */}
-          <div className="bg-white dark:bg-[#0D1527] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm space-y-3">
-            <span className="text-xs font-mono uppercase font-bold text-slate-500 block">
+          <div className="bg-white dark:bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)] dark:border-white/10 shadow-sm space-y-3">
+            <span className="text-xs font-mono uppercase font-bold text-[var(--text-secondary)] block">
               Active Memberships &amp; VIP Passes
             </span>
 
             <div className="space-y-2">
-              <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:bg-[#070A11] transition-colors cursor-pointer">
+              <label className="flex items-center justify-between p-3 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface)] dark:bg-[var(--bg)] transition-colors cursor-pointer">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">⚡</span>
                   <div>
-                    <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] block">Zepto Pass</span>
-                    <span className="text-[10px] text-slate-500 font-mono">Free delivery lowered to ₹99</span>
+                    <span className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] block">Zepto Pass</span>
+                    <span className="text-[10px] text-[var(--text-secondary)] font-mono">Free delivery lowered to ₹99</span>
                   </div>
                 </div>
                 <input
@@ -266,12 +266,12 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
                 />
               </label>
 
-              <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:bg-[#070A11] transition-colors cursor-pointer">
+              <label className="flex items-center justify-between p-3 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface)] dark:bg-[var(--bg)] transition-colors cursor-pointer">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">🍊</span>
                   <div>
-                    <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] block">Swiggy One</span>
-                    <span className="text-[10px] text-slate-500 font-mono">Free delivery lowered to ₹99</span>
+                    <span className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] block">Swiggy One</span>
+                    <span className="text-[10px] text-[var(--text-secondary)] font-mono">Free delivery lowered to ₹99</span>
                   </div>
                 </div>
                 <input
@@ -285,12 +285,12 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
           </div>
 
           {/* Habit Burn Tracker */}
-          <div className="bg-white dark:bg-[#0D1527] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm space-y-3">
+          <div className="bg-white dark:bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)] dark:border-white/10 shadow-sm space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono uppercase font-bold text-slate-500">
+              <span className="text-xs font-mono uppercase font-bold text-[var(--text-secondary)]">
                 Monthly 10-Min Orders
               </span>
-              <span className="text-xs font-mono font-bold text-slate-900 dark:text-[#F1F5F9]">
+              <span className="text-xs font-mono font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                 {ordersPerMonth} orders / mo
               </span>
             </div>
@@ -302,8 +302,8 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
               onChange={(e) => setOrdersPerMonth(Number(e.target.value))}
               className="w-full accent-pink-600 cursor-pointer"
             />
-            <div className="pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-xs">
-              <span className="text-slate-500">Annual Surcharges Paid:</span>
+            <div className="pt-2 border-t border-[var(--border-subtle)] dark:border-white/5 flex items-center justify-between text-xs">
+              <span className="text-[var(--text-secondary)]">Annual Surcharges Paid:</span>
               <span className="font-mono font-black text-rose-600">
                 ₹{annualSurchargePaid.toLocaleString('en-IN')}/yr
               </span>
@@ -317,7 +317,7 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
           {bestPlatform.deficitToFreeDelivery > 0 ? (
             <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 rounded-3xl p-5 text-white shadow-lg space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-white/20 dark:bg-[#0D1527]/20 uppercase tracking-wider">
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-white/20 dark:bg-[var(--surface)]/20 uppercase tracking-wider">
                   💡 CART FILLER HACK AVAILABLE
                 </span>
                 <span className="text-xs font-mono font-bold">
@@ -345,7 +345,7 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
                     {suggestedFillers.map((filler) => (
                       <div
                         key={filler.id}
-                        className="bg-white/10 dark:bg-[#0D1527]/10 backdrop-blur-md rounded-xl p-2 border border-white/15 flex items-center gap-2"
+                        className="bg-white/10 dark:bg-[var(--surface)]/10 backdrop-blur-md rounded-xl p-2 border border-white/15 flex items-center gap-2"
                       >
                         <span className="text-base">{filler.icon}</span>
                         <div className="min-w-0">
@@ -365,7 +365,7 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
           ) : (
             <div className="bg-emerald-600 rounded-3xl p-5 text-white shadow-md flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-white/20 dark:bg-[#0D1527]/20 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-white/20 dark:bg-[var(--surface)]/20 px-2 py-0.5 rounded-full">
                   ✓ FREE DELIVERY UNLOCKED
                 </span>
                 <h4 className="font-heading font-extrabold text-base text-white mt-1 m-0">
@@ -386,16 +386,16 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
               return (
                 <div
                   key={platform.id}
-                  className={`bg-white dark:bg-[#0D1527] rounded-2xl p-4 border transition-all shadow-sm ${
-                    isCheapest ? 'border-pink-300 ring-2 ring-pink-500/10' : 'border-slate-200 dark:border-white/10'
+                  className={`bg-white dark:bg-[var(--surface)] rounded-2xl p-4 border transition-all shadow-sm ${
+                    isCheapest ? 'border-pink-300 ring-2 ring-pink-500/10' : 'border-[var(--border-subtle)] dark:border-white/10'
                   }`}
                 >
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/5">
+                  <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)] dark:border-white/5">
                     <div className="flex items-center gap-2">
                       <span className="text-xl">{platform.icon}</span>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-extrabold text-slate-900 dark:text-[#F1F5F9]">
+                          <span className="text-sm font-extrabold text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                             {platform.name}
                           </span>
                           {isCheapest && (
@@ -404,22 +404,22 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
                             </span>
                           )}
                           {platform.isPassActive && (
-                            <span className="text-[9.5px] font-mono font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                            <span className="text-[9.5px] font-mono font-bold px-1.5 py-0.5 rounded bg-[var(--surface-2)] text-[var(--idh-accent)] border border-[var(--border-subtle)]">
                               PASS ACTIVE
                             </span>
                           )}
                         </div>
-                        <span className="text-[10px] font-mono text-slate-400">
+                        <span className="text-[10px] font-mono text-[var(--text-secondary)]">
                           Free delivery threshold: ₹{platform.threshold}
                         </span>
                       </div>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-lg font-mono font-black text-slate-900 dark:text-[#F1F5F9]">
+                      <span className="text-lg font-mono font-black text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                         ₹{platform.totalPayable}
                       </span>
-                      <span className="text-[10px] font-mono text-slate-500 block">
+                      <span className="text-[10px] font-mono text-[var(--text-secondary)] block">
                         (₹{cartValue} item + ₹{platform.totalSurcharges} fees)
                       </span>
                     </div>
@@ -431,7 +431,7 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
                       className={`px-2 py-0.5 rounded-md border ${
                         platform.deliveryFee === 0
                           ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                          : 'bg-slate-50 dark:bg-[#070A11] text-slate-700 dark:text-slate-200 border-slate-200 dark:border-white/10'
+                          : 'bg-[var(--surface)] dark:bg-[var(--bg)] text-[var(--text-primary)] dark:text-[var(--text-secondary)] border-[var(--border-subtle)] dark:border-white/10'
                       }`}
                     >
                       Delivery: {platform.deliveryFee === 0 ? 'FREE' : `₹${platform.deliveryFee}`}
@@ -443,7 +443,7 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
                       </span>
                     )}
 
-                    <span className="px-2 py-0.5 rounded-md bg-slate-50 dark:bg-[#070A11] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10">
+                    <span className="px-2 py-0.5 rounded-md bg-[var(--surface)] dark:bg-[var(--bg)] text-[var(--text-secondary)] dark:text-[var(--text-secondary)] border border-[var(--border-subtle)] dark:border-white/10">
                       Handling / Tech Fee: ₹{platform.handlingFee}
                     </span>
 
@@ -454,7 +454,7 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
                     )}
 
                     {platform.rainSurgeFee > 0 && (
-                      <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                      <span className="px-2 py-0.5 rounded-md bg-[var(--surface-2)] text-[var(--idh-accent)] border border-[var(--border-subtle)]">
                         🌧️ Rain Surge: ₹{platform.rainSurgeFee}
                       </span>
                     )}
@@ -465,8 +465,8 @@ export const QuickCommerceDeliveryFeeOptimizer: React.FC = () => {
           </div>
 
           {/* Quick-Commerce Rules Guide */}
-          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
-            <span className="font-bold text-slate-900 dark:text-[#F1F5F9] block font-heading">
+          <div className="p-4 rounded-2xl bg-[var(--surface)] dark:bg-[var(--bg)] border border-[var(--border-subtle)] dark:border-white/10 space-y-1.5 text-xs text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">
+            <span className="font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] block font-heading">
               Quick Commerce Pricing Realities (2025/2026):
             </span>
             <p className="text-[11px] leading-relaxed m-0">

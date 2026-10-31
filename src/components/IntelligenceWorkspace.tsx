@@ -99,7 +99,7 @@ export function IntelligenceWorkspace({ query, offers, loading, onSearch, onLook
       ['Myntra', `https://www.myntra.com/search?q=${encodeURIComponent(mission.product || query)}`],
       ['Google Shopping', 'in-app-radar'],
     ].map(([name, url]) => name === 'Google Shopping' ? (
-      <button key={name} type="button" onClick={() => openGoogleShoppingModal(mission.product || query)} className="mine-store-btn inline-flex items-center gap-1 font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+      <button key={name} type="button" onClick={() => openGoogleShoppingModal(mission.product || query)} className="mine-store-btn inline-flex items-center gap-1 font-bold text-[var(--idh-accent)] dark:text-[var(--idh-accent)] hover:underline cursor-pointer">
         <span>🛍️ Google Shopping Radar (In-App)</span>
       </button>
     ) : (

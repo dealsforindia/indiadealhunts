@@ -390,7 +390,7 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
   return (
     <>
       <section data-mobile-stories
-        className="flash-stories w-full py-4 bg-white dark:bg-[#0D1527] border-b border-slate-200/80 dark:border-white/10"
+        className="flash-stories w-full py-4 bg-white dark:bg-[var(--surface)] border-b border-[var(--border-subtle)]/80 dark:border-white/10"
         aria-label="Flash Deal Stories"
       >
         <div className="max-w-[1340px] mx-auto px-4 md:px-6">
@@ -398,13 +398,13 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--idh-action-solid)] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--idh-action-solid)]"></span>
               </span>
-              <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-[#F8FAFC] font-mono">
+              <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[var(--text-primary)] dark:text-[var(--text-primary)] font-mono">
                 Collections worth exploring
               </h3>
-              <span className="hidden sm:inline-block text-[11px] text-slate-400">
+              <span className="hidden sm:inline-block text-[11px] text-[var(--text-secondary)]">
                 A quick look at current finds
               </span>
             </div>
@@ -414,7 +414,7 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
               <button
                 type="button"
                 onClick={() => handleScroll('left')}
-                className="w-7 h-7 rounded-full bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-[#F1F5F9] transition-all text-xs cursor-pointer"
+                className="w-7 h-7 rounded-full bg-[var(--surface-2)] dark:bg-[var(--surface-2)] hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)] border border-[var(--border-subtle)] dark:border-white/10 flex items-center justify-center text-[var(--text-secondary)] dark:text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-primary)] transition-all text-xs cursor-pointer"
                 title="Scroll Left"
                 aria-label="Scroll Left"
               >
@@ -423,7 +423,7 @@ export const CategoryStories: React.FC<CategoryStoriesProps> = ({ onSelectCatego
               <button
                 type="button"
                 onClick={() => handleScroll('right')}
-                className="w-7 h-7 rounded-full bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-[#F1F5F9] transition-all text-xs cursor-pointer"
+                className="w-7 h-7 rounded-full bg-[var(--surface-2)] dark:bg-[var(--surface-2)] hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)] border border-[var(--border-subtle)] dark:border-white/10 flex items-center justify-center text-[var(--text-secondary)] dark:text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-primary)] transition-all text-xs cursor-pointer"
                 title="Scroll Right"
                 aria-label="Scroll Right"
               >

@@ -62,24 +62,24 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
 
   return (
     <AnimatePresence>
-      <div ref={modalSurface} role="dialog" aria-modal="true" aria-label="Exchange cost planner" className="shopper-tool-modal fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
+      <div ref={modalSurface} role="dialog" aria-modal="true" aria-label="Exchange cost planner" className="shopper-tool-modal fixed inset-0 z-[110] flex items-center justify-center p-4 bg-[var(--surface)]/70 backdrop-blur-md">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-xl bg-white dark:bg-[#0D1527] rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden"
+          className="relative w-full max-w-xl bg-white dark:bg-[var(--surface)] rounded-3xl shadow-2xl border border-[var(--border-subtle)] dark:border-white/10 overflow-hidden"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/80 dark:bg-[#070A11]/80">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-subtle)] dark:border-white/5 bg-[var(--surface)]/80 dark:bg-[var(--bg)]/80">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-lg font-bold shadow-sm">
                 🔄
               </div>
               <div>
-                <h2 className="text-lg font-bold text-slate-900 dark:text-[#F1F5F9]">
+                <h2 className="text-lg font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                   Old Phone Trade-In & Exchange Estimator
                 </h2>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-[var(--text-secondary)]">
                   Plan using your merchant’s confirmed exchange quote
                 </p>
               </div>
@@ -88,7 +88,7 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close dialog" className="w-11 h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#1E293B]/60 dark:bg-[#172440]/60 transition-colors cursor-pointer"
+              aria-label="Close dialog" className="w-11 h-11 rounded-xl flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-secondary)] hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-2)]/60 dark:bg-[var(--surface-2)]/60 transition-colors cursor-pointer"
             >
               ✕
             </button>
@@ -96,8 +96,8 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
 
           <div className="p-6 space-y-6">
             {/* Target New Product */}
-            <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10">
-              <div className="w-16 h-16 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 p-1 flex items-center justify-center overflow-hidden shrink-0">
+            <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-[var(--surface)] dark:bg-[var(--bg)] border border-[var(--border-subtle)] dark:border-white/10">
+              <div className="w-16 h-16 rounded-xl bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)] dark:border-white/10 p-1 flex items-center justify-center overflow-hidden shrink-0">
                 {deal.image ? (
                   <img src={deal.image} alt={deal.title} className="w-full h-full object-contain" />
                 ) : (
@@ -106,20 +106,20 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
               </div>
               <div className="min-w-0 flex-1">
                 <span className="text-[10px] font-mono font-bold text-indigo-700 uppercase tracking-wider">Purchase target:</span>
-                <p className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] truncate">{deal.title}</p>
-                <p className="text-base font-black text-slate-900 dark:text-[#F1F5F9] mt-0.5">{cleanDealPrice > 0 ? `₹${cleanDealPrice.toLocaleString('en-IN')}` : 'Check store'}</p>
+                <p className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] truncate">{deal.title}</p>
+                <p className="text-base font-black text-[var(--text-primary)] dark:text-[var(--text-primary)] mt-0.5">{cleanDealPrice > 0 ? `₹${cleanDealPrice.toLocaleString('en-IN')}` : 'Check store'}</p>
               </div>
             </div>
 
             {/* Select Old Model */}
             <div>
-              <label className="block text-xs font-mono uppercase text-slate-400 font-semibold mb-2">
+              <label className="block text-xs font-mono uppercase text-[var(--text-secondary)] font-semibold mb-2">
                 1. Select Your Current Smartphone
               </label>
               <select
                 value={selectedModel}
                 onChange={(e) => setSelectedModel(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-white/20 text-sm font-semibold text-slate-800 dark:text-[#F8FAFC] bg-white dark:bg-[#0D1527] focus:border-indigo-500 focus:ring-3 focus:ring-indigo-100 outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-subtle)] dark:border-white/20 text-sm font-semibold text-[var(--text-primary)] dark:text-[var(--text-primary)] bg-white dark:bg-[var(--surface)] focus:border-indigo-500 focus:ring-3 focus:ring-indigo-100 outline-none"
               >
                 {POPULAR_OLD_PHONES.map((m) => (
                   <option key={m.name} value={m.name}>
@@ -131,7 +131,7 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
 
             {/* Condition Picker */}
             <div>
-              <label className="block text-xs font-mono uppercase text-slate-400 font-semibold mb-2">
+              <label className="block text-xs font-mono uppercase text-[var(--text-secondary)] font-semibold mb-2">
                 2. Select Cosmetic & Functional Condition
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -145,11 +145,11 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
                       className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                         isSel
                           ? 'bg-indigo-50 border-indigo-400 ring-2 ring-indigo-100 shadow-2xs'
-                          : 'bg-white dark:bg-[#0D1527] border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:bg-[#070A11]'
+                          : 'bg-white dark:bg-[var(--surface)] border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface)] dark:bg-[var(--bg)]'
                       }`}
                     >
-                      <span className="block text-xs font-bold text-slate-900 dark:text-[#F1F5F9]">{c.label}</span>
-                      <span className="block text-[11px] text-slate-500 mt-0.5 line-clamp-1">{c.desc}</span>
+                      <span className="block text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]">{c.label}</span>
+                      <span className="block text-[11px] text-[var(--text-secondary)] mt-0.5 line-clamp-1">{c.desc}</span>
                     </button>
                   );
                 })}
@@ -160,10 +160,10 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
               <label className="commerce-filter-field">Confirmed trade-in value (₹)<input type="number" min="0" value={tradeQuote} onChange={event => setTradeQuote(event.target.value)} /></label>
               <label className="commerce-filter-field">Confirmed exchange bonus (₹)<input type="number" min="0" value={bonusQuote} onChange={event => setBonusQuote(event.target.value)} /></label>
             </div>
-            <p className="text-xs text-slate-500">Enter a quote obtained from your merchant. Selecting a model or condition does not create a quote. Eligibility, inspection and final value depend on the merchant.</p>
+            <p className="text-xs text-[var(--text-secondary)]">Enter a quote obtained from your merchant. Selecting a model or condition does not create a quote. Eligibility, inspection and final value depend on the merchant.</p>
             {/* Price Upgrade Summary */}
             <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50 via-purple-50/40 to-white border border-indigo-200 shadow-xs space-y-2">
-              <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400">
+              <div className="flex justify-between text-xs text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">
                 <span>Listed product price:</span>
                 <span>{cleanDealPrice > 0 ? `₹${cleanDealPrice.toLocaleString('en-IN')}` : 'Check store'}</span>
               </div>
@@ -177,8 +177,8 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
               </div>
               <div className="pt-2 border-t border-indigo-200 flex items-baseline justify-between">
                 <div>
-                  <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] block">Scenario upgrade cost:</span>
-                  <span className="text-[11px] text-slate-500">You save ₹{totalExchangeSavings.toLocaleString('en-IN')} total</span>
+                  <span className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] block">Scenario upgrade cost:</span>
+                  <span className="text-[11px] text-[var(--text-secondary)]">You save ₹{totalExchangeSavings.toLocaleString('en-IN')} total</span>
                 </div>
                 <div className="text-right">
                   <span className="text-2xl font-black text-indigo-900">
@@ -193,7 +193,7 @@ export const PhoneExchangeEstimatorModal: React.FC<PhoneExchangeEstimatorModalPr
               href={deal.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-3.5 px-6 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm tracking-wide shadow-md transition-all flex items-center justify-center gap-2 text-center"
+              className="w-full py-3.5 px-6 rounded-2xl bg-[var(--idh-action-solid)] hover:bg-[var(--idh-action-solid)] text-white font-bold text-sm tracking-wide shadow-md transition-all flex items-center justify-center gap-2 text-center"
             >
               <span>Check exchange terms at {deal.store || 'Store'}</span>
               <span>→</span>

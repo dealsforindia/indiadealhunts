@@ -116,24 +116,24 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div ref={modalSurface} role="dialog" aria-modal="true" aria-label="Set a price alert" className="shopper-tool-modal fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
+      <div ref={modalSurface} role="dialog" aria-modal="true" aria-label="Set a price alert" className="shopper-tool-modal fixed inset-0 z-[110] flex items-center justify-center p-4 bg-[var(--surface)]/70 backdrop-blur-md">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-md bg-white dark:bg-[#0D1527] rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden"
+          className="relative w-full max-w-md bg-white dark:bg-[var(--surface)] rounded-3xl shadow-2xl border border-[var(--border-subtle)] dark:border-white/10 overflow-hidden"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/80 dark:bg-[#070A11]/80">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-subtle)] dark:border-white/5 bg-[var(--surface)]/80 dark:bg-[var(--bg)]/80">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-lg font-bold shadow-sm">
                 🔔
               </div>
               <div>
-                <h2 className="text-lg font-bold text-slate-900 dark:text-[#F1F5F9]">
+                <h2 className="text-lg font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                   Price Drop Radar Alert
                 </h2>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-[var(--text-secondary)]">
                   Register a target; delivery depends on monitoring coverage
                 </p>
               </div>
@@ -142,7 +142,7 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close dialog" className="w-11 h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#1E293B]/60 dark:bg-[#172440]/60 transition-colors cursor-pointer"
+              aria-label="Close dialog" className="w-11 h-11 rounded-xl flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-secondary)] hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-2)]/60 dark:bg-[var(--surface-2)]/60 transition-colors cursor-pointer"
             >
               ✕
             </button>
@@ -154,16 +154,16 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                 <div className="w-14 h-14 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl">
                   ✓
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-[#F1F5F9]">Alert Armed Successfully!</h3>
-                <p className="text-xs text-slate-500">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]">Alert Armed Successfully!</h3>
+                <p className="text-xs text-[var(--text-secondary)]">
                   Your target of ₹{targetPrice} has been registered. Notifications depend on the monitoring service detecting a qualifying price.
                 </p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Product Pill */}
-                <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10">
-                  <div className="w-12 h-12 rounded-xl bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 p-1 flex items-center justify-center overflow-hidden shrink-0">
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-[var(--surface)] dark:bg-[var(--bg)] border border-[var(--border-subtle)] dark:border-white/10">
+                  <div className="w-12 h-12 rounded-xl bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)] dark:border-white/10 p-1 flex items-center justify-center overflow-hidden shrink-0">
                     {deal.image ? (
                       <img src={deal.image} alt={deal.title} className="w-full h-full object-contain" />
                     ) : (
@@ -171,25 +171,25 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] truncate">{deal.title}</p>
-                    <p className="text-xs text-slate-500">
-                      Listed price: <span className="font-bold text-slate-800 dark:text-[#F8FAFC]">{cleanPrice > 0 ? `₹${cleanPrice.toLocaleString('en-IN')}` : 'Check store'}</span>
+                    <p className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] truncate">{deal.title}</p>
+                    <p className="text-xs text-[var(--text-secondary)]">
+                      Listed price: <span className="font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]">{cleanPrice > 0 ? `₹${cleanPrice.toLocaleString('en-IN')}` : 'Check store'}</span>
                     </p>
                   </div>
                 </div>
 
                 {/* Target Price Input */}
                 <div>
-                  <label className="block text-xs font-mono uppercase text-slate-400 font-semibold mb-1">
+                  <label className="block text-xs font-mono uppercase text-[var(--text-secondary)] font-semibold mb-1">
                     Your Target Price (₹)
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-sm">₹</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-[var(--text-secondary)] text-sm">₹</span>
                     <input
                       type="number"
                       value={targetPrice}
                       onChange={(e) => setTargetPrice(e.target.value)}
-                      className="w-full pl-8 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-white/20 focus:border-blue-500 focus:ring-3 focus:ring-blue-100 outline-none text-base font-bold text-slate-900 dark:text-[#F1F5F9]"
+                      className="w-full pl-8 pr-4 py-2.5 rounded-xl border border-[var(--border-subtle)] dark:border-white/20 focus:border-[var(--border-subtle)] focus:ring-3 focus:ring-blue-100 outline-none text-base font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]"
                       placeholder="e.g. 19999"
                       required
                     />
@@ -202,7 +202,7 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                           key={pct}
                           type="button"
                           onClick={() => setTargetPrice(quickVal.toString())}
-                          className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-600 dark:text-slate-400 transition-colors"
+                          className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-[var(--surface-2)] dark:bg-[var(--surface-2)] hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)] text-[var(--text-secondary)] dark:text-[var(--text-secondary)] transition-colors"
                         >
                           {Math.round((1 - pct) * 100)}% Drop (₹{quickVal.toLocaleString('en-IN')})
                         </button>
@@ -214,22 +214,22 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                 {/* Notification Channel */}
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <label className="block text-xs font-mono uppercase text-slate-400 font-semibold">
+                    <label className="block text-xs font-mono uppercase text-[var(--text-secondary)] font-semibold">
                       Notify Me Via
                     </label>
                     <div className="flex gap-2 text-xs">
                       <button
                         type="button"
                         onClick={() => setContactType('telegram')}
-                        className={`font-semibold cursor-pointer ${contactType === 'telegram' ? 'text-blue-600 underline' : 'text-slate-400'}`}
+                        className={`font-semibold cursor-pointer ${contactType === 'telegram' ? 'text-[var(--idh-accent)] underline' : 'text-[var(--text-secondary)]'}`}
                       >
                         Telegram
                       </button>
-                      <span className="text-slate-300">·</span>
+                      <span className="text-[var(--text-secondary)]">·</span>
                       <button
                         type="button"
                         onClick={() => setContactType('email')}
-                        className={`font-semibold cursor-pointer ${contactType === 'email' ? 'text-blue-600 underline' : 'text-slate-400'}`}
+                        className={`font-semibold cursor-pointer ${contactType === 'email' ? 'text-[var(--idh-accent)] underline' : 'text-[var(--text-secondary)]'}`}
                       >
                         Email
                       </button>
@@ -239,13 +239,13 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                     type="text"
                     value={contact}
                     onChange={(e) => setContact(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-white/20 focus:border-blue-500 focus:ring-3 focus:ring-blue-100 outline-none text-sm text-slate-900 dark:text-[#F1F5F9]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-subtle)] dark:border-white/20 focus:border-[var(--border-subtle)] focus:ring-3 focus:ring-blue-100 outline-none text-sm text-[var(--text-primary)] dark:text-[var(--text-primary)]"
                     placeholder={contactType === 'telegram' ? '@your_telegram_username' : 'you@example.com'}
                     required
                   />
                   {contactType === 'telegram' && (
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 flex items-center gap-1">
-                      <span>💡</span> Make sure to click <a href="https://t.me/dealsforindiabot" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline font-semibold">Start on @dealsforindiabot</a> on Telegram so we can DM your alerts!
+                    <p className="text-[11px] text-[var(--text-secondary)] dark:text-[var(--text-secondary)] mt-1.5 flex items-center gap-1">
+                      <span>💡</span> Make sure to click <a href="https://t.me/dealsforindiabot" target="_blank" rel="noopener noreferrer" className="text-[var(--idh-accent)] underline font-semibold">Start on @dealsforindiabot</a> on Telegram so we can DM your alerts!
                     </p>
                   )}
                 </div>
@@ -259,7 +259,7 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 px-5 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white font-bold text-sm tracking-wide shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full py-3 px-5 rounded-xl bg-[var(--idh-action-solid)] hover:bg-[var(--idh-action-solid)] disabled:opacity-50 text-white font-bold text-sm tracking-wide shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <span>Arming Radar...</span>

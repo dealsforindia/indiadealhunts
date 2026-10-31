@@ -63,7 +63,7 @@ const STORE_POLICIES: StorePolicy[] = [
   {
     storeId: 'flipkart',
     storeName: 'Flipkart',
-    badgeColor: 'bg-blue-100 text-blue-800 border-blue-200',
+    badgeColor: 'bg-[var(--surface-2)] text-[var(--idh-accent)] border-[var(--border-subtle)]',
     logoIcon: '🛍️',
     supportPhone: '1800-202-9898',
     nodalEmail: 'nodal.officer@flipkart.com',
@@ -276,26 +276,26 @@ Platform: ${activeStore.storeName}`;
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="bg-white dark:bg-[#0D1527] p-5 sm:p-6 rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-xs">
+      <div className="bg-white dark:bg-[var(--surface)] p-5 sm:p-6 rounded-2xl border border-[var(--border-subtle)]/90 dark:border-white/10 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="text-xl">🛡️</span>
-              <h3 className="font-heading font-black text-lg text-slate-900 dark:text-[#F1F5F9] tracking-tight">
+              <h3 className="font-heading font-black text-lg text-[var(--text-primary)] dark:text-[var(--text-primary)] tracking-tight">
                 E-Commerce Return Window &amp; Open Box Delivery Sentinel
               </h3>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[var(--surface-2)] text-[var(--idh-accent)] border border-[var(--border-subtle)]">
                 INDIAN CONSUMER PROTECTION LAW
               </span>
             </div>
-            <p className="text-xs text-slate-500 max-w-2xl">
+            <p className="text-xs text-[var(--text-secondary)] max-w-2xl">
               Amazon, Flipkart, and Myntra have quietly tightened return policies.
               Track your exact deadline countdown, follow the 6-step Open Box Delivery protocol before giving OTP, and draft legal dispute notices.
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-bold text-slate-500 bg-slate-100 dark:bg-[#111C33] px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10">
+            <span className="text-xs font-mono font-bold text-[var(--text-secondary)] bg-[var(--surface-2)] dark:bg-[var(--surface-2)] px-3 py-1.5 rounded-xl border border-[var(--border-subtle)] dark:border-white/10">
               National Helpline: 1915
             </span>
           </div>
@@ -316,17 +316,17 @@ Platform: ${activeStore.storeName}`;
               }}
               className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                 isSelected
-                  ? 'border-blue-600 bg-blue-50/50 shadow-xs ring-1 ring-blue-500/20'
-                  : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:border-white/20 hover:bg-slate-50 dark:bg-[#070A11] bg-white dark:bg-[#0D1527]'
+                  ? 'border-[var(--border-subtle)] bg-[var(--surface-2)]/50 shadow-xs ring-1 ring-blue-500/20'
+                  : 'border-[var(--border-subtle)] dark:border-white/10 hover:border-[var(--border-subtle)] dark:border-white/20 hover:bg-[var(--surface)] dark:bg-[var(--bg)] bg-white dark:bg-[var(--surface)]'
               }`}
             >
               <div>
                 <div className="text-xl mb-1">{store.logoIcon}</div>
-                <div className="font-bold text-xs text-slate-900 dark:text-[#F1F5F9] line-clamp-1">
+                <div className="font-bold text-xs text-[var(--text-primary)] dark:text-[var(--text-primary)] line-clamp-1">
                   {store.storeName}
                 </div>
               </div>
-              <div className="mt-2 text-[10px] font-mono text-slate-500 line-clamp-1">
+              <div className="mt-2 text-[10px] font-mono text-[var(--text-secondary)] line-clamp-1">
                 {store.nodalEmail}
               </div>
             </button>
@@ -338,8 +338,8 @@ Platform: ${activeStore.storeName}`;
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Category Rules & Expiry Calculator */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-white dark:bg-[#0D1527] p-5 rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-xs space-y-4">
-            <div className="font-bold text-sm text-slate-800 dark:text-[#F8FAFC] flex items-center justify-between">
+          <div className="bg-white dark:bg-[var(--surface)] p-5 rounded-2xl border border-[var(--border-subtle)]/90 dark:border-white/10 shadow-xs space-y-4">
+            <div className="font-bold text-sm text-[var(--text-primary)] dark:text-[var(--text-primary)] flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <span>⏱️</span>
                 <span>Return Window &amp; Expiry Countdown</span>
@@ -351,20 +351,20 @@ Platform: ${activeStore.storeName}`;
 
             {/* Delivery Date Input */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
+              <label className="block text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] mb-1">
                 Order Delivery Date
               </label>
               <input
                 type="date"
                 value={deliveryDate}
                 onChange={(e) => setDeliveryDate(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-white/10 font-mono text-xs bg-slate-50/50 dark:bg-[#070A11]/50 focus:bg-white dark:bg-[#0D1527] focus:border-blue-500 focus:outline-none"
+                className="w-full px-3.5 py-2 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 font-mono text-xs bg-[var(--surface)]/50 dark:bg-[var(--bg)]/50 focus:bg-white dark:bg-[var(--surface)] focus:border-[var(--border-subtle)] focus:outline-none"
               />
             </div>
 
             {/* Category Rules Selector */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">
+              <label className="block text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] mb-1.5">
                 Product Category
               </label>
               <div className="space-y-2">
@@ -377,21 +377,21 @@ Platform: ${activeStore.storeName}`;
                       onClick={() => setSelectedCategoryIdx(idx)}
                       className={`w-full p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between text-xs ${
                         isSelected
-                          ? 'border-blue-600 bg-blue-50/40 font-bold text-blue-950'
-                          : 'border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:bg-[#070A11] text-slate-700 dark:text-slate-200'
+                          ? 'border-[var(--border-subtle)] bg-[var(--surface-2)]/40 font-bold text-[var(--idh-accent)]'
+                          : 'border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface)] dark:bg-[var(--bg)] text-[var(--text-primary)] dark:text-[var(--text-secondary)]'
                       }`}
                     >
                       <div className="space-y-0.5">
                         <div className="font-bold">{rule.category}</div>
-                        <div className="text-[11px] text-slate-500 font-normal">
+                        <div className="text-[11px] text-[var(--text-secondary)] font-normal">
                           {rule.conditions}
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0 ml-3">
-                        <span className="font-mono font-bold text-blue-700 bg-white dark:bg-[#0D1527] px-2 py-0.5 rounded border border-blue-200 text-[10px] block">
+                        <span className="font-mono font-bold text-[var(--idh-accent)] bg-white dark:bg-[var(--surface)] px-2 py-0.5 rounded border border-[var(--border-subtle)] text-[10px] block">
                           {rule.windowDays === 0 ? 'Non-Returnable' : `${rule.windowDays} Days`}
                         </span>
-                        <span className="text-[9.5px] text-slate-400 font-mono block mt-0.5">
+                        <span className="text-[9.5px] text-[var(--text-secondary)] font-mono block mt-0.5">
                           {rule.type}
                         </span>
                       </div>
@@ -429,7 +429,7 @@ Platform: ${activeStore.storeName}`;
                       ? 'Expires Today (Final Hours)'
                       : `${expiryDetails.daysLeft} Days Remaining`}
                   </div>
-                  <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-white/80 dark:bg-[#0D1527]/80 shadow-2xs">
+                  <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-white/80 dark:bg-[var(--surface)]/80 shadow-2xs">
                     {activeRule.type}
                   </span>
                 </div>
@@ -440,9 +440,9 @@ Platform: ${activeStore.storeName}`;
 
         {/* Right Column: Open Box Delivery Pre-OTP Checklist */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-white dark:bg-[#0D1527] p-5 rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-xs space-y-4">
+          <div className="bg-white dark:bg-[var(--surface)] p-5 rounded-2xl border border-[var(--border-subtle)]/90 dark:border-white/10 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
-              <div className="font-bold text-sm text-slate-800 dark:text-[#F8FAFC] flex items-center gap-2">
+              <div className="font-bold text-sm text-[var(--text-primary)] dark:text-[var(--text-primary)] flex items-center gap-2">
                 <span>📦</span>
                 <span>Open Box Delivery (OBD) Protocol</span>
               </div>
@@ -451,7 +451,7 @@ Platform: ${activeStore.storeName}`;
               </span>
             </div>
 
-            <div className="text-xs text-slate-600 dark:text-slate-400 bg-amber-50/50 p-3 rounded-xl border border-amber-200/60 leading-relaxed text-[11.5px]">
+            <div className="text-xs text-[var(--text-secondary)] dark:text-[var(--text-secondary)] bg-amber-50/50 p-3 rounded-xl border border-amber-200/60 leading-relaxed text-[11.5px]">
               <strong>Rule of Golden Protection:</strong> Once you give the 4 or 6-digit delivery OTP to the delivery agent, e-commerce platforms automatically tag the product as inspected and physically intact. Claims for broken screens or soap bars are subsequently rejected!
             </div>
 
@@ -493,8 +493,8 @@ Platform: ${activeStore.storeName}`;
                   key={item.id}
                   className={`flex items-start gap-3 p-2.5 rounded-xl border transition-colors cursor-pointer text-xs ${
                     obdChecks[item.id]
-                      ? 'border-emerald-300 bg-emerald-50/50 text-slate-900 dark:text-[#F1F5F9]'
-                      : 'border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:bg-[#070A11] text-slate-700 dark:text-slate-200'
+                      ? 'border-emerald-300 bg-emerald-50/50 text-[var(--text-primary)] dark:text-[var(--text-primary)]'
+                      : 'border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface)] dark:bg-[var(--bg)] text-[var(--text-primary)] dark:text-[var(--text-secondary)]'
                   }`}
                 >
                   <input
@@ -505,16 +505,16 @@ Platform: ${activeStore.storeName}`;
                   />
                   <div>
                     <div className="font-bold text-xs">{item.label}</div>
-                    <div className="text-[11px] text-slate-500">{item.desc}</div>
+                    <div className="text-[11px] text-[var(--text-secondary)]">{item.desc}</div>
                   </div>
                 </label>
               ))}
             </div>
 
             {/* Progress Bar & Safe to share OTP verdict */}
-            <div className="pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
+            <div className="pt-2 border-t border-[var(--border-subtle)] dark:border-white/5 flex items-center justify-between">
               <div>
-                <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                <span className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)]">
                   Inspection: {obdProgress.passed} / {obdProgress.total} Passed
                 </span>
               </div>
@@ -535,10 +535,10 @@ Platform: ${activeStore.storeName}`;
       </div>
 
       {/* Bottom Section: Legal Notice & Grievance Generator */}
-      <div className="bg-slate-900 text-white p-5 sm:p-6 rounded-2xl shadow-xl space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+      <div className="bg-[var(--idh-action-solid)] text-white p-5 sm:p-6 rounded-2xl shadow-xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-3">
           <div>
-            <div className="text-xs uppercase tracking-wider font-mono text-blue-400 font-bold">
+            <div className="text-xs uppercase tracking-wider font-mono text-[var(--idh-accent)] font-bold">
               Consumer Grievance Legal Generator
             </div>
             <div className="text-lg font-heading font-black text-white mt-0.5">
@@ -549,7 +549,7 @@ Platform: ${activeStore.storeName}`;
           <button
             type="button"
             onClick={handleCopyLegalDispute}
-            className="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-2 self-start sm:self-auto"
+            className="px-4 py-2 rounded-xl text-xs font-bold bg-[var(--idh-action-solid)] hover:bg-[var(--idh-action-solid)] text-white transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-2 self-start sm:self-auto"
           >
             <span>{copiedLetter ? '✓ Notice Copied' : '📋 Copy Legal Notice'}</span>
           </button>
@@ -557,41 +557,41 @@ Platform: ${activeStore.storeName}`;
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label className="text-[11px] font-mono text-slate-400 block mb-1">
+            <label className="text-[11px] font-mono text-[var(--text-secondary)] block mb-1">
               Order Number / ID
             </label>
             <input
               type="text"
               value={orderNumber}
               onChange={(e) => setOrderNumber(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-mono text-white focus:outline-none"
+              className="w-full px-3 py-1.5 rounded-lg bg-[var(--idh-action-solid)] border border-[var(--border-subtle)] text-xs font-mono text-white focus:outline-none"
             />
           </div>
           <div>
-            <label className="text-[11px] font-mono text-slate-400 block mb-1">
+            <label className="text-[11px] font-mono text-[var(--text-secondary)] block mb-1">
               Product Title
             </label>
             <input
               type="text"
               value={productTitle}
               onChange={(e) => setProductTitle(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none"
+              className="w-full px-3 py-1.5 rounded-lg bg-[var(--idh-action-solid)] border border-[var(--border-subtle)] text-xs text-white focus:outline-none"
             />
           </div>
           <div>
-            <label className="text-[11px] font-mono text-slate-400 block mb-1">
+            <label className="text-[11px] font-mono text-[var(--text-secondary)] block mb-1">
               Defect Description
             </label>
             <input
               type="text"
               value={defectReason}
               onChange={(e) => setDefectReason(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none"
+              className="w-full px-3 py-1.5 rounded-lg bg-[var(--idh-action-solid)] border border-[var(--border-subtle)] text-xs text-white focus:outline-none"
             />
           </div>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 text-[11px] font-mono text-slate-300 leading-relaxed">
+        <div className="p-3.5 rounded-xl bg-[var(--surface)]/90 border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-secondary)] leading-relaxed">
           Pre-cites: Section 5(3)(b) of the Consumer Protection (E-Commerce) Rules, 2020. Addressed directly to {activeStore.nodalEmail} with copy to National Consumer Helpline.
         </div>
       </div>

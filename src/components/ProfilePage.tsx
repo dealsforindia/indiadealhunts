@@ -534,16 +534,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const triggeredCount = trackedAlerts.filter((a) => a.status === 'triggered').length;
 
   return (
-    <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-28">
+    <div className="idh-profile w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-28">
       {/* ── Top Header Hero Banner ── */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white p-6 sm:p-8 mb-8 border border-white/10 shadow-2xl">
+      <div className="idh-profile-banner relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white p-6 sm:p-8 mb-8 border border-white/10 shadow-2xl">
         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-72 h-72 bg-[var(--idh-action-solid)]/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4 sm:gap-5">
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-0.5 shadow-xl flex items-center justify-center shrink-0 overflow-hidden">
-              <div className="w-full h-full rounded-[14px] bg-slate-950 flex items-center justify-center text-white overflow-hidden">
+              <div className="w-full h-full rounded-[14px] bg-[var(--idh-action-solid)] flex items-center justify-center text-white overflow-hidden">
                 {userAvatar ? (
                   <img src={userAvatar} alt="Profile" className="w-full h-full object-cover" />
                 ) : userEmail ? (
@@ -566,12 +566,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                     <ShieldCheck size={12} /> Verified Member
                   </span>
                 ) : (
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-500/20 border border-slate-400/40 text-slate-300 flex items-center gap-1">
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[var(--surface-2)]/20 border border-[var(--border-subtle)]/40 text-[var(--profile-muted)] flex items-center gap-1">
                     <User size={12} /> Guest Session
                   </span>
                 )}
               </div>
-              <p className="text-slate-300 text-xs sm:text-sm max-w-lg leading-relaxed">
+              <p className="text-[var(--profile-muted)] text-xs sm:text-sm max-w-lg leading-relaxed">
                 {userEmail
                   ? `Signed in as ${userEmail} · 24/7 personal price drop radar active.`
                   : 'Sign in with Google or Email to track custom products, receive instant price drop alerts, and sync saved deals.'}
@@ -584,7 +584,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs sm:text-sm font-semibold border border-white/10 transition-colors flex items-center gap-2 cursor-pointer"
+                className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-[var(--profile-muted)] text-xs sm:text-sm font-semibold border border-white/10 transition-colors flex items-center gap-2 cursor-pointer"
               >
                 <LogOut size={15} /> Sign out
               </button>
@@ -595,7 +595,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   setInputEmail('');
                   setShowAuthModal(true);
                 }}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-xs sm:text-sm shadow-lg transition-transform active:scale-95 flex items-center gap-2 cursor-pointer"
+                className="profile-primary px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 cursor-pointer"
               >
                 <LogIn size={15} /> Sign In / Join
               </button>
@@ -606,34 +606,35 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         {/* ── Real Stats Strip ── */}
         <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-white/10">
           <div className="bg-white/5 p-3 rounded-2xl border border-white/5">
-            <div className="text-[11px] text-slate-400 flex items-center gap-1.5 mb-1">
+            <div className="text-[11px] text-[var(--profile-muted)] flex items-center gap-1.5 mb-1">
               <Target size={13} className="text-emerald-400" /> Active Monitors
             </div>
             <div className="text-base sm:text-lg font-bold text-white">{trackedAlerts.length} Products</div>
           </div>
 
           <div className="bg-white/5 p-3 rounded-2xl border border-white/5">
-            <div className="text-[11px] text-slate-400 flex items-center gap-1.5 mb-1">
+            <div className="text-[11px] text-[var(--profile-muted)] flex items-center gap-1.5 mb-1">
               <CheckCircle2 size={13} className="text-emerald-400" /> Triggered Drops
             </div>
             <div className="text-base sm:text-lg font-bold text-emerald-400">{triggeredCount} Emailed</div>
           </div>
 
-          <div
+          <button
+            type="button"
             onClick={() => onNavigateTab('saved')}
-            className="cursor-pointer bg-white/5 hover:bg-white/10 p-3 rounded-2xl border border-white/5 transition-colors"
+            className="cursor-pointer text-left bg-white/5 hover:bg-white/10 p-3 rounded-2xl border border-white/5 transition-colors"
           >
-            <div className="text-[11px] text-slate-400 flex items-center gap-1.5 mb-1">
+            <div className="text-[11px] text-[var(--profile-muted)] flex items-center gap-1.5 mb-1">
               <Bookmark size={13} className="text-amber-400" /> Saved Loot
             </div>
             <div className="text-base sm:text-lg font-bold text-white">{savedCount} Deals</div>
-          </div>
+          </button>
 
           <div className="bg-white/5 p-3 rounded-2xl border border-white/5">
-            <div className="text-[11px] text-slate-400 flex items-center gap-1.5 mb-1">
-              <Bell size={13} className="text-blue-400" /> Drop Notifications
+            <div className="text-[11px] text-[var(--profile-muted)] flex items-center gap-1.5 mb-1">
+              <Bell size={13} className="text-[var(--profile-accent)]" /> Drop Notifications
             </div>
-            <div className="text-base sm:text-lg font-bold text-blue-300">
+            <div className="text-base sm:text-lg font-bold text-[var(--profile-accent)]">
               {emailAlerts ? 'Email Live' : 'Paused'}
             </div>
           </div>
@@ -645,19 +646,19 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         <div className="lg:col-span-7 space-y-6">
 
           {/* 1. Add Scraper Card */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-[#0D1527] border border-slate-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+          <div className="p-6 rounded-3xl bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)]/80 dark:border-white/10 shadow-sm relative overflow-hidden">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center font-bold shadow-md shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-[var(--text-primary)] flex items-center justify-center font-bold shadow-md shrink-0">
                 <Target size={22} />
               </div>
               <div>
-                <h2 className="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <h2 className="text-lg font-extrabold text-[var(--text-primary)] dark:text-white flex items-center gap-2">
                   Track Any Store Product Link
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">
                     24/7 Radar
                   </span>
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">
                   Paste Amazon, Flipkart, Myntra, Swiggy, or any product URL. When price drops, get an instant email!
                 </p>
               </div>
@@ -666,7 +667,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <form onSubmit={handleAddScraper} className="mt-5 space-y-4">
               {/* Product URL Input */}
               <div>
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-1.5">
+                <label className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] uppercase tracking-wider block mb-1.5">
                   Store Product Link (URL)
                 </label>
                 <div className="flex gap-2">
@@ -677,14 +678,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       value={inputUrl}
                       onChange={(e) => setInputUrl(e.target.value)}
                       placeholder="https://www.amazon.in/dp/... or flipkart.com/..."
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-4 py-3 rounded-xl bg-[var(--surface)] dark:bg-[var(--surface)]/60 border border-[var(--border-subtle)] dark:border-white/10 text-xs sm:text-sm text-[var(--text-primary)] dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                   </div>
                   <button
                     type="button"
                     onClick={() => handleInspectUrl()}
                     disabled={isInspecting || !inputUrl.trim()}
-                    className="px-4 py-3 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-slate-800 dark:text-white text-xs font-bold border border-slate-200 dark:border-white/10 transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-40"
+                    className="px-4 py-3 rounded-xl bg-[var(--surface-2)] dark:bg-white/10 hover:bg-[var(--surface-2)] dark:hover:bg-white/15 text-[var(--text-primary)] dark:text-white text-xs font-bold border border-[var(--border-subtle)] dark:border-white/10 transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-40"
                     title="Inspect product live"
                   >
                     {isInspecting ? (
@@ -700,7 +701,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               {/* Scraped Product Live Preview Card */}
               {inspectPreview && (
                 <div className="p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-xl bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800/40 p-1 flex items-center justify-center shrink-0 overflow-hidden">
+                  <div className="w-14 h-14 rounded-xl bg-white dark:bg-[var(--surface)] border border-emerald-200 dark:border-emerald-800/40 p-1 flex items-center justify-center shrink-0 overflow-hidden">
                     {inspectPreview.image ? (
                       <img src={inspectPreview.image} alt={inspectPreview.title} className="w-full h-full object-contain" />
                     ) : (
@@ -713,12 +714,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                         {inspectPreview.store || 'Verified Store'}
                       </span>
                       {inspectPreview.price && (
-                        <span className="text-xs font-bold text-slate-900 dark:text-white">
+                        <span className="text-xs font-bold text-[var(--text-primary)] dark:text-white">
                           Live: ₹{inspectPreview.price.toLocaleString('en-IN')}
                         </span>
                       )}
                     </div>
-                    <p className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate">
+                    <p className="text-xs font-medium text-[var(--text-primary)] dark:text-[var(--text-secondary)] truncate">
                       {inspectPreview.title}
                     </p>
                   </div>
@@ -729,11 +730,11 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Target Price */}
                 <div>
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-1.5">
+                  <label className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] uppercase tracking-wider block mb-1.5">
                     Alert Me If Price Drops Below (₹)
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] font-bold text-sm">₹</span>
                     <input
                       type="number"
                       required
@@ -741,7 +742,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       value={inputTargetPrice}
                       onChange={(e) => setInputTargetPrice(e.target.value)}
                       placeholder="e.g. 1499"
-                      className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-[var(--surface)] dark:bg-[var(--surface)]/60 border border-[var(--border-subtle)] dark:border-white/10 text-sm font-bold text-[var(--text-primary)] dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                   </div>
                   {/* Quick percentage drop pills */}
@@ -757,7 +758,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                               playTactileClick();
                               setInputTargetPrice(String(val));
                             }}
-                            className="px-2 py-0.5 rounded-lg text-[10.5px] font-semibold bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
+                            className="px-2 py-0.5 rounded-lg text-[10.5px] font-semibold bg-[var(--surface-2)] dark:bg-white/5 hover:bg-[var(--surface-2)] dark:hover:bg-white/10 text-[var(--text-primary)] dark:text-[var(--text-secondary)] transition-colors cursor-pointer"
                           >
                             -{Math.round((1 - pct) * 100)}% (₹{val.toLocaleString('en-IN')})
                           </button>
@@ -769,18 +770,18 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
                 {/* Email for price drops */}
                 <div>
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-1.5">
+                  <label className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] uppercase tracking-wider block mb-1.5">
                     Notification Email Address
                   </label>
                   <div className="relative">
-                    <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                     <input
                       type="email"
                       required
                       value={inputScraperEmail}
                       onChange={(e) => setInputScraperEmail(e.target.value)}
                       placeholder="yourname@gmail.com"
-                      className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[var(--surface)] dark:bg-[var(--surface)]/60 border border-[var(--border-subtle)] dark:border-white/10 text-sm text-[var(--text-primary)] dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                   </div>
                 </div>
@@ -790,7 +791,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               <button
                 type="submit"
                 disabled={isArmingScraper}
-                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-sm shadow-lg transition-transform active:scale-98 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="profile-primary w-full py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {isArmingScraper ? (
                   <>
@@ -808,17 +809,17 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           </div>
 
           {/* 2. Active Tracked Scrapers Watchlist */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-[#0D1527] border border-slate-200/80 dark:border-white/10 shadow-sm space-y-4">
+          <div className="p-6 rounded-3xl bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)]/80 dark:border-white/10 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-[var(--idh-action-solid)]/10 text-[var(--idh-accent)] dark:text-[var(--idh-accent)] flex items-center justify-center shrink-0">
                   <Activity size={18} />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-base font-bold text-[var(--text-primary)] dark:text-white">
                     Your Tracked Scrapers ({trackedAlerts.length})
                   </h3>
-                  <p className="text-xs text-slate-500">24/7 background monitors running on IndiaDealHunts</p>
+                  <p className="text-xs text-[var(--text-secondary)]">24/7 background monitors running on IndiaDealHunts</p>
                 </div>
               </div>
 
@@ -827,21 +828,21 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   type="button"
                   onClick={() => fetchUserAlerts(userEmail)}
                   disabled={loadingAlerts}
-                  className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-[var(--surface-2)] dark:bg-white/5 hover:bg-[var(--surface-2)] dark:hover:bg-white/10 text-[var(--text-secondary)] dark:text-[var(--text-secondary)] transition-colors cursor-pointer"
                   title="Refresh list"
                 >
-                  <RefreshCw size={14} className={loadingAlerts ? 'animate-spin text-blue-500' : ''} />
+                  <RefreshCw size={14} className={loadingAlerts ? 'animate-spin text-[var(--idh-accent)]' : ''} />
                 </button>
               )}
             </div>
 
             {trackedAlerts.length === 0 ? (
-              <div className="py-8 px-4 rounded-2xl bg-slate-50/70 dark:bg-white/[0.02] border border-dashed border-slate-200 dark:border-white/10 text-center">
-                <Target size={28} className="mx-auto mb-2 text-slate-400" />
-                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              <div className="py-8 px-4 rounded-2xl bg-[var(--surface)]/70 dark:bg-white/[0.02] border border-dashed border-[var(--border-subtle)] dark:border-white/10 text-center">
+                <Target size={28} className="mx-auto mb-2 text-[var(--text-secondary)]" />
+                <p className="text-sm font-semibold text-[var(--text-primary)] dark:text-[var(--text-secondary)]">
                   No active scrapers yet
                 </p>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+                <p className="text-xs text-[var(--text-secondary)] max-w-sm mx-auto mt-1">
                   Paste any Amazon, Flipkart, or store product link above to start automated 24/7 price scanning with email alerts.
                 </p>
               </div>
@@ -853,10 +854,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   return (
                     <div
                       key={alert.id}
-                      className="p-4 rounded-2xl bg-slate-50/70 dark:bg-white/[0.02] border border-slate-200/70 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3.5"
+                      className="p-4 rounded-2xl bg-[var(--surface)]/70 dark:bg-white/[0.02] border border-[var(--border-subtle)]/70 dark:border-white/5 hover:border-[var(--border-subtle)] dark:hover:border-white/10 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3.5"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 p-1 flex items-center justify-center shrink-0 overflow-hidden">
+                        <div className="w-12 h-12 rounded-xl bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)] dark:border-white/10 p-1 flex items-center justify-center shrink-0 overflow-hidden">
                           {alert.image_url ? (
                             <img src={alert.image_url} alt={alert.product_title} className="w-full h-full object-contain" />
                           ) : (
@@ -866,7 +867,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[var(--surface-2)] dark:bg-[var(--surface)] text-[var(--text-primary)] dark:text-[var(--text-secondary)]">
                               {alert.store || 'Store'}
                             </span>
                             {isTriggered ? (
@@ -874,7 +875,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                                 <CheckCircle2 size={10} /> Price Dropped! (Emailed)
                               </span>
                             ) : (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center gap-1">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--idh-action-solid)]/20 text-[var(--idh-accent)] border border-[var(--border-subtle)]/30 flex items-center gap-1">
                                 <Clock size={10} /> 24/7 Radar Active
                               </span>
                             )}
@@ -883,11 +884,11 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                             href={alert.product_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs font-bold text-slate-900 dark:text-white truncate block hover:text-emerald-500 transition-colors"
+                            className="text-xs font-bold text-[var(--text-primary)] dark:text-white truncate block hover:text-emerald-500 transition-colors"
                           >
                             {alert.product_title}
                           </a>
-                          <div className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-2">
+                          <div className="text-[11px] text-[var(--text-secondary)] mt-0.5 flex items-center gap-2">
                             <span>
                               Target: <strong className="text-emerald-600 dark:text-emerald-400">≤ ₹{alert.target_price.toLocaleString('en-IN')}</strong>
                             </span>
@@ -905,7 +906,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                           type="button"
                           onClick={() => handleCheckAlertNow(alert)}
                           disabled={isChecking}
-                          className="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/15 text-slate-800 dark:text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-40"
+                          className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] dark:bg-white/10 hover:bg-[var(--surface-2)] dark:hover:bg-white/15 text-[var(--text-primary)] dark:text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-40"
                           title="Check store price now"
                         >
                           <RefreshCw size={12} className={isChecking ? 'animate-spin text-emerald-500' : ''} />
@@ -932,31 +933,30 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         <div className="lg:col-span-5 space-y-6">
 
           {/* 1. How 24/7 Price Radar Works */}
-          <div className="p-6 rounded-3xl bg-gradient-to-br from-slate-950 to-indigo-950 text-white border border-indigo-500/20 shadow-lg relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl" />
+          <div className="idh-profile-guide p-6 rounded-3xl relative overflow-hidden">
             <div className="relative z-10">
               <div className="flex items-center gap-2.5 mb-2">
-                <Target size={20} className="text-emerald-400" />
-                <h3 className="text-base font-bold text-white">How 24/7 Price Radar Works</h3>
+                <Target size={20} className="text-[var(--idh-accent)]" />
+                <h3 className="text-base font-bold text-[var(--text-primary)]">How 24/7 Price Radar Works</h3>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed mb-4">
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-4">
                 Track any product on Amazon, Flipkart, Myntra, Swiggy, or any store without installing browser extensions.
               </p>
 
               <div className="space-y-3 mb-4">
-                <div className="flex items-start gap-2.5 text-xs text-slate-300">
+                <div className="flex items-start gap-2.5 text-xs text-[var(--text-secondary)]">
                   <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0 text-[10px]">1</span>
                   <span><strong>Paste Product Link:</strong> Paste any store URL in the tracker on the left.</span>
                 </div>
-                <div className="flex items-start gap-2.5 text-xs text-slate-300">
-                  <span className="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 font-bold flex items-center justify-center shrink-0 text-[10px]">2</span>
+                <div className="flex items-start gap-2.5 text-xs text-[var(--text-secondary)]">
+                  <span className="w-5 h-5 rounded-full bg-[var(--idh-action-solid)]/20 text-[var(--idh-accent)] font-bold flex items-center justify-center shrink-0 text-[10px]">2</span>
                   <span><strong>Set Target Price:</strong> Specify the exact price you want to pay.</span>
                 </div>
-                <div className="flex items-start gap-2.5 text-xs text-slate-300">
+                <div className="flex items-start gap-2.5 text-xs text-[var(--text-secondary)]">
                   <span className="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 font-bold flex items-center justify-center shrink-0 text-[10px]">3</span>
                   <span><strong>24/7 Background Sweeps:</strong> Our server continuously checks prices every few minutes.</span>
                 </div>
-                <div className="flex items-start gap-2.5 text-xs text-slate-300">
+                <div className="flex items-start gap-2.5 text-xs text-[var(--text-secondary)]">
                   <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center shrink-0 text-[10px]">4</span>
                   <span><strong>Instant Email Alert:</strong> As soon as the price drops to or below your target, you get an email.</span>
                 </div>
@@ -969,7 +969,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                     setInputEmail('');
                     setShowAuthModal(true);
                   }}
-                  className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  className="profile-primary w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <LogIn size={14} /> Sign In with Email
                 </button>
@@ -978,16 +978,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           </div>
 
           {/* 2. Preferences & Settings */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-[#0D1527] border border-slate-200/80 dark:border-white/10 shadow-sm space-y-4">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Account Preferences</h3>
+          <div className="p-6 rounded-3xl bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)]/80 dark:border-white/10 shadow-sm space-y-4">
+            <h3 className="text-base font-bold text-[var(--text-primary)] dark:text-white">Account Preferences</h3>
 
             {/* Email Notifications Toggle */}
-            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5">
+            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[var(--surface)] dark:bg-white/[0.02] border border-[var(--border-subtle)] dark:border-white/5">
               <div className="flex items-center gap-2.5">
                 <Mail size={18} className="text-emerald-500" />
                 <div>
-                  <div className="text-xs font-bold text-slate-900 dark:text-white">Email Drop Notifications</div>
-                  <div className="text-[11px] text-slate-500">
+                  <div className="text-xs font-bold text-[var(--text-primary)] dark:text-white">Email Drop Notifications</div>
+                  <div className="text-[11px] text-[var(--text-secondary)]">
                     {userEmail ? `Delivering to ${userEmail}` : 'Requires email sign in'}
                   </div>
                 </div>
@@ -996,7 +996,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 type="button"
                 onClick={handleToggleEmailAlerts}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-                  emailAlerts ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'
+                  emailAlerts ? 'bg-emerald-500' : 'bg-[var(--surface-2)] dark:bg-[var(--surface)]'
                 }`}
               >
                 <span
@@ -1009,7 +1009,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
             {/* Appearance Theme Selector */}
             <div className="pt-2">
-              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-2">
+              <label className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] uppercase tracking-wider block mb-2">
                 Interface Theme
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -1030,7 +1030,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                         active
                           ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 font-bold ring-1 ring-emerald-500/30'
-                          : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 text-slate-600 dark:text-slate-400'
+                          : 'border-[var(--border-subtle)] dark:border-white/10 hover:border-[var(--border-subtle)] dark:hover:border-white/20 text-[var(--text-secondary)] dark:text-[var(--text-secondary)]'
                       }`}
                     >
                       <Icon size={14} />
@@ -1042,23 +1042,23 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             </div>
 
             {/* Tactile Audio Sound */}
-            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5">
+            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[var(--surface)] dark:bg-white/[0.02] border border-[var(--border-subtle)] dark:border-white/5">
               <div className="flex items-center gap-2.5">
                 {isAudioEnabled ? (
                   <Volume2 size={18} className="text-amber-500" />
                 ) : (
-                  <VolumeX size={18} className="text-slate-400" />
+                  <VolumeX size={18} className="text-[var(--text-secondary)]" />
                 )}
                 <div>
-                  <div className="text-xs font-bold text-slate-900 dark:text-white">Tactile Feedback Sounds</div>
-                  <div className="text-[11px] text-slate-500">Audio feedback on clicks & saves</div>
+                  <div className="text-xs font-bold text-[var(--text-primary)] dark:text-white">Tactile Feedback Sounds</div>
+                  <div className="text-[11px] text-[var(--text-secondary)]">Audio feedback on clicks & saves</div>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={onToggleAudio}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-                  isAudioEnabled ? 'bg-amber-500' : 'bg-slate-300 dark:bg-slate-700'
+                  isAudioEnabled ? 'bg-amber-500' : 'bg-[var(--surface-2)] dark:bg-[var(--surface)]'
                 }`}
               >
                 <span
@@ -1071,19 +1071,19 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           </div>
 
           {/* 3. Telegram VIP Channel */}
-          <div className="p-5 rounded-3xl bg-blue-50/70 dark:bg-blue-950/20 border border-blue-200/70 dark:border-blue-900/40 flex items-center justify-between">
+          <div className="p-5 rounded-3xl bg-[var(--surface-2)]/70 dark:bg-[var(--idh-action-solid)]/20 border border-[var(--border-subtle)]/70 dark:border-[var(--border-subtle)]/40 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <TelegramIcon />
               <div>
-                <div className="text-xs font-bold text-blue-900 dark:text-blue-200">Telegram VIP Channel</div>
-                <div className="text-[11px] text-blue-700 dark:text-blue-300">Live loot drops before web post</div>
+                <div className="text-xs font-bold text-[var(--idh-accent)] dark:text-[var(--idh-accent)]">Telegram VIP Channel</div>
+                <div className="text-[11px] text-[var(--idh-accent)] dark:text-[var(--idh-accent)]">Live loot drops before web post</div>
               </div>
             </div>
             <a
               href="https://t.me/dealsforindiachannel"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3.5 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-bold shadow hover:bg-blue-500 transition-colors flex items-center gap-1 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl bg-[var(--idh-action-solid)] text-white text-xs font-bold shadow hover:bg-[var(--idh-action-solid)] transition-colors flex items-center gap-1 cursor-pointer"
             >
               Join <ExternalLink size={12} />
             </a>
@@ -1095,7 +1095,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       {/* ── Auth / Sign In Modal ── */}
       <AnimatePresence>
         {showAuthModal && (
-          <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md">
+          <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-[var(--surface)]/70 backdrop-blur-md">
             <motion.div
               role="dialog"
               aria-modal="true"
@@ -1103,32 +1103,32 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="w-full max-w-md bg-white dark:bg-[#0D1527] rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl p-6 sm:p-8 relative"
+              className="w-full max-w-md bg-white dark:bg-[var(--surface)] rounded-3xl border border-[var(--border-subtle)] dark:border-white/10 shadow-2xl p-6 sm:p-8 relative"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2.5">
                   <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
                     <User size={20} />
                   </div>
-                  <h3 id="auth-modal-title" className="text-lg font-bold text-slate-900 dark:text-white">Sign In to IndiaDealHunts</h3>
+                  <h3 id="auth-modal-title" className="text-lg font-bold text-[var(--text-primary)] dark:text-white">Sign In to IndiaDealHunts</h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowAuthModal(false)}
                   aria-label="Close sign in dialog"
-                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center text-sm cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-[var(--surface-2)] dark:bg-white/10 text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:hover:text-white flex items-center justify-center text-sm cursor-pointer"
                 >
                   ✕
                 </button>
               </div>
 
-              <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
+              <p className="text-xs text-[var(--text-secondary)] dark:text-[var(--text-secondary)] mb-6">
                 {authStep === 'email'
                   ? 'Passwordless & secure email authentication. Enter your email to receive a 6-digit verification code.'
                   : (
                     <>
                       Enter the 6-digit verification code sent to{' '}
-                      <strong className="text-slate-900 dark:text-white font-semibold">{inputEmail}</strong>.
+                      <strong className="text-[var(--text-primary)] dark:text-white font-semibold">{inputEmail}</strong>.
                     </>
                   )}
               </p>
@@ -1143,7 +1143,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               {authStep === 'email' ? (
                 <form onSubmit={handleRequestCode} className="space-y-4">
                   <div>
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                    <label className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] block mb-1.5">
                       Your Email Address
                     </label>
                     <input
@@ -1156,7 +1156,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                         if (authError) setAuthError(null);
                       }}
                       placeholder="e.g. yourname@gmail.com"
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-4 py-3 rounded-xl bg-[var(--surface)] dark:bg-[var(--surface)]/60 border border-[var(--border-subtle)] dark:border-white/10 text-sm text-[var(--text-primary)] dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                     {suggestEmailDomain(inputEmail) && (
                       <button
@@ -1195,7 +1195,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               ) : (
                 <form onSubmit={handleVerifyCode} className="space-y-4">
                   <div>
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                    <label className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] block mb-1.5">
                       6-Digit Verification Code
                     </label>
                     <input
@@ -1208,12 +1208,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       value={inputCode}
                       onChange={(e) => setInputCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                       placeholder="123456"
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-xl font-mono font-black text-center tracking-[8px] text-emerald-600 dark:text-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-4 py-3 rounded-xl bg-[var(--surface)] dark:bg-[var(--surface)]/60 border border-[var(--border-subtle)] dark:border-white/10 text-xl font-mono font-black text-center tracking-[8px] text-emerald-600 dark:text-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2 text-center">
-                      Check your inbox or spam folder for an email from <span className="text-slate-700 dark:text-slate-300 font-medium">IndiaDealHunts</span>.
+                    <p className="text-[11px] text-[var(--text-secondary)] dark:text-[var(--text-secondary)] mt-2 text-center">
+                      Check your inbox or spam folder for an email from <span className="text-[var(--text-primary)] dark:text-[var(--text-secondary)] font-medium">IndiaDealHunts</span>.
                       <br />
-                      <span className="text-slate-400">If you entered the wrong email address, use &ldquo;← Change Email&rdquo; below.</span>
+                      <span className="text-[var(--text-secondary)]">If you entered the wrong email address, use &ldquo;← Change Email&rdquo; below.</span>
                     </p>
                   </div>
 
@@ -1242,7 +1242,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                         setAuthError(null);
                         setResendCooldown(0);
                       }}
-                      className="text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 font-medium cursor-pointer"
+                      className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:hover:text-[var(--text-secondary)] font-medium cursor-pointer"
                     >
                       ← Change Email
                     </button>

@@ -298,7 +298,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({
 
             }}
 
-            className="hidden lg:flex items-center justify-center w-12 h-12 rounded-full bg-white/10 dark:bg-[#0D1527]/10 hover:bg-white/20 dark:bg-[#0D1527]/20 border border-white/15 text-white/80 hover:text-white transition-all mr-6 hover:scale-110 shadow-lg cursor-pointer"
+            className="hidden lg:flex items-center justify-center w-12 h-12 rounded-full bg-white/10 dark:bg-[var(--surface)]/10 hover:bg-white/20 dark:bg-[var(--surface)]/20 border border-white/15 text-white/80 hover:text-white transition-all mr-6 hover:scale-110 shadow-lg cursor-pointer"
 
             title="Previous Story Category"
 
@@ -372,7 +372,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({
 
                   key={idx}
 
-                  className="flex-1 h-1.5 rounded-full overflow-hidden bg-white/20 dark:bg-[#0D1527]/20 backdrop-blur-sm"
+                  className="flex-1 h-1.5 rounded-full overflow-hidden bg-white/20 dark:bg-[var(--surface)]/20 backdrop-blur-sm"
 
                 >
 
@@ -476,7 +476,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({
 
                 }}
 
-                className="w-8 h-8 rounded-full bg-white/10 dark:bg-[#0D1527]/10 hover:bg-white/20 dark:bg-[#0D1527]/20 flex items-center justify-center text-white/80 hover:text-white transition-all cursor-pointer"
+                className="w-8 h-8 rounded-full bg-white/10 dark:bg-[var(--surface)]/10 hover:bg-white/20 dark:bg-[var(--surface)]/20 flex items-center justify-center text-white/80 hover:text-white transition-all cursor-pointer"
 
                 aria-label={isPaused ? "Resume story autoplay" : "Pause story autoplay"}
 
@@ -500,7 +500,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({
 
                 }}
 
-                className="w-8 h-8 rounded-full bg-white/10 dark:bg-[#0D1527]/10 hover:bg-white/20 dark:bg-[#0D1527]/20 flex items-center justify-center text-white/80 hover:text-white transition-all cursor-pointer"
+                className="w-8 h-8 rounded-full bg-white/10 dark:bg-[var(--surface)]/10 hover:bg-white/20 dark:bg-[var(--surface)]/20 flex items-center justify-center text-white/80 hover:text-white transition-all cursor-pointer"
 
                 aria-label="Close Story"
 
@@ -604,7 +604,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({
 
                   <div className="flex flex-col items-center justify-center text-white/50 text-center p-4">
 
-                    <div className="w-16 h-16 rounded-2xl bg-white/5 dark:bg-[#0D1527]/5 border border-white/10 flex items-center justify-center text-3xl mb-2 shadow-inner">
+                    <div className="w-16 h-16 rounded-2xl bg-white/5 dark:bg-[var(--surface)]/5 border border-white/10 flex items-center justify-center text-3xl mb-2 shadow-inner">
 
                       {activeCollection.emoji}
 
@@ -826,7 +826,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({
 
             }}
 
-            className="hidden lg:flex items-center justify-center w-12 h-12 rounded-full bg-white/10 dark:bg-[#0D1527]/10 hover:bg-white/20 dark:bg-[#0D1527]/20 border border-white/15 text-white/80 hover:text-white transition-all ml-6 hover:scale-110 shadow-lg cursor-pointer"
+            className="hidden lg:flex items-center justify-center w-12 h-12 rounded-full bg-white/10 dark:bg-[var(--surface)]/10 hover:bg-white/20 dark:bg-[var(--surface)]/20 border border-white/15 text-white/80 hover:text-white transition-all ml-6 hover:scale-110 shadow-lg cursor-pointer"
 
             title="Next Story Category"
 

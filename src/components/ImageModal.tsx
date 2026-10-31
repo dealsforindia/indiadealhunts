@@ -23,20 +23,20 @@ export const ImageModal: React.FC<ImageModalProps> = ({ deal, onClose }) => {
 
   return createPortal(
     <div ref={modalSurface}
-      className="fixed inset-0 z-[250] flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-[250] flex items-center justify-center p-3 sm:p-4 bg-[var(--surface)]/60 backdrop-blur-md animate-in fade-in duration-200"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="image-modal-title"
     >
       <div
-        className="relative max-w-2xl w-full bg-white dark:bg-[#0D1527] rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-2xl overflow-y-auto max-h-[calc(100dvh-2rem)] overscroll-contain"
+        className="relative max-w-2xl w-full bg-white dark:bg-[var(--surface)] rounded-3xl border border-[var(--border-subtle)] dark:border-white/10 p-6 shadow-2xl overflow-y-auto max-h-[calc(100dvh-2rem)] overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button with >= 44x44px Hit Target */}
         <button
           onClick={onClose}
-          className="touch-target min-h-[44px] min-w-[44px] absolute top-4 right-4 p-2.5 rounded-full bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-500 hover:text-slate-900 dark:text-[#F1F5F9] transition cursor-pointer"
+          className="touch-target min-h-[44px] min-w-[44px] absolute top-4 right-4 p-2.5 rounded-full bg-[var(--surface-2)] dark:bg-[var(--surface-2)] hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-primary)] transition cursor-pointer"
           aria-label="Close photo modal (Escape)"
         >
           <X className="w-5 h-5" aria-hidden="true" />
@@ -46,7 +46,7 @@ export const ImageModal: React.FC<ImageModalProps> = ({ deal, onClose }) => {
         <div className="flex flex-col md:flex-row gap-6 items-center">
           
           {/* Image */}
-          <div className="w-full md:w-1/2 aspect-square bg-slate-50 dark:bg-[#070A11] rounded-2xl p-4 flex items-center justify-center border border-slate-200/80 dark:border-white/10 overflow-hidden shadow-inner">
+          <div className="w-full md:w-1/2 aspect-square bg-[var(--surface)] dark:bg-[var(--bg)] rounded-2xl p-4 flex items-center justify-center border border-[var(--border-subtle)]/80 dark:border-white/10 overflow-hidden shadow-inner">
             {deal.image && !imageError ? (
               <img
                 src={getCleanImageUrl(deal.image)}
@@ -55,9 +55,9 @@ export const ImageModal: React.FC<ImageModalProps> = ({ deal, onClose }) => {
                 className="max-h-full max-w-full object-contain filter drop-shadow-md"
               />
             ) : (
-              <div className="text-slate-400 flex flex-col items-center gap-2 p-4 text-center">
-                <ShoppingBag className="w-12 h-12 text-blue-600" aria-hidden="true" />
-                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{deal.store} listing · Offer Preview</span>
+              <div className="text-[var(--text-secondary)] flex flex-col items-center gap-2 p-4 text-center">
+                <ShoppingBag className="w-12 h-12 text-[var(--idh-accent)]" aria-hidden="true" />
+                <span className="text-xs font-semibold text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">{deal.store} listing · Offer Preview</span>
               </div>
             )}
           </div>
@@ -66,7 +66,7 @@ export const ImageModal: React.FC<ImageModalProps> = ({ deal, onClose }) => {
           <div className="w-full md:w-1/2 flex flex-col justify-between space-y-4">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-mono">
+                <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--idh-accent)] border border-[var(--border-subtle)] font-mono">
                   {deal.store}
                 </span>
                 {deal.discount_pct && (
@@ -76,24 +76,24 @@ export const ImageModal: React.FC<ImageModalProps> = ({ deal, onClose }) => {
                 )}
               </div>
 
-              <h2 id="image-modal-title" className="text-base font-bold text-slate-900 dark:text-[#F1F5F9] line-clamp-3 leading-snug">
+              <h2 id="image-modal-title" className="text-base font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] line-clamp-3 leading-snug">
                 {deal.title}
               </h2>
             </div>
 
             {/* Pricing */}
-            <div className="bg-slate-50 dark:bg-[#070A11] p-4 rounded-2xl border border-slate-200/80 dark:border-white/10">
+            <div className="bg-[var(--surface)] dark:bg-[var(--bg)] p-4 rounded-2xl border border-[var(--border-subtle)]/80 dark:border-white/10">
               <div className="flex items-baseline gap-2">
                 {deal.price ? (
-                  <span className="text-2xl font-mono font-extrabold text-slate-900 dark:text-[#F1F5F9]">
+                  <span className="text-2xl font-mono font-extrabold text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                     ₹{deal.price.toLocaleString('en-IN')}
                   </span>
                 ) : (
-                  <span className="text-lg font-bold text-slate-700 dark:text-slate-200">Price on Store</span>
+                  <span className="text-lg font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)]">Price on Store</span>
                 )}
 
                 {deal.mrp && deal.mrp > (deal.price || 0) && (
-                  <span className="text-sm text-slate-400 line-through font-mono">
+                  <span className="text-sm text-[var(--text-secondary)] line-through font-mono">
                     ₹{deal.mrp.toLocaleString('en-IN')}
                   </span>
                 )}
@@ -112,7 +112,7 @@ export const ImageModal: React.FC<ImageModalProps> = ({ deal, onClose }) => {
               href={deal.url}
               target="_blank"
               rel="noopener noreferrer sponsored"
-              className="w-full min-h-[44px] py-3 px-6 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs tracking-wider uppercase text-center shadow-md flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
+              className="w-full min-h-[44px] py-3 px-6 rounded-xl bg-[var(--idh-action-solid)] hover:bg-[var(--idh-action-solid)] text-white font-bold text-xs tracking-wider uppercase text-center shadow-md flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
               aria-label={`Claim deal on ${deal.store}`}
             >
               <span>Buy on {deal.store}</span>

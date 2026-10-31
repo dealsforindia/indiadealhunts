@@ -1,0 +1,902 @@
+[
+  {
+    "expression": "wave",
+    "frame": 1,
+    "file": "wave/01.png",
+    "runtime": "wave/01.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "wave",
+    "frame": 2,
+    "file": "wave/02.png",
+    "runtime": "wave/02.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "wave",
+    "frame": 5,
+    "file": "wave/05.png",
+    "runtime": "wave/05.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "wave",
+    "frame": 3,
+    "file": "wave/03.png",
+    "runtime": "wave/03.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "wave",
+    "frame": 4,
+    "file": "wave/04.png",
+    "runtime": "wave/04.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "wave",
+    "frame": 6,
+    "file": "wave/06.png",
+    "runtime": "wave/06.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "wave",
+    "frame": 7,
+    "file": "wave/07.png",
+    "runtime": "wave/07.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "wave",
+    "frame": 8,
+    "file": "wave/08.png",
+    "runtime": "wave/08.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "wave",
+    "frame": 9,
+    "file": "wave/09.png",
+    "runtime": "wave/09.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "wave",
+    "frame": 11,
+    "file": "wave/11.png",
+    "runtime": "wave/11.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "wave",
+    "frame": 10,
+    "file": "wave/10.png",
+    "runtime": "wave/10.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "wave",
+    "frame": 12,
+    "file": "wave/12.png",
+    "runtime": "wave/12.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "wave",
+    "frame": 13,
+    "file": "wave/13.png",
+    "runtime": "wave/13.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "wave",
+    "frame": 14,
+    "file": "wave/14.png",
+    "runtime": "wave/14.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "surprise",
+    "frame": 2,
+    "file": "surprise/02.png",
+    "runtime": "surprise/02.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "wave",
+    "frame": 15,
+    "file": "wave/15.png",
+    "runtime": "wave/15.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "surprise",
+    "frame": 3,
+    "file": "surprise/03.png",
+    "runtime": "surprise/03.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "surprise",
+    "frame": 1,
+    "file": "surprise/01.png",
+    "runtime": "surprise/01.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "surprise",
+    "frame": 5,
+    "file": "surprise/05.png",
+    "runtime": "surprise/05.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "surprise",
+    "frame": 4,
+    "file": "surprise/04.png",
+    "runtime": "surprise/04.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "surprise",
+    "frame": 6,
+    "file": "surprise/06.png",
+    "runtime": "surprise/06.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "surprise",
+    "frame": 9,
+    "file": "surprise/09.png",
+    "runtime": "surprise/09.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "surprise",
+    "frame": 7,
+    "file": "surprise/07.png",
+    "runtime": "surprise/07.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "surprise",
+    "frame": 8,
+    "file": "surprise/08.png",
+    "runtime": "surprise/08.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "surprise",
+    "frame": 10,
+    "file": "surprise/10.png",
+    "runtime": "surprise/10.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "surprise",
+    "frame": 11,
+    "file": "surprise/11.png",
+    "runtime": "surprise/11.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "surprise",
+    "frame": 14,
+    "file": "surprise/14.png",
+    "runtime": "surprise/14.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "surprise",
+    "frame": 12,
+    "file": "surprise/12.png",
+    "runtime": "surprise/12.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "surprise",
+    "frame": 15,
+    "file": "surprise/15.png",
+    "runtime": "surprise/15.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "surprise",
+    "frame": 13,
+    "file": "surprise/13.png",
+    "runtime": "surprise/13.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "thinking",
+    "frame": 1,
+    "file": "thinking/01.png",
+    "runtime": "thinking/01.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "thinking",
+    "frame": 4,
+    "file": "thinking/04.png",
+    "runtime": "thinking/04.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "thinking",
+    "frame": 2,
+    "file": "thinking/02.png",
+    "runtime": "thinking/02.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "thinking",
+    "frame": 5,
+    "file": "thinking/05.png",
+    "runtime": "thinking/05.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "thinking",
+    "frame": 3,
+    "file": "thinking/03.png",
+    "runtime": "thinking/03.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "thinking",
+    "frame": 6,
+    "file": "thinking/06.png",
+    "runtime": "thinking/06.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "thinking",
+    "frame": 7,
+    "file": "thinking/07.png",
+    "runtime": "thinking/07.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "thinking",
+    "frame": 9,
+    "file": "thinking/09.png",
+    "runtime": "thinking/09.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "thinking",
+    "frame": 10,
+    "file": "thinking/10.png",
+    "runtime": "thinking/10.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "thinking",
+    "frame": 8,
+    "file": "thinking/08.png",
+    "runtime": "thinking/08.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "thinking",
+    "frame": 11,
+    "file": "thinking/11.png",
+    "runtime": "thinking/11.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "thinking",
+    "frame": 12,
+    "file": "thinking/12.png",
+    "runtime": "thinking/12.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "thinking",
+    "frame": 13,
+    "file": "thinking/13.png",
+    "runtime": "thinking/13.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "thinking",
+    "frame": 15,
+    "file": "thinking/15.png",
+    "runtime": "thinking/15.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "thinking",
+    "frame": 14,
+    "file": "thinking/14.png",
+    "runtime": "thinking/14.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "celebration",
+    "frame": 1,
+    "file": "celebration/01.png",
+    "runtime": "celebration/01.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "celebration",
+    "frame": 3,
+    "file": "celebration/03.png",
+    "runtime": "celebration/03.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "celebration",
+    "frame": 2,
+    "file": "celebration/02.png",
+    "runtime": "celebration/02.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "celebration",
+    "frame": 4,
+    "file": "celebration/04.png",
+    "runtime": "celebration/04.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "celebration",
+    "frame": 5,
+    "file": "celebration/05.png",
+    "runtime": "celebration/05.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "celebration",
+    "frame": 6,
+    "file": "celebration/06.png",
+    "runtime": "celebration/06.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "celebration",
+    "frame": 7,
+    "file": "celebration/07.png",
+    "runtime": "celebration/07.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "celebration",
+    "frame": 8,
+    "file": "celebration/08.png",
+    "runtime": "celebration/08.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "celebration",
+    "frame": 10,
+    "file": "celebration/10.png",
+    "runtime": "celebration/10.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "celebration",
+    "frame": 9,
+    "file": "celebration/09.png",
+    "runtime": "celebration/09.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "celebration",
+    "frame": 11,
+    "file": "celebration/11.png",
+    "runtime": "celebration/11.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "celebration",
+    "frame": 13,
+    "file": "celebration/13.png",
+    "runtime": "celebration/13.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "celebration",
+    "frame": 12,
+    "file": "celebration/12.png",
+    "runtime": "celebration/12.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "celebration",
+    "frame": 15,
+    "file": "celebration/15.png",
+    "runtime": "celebration/15.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "celebration",
+    "frame": 14,
+    "file": "celebration/14.png",
+    "runtime": "celebration/14.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "looking_down",
+    "frame": 1,
+    "file": "looking_down/01.png",
+    "runtime": "looking_down/01.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "looking_down",
+    "frame": 2,
+    "file": "looking_down/02.png",
+    "runtime": "looking_down/02.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "looking_down",
+    "frame": 4,
+    "file": "looking_down/04.png",
+    "runtime": "looking_down/04.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "looking_down",
+    "frame": 3,
+    "file": "looking_down/03.png",
+    "runtime": "looking_down/03.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "looking_down",
+    "frame": 5,
+    "file": "looking_down/05.png",
+    "runtime": "looking_down/05.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "looking_down",
+    "frame": 8,
+    "file": "looking_down/08.png",
+    "runtime": "looking_down/08.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "looking_down",
+    "frame": 6,
+    "file": "looking_down/06.png",
+    "runtime": "looking_down/06.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "looking_down",
+    "frame": 10,
+    "file": "looking_down/10.png",
+    "runtime": "looking_down/10.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "looking_down",
+    "frame": 9,
+    "file": "looking_down/09.png",
+    "runtime": "looking_down/09.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "looking_down",
+    "frame": 7,
+    "file": "looking_down/07.png",
+    "runtime": "looking_down/07.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "looking_down",
+    "frame": 11,
+    "file": "looking_down/11.png",
+    "runtime": "looking_down/11.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "looking_down",
+    "frame": 12,
+    "file": "looking_down/12.png",
+    "runtime": "looking_down/12.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "looking_down",
+    "frame": 14,
+    "file": "looking_down/14.png",
+    "runtime": "looking_down/14.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "looking_down",
+    "frame": 13,
+    "file": "looking_down/13.png",
+    "runtime": "looking_down/13.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "looking_down",
+    "frame": 15,
+    "file": "looking_down/15.png",
+    "runtime": "looking_down/15.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "sunglasses",
+    "frame": 1,
+    "file": "sunglasses/01.png",
+    "runtime": "sunglasses/01.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "sunglasses",
+    "frame": 2,
+    "file": "sunglasses/02.png",
+    "runtime": "sunglasses/02.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "sunglasses",
+    "frame": 5,
+    "file": "sunglasses/05.png",
+    "runtime": "sunglasses/05.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "sunglasses",
+    "frame": 3,
+    "file": "sunglasses/03.png",
+    "runtime": "sunglasses/03.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "sunglasses",
+    "frame": 6,
+    "file": "sunglasses/06.png",
+    "runtime": "sunglasses/06.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "sunglasses",
+    "frame": 4,
+    "file": "sunglasses/04.png",
+    "runtime": "sunglasses/04.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "sunglasses",
+    "frame": 7,
+    "file": "sunglasses/07.png",
+    "runtime": "sunglasses/07.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "sunglasses",
+    "frame": 8,
+    "file": "sunglasses/08.png",
+    "runtime": "sunglasses/08.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "sunglasses",
+    "frame": 9,
+    "file": "sunglasses/09.png",
+    "runtime": "sunglasses/09.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "sunglasses",
+    "frame": 10,
+    "file": "sunglasses/10.png",
+    "runtime": "sunglasses/10.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "sunglasses",
+    "frame": 11,
+    "file": "sunglasses/11.png",
+    "runtime": "sunglasses/11.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "sunglasses",
+    "frame": 12,
+    "file": "sunglasses/12.png",
+    "runtime": "sunglasses/12.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "sunglasses",
+    "frame": 13,
+    "file": "sunglasses/13.png",
+    "runtime": "sunglasses/13.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "sunglasses",
+    "frame": 14,
+    "file": "sunglasses/14.png",
+    "runtime": "sunglasses/14.webp",
+    "size": [
+      360,
+      540
+    ]
+  },
+  {
+    "expression": "sunglasses",
+    "frame": 15,
+    "file": "sunglasses/15.png",
+    "runtime": "sunglasses/15.webp",
+    "size": [
+      360,
+      540
+    ]
+  }
+]

@@ -179,29 +179,29 @@ export const BankOfferStackingOptimizer: React.FC = () => {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Header Banner */}
-      <div className="bg-white dark:bg-[#0D1527] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)] dark:border-white/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xl">💳</span>
-            <h3 className="font-heading font-extrabold text-base sm:text-lg text-slate-900 dark:text-[#F1F5F9] m-0">
+            <h3 className="font-heading font-extrabold text-base sm:text-lg text-[var(--text-primary)] dark:text-[var(--text-primary)] m-0">
               Bank Offer &amp; Credit Card Stacking Optimizer
             </h3>
-            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[var(--surface-2)] text-[var(--idh-accent)] border border-[var(--border-subtle)]">
               INSTANT VS CASHBACK
             </span>
           </div>
-          <p className="text-xs text-slate-500 m-0 leading-relaxed">
+          <p className="text-xs text-[var(--text-secondary)] m-0 leading-relaxed">
             Eliminate the confusion between capped 10% instant bank discounts and 5% unlimited cashback on high-ticket purchases.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <label className="flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-[#070A11] px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 cursor-pointer">
+          <label className="flex items-center gap-1.5 text-xs text-[var(--text-primary)] dark:text-[var(--text-secondary)] bg-[var(--surface)] dark:bg-[var(--bg)] px-3 py-1.5 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 cursor-pointer">
             <input
               type="checkbox"
               checked={hasPrime}
               onChange={(e) => setHasPrime(e.target.checked)}
-              className="rounded text-blue-600"
+              className="rounded text-[var(--idh-accent)]"
             />
             <span className="font-semibold">Amazon Prime Active (5%)</span>
           </label>
@@ -209,14 +209,14 @@ export const BankOfferStackingOptimizer: React.FC = () => {
       </div>
 
       {/* Cart Size & Target Store Selector */}
-      <div className="bg-white dark:bg-[#0D1527] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm space-y-4">
+      <div className="bg-white dark:bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)] dark:border-white/10 shadow-sm space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
           <div className="md:col-span-6">
-            <span className="text-xs font-mono uppercase font-bold text-slate-500 block mb-1.5">
+            <span className="text-xs font-mono uppercase font-bold text-[var(--text-secondary)] block mb-1.5">
               Enter Total Checkout Cart Amount
             </span>
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold font-mono text-base">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] font-bold font-mono text-base">
                 ₹
               </span>
               <input
@@ -226,13 +226,13 @@ export const BankOfferStackingOptimizer: React.FC = () => {
                 value={cartAmount || ''}
                 onChange={(e) => setCartAmount(Number(e.target.value))}
                 placeholder="e.g. 32999"
-                className="w-full h-11 pl-9 pr-4 rounded-xl border border-slate-300 dark:border-white/20 text-base font-mono font-bold text-slate-900 dark:text-[#F1F5F9] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
+                className="w-full h-11 pl-9 pr-4 rounded-xl border border-[var(--border-subtle)] dark:border-white/20 text-base font-mono font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[var(--border-subtle)] transition-all"
               />
             </div>
           </div>
 
           <div className="md:col-span-6">
-            <span className="text-xs font-mono uppercase font-bold text-slate-500 block mb-1.5">
+            <span className="text-xs font-mono uppercase font-bold text-[var(--text-secondary)] block mb-1.5">
               Quick Pre-Fill Basket Value
             </span>
             <div className="flex items-center gap-1.5 flex-wrap">
@@ -243,8 +243,8 @@ export const BankOfferStackingOptimizer: React.FC = () => {
                   onClick={() => setCartAmount(val)}
                   className={`px-2.5 py-1.5 rounded-lg text-xs font-mono border transition-all cursor-pointer ${
                     cartAmount === val
-                      ? 'bg-blue-50 text-blue-700 border-blue-300 font-bold'
-                      : 'bg-slate-50 dark:bg-[#070A11] text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:bg-[#111C33]'
+                      ? 'bg-[var(--surface-2)] text-[var(--idh-accent)] border-[var(--border-subtle)] font-bold'
+                      : 'bg-[var(--surface)] dark:bg-[var(--bg)] text-[var(--text-secondary)] dark:text-[var(--text-secondary)] border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)]'
                   }`}
                 >
                   ₹{val.toLocaleString('en-IN')}
@@ -260,7 +260,7 @@ export const BankOfferStackingOptimizer: React.FC = () => {
         <div className="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-3xl p-6 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-5 relative overflow-hidden">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full bg-white/20 dark:bg-[#0D1527]/20 text-white font-mono font-bold text-[11px] uppercase tracking-wider backdrop-blur-xs">
+              <span className="px-2.5 py-0.5 rounded-full bg-white/20 dark:bg-[var(--surface)]/20 text-white font-mono font-bold text-[11px] uppercase tracking-wider backdrop-blur-xs">
                 🏆 #1 HIGHEST SAVINGS PAYMENT METHOD
               </span>
               <span className="text-xs font-mono text-emerald-200">
@@ -277,13 +277,13 @@ export const BankOfferStackingOptimizer: React.FC = () => {
             </p>
 
             {deltaSavings > 0 && (
-              <span className="inline-block text-[11px] font-mono text-emerald-100 bg-white/10 dark:bg-[#0D1527]/10 px-2 py-0.5 rounded-lg">
+              <span className="inline-block text-[11px] font-mono text-emerald-100 bg-white/10 dark:bg-[var(--surface)]/10 px-2 py-0.5 rounded-lg">
                 Beats the 2nd best card ({secondBestOffer?.name}) by ₹{deltaSavings.toLocaleString('en-IN')}!
               </span>
             )}
           </div>
 
-          <div className="bg-white/10 dark:bg-[#0D1527]/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 flex flex-col items-center justify-center shrink-0 min-w-[190px]">
+          <div className="bg-white/10 dark:bg-[var(--surface)]/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 flex flex-col items-center justify-center shrink-0 min-w-[190px]">
             <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-200">
               FINAL PAYABLE AMOUNT
             </span>
@@ -298,12 +298,12 @@ export const BankOfferStackingOptimizer: React.FC = () => {
       )}
 
       {/* Comprehensive Ranked Matrix */}
-      <div className="bg-white dark:bg-[#0D1527] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm space-y-3">
-        <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/5">
-          <span className="text-xs font-mono uppercase font-bold text-slate-500">
+      <div className="bg-white dark:bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)] dark:border-white/10 shadow-sm space-y-3">
+        <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)] dark:border-white/5">
+          <span className="text-xs font-mono uppercase font-bold text-[var(--text-secondary)]">
             All Available Card &amp; Voucher Routes (Ranked by Net Rupees Saved)
           </span>
-          <span className="text-[11px] font-mono text-slate-400">
+          <span className="text-[11px] font-mono text-[var(--text-secondary)]">
             Simulated for ₹{cartAmount.toLocaleString('en-IN')} cart
           </span>
         </div>
@@ -318,18 +318,18 @@ export const BankOfferStackingOptimizer: React.FC = () => {
                   isWinner
                     ? 'bg-emerald-50/70 border-emerald-300 shadow-xs'
                     : offer.isEligible
-                    ? 'bg-white dark:bg-[#0D1527] border-slate-200 dark:border-white/10 hover:border-slate-300 dark:border-white/20'
-                    : 'bg-slate-50/70 dark:bg-[#070A11]/70 border-slate-200 dark:border-white/10 opacity-60'
+                    ? 'bg-white dark:bg-[var(--surface)] border-[var(--border-subtle)] dark:border-white/10 hover:border-[var(--border-subtle)] dark:border-white/20'
+                    : 'bg-[var(--surface)]/70 dark:bg-[var(--bg)]/70 border-[var(--border-subtle)] dark:border-white/10 opacity-60'
                 }`}
               >
                 <div className="flex items-start gap-3">
                   <span className="text-2xl mt-0.5">{offer.icon}</span>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-slate-900 dark:text-[#F1F5F9]">
+                      <span className="text-sm font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]">
                         {offer.name}
                       </span>
-                      <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#111C33] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10">
+                      <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-[var(--surface-2)] dark:bg-[var(--surface-2)] text-[var(--text-primary)] dark:text-[var(--text-secondary)] border border-[var(--border-subtle)] dark:border-white/10">
                         {offer.badge}
                       </span>
                       {isWinner && (
@@ -338,7 +338,7 @@ export const BankOfferStackingOptimizer: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <span className="text-xs text-slate-500 block mt-0.5">
+                    <span className="text-xs text-[var(--text-secondary)] block mt-0.5">
                       {offer.bank} • {offer.type === 'instant_discount' ? 'Instant Price Drop' : offer.type === 'smartbuy_voucher' ? 'Gyftr Voucher 5X Points' : 'Statement Cashback'}
                     </span>
                     {!offer.isEligible && (
@@ -349,19 +349,19 @@ export const BankOfferStackingOptimizer: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100 dark:border-white/5">
+                <div className="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 pt-2 sm:pt-0 border-[var(--border-subtle)] dark:border-white/5">
                   <div className="flex items-baseline gap-1.5">
-                    <span className="text-xs text-slate-400">Total Savings:</span>
+                    <span className="text-xs text-[var(--text-secondary)]">Total Savings:</span>
                     <span
                       className={`text-base font-mono font-bold ${
-                        isWinner ? 'text-emerald-700' : offer.isEligible ? 'text-slate-900 dark:text-[#F1F5F9]' : 'text-slate-400'
+                        isWinner ? 'text-emerald-700' : offer.isEligible ? 'text-[var(--text-primary)] dark:text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'
                       }`}
                     >
                       {offer.isEligible ? `₹${offer.netSavings.toLocaleString('en-IN')}` : '₹0'}
                     </span>
                   </div>
                   {offer.isEligible && (
-                    <span className="text-[11px] font-mono text-slate-500">
+                    <span className="text-[11px] font-mono text-[var(--text-secondary)]">
                       Final: ₹{offer.finalPrice.toLocaleString('en-IN')} ({offer.effectiveDiscountPercent}%)
                     </span>
                   )}
@@ -373,12 +373,12 @@ export const BankOfferStackingOptimizer: React.FC = () => {
       </div>
 
       {/* Pro-Tips & Traps Card */}
-      <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-2">
-        <div className="flex items-center gap-1.5 text-blue-900 font-bold text-xs">
+      <div className="p-4 rounded-2xl bg-[var(--surface-2)]/70 border border-[var(--border-subtle)] space-y-2">
+        <div className="flex items-center gap-1.5 text-[var(--idh-accent)] font-bold text-xs">
           <span>💡</span>
           <span>Pro-Shopper Golden Rules for Festive Sales:</span>
         </div>
-        <ul className="text-[11px] text-blue-800 space-y-1 list-disc pl-4 leading-relaxed">
+        <ul className="text-[11px] text-[var(--idh-accent)] space-y-1 list-disc pl-4 leading-relaxed">
           <li><strong>High-Value Purchases (&gt; ₹35,000):</strong> Unlimited 5% cashback cards (Amazon Pay ICICI / Flipkart Axis) beat 10% instant bank discounts because instant offers are artificially capped at ₹1,500 to ₹1,750!</li>
           <li><strong>Processing Fee Trap:</strong> Watch out for bank offers that charge ₹99 + 18% GST (₹117 total) fee on instant discounts. On a ₹5,000 cart, a ₹500 discount with ₹117 fee drops your real saving to only ₹383!</li>
           <li><strong>SmartBuy Gyftr Gift Cards:</strong> If you hold HDFC Infinia or Diners Black, buying Amazon Shopping Vouchers via SmartBuy yields 16.6% to 9.9% net return in reward points!</li>

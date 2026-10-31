@@ -3,6 +3,7 @@ export type ThemePreference = 'system' | 'light' | 'dark';
 export type ResolvedTheme = 'light' | 'dark';
 export const THEME_STORAGE_KEY = 'idh_theme_preference';
 const THEME_EVENT = 'idh-appearance-change';
+let transitionTimer: ReturnType<typeof setTimeout> | undefined;
 let memoryPreference: ThemePreference | undefined;
 export function getStoredThemePreference(): ThemePreference {
   if (typeof window === 'undefined') return 'system';
@@ -15,11 +16,17 @@ export function resolveTheme(preference: ThemePreference): ResolvedTheme { retur
 export function applyTheme(preference: ThemePreference): ResolvedTheme {
   const resolved = resolveTheme(preference);
   if (typeof window === 'undefined') return resolved;
+  const previous=document.documentElement.dataset.theme;
+  if(previous && previous!==resolved && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    document.documentElement.classList.add('theme-changing');
+    if(transitionTimer)clearTimeout(transitionTimer);
+    transitionTimer=setTimeout(()=>document.documentElement.classList.remove('theme-changing'),550);
+  }
   memoryPreference = preference;
   document.documentElement.classList.toggle('dark', resolved === 'dark');
   document.documentElement.dataset.theme = resolved;
   document.documentElement.style.colorScheme = resolved;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', resolved === 'dark' ? '#0b1220' : '#f7f8fa');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', resolved === 'dark' ? '#0b100e' : '#f3f2ee');
   try { localStorage.setItem(THEME_STORAGE_KEY, preference); } catch {}
   window.dispatchEvent(new Event(THEME_EVENT));
   return resolved;

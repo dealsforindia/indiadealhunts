@@ -49,36 +49,36 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 sm:px-6 flex flex-col gap-8">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs text-slate-400">
+      <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
         <button
           onClick={onBackToHome}
-          className="hover:text-blue-600 transition-colors cursor-pointer bg-transparent border-0 p-0 font-medium"
+          className="hover:text-[var(--idh-accent)] transition-colors cursor-pointer bg-transparent border-0 p-0 font-medium"
         >
           Home
         </button>
         <span>/</span>
-        <span className="text-slate-800 dark:text-[#F8FAFC] font-semibold">Contact & Support</span>
+        <span className="text-[var(--text-primary)] dark:text-[var(--text-primary)] font-semibold">Contact & Support</span>
       </div>
 
       {/* Header */}
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-heading font-black tracking-tight text-slate-900 dark:text-[#F1F5F9]">
+        <h1 className="text-3xl font-heading font-black tracking-tight text-[var(--text-primary)] dark:text-[var(--text-primary)]">
           Contact & Curation Desk
         </h1>
-        <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-          Report an expired deal, provide partnership inquiries, or suggest feature requests to our engineering team. Direct inquiries: <a href="mailto:hello@rudranil.me" className="text-blue-600 font-medium hover:underline">hello@rudranil.me</a>.
+        <p className="text-[var(--text-secondary)] dark:text-[var(--text-secondary)] text-sm leading-relaxed">
+          Report an expired deal, provide partnership inquiries, or suggest feature requests to our engineering team. Direct inquiries: <a href="mailto:hello@rudranil.me" className="text-[var(--idh-accent)] font-medium hover:underline">hello@rudranil.me</a>.
         </p>
       </div>
 
       {submitted ? (
-        <div className="p-8 rounded-2xl bg-white dark:bg-[#0D1527] border border-emerald-200 flex flex-col gap-3 items-center text-center shadow-sm">
+        <div className="p-8 rounded-2xl bg-white dark:bg-[var(--surface)] border border-emerald-200 flex flex-col gap-3 items-center text-center shadow-sm">
           <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-xs">
             <IconCheck size={24} />
           </div>
-          <h3 className="text-lg font-bold font-heading text-slate-900 dark:text-[#F1F5F9]">
+          <h3 className="text-lg font-bold font-heading text-[var(--text-primary)] dark:text-[var(--text-primary)]">
             Message Received
           </h3>
-          <p className="text-xs text-slate-500 max-w-md leading-relaxed">
+          <p className="text-xs text-[var(--text-secondary)] max-w-md leading-relaxed">
             Thank you for reaching out! Your note has been dispatched to our moderation queue. We will review and respond if needed.
           </p>
           <button
@@ -86,13 +86,13 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
               setSubmitted(false);
               setMessage('');
             }}
-            className="mt-2 px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-[#111C33] hover:bg-slate-200 dark:bg-[#172440] text-slate-900 dark:text-[#F1F5F9] text-xs font-bold border border-slate-300 dark:border-white/20 cursor-pointer transition-colors"
+            className="mt-2 px-5 py-2.5 rounded-xl bg-[var(--surface-2)] dark:bg-[var(--surface-2)] hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)] text-[var(--text-primary)] dark:text-[var(--text-primary)] text-xs font-bold border border-[var(--border-subtle)] dark:border-white/20 cursor-pointer transition-colors"
           >
             Send Another Note
           </button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#0D1527] border border-slate-200/90 dark:border-white/10 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow">
+        <form onSubmit={handleSubmit} className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)]/90 dark:border-white/10 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow">
           {submitError && (
             <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-medium">
               {submitError}
@@ -101,7 +101,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
+              <label className="block text-[11px] font-mono uppercase text-[var(--text-secondary)] font-bold mb-1.5">
                 Your Name
               </label>
               <input
@@ -109,11 +109,11 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 aria-label="Your name" placeholder="Rohan Sharma"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--surface)] dark:bg-[var(--bg)] border border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-primary)] dark:text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[var(--surface)] focus:border-[var(--border-subtle)] focus:ring-2 focus:ring-blue-100 transition-colors"
               />
             </div>
             <div>
-              <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
+              <label className="block text-[11px] font-mono uppercase text-[var(--text-secondary)] font-bold mb-1.5">
                 Email Address *
               </label>
               <input
@@ -122,19 +122,19 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 aria-label="Email address" placeholder="rohan@gmail.com"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--surface)] dark:bg-[var(--bg)] border border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-primary)] dark:text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[var(--surface)] focus:border-[var(--border-subtle)] focus:ring-2 focus:ring-blue-100 transition-colors"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
+            <label className="block text-[11px] font-mono uppercase text-[var(--text-secondary)] font-bold mb-1.5">
               Subject
             </label>
             <select aria-label="Subject"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--surface)] dark:bg-[var(--bg)] border border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-primary)] dark:text-[var(--text-primary)] text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[var(--surface)] focus:border-[var(--border-subtle)] focus:ring-2 focus:ring-blue-100 transition-colors"
             >
               <option value="Feedback">Feedback & Suggestions</option>
               <option value="Expired Deal">Report an Expired / Fake Deal</option>
@@ -144,7 +144,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
           </div>
 
           <div>
-            <label className="block text-[11px] font-mono uppercase text-slate-500 font-bold mb-1.5">
+            <label className="block text-[11px] font-mono uppercase text-[var(--text-secondary)] font-bold mb-1.5">
               Your Message *
             </label>
             <textarea aria-label="Your message"
@@ -153,14 +153,14 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Describe the deal URL, bug, or feedback..."
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[#0D1527] focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--surface)] dark:bg-[var(--bg)] border border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-primary)] dark:text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-xs sm:text-sm focus:outline-none focus:bg-white dark:bg-[var(--surface)] focus:border-[var(--border-subtle)] focus:ring-2 focus:ring-blue-100 transition-colors"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="h-11 rounded-xl bg-slate-900 hover:bg-black text-white font-extrabold text-xs sm:text-sm tracking-wide shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer disabled:opacity-60"
+            className="h-11 rounded-xl bg-[var(--idh-action-solid)] hover:bg-black text-white font-extrabold text-xs sm:text-sm tracking-wide shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer disabled:opacity-60"
           >
             {loading ? 'Sending Message...' : 'Send Message →'}
           </button>

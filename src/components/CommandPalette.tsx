@@ -448,7 +448,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
     <div
 
-      className="phone-command-overlay fixed inset-0 z-[100] flex items-start justify-center pt-12 sm:pt-20 px-3 sm:px-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-150"
+      className="phone-command-overlay fixed inset-0 z-[100] flex items-start justify-center pt-12 sm:pt-20 px-3 sm:px-4 bg-[var(--surface)]/40 backdrop-blur-sm animate-in fade-in duration-150"
 
       onClick={onClose}
 
@@ -466,7 +466,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
         ref={modalSurface} role="dialog" aria-modal="true" aria-label="Search deals and shopping tools"
 
-        className="phone-command-panel w-full max-w-2xl bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[calc(100dvh-3rem)] overscroll-contain"
+        className="phone-command-panel w-full max-w-2xl bg-white dark:bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] dark:border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[calc(100dvh-3rem)] overscroll-contain"
 
         onClick={(e) => e.stopPropagation()}
 
@@ -474,7 +474,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
         {/* Search Bar Input */}
 
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-200 dark:border-white/10 bg-slate-50/60 dark:bg-[#070A11]/60">
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[var(--border-subtle)] dark:border-white/10 bg-[var(--surface)]/60 dark:bg-[var(--bg)]/60">
 
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.2">
 
@@ -504,7 +504,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
             placeholder="Search deals, products, or utilities (e.g. iPhone, GST, Blinkit, EMI)..."
 
-            className="min-w-0 flex-1 bg-transparent border-none text-slate-900 dark:text-[#F1F5F9] placeholder:text-slate-400 text-sm sm:text-base focus:outline-none font-medium"
+            className="min-w-0 flex-1 bg-transparent border-none text-[var(--text-primary)] dark:text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-sm sm:text-base focus:outline-none font-medium"
 
           />
 
@@ -516,7 +516,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
               onClick={() => setQuery('')}
 
-              className="text-xs text-slate-400 hover:text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded cursor-pointer"
+              className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-secondary)] dark:text-[var(--text-secondary)] px-1.5 py-0.5 rounded cursor-pointer"
 
             >
 
@@ -528,7 +528,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
           <button type="button" className="phone-command-close" aria-label="Close search" onClick={onClose}>×</button>
 
-          <span className="text-xs font-mono font-bold text-slate-400 border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0D1527] px-1.5 py-0.5 rounded shadow-2xs hidden sm:inline-block">
+          <span className="text-xs font-mono font-bold text-[var(--text-secondary)] border border-[var(--border-subtle)] dark:border-white/10 bg-white dark:bg-[var(--surface)] px-1.5 py-0.5 rounded shadow-2xs hidden sm:inline-block">
 
             ESC
 
@@ -540,7 +540,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
         {query.trim() && (
 
-          <div className="flex flex-col sm:flex-row gap-1.5 p-2 bg-slate-50 dark:bg-[#070A11] border-b border-slate-100 dark:border-white/5">
+          <div className="flex flex-col sm:flex-row gap-1.5 p-2 bg-[var(--surface)] dark:bg-[var(--bg)] border-b border-[var(--border-subtle)] dark:border-white/5">
 
             <button
 
@@ -594,9 +594,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
         {matchingTools.length > 0 && onOpenTool && (
 
-          <div className="p-2 border-b border-slate-100 dark:border-white/5 bg-slate-50/70 dark:bg-[#070A11]/70">
+          <div className="p-2 border-b border-[var(--border-subtle)] dark:border-white/5 bg-[var(--surface)]/70 dark:bg-[var(--bg)]/70">
 
-            <div className="px-2 py-1 text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">
+            <div className="px-2 py-1 text-xs font-mono font-bold text-[var(--text-secondary)] uppercase tracking-wider">
 
               Shopping Utility Engines
 
@@ -624,7 +624,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
                   }}
 
-                  className="w-full text-left flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-[#0D1527] hover:bg-slate-100 dark:hover:bg-[#172440]/90 dark:bg-[#111C33]/90 border border-slate-200/80 dark:border-white/10 cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                  className="w-full text-left flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-[var(--surface)] hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-2)]/90 dark:bg-[var(--surface-2)]/90 border border-[var(--border-subtle)]/80 dark:border-white/10 cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
 
                 >
 
@@ -636,7 +636,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
                       <div className="flex items-center gap-1.5">
 
-                        <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] truncate">
+                        <span className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] truncate">
 
                           {tool.name}
 
@@ -650,7 +650,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
                       </div>
 
-                      <div className="text-[11px] text-slate-500 truncate">
+                      <div className="text-[11px] text-[var(--text-secondary)] truncate">
 
                         {tool.desc}
 
@@ -680,9 +680,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
         {/* Quick Store Filter Pills */}
 
-        <div className="flex items-center gap-1.5 px-4 py-2 border-b border-slate-100 dark:border-white/5 bg-white dark:bg-[#0D1527] overflow-x-auto text-xs">
+        <div className="flex items-center gap-1.5 px-4 py-2 border-b border-[var(--border-subtle)] dark:border-white/5 bg-white dark:bg-[var(--surface)] overflow-x-auto text-xs">
 
-          <span className="text-xs font-mono font-bold text-slate-400 uppercase mr-1">
+          <span className="text-xs font-mono font-bold text-[var(--text-secondary)] uppercase mr-1">
 
             Store:
 
@@ -702,9 +702,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
                 selectedStore === s
 
-                  ? 'bg-slate-900 text-white'
+                  ? 'bg-[var(--idh-action-solid)] text-white'
 
-                  : 'bg-slate-100 dark:bg-[#111C33] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-[#F1F5F9] hover:bg-slate-200 dark:bg-[#172440]'
+                  : 'bg-[var(--surface-2)] dark:bg-[var(--surface-2)] text-[var(--text-secondary)] dark:text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-primary)] hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)]'
 
               }`}
 
@@ -756,7 +756,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
                   className={`w-full text-left flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors border-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
 
-                    isHighlighted ? 'bg-slate-100 dark:bg-[#111C33]' : 'hover:bg-slate-50 dark:bg-[#070A11]'
+                    isHighlighted ? 'bg-[var(--surface-2)] dark:bg-[var(--surface-2)]' : 'hover:bg-[var(--surface)] dark:bg-[var(--bg)]'
 
                   }`}
 
@@ -764,7 +764,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
                   <div className="flex items-center gap-3 min-w-0 pr-3">
 
-                    <div className="w-10 h-10 rounded-lg bg-slate-50 dark:bg-[#070A11] border border-slate-200 dark:border-white/10 overflow-hidden flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-lg bg-[var(--surface)] dark:bg-[var(--bg)] border border-[var(--border-subtle)] dark:border-white/10 overflow-hidden flex items-center justify-center shrink-0">
 
                       {imgUrl ? (
 
@@ -800,7 +800,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
                       </div>
 
-                      <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9] truncate mt-0.5">
+                      <span className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] truncate mt-0.5">
 
                         {deal.title}
 
@@ -814,13 +814,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
                   <div className="flex items-center gap-2 shrink-0">
 
-                    <span className="font-mono text-sm font-extrabold text-slate-900 dark:text-[#F1F5F9]">
+                    <span className="font-mono text-sm font-extrabold text-[var(--text-primary)] dark:text-[var(--text-primary)]">
 
                       ₹{deal.price ? Number(deal.price).toLocaleString('en-IN') : 'Deal'}
 
                     </span>
 
-                    <span className="text-xs text-blue-600 font-bold hidden sm:inline">
+                    <span className="text-xs text-[var(--idh-accent)] font-bold hidden sm:inline">
 
                       View →
 
@@ -836,7 +836,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
           ) : (
 
-            <div className="py-10 text-center text-slate-500 text-xs">
+            <div className="py-10 text-center text-[var(--text-secondary)] text-xs">
 
               No matching deals found for "{query}".
 
@@ -850,11 +850,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
         {/* Trending Searches & Utilities Footer */}
 
-        <div className="px-4 py-3 bg-slate-50 dark:bg-[#070A11] border-t border-slate-200 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="px-4 py-3 bg-[var(--surface)] dark:bg-[var(--bg)] border-t border-[var(--border-subtle)] dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
 
           <div className="flex flex-wrap items-center gap-1.5">
 
-            <span className="text-xs font-mono font-bold text-slate-400 uppercase">
+            <span className="text-xs font-mono font-bold text-[var(--text-secondary)] uppercase">
 
               Trending:
 
@@ -878,7 +878,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
                 }}
 
-                className="px-2 py-0.5 rounded-md bg-white dark:bg-[#0D1527] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:text-blue-600 hover:border-blue-300 font-medium cursor-pointer transition-colors text-[11px]"
+                className="px-2 py-0.5 rounded-md bg-white dark:bg-[var(--surface)] border border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-primary)] dark:text-[var(--text-secondary)] hover:text-[var(--idh-accent)] hover:border-[var(--border-subtle)] font-medium cursor-pointer transition-colors text-[11px]"
 
               >
 

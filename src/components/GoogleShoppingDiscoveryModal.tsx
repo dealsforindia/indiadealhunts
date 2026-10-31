@@ -54,7 +54,7 @@ interface GoogleShoppingDiscoveryModalProps {
 }
 
 const STORE_CONFIG: Record<string, { bg: string; text: string; border: string; btn: string; icon: string }> = {
-  flipkart: { bg: 'bg-blue-50 dark:bg-blue-950/40', text: 'text-blue-700 dark:text-blue-300', border: 'border-blue-200 dark:border-blue-800', btn: 'bg-blue-600 hover:bg-blue-700', icon: '⚡' },
+  flipkart: { bg: 'bg-[var(--surface-2)] dark:bg-[var(--idh-action-solid)]/40', text: 'text-[var(--idh-accent)] dark:text-[var(--idh-accent)]', border: 'border-[var(--border-subtle)] dark:border-[var(--border-subtle)]', btn: 'bg-[var(--idh-action-solid)] hover:bg-[var(--idh-action-solid)]', icon: '⚡' },
   amazon: { bg: 'bg-amber-50 dark:bg-amber-950/40', text: 'text-amber-800 dark:text-amber-300', border: 'border-amber-200 dark:border-amber-800', btn: 'bg-amber-600 hover:bg-amber-700', icon: '📦' },
   myntra: { bg: 'bg-pink-50 dark:bg-pink-950/40', text: 'text-pink-700 dark:text-pink-300', border: 'border-pink-200 dark:border-pink-800', btn: 'bg-pink-600 hover:bg-pink-700', icon: '👗' },
   croma: { bg: 'bg-cyan-50 dark:bg-cyan-950/40', text: 'text-cyan-800 dark:text-cyan-300', border: 'border-cyan-200 dark:border-cyan-800', btn: 'bg-cyan-600 hover:bg-cyan-700', icon: '💻' },
@@ -70,7 +70,7 @@ function getStoreConfig(store: string) {
   for (const [key, config] of Object.entries(STORE_CONFIG)) {
     if (s.includes(key)) return config;
   }
-  return { bg: 'bg-slate-100 dark:bg-slate-800', text: 'text-slate-800 dark:text-slate-200', border: 'border-slate-300 dark:border-slate-700', btn: 'bg-slate-800 hover:bg-slate-900', icon: '🛍️' };
+  return { bg: 'bg-[var(--surface-2)] dark:bg-[var(--surface)]', text: 'text-[var(--text-primary)] dark:text-[var(--text-secondary)]', border: 'border-[var(--border-subtle)] dark:border-[var(--border-subtle)]', btn: 'bg-[var(--surface)] hover:bg-[var(--surface)]', icon: '🛍️' };
 }
 
 export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModalProps> = ({
@@ -323,7 +323,7 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="fixed inset-0 bg-slate-950/75 backdrop-blur-md transition-opacity"
+          className="fixed inset-0 bg-[var(--surface)]/75 backdrop-blur-md transition-opacity"
         />
 
         {/* Modal Window */}
@@ -332,21 +332,21 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 16 }}
           transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-5xl rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-[#0D1527]/95 text-slate-900 dark:text-[#F1F5F9] shadow-2xl backdrop-blur-xl flex flex-col max-h-[92vh] overflow-hidden z-10"
+          className="relative w-full max-w-5xl rounded-3xl border border-[var(--border-subtle)]/80 dark:border-white/10 bg-white/95 dark:bg-[var(--surface)]/95 text-[var(--text-primary)] dark:text-[var(--text-primary)] shadow-2xl backdrop-blur-xl flex flex-col max-h-[92vh] overflow-hidden z-10"
         >
           {/* ── 1. Top Header Banner ── */}
-          <div className="border-b border-slate-200/80 dark:border-white/10 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-[#0D1527] dark:via-[#111C33] dark:to-[#0D1527] p-4 sm:p-6">
+          <div className="border-b border-[var(--border-subtle)]/80 dark:border-white/10 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-[var(--surface)] dark:via-[var(--surface-2)] dark:to-[var(--surface)] p-4 sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 {/* Vibrant Google Colors Shopping Badge */}
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-500 via-rose-500 to-amber-400 p-0.5 shadow-md">
-                  <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-white dark:bg-[#0D1527]">
-                    <ShoppingBag className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-white dark:bg-[var(--surface)]">
+                    <ShoppingBag className="h-5 w-5 text-[var(--idh-accent)] dark:text-[var(--idh-accent)]" />
                   </div>
                 </div>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h2 className="font-heading text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    <h2 className="font-heading text-lg sm:text-xl font-black text-[var(--text-primary)] dark:text-white tracking-tight">
                       Google Shopping & Pan-India Radar
                     </h2>
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 px-2.5 py-0.5 text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-300">
@@ -354,7 +354,7 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
                       IN-APP DISCOVERY
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  <p className="text-xs text-[var(--text-secondary)] dark:text-[var(--text-secondary)] mt-0.5">
                     Live server-side price comparison across Amazon, Flipkart, Myntra, Croma, & 10+ stores without leaving the PWA.
                   </p>
                 </div>
@@ -364,7 +364,7 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111C33] text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#172440] transition cursor-pointer shadow-xs"
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--border-subtle)] dark:border-white/10 bg-white dark:bg-[var(--surface-2)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:hover:text-white hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-2)] transition cursor-pointer shadow-xs"
                 aria-label="Close Google Shopping Radar"
               >
                 <X size={18} />
@@ -374,20 +374,20 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
             {/* In-Modal Search Input Bar */}
             <form onSubmit={handleSearchSubmit} className="mt-4 flex items-center gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-secondary)]" />
                 <input
                   ref={inputRef}
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Scan product across stores (e.g. Cashew 1kg, OnePlus Nord, Sony Headphones)..."
-                  className="w-full rounded-2xl border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070A11] pl-10 pr-10 py-2.5 text-xs sm:text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-blue-500 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 shadow-xs"
+                  className="w-full rounded-2xl border border-[var(--border-subtle)] dark:border-white/15 bg-white dark:bg-[var(--bg)] pl-10 pr-10 py-2.5 text-xs sm:text-sm font-medium text-[var(--text-primary)] dark:text-white placeholder:text-[var(--text-secondary)] focus:border-[var(--border-subtle)] focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 shadow-xs"
                 />
                 {query && (
                   <button
                     type="button"
                     onClick={() => { setQuery(''); inputRef.current?.focus(); }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[var(--text-secondary)] hover:text-[var(--text-secondary)] dark:hover:text-[var(--text-secondary)]"
                   >
                     <X size={14} />
                   </button>
@@ -421,10 +421,10 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
                         {lowestPriceOffer.store}
                       </span>
                     </div>
-                    <p className="text-xs font-bold text-slate-800 dark:text-slate-200 line-clamp-1 max-w-xl">
+                    <p className="text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] line-clamp-1 max-w-xl">
                       {lowestPriceOffer.title} · <span className="font-black text-emerald-700 dark:text-emerald-400 text-sm">₹{Math.round(lowestPriceOffer.price).toLocaleString('en-IN')}</span>
                       {lowestPriceOffer.mrp && lowestPriceOffer.mrp > lowestPriceOffer.price && (
-                        <span className="text-slate-500 font-normal line-through ml-1 text-xs">
+                        <span className="text-[var(--text-secondary)] font-normal line-through ml-1 text-xs">
                           ₹{Math.round(lowestPriceOffer.mrp).toLocaleString('en-IN')}
                         </span>
                       )}
@@ -444,7 +444,7 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
           )}
 
           {/* ── 3. Filters and Sorting Toolbar ── */}
-          <div className="px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 dark:border-white/10 text-xs">
+          <div className="px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border-subtle)]/80 dark:border-white/10 text-xs">
             {/* Merchant Filter Chips */}
             <div className="flex flex-wrap items-center gap-1.5">
               {[
@@ -461,8 +461,8 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
                   onClick={() => setStoreFilter(key)}
                   className={`rounded-xl px-2.5 py-1 font-bold transition cursor-pointer ${
                     storeFilter === key
-                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xs'
-                      : 'border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#111C33] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#172440]'
+                      ? 'bg-[var(--idh-accent)] text-[var(--idh-on-accent)] shadow-xs'
+                      : 'border border-[var(--border-subtle)] dark:border-white/10 bg-[var(--surface)] dark:bg-[var(--surface-2)] text-[var(--text-primary)] dark:text-[var(--text-secondary)] hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-2)]'
                   }`}
                 >
                   {label}
@@ -472,12 +472,12 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
 
             {/* Sort Dropdown & View Mode */}
             <div className="flex items-center gap-2">
-              <label className="flex items-center gap-1 font-bold text-slate-500">
+              <label className="flex items-center gap-1 font-bold text-[var(--text-secondary)]">
                 <span>Sort:</span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#111C33] px-2 py-1 text-slate-800 dark:text-slate-200 font-bold outline-hidden cursor-pointer"
+                  className="rounded-lg border border-[var(--border-subtle)] dark:border-white/10 bg-[var(--surface)] dark:bg-[var(--surface-2)] px-2 py-1 text-[var(--text-primary)] dark:text-[var(--text-secondary)] font-bold outline-hidden cursor-pointer"
                 >
                   <option value="lowest">Lowest Price</option>
                   <option value="discount">Highest Discount %</option>
@@ -485,11 +485,11 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
                 </select>
               </label>
 
-              <div className="flex items-center rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#111C33] p-0.5">
+              <div className="flex items-center rounded-lg border border-[var(--border-subtle)] dark:border-white/10 bg-[var(--surface)] dark:bg-[var(--surface-2)] p-0.5">
                 <button
                   type="button"
                   onClick={() => setViewMode('grid')}
-                  className={`p-1 rounded-md transition ${viewMode === 'grid' ? 'bg-white dark:bg-[#1B2947] text-blue-600 shadow-2xs' : 'text-slate-400'}`}
+                  className={`p-1 rounded-md transition ${viewMode === 'grid' ? 'bg-white dark:bg-[#1B2947] text-[var(--idh-accent)] shadow-2xs' : 'text-[var(--text-secondary)]'}`}
                   title="Grid view"
                 >
                   <Grid size={14} />
@@ -497,7 +497,7 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
                 <button
                   type="button"
                   onClick={() => setViewMode('list')}
-                  className={`p-1 rounded-md transition ${viewMode === 'list' ? 'bg-white dark:bg-[#1B2947] text-blue-600 shadow-2xs' : 'text-slate-400'}`}
+                  className={`p-1 rounded-md transition ${viewMode === 'list' ? 'bg-white dark:bg-[#1B2947] text-[var(--idh-accent)] shadow-2xs' : 'text-[var(--text-secondary)]'}`}
                   title="List view"
                 >
                   <ListIcon size={14} />
@@ -512,14 +512,14 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
             {loading && (
               <div className="py-12 flex flex-col items-center justify-center gap-3 text-center">
                 <div className="relative flex h-16 w-16 items-center justify-center">
-                  <div className="absolute inset-0 rounded-full border-4 border-blue-500/20 animate-ping" />
-                  <div className="h-12 w-12 rounded-full border-3 border-blue-600 border-t-transparent animate-spin" />
-                  <ShoppingBag className="absolute h-5 w-5 text-blue-600" />
+                  <div className="absolute inset-0 rounded-full border-4 border-[var(--border-subtle)]/20 animate-ping" />
+                  <div className="h-12 w-12 rounded-full border-3 border-[var(--border-subtle)] border-t-transparent animate-spin" />
+                  <ShoppingBag className="absolute h-5 w-5 text-[var(--idh-accent)]" />
                 </div>
-                <h3 className="font-heading text-sm font-bold text-slate-900 dark:text-white">
+                <h3 className="font-heading text-sm font-bold text-[var(--text-primary)] dark:text-white">
                   Scanning Pan-India Google Shopping Index…
                 </h3>
-                <p className="text-xs text-slate-500 max-w-sm">
+                <p className="text-xs text-[var(--text-secondary)] max-w-sm">
                   Checking Amazon, Flipkart, Myntra, Croma, and verified Indian merchants for “{activeQuery}”.
                 </p>
               </div>
@@ -527,28 +527,28 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
 
             {/* Error / Empty State */}
             {!loading && (error || processedOffers.length === 0) && (
-              <div className="py-10 px-6 text-center max-w-lg mx-auto rounded-3xl border border-slate-200 dark:border-white/10 bg-slate-50/60 dark:bg-[#111C33]/60 p-6">
+              <div className="py-10 px-6 text-center max-w-lg mx-auto rounded-3xl border border-[var(--border-subtle)] dark:border-white/10 bg-[var(--surface)]/60 dark:bg-[var(--surface-2)]/60 p-6">
                 <div className="flex h-12 w-12 mx-auto items-center justify-center rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 text-xl mb-3">
                   🔍
                 </div>
-                <h3 className="font-heading font-black text-slate-900 dark:text-white text-base">
+                <h3 className="font-heading font-black text-[var(--text-primary)] dark:text-white text-base">
                   {error ? 'Search Notice' : 'No Offers Discovered'}
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-4 leading-relaxed">
+                <p className="text-xs text-[var(--text-secondary)] dark:text-[var(--text-secondary)] mt-1 mb-4 leading-relaxed">
                   {error || `We couldn't find matching store offers for “${activeQuery}”. You can paste an exact product link below to verify price history.`}
                 </p>
                 <div className="flex flex-wrap justify-center gap-2">
                   <button
                     type="button"
                     onClick={() => { setQuery('cashew 1kg'); setActiveQuery('cashew 1kg'); fetchGoogleShoppingOffers('cashew 1kg'); }}
-                    className="rounded-xl border border-slate-300 dark:border-white/20 bg-white dark:bg-[#172440] px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100"
+                    className="rounded-xl border border-[var(--border-subtle)] dark:border-white/20 bg-white dark:bg-[var(--surface-2)] px-3 py-1.5 text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] hover:bg-[var(--surface-2)]"
                   >
                     Try &ldquo;Cashew 1kg&rdquo;
                   </button>
                   <button
                     type="button"
                     onClick={() => { setQuery('OnePlus Nord'); setActiveQuery('OnePlus Nord'); fetchGoogleShoppingOffers('OnePlus Nord'); }}
-                    className="rounded-xl border border-slate-300 dark:border-white/20 bg-white dark:bg-[#172440] px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100"
+                    className="rounded-xl border border-[var(--border-subtle)] dark:border-white/20 bg-white dark:bg-[var(--surface-2)] px-3 py-1.5 text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] hover:bg-[var(--surface-2)]"
                   >
                     Try &ldquo;OnePlus Nord&rdquo;
                   </button>
@@ -569,8 +569,8 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
                       key={offer.id}
                       className={`relative flex flex-col justify-between rounded-2xl border transition-all duration-200 ${
                         offer.is_lowest_price
-                          ? 'border-emerald-300 dark:border-emerald-600/50 bg-gradient-to-b from-emerald-50/40 via-white to-white dark:from-emerald-950/20 dark:via-[#0D1527] dark:to-[#0D1527] shadow-md ring-1 ring-emerald-300/40'
-                          : 'border-slate-200/90 dark:border-white/10 bg-white dark:bg-[#0D1527] hover:border-slate-300 dark:hover:border-white/20 shadow-xs hover:shadow-md'
+                          ? 'border-emerald-300 dark:border-emerald-600/50 bg-gradient-to-b from-emerald-50/40 via-white to-white dark:from-emerald-950/20 dark:via-[var(--surface)] dark:to-[var(--surface)] shadow-md ring-1 ring-emerald-300/40'
+                          : 'border-[var(--border-subtle)]/90 dark:border-white/10 bg-white dark:bg-[var(--surface)] hover:border-[var(--border-subtle)] dark:hover:border-white/20 shadow-xs hover:shadow-md'
                       } p-3.5`}
                     >
                       {/* Top Brand Pill & Lowest Price Tag */}
@@ -597,7 +597,7 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
 
                       {/* Content Area: Thumbnail + Title */}
                       <div className="flex gap-3">
-                        <div className="h-18 w-18 shrink-0 rounded-xl border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#111C33] p-1 flex items-center justify-center overflow-hidden">
+                        <div className="h-18 w-18 shrink-0 rounded-xl border border-[var(--border-subtle)] dark:border-white/5 bg-[var(--surface)] dark:bg-[var(--surface-2)] p-1 flex items-center justify-center overflow-hidden">
                           {offer.image && !failedImages.has(offer.id) ? (
                             <img
                               src={offer.image}
@@ -610,13 +610,13 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
                           ) : (
                             <div className="flex flex-col items-center justify-center text-center p-1">
                               <span className="text-xl mb-0.5">{sc.icon}</span>
-                              <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase">{offer.store}</span>
+                              <span className="text-[9px] font-bold text-[var(--text-secondary)] dark:text-[var(--text-secondary)] uppercase">{offer.store}</span>
                             </div>
                           )}
                         </div>
 
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-heading text-xs font-bold text-slate-900 dark:text-slate-100 line-clamp-2 leading-snug" title={offer.title}>
+                          <h4 className="font-heading text-xs font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] line-clamp-2 leading-snug" title={offer.title}>
                             {offer.title}
                           </h4>
 
@@ -624,17 +624,17 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
                           {/* Pricing */}
                           <div className="mt-1.5 flex items-baseline gap-1.5">
                             {offer.price ? (
-                              <span className="font-mono text-base font-black text-slate-900 dark:text-emerald-400">
+                              <span className="font-mono text-base font-black text-[var(--text-primary)] dark:text-emerald-400">
                                 ₹{Math.round(offer.price).toLocaleString('en-IN')}
                               </span>
                             ) : (
-                              <span className="text-xs font-mono font-bold text-slate-500">
+                              <span className="text-xs font-mono font-bold text-[var(--text-secondary)]">
                                 Check store price
                               </span>
                             )}
 
                             {offer.mrp && offer.price && offer.mrp > offer.price && (
-                              <span className="font-mono text-[11px] text-slate-400 line-through">
+                              <span className="font-mono text-[11px] text-[var(--text-secondary)] line-through">
                                 ₹{Math.round(offer.mrp).toLocaleString('en-IN')}
                               </span>
                             )}
@@ -650,15 +650,15 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
 
                       {/* Inline Price History Expander */}
                       {isHistoryExpanded && (
-                        <div className="mt-3 pt-3 border-t border-slate-100 dark:border-white/10">
+                        <div className="mt-3 pt-3 border-t border-[var(--border-subtle)] dark:border-white/10">
                           <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-[10px] font-mono font-bold text-slate-500">
+                            <span className="text-[10px] font-mono font-bold text-[var(--text-secondary)]">
                               Verified 90-Day Trend
                             </span>
                             <button
                               type="button"
                               onClick={() => setExpandedHistoryOfferId(null)}
-                              className="text-[10px] font-bold text-slate-400 hover:text-slate-600"
+                              className="text-[10px] font-bold text-[var(--text-secondary)] hover:text-[var(--text-secondary)]"
                             >
                               Close
                             </button>
@@ -668,7 +668,7 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
                       )}
 
                       {/* Actions Toolbar */}
-                      <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-white/5 flex items-center justify-between gap-2">
+                      <div className="mt-3 pt-2.5 border-t border-[var(--border-subtle)] dark:border-white/5 flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5">
                           <button
                             type="button"
@@ -679,7 +679,7 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
                                 setExpandedHistoryOfferId(offer.id);
                               }
                             }}
-                            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#111C33] hover:bg-slate-100 dark:hover:bg-[#172440] px-2 py-1 text-[10px] font-bold text-slate-700 dark:text-slate-300 transition"
+                            className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-subtle)] dark:border-white/10 bg-[var(--surface)] dark:bg-[var(--surface-2)] hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-2)] px-2 py-1 text-[10px] font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] transition"
                             title="Inspect 90-day price trend"
                           >
                             <TrendingDown size={11} />
@@ -692,7 +692,7 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
                               onOpenLookup?.(offer.raw_url || offer.url);
                               onClose();
                             }}
-                            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#111C33] hover:bg-slate-100 dark:hover:bg-[#172440] px-2 py-1 text-[10px] font-bold text-slate-700 dark:text-slate-300 transition"
+                            className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-subtle)] dark:border-white/10 bg-[var(--surface)] dark:bg-[var(--surface-2)] hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-2)] px-2 py-1 text-[10px] font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] transition"
                             title="Deep verify on Deal Lookup"
                           >
                             <ShieldCheck size={11} />
@@ -726,7 +726,7 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
           </div>
 
           {/* ── 5. Bottom Verification Strip & Direct Link Lookup ── */}
-          <div className="border-t border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-[#070A11] p-3 sm:p-4">
+          <div className="border-t border-[var(--border-subtle)]/80 dark:border-white/10 bg-[var(--surface)] dark:bg-[var(--bg)] p-3 sm:p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <form onSubmit={handlePasteCheck} className="flex-1 flex items-center gap-2 max-w-xl">
                 <input
@@ -734,18 +734,18 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
                   value={pasteUrlInput}
                   onChange={(e) => setPasteUrlInput(e.target.value)}
                   placeholder="Paste any product URL from Google Shopping, Amazon, Flipkart, etc..."
-                  className="flex-1 rounded-xl border border-slate-300 dark:border-white/15 bg-white dark:bg-[#0D1527] px-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:border-blue-500"
+                  className="flex-1 rounded-xl border border-[var(--border-subtle)] dark:border-white/15 bg-white dark:bg-[var(--surface)] px-3 py-1.5 text-xs text-[var(--text-primary)] dark:text-white placeholder:text-[var(--text-secondary)] focus:outline-hidden focus:border-[var(--border-subtle)]"
                 />
                 <button
                   type="submit"
                   disabled={!pasteUrlInput.trim()}
-                  className="rounded-xl bg-slate-900 hover:bg-blue-600 disabled:opacity-50 px-3 py-1.5 text-xs font-bold text-white transition shrink-0 cursor-pointer"
+                  className="rounded-xl bg-[var(--idh-action-solid)] hover:bg-[var(--idh-action-solid)] disabled:opacity-50 px-3 py-1.5 text-xs font-bold text-white transition shrink-0 cursor-pointer"
                 >
                   Verify URL
                 </button>
               </form>
 
-              <div className="flex items-center gap-3 text-[11px] text-slate-500">
+              <div className="flex items-center gap-3 text-[11px] text-[var(--text-secondary)]">
                 <span className="flex items-center gap-1">
                   <ShieldCheck size={13} className="text-emerald-500" />
                   Merchant Checkout Verified
@@ -753,7 +753,7 @@ export const GoogleShoppingDiscoveryModal: React.FC<GoogleShoppingDiscoveryModal
                 <button
                   type="button"
                   onClick={onClose}
-                  className="font-bold text-slate-700 dark:text-slate-300 hover:underline cursor-pointer"
+                  className="font-bold text-[var(--text-primary)] dark:text-[var(--text-secondary)] hover:underline cursor-pointer"
                 >
                   Close Radar
                 </button>
