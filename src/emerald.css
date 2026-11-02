@@ -10,6 +10,8 @@
   --glass-rim:#ffffffed; --glass-under:#303b302b; --glass-sheen:#ffffffa3; --glass-drop:0 4px 12px #26382b12;
   --idh-hero:radial-gradient(ellipse at 85% 20%,#6c98751a,transparent 58%),linear-gradient(135deg,#fffefa,#e6e9e1);
   --idh-image:#f2f1ed;
+  --idh-evidence-skin:linear-gradient(145deg,rgba(247,247,245,.84),rgba(235,235,232,.92));
+  --idh-evidence-rim:rgba(255,255,255,.7);
   --font-heading:'Plus Jakarta Sans',system-ui,sans-serif;
 }
 html.dark {
@@ -22,6 +24,8 @@ html.dark {
   --glass-skin:linear-gradient(165deg,#ffffff24 0%,#ffffff08 46%,#00000038 100%);
   --glass-rim:#ffffff4d; --glass-under:#00000085; --glass-sheen:#ffffff2b; --glass-drop:0 5px 15px #00000040;
   --idh-hero:radial-gradient(ellipse at 85% 20%,#6c987521,transparent 58%),linear-gradient(135deg,#1c2820,#121a16);
+  --idh-evidence-skin:linear-gradient(145deg,rgba(24,35,29,.72),rgba(12,18,15,.9));
+  --idh-evidence-rim:rgba(255,255,255,.12);
 }
 /* Bridge historical component tokens once, so both theme variants share ownership. */
 :root,html.dark {
@@ -170,6 +174,39 @@ html.dark .premium-hero-frame {background:var(--idh-hero)!important;box-shadow:i
 .commerce-filter-field,.commerce-filter-field select,.commerce-filter-field input,.commerce-filter-footer button,html.dark .commerce-filter-field,html.dark .commerce-filter-field select,html.dark .commerce-filter-field input,html.dark .commerce-filter-footer button {background:var(--idh-panel-2)!important;color:var(--idh-ink)!important;border-color:var(--idh-edge)!important}
 .commerce-filter-footer button:last-child,html.dark .commerce-filter-footer button:last-child {background:var(--idh-accent)!important;color:var(--idh-on-accent)!important}
 .commerce-price-history>svg {color:var(--idh-accent)!important}
+/* Authored detail actions share one silhouette, stroke and material in both themes. */
+.deal-detail-sheet .detail-icon-control,.deal-detail-sheet .detail-action{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border:1px solid var(--idh-edge);background:var(--glass-skin);color:var(--idh-ink);box-shadow:inset 0 1px 0 var(--glass-rim),0 2px 5px #0000000c;cursor:pointer;transition:background-color .18s ease,border-color .18s ease,transform .18s ease;flex-shrink:0}
+.deal-detail-sheet .detail-icon-control{width:44px;height:44px;padding:0;border-radius:13px}
+.deal-detail-sheet .detail-action{padding:0 16px;border-radius:14px;font-family:var(--font-heading);font-size:12px;font-weight:600}
+.deal-detail-sheet .detail-action-primary{background:var(--idh-accent);color:var(--idh-on-accent);border-color:transparent}
+.deal-detail-sheet .detail-action-quiet{color:var(--idh-muted)}
+.deal-detail-sheet .detail-scan-control,.deal-detail-sheet .detail-icon-control[aria-pressed=true]{color:var(--idh-accent);border-color:var(--idh-edge-bright)}
+.deal-action-icon{display:block;flex-shrink:0;width:20px;height:20px}
+.deal-action-icon .scan-line{opacity:0;transform:translateY(-5px)}
+@media(hover:hover) and (pointer:fine){.deal-detail-sheet :is(.detail-action,.detail-icon-control):hover:not(:disabled){border-color:var(--idh-edge-bright);transform:translateY(-1px)}.deal-detail-sheet .detail-scan-control:hover .scan-line{animation:detail-store-scan 1.3s ease-in-out 1}}
+.deal-detail-sheet :is(.detail-action,.detail-icon-control):focus-visible{outline:2px solid var(--idh-accent);outline-offset:3px}
+.deal-detail-sheet :is(.detail-action,.detail-icon-control):active:not(:disabled){transform:scale(.97)}
+.deal-detail-sheet .detail-action:disabled{opacity:.55;cursor:default;box-shadow:none}
+@keyframes detail-store-scan{0%{opacity:0;transform:translateY(-5px)}20%,75%{opacity:.8}100%{opacity:0;transform:translateY(6px)}}
+@media(prefers-reduced-motion:reduce){.deal-detail-sheet :is(.detail-action,.detail-icon-control){transition:none;transform:none!important}.deal-detail-sheet .scan-line{animation:none!important}}
+.deal-stream-reconnect{background:var(--idh-panel-2)!important;border-color:var(--idh-edge)!important;color:var(--idh-ink)!important;box-shadow:var(--idh-shadow),inset 0 1px 0 var(--glass-rim)}
+.deal-stream-reconnect .deal-stream-icon{background:var(--glass-skin);color:var(--idh-accent);border:1px solid var(--idh-edge);box-shadow:inset 0 1px 0 var(--glass-rim),var(--glass-drop)}
+.deal-stream-reconnect .deal-stream-icon .deal-action-icon{width:24px;height:24px}
+.deal-stream-reconnect p{color:var(--idh-muted)!important}
+.deal-stream-refresh{background:var(--idh-accent)!important;color:var(--idh-on-accent)!important;border:1px solid transparent}
+.deal-stream-refresh:hover{filter:brightness(.94);transform:translateY(-1px)}
+.deal-stream-refresh:focus-visible{outline:2px solid var(--idh-accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.deal-stream-refresh{transition:none!important;transform:none!important}}
+/* From the owner's Cryon/hai prototypes: lit glass above a legible chart plane. */
+.proper-price-history.premium-history{background:var(--idh-evidence-skin)!important;border-color:var(--idh-edge)!important;box-shadow:inset 0 1px 0 var(--idh-evidence-rim),0 16px 40px -12px #00000024;backdrop-filter:blur(12px) saturate(115%);-webkit-backdrop-filter:blur(12px) saturate(115%)}
+.proper-price-history .history-periods{background:color-mix(in srgb,var(--idh-panel-2) 70%,transparent);border:1px solid var(--idh-edge)}
+.proper-price-history button.history-period{color:var(--idh-muted);border:1px solid transparent;border-radius:10px;transition:background-color .2s ease,border-color .2s ease,color .2s ease}
+.proper-price-history button.history-period[aria-pressed=true],html.dark .proper-price-history button.history-period[aria-pressed=true]{background:var(--glass-skin);color:var(--idh-accent);border-color:var(--idh-edge-bright);box-shadow:inset 0 1px 0 var(--idh-evidence-rim),0 2px 6px #00000014}
+.proper-price-history .history-period:hover:not([aria-pressed=true]){color:var(--idh-ink);background:var(--idh-panel-2)}
+.proper-price-history .history-plot{font-variant-numeric:tabular-nums}
+@supports not (backdrop-filter:blur(1px)){.proper-price-history.premium-history{background:var(--idh-panel)!important}}
+@media(prefers-reduced-transparency:reduce){.proper-price-history.premium-history{background:var(--idh-panel)!important;backdrop-filter:none;-webkit-backdrop-filter:none}}
+@media(prefers-reduced-motion:reduce){.proper-price-history .history-period{transition:none}}
 .commerce-history-periods button[aria-pressed=true],html.dark .commerce-history-periods button[aria-pressed=true] {background:var(--idh-panel-2)!important;color:var(--idh-ink)!important;border-color:var(--idh-edge-bright)!important}
 .product-reviews,.product-reviews article,html.dark .product-reviews,html.dark .product-reviews article {background:var(--idh-panel-2)!important;border-color:var(--idh-edge)!important;color:var(--idh-muted)!important}
 .product-reviews h3,.product-reviews h4,.review-rating-summary strong,html.dark .product-reviews h3,html.dark .product-reviews h4,html.dark .review-rating-summary strong {color:var(--idh-ink)!important}

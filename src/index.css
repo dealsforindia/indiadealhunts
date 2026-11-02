@@ -159,8 +159,8 @@
   h5,
   h6 {
     font-family: var(--font-heading);
-    line-height: 1.2;
-    letter-spacing: -0.025em;
+    line-height: 1.35;
+    letter-spacing: -0.005em;
     color: var(--text-primary);
   }
 

@@ -75,6 +75,7 @@ export default function ProductPriceHistoryContent({ url, dealId, currentPrice, 
   const formatCoverage = (spanMs: number, count: number) => {
     if (count <= 0) return '—';
     if (count === 1 || spanMs <= 0) return '1 check';
+    if (spanMs < 3600000) return `${Math.max(1, Math.round(spanMs / 60000))} min`;
     const hours = Math.round(spanMs / 3600000);
     if (hours < 24) return `${Math.max(1, hours)} hr${hours === 1 ? '' : 's'}`;
     const days = Math.round(spanMs / 86400000);
@@ -83,25 +84,25 @@ export default function ProductPriceHistoryContent({ url, dealId, currentPrice, 
   const tick = (time: number) => span < 86400000 ? new Date(time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : dateLabel(time, true);
   const padding = low !== null && high !== null ? Math.max((high - low) * .15, high * .03, 1) : 1;
   return (
-    <section className="proper-price-history premium-history mt-4 rounded-2xl border border-[var(--border-subtle)] dark:border-white/10 bg-white dark:bg-[var(--surface)]/50 p-4 sm:p-5 min-w-0" aria-label="Product price history">
+    <section className="proper-price-history premium-history mt-4 rounded-2xl border border-[var(--border-subtle)] dark:border-white/10 p-4 sm:p-5 min-w-0" aria-label="Product price history">
       <header className="flex items-start justify-between gap-3">
-        <div><h3 className="flex items-center gap-2 text-base font-bold text-[var(--text-primary)] dark:text-white"><History size={18} className="text-sky-500" />Price history & trend</h3><p className="mt-1 text-xs text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">{source}</p></div>
+        <div><h3 className="flex items-center gap-2 text-base font-bold text-[var(--text-primary)] dark:text-white"><History size={18} className="text-[var(--idh-accent)]" />Price history & trend</h3><p className="mt-1 text-xs text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">{source}</p></div>
         <button type="button" onClick={() => setAttempt(a => a + 1)} disabled={loading} aria-label="Reload price history" className="h-11 w-11 shrink-0 rounded-xl border border-[var(--border-subtle)] dark:border-white/10 flex items-center justify-center text-[var(--text-secondary)] dark:text-[var(--text-secondary)] disabled:opacity-50"><RefreshCw size={16} className={loading ? 'animate-spin' : ''} /></button>
       </header>
-      <div role="group" aria-label="Price history period" className="grid grid-cols-4 rounded-xl bg-[var(--surface-2)] dark:bg-[var(--surface)]/50 p-1 mt-4 gap-1">
-        {[7, 30, 90, 0].map(period => <button type="button" key={period} aria-pressed={days === period} onClick={() => setDays(period)} className={`min-h-11 rounded-lg text-xs font-semibold transition-colors ${days === period ? 'bg-sky-600 text-white shadow-sm' : 'text-[var(--text-secondary)] dark:text-[var(--text-secondary)] hover:bg-[var(--surface-2)] dark:hover:bg-white/5'}`}>{period ? `${period} days` : 'All'}</button>)}
+      <div role="group" aria-label="Price history period" className="history-periods grid grid-cols-4 rounded-xl p-1 mt-4 gap-1">
+        {[7, 30, 90, 0].map(period => <button type="button" key={period} aria-pressed={days === period} onClick={() => setDays(period)} className="history-period min-h-11 rounded-lg text-xs font-semibold">{period ? `${period} days` : 'All'}</button>)}
       </div>
       {loading ? <div role="status" className="h-64 flex items-center justify-center text-sm text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">Loading recorded prices…</div> : <>
         <div className="flex justify-between items-end gap-2 mt-5 mb-3"><div><p className="text-xs text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">Latest observation in this range</p><strong className="text-2xl font-bold text-[var(--text-primary)] dark:text-white">{latest ? rupees(latest[1]) : '—'}</strong></div><span className="text-xs text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">{visible.length} recorded checks</span></div>
-        {visible.length > 1 ? <div className="h-64 w-full min-w-0" role="img" aria-label={`Price chart: ${visible.length} observations, low ${rupees(low)}, high ${rupees(high)}`}>
+        {visible.length > 1 ? <div className="history-plot h-64 w-full min-w-0" role="img" aria-label={`Price chart: ${visible.length} observations, low ${rupees(low)}, high ${rupees(high)}`}>
           <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             <AreaChart data={data} margin={{ top: 12, right: 6, left: 0, bottom: 8 }} accessibilityLayer>
-              <defs><linearGradient id={`history-${id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#a78bfa" stopOpacity={.25}/><stop offset="100%" stopColor="#a78bfa" stopOpacity={0}/></linearGradient></defs>
-              <CartesianGrid vertical={false} stroke="currentColor" className="text-[var(--text-secondary)] dark:text-[var(--text-primary)]" strokeDasharray="3 5" />
-              <XAxis dataKey="time" type="number" domain={['dataMin', 'dataMax']} tickFormatter={tick} tick={{ fill: '#94a3b8', fontSize: 11 }} tickLine={false} axisLine={false} minTickGap={35} />
-              <YAxis domain={[Math.max(0, (low || 0) - padding), (high || 0) + padding]} tickFormatter={value => `₹${Number(value).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`} width={66} tick={{ fill: '#94a3b8', fontSize: 11 }} tickLine={false} axisLine={false} />
-              <Tooltip labelFormatter={label => `${dateLabel(Number(label))} · ${new Date(Number(label)).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`} formatter={value => [rupees(Number(value)), 'Recorded price']} contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 12, color: '#f8fafc', fontSize: 12 }} itemStyle={{ color: '#ddd6fe' }} cursor={{ stroke: '#a78bfa', strokeDasharray: '4 4' }} />
-              <Area type="stepAfter" dataKey="price" stroke="#a78bfa" strokeWidth={2.5} fill={`url(#history-${id})`} dot={false} activeDot={{ r: 5, strokeWidth: 2, fill: '#0f172a' }} isAnimationActive={false} />
+              <defs><linearGradient id={`history-${id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="var(--idh-accent)" stopOpacity={.2}/><stop offset="100%" stopColor="var(--idh-accent)" stopOpacity={0}/></linearGradient></defs>
+              <CartesianGrid vertical={false} stroke="var(--idh-edge)" strokeOpacity={.55} strokeDasharray="1 6" />
+              <XAxis dataKey="time" type="number" domain={['dataMin', 'dataMax']} tickFormatter={tick} tick={{ fill: 'var(--idh-muted)', fontSize: 11 }} tickLine={false} axisLine={false} minTickGap={35} />
+              <YAxis domain={[Math.max(0, (low || 0) - padding), (high || 0) + padding]} tickFormatter={value => `₹${Number(value).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`} width={66} tick={{ fill: 'var(--idh-muted)', fontSize: 11 }} tickLine={false} axisLine={false} />
+              <Tooltip labelFormatter={label => `${dateLabel(Number(label))} · ${new Date(Number(label)).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`} formatter={value => [rupees(Number(value)), 'Recorded price']} contentStyle={{ background: 'var(--idh-panel)', border: '1px solid var(--idh-edge-bright)', borderRadius: 12, color: 'var(--idh-ink)', boxShadow: 'var(--idh-shadow)', fontSize: 12 }} itemStyle={{ color: 'var(--idh-accent)' }} labelStyle={{ color: 'var(--idh-muted)', marginBottom: 6 }} cursor={{ stroke: 'var(--idh-accent)', strokeDasharray: '3 5', strokeOpacity: .6 }} />
+              <Area type="stepAfter" dataKey="price" stroke="var(--idh-accent)" strokeWidth={1.75} fill={`url(#history-${id})`} dot={false} activeDot={{ r: 4.5, strokeWidth: 2, stroke: 'var(--idh-accent)', fill: 'var(--idh-panel)' }} isAnimationActive={false} />
             </AreaChart>
           </ResponsiveContainer>
         </div> : <div className="rounded-xl border border-dashed border-[var(--border-subtle)] dark:border-[var(--border-subtle)] p-5 text-sm text-[var(--text-secondary)] dark:text-[var(--text-secondary)] mt-4" role="status">{visible.length === 1 ? `One recorded price on ${dateLabel(visible[0][0])}. More observations are needed to show a trend.` : points.length ? `No recorded prices in the last ${days} days. Select All to see available observations.` : message || 'No recorded price history is available for this product.'}</div>}

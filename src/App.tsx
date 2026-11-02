@@ -1,3 +1,4 @@
+import { trackStorefrontVisit } from './utils/visitorTracking';
 import { RecoveryBoundary } from './components/RecoveryBoundary';
 import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicDeal, publicStoreUrl, lookupTargetUrl, isDisplayableOffer } from './utils/publicLinks';
 import { ArrowDown, LoaderCircle, X } from 'lucide-react';
@@ -13,6 +14,8 @@ import { TrustStrip } from './components/TrustStrip';
 import { MobileNav } from './components/MobileNav';
 import { Footer } from './components/Footer';
 import { DealDetailModal } from './components/DealDetailModal';
+import { DealActionIcon } from './components/DealActionIcon';
+import { SharkMosaicCanvas } from './components/SharkMosaicCanvas';
 import { ImageModal } from './components/ImageModal';
 import { DealLookupModal } from './components/DealLookupModal';
 import { SubmitDeal } from './components/SubmitDeal';
@@ -61,6 +64,12 @@ const TopDiscountsPage = lazy(() => import('./components/TopDiscountsPage').then
 const WorthScorePage = lazy(() => import('./components/WorthScorePage').then(module => ({ default: module.WorthScorePage })));
 
 const App: React.FC = () => {
+  useEffect(() => {
+    trackStorefrontVisit();
+    const timer = window.setInterval(trackStorefrontVisit, 60000);
+    document.addEventListener('visibilitychange', trackStorefrontVisit);
+    return () => { window.clearInterval(timer); document.removeEventListener('visibilitychange', trackStorefrontVisit); };
+  }, []);
   // Theme Manager Engine (System vs Dark vs Light with OS sync)
   useTheme();
 
@@ -978,14 +987,15 @@ const App: React.FC = () => {
         minHeight: '100vh',
         maxWidth: '100vw',
         overflowX: 'clip',
-        backgroundColor: 'var(--bg)',
+        backgroundColor: 'transparent',
         color: 'var(--text)',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
-      {/* ── 0. Global Ambient Mesh Background ── */}
+      {/* ── 0. Global Ambient Mesh Background & Procedural Shark Mosaic ── */}
       <div className="ambient-mesh"></div>
+      <SharkMosaicCanvas />
 
 
 
@@ -1315,19 +1325,19 @@ const App: React.FC = () => {
                         onOpenGoogleShopping={handleOpenGoogleShopping}
                       />
                     )}
-                    <div className="py-12 px-6 text-center max-w-md mx-auto rounded-2xl border border-[var(--border-subtle)] dark:border-white/10 bg-white dark:bg-[var(--surface)] shadow-sm">
-                      <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto mb-3 text-xl">
-                        ⚡
+                    <div className="deal-stream-reconnect py-12 px-6 text-center max-w-md mx-auto rounded-2xl border shadow-sm" role="status" aria-live="polite">
+                      <div className="deal-stream-icon w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                        <DealActionIcon kind="bolt" />
                       </div>
-                      <h3 className="font-heading font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)] mb-1">
+                      <h3 className="font-heading font-bold mb-1">
                         Connecting to Deal Stream
                       </h3>
-                      <p className="text-xs text-[var(--text-secondary)] dark:text-[var(--text-secondary)] mb-4">
+                      <p className="text-xs mb-4">
                         Fetching the latest verified loot drops and discounts...
                       </p>
                       <button
                         onClick={() => fetchDeals(0, false)}
-                        className="px-5 py-2.5 bg-[var(--idh-action-solid)] dark:bg-emerald-600 hover:bg-black dark:hover:bg-emerald-500 text-white font-bold text-xs rounded-xl cursor-pointer shadow-sm transition-colors"
+                        className="deal-stream-refresh px-5 py-2.5 font-bold text-xs rounded-xl cursor-pointer shadow-sm transition-colors"
                       >
                         Refresh Offers
                       </button>

@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
 import { Star, Sparkles } from 'lucide-react';
+import { DealActionIcon } from './DealActionIcon';
 import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { ProductPriceHistory } from './ProductPriceHistory';
@@ -321,92 +322,11 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <button
-              type="button"
-              onClick={() => openGoogleShoppingModal(deal.title)}
-              title="Compare price across Amazon, Flipkart, Myntra & Google Shopping Radar"
-              aria-label="Scan other stores for this product"
-              style={{
-                width: '32px',
-                height: '32px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#EFF6FF',
-                border: '1px solid #BFDBFE',
-                borderRadius: '8px',
-                color: '#1D4ED8',
-                cursor: 'pointer',
-                transition: 'all 120ms ease',
-                fontSize: '15px',
-              }}
-            >
-              🛍️
-            </button>
+            <button type="button" className="detail-icon-control detail-scan-control" onClick={() => openGoogleShoppingModal(deal.title)} title="Scan other stores" aria-label="Scan other stores for this product"><DealActionIcon kind="scan" /></button>
 
-            <button
-              type="button"
-              onClick={handleToggleFavorite}
-              title={saved ? 'Saved in Loot Bookmarks' : 'Save deal'}
-              aria-label={saved ? "Remove from bookmarks" : "Save deal to bookmarks"}
-              aria-pressed={saved}
-              style={{
-                width: '32px',
-                height: '32px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: saved ? '#FEF3C7' : '#FFFFFF',
-                border: `1px solid ${saved ? '#FDE68A' : '#E2E8F0'}`,
-                borderRadius: '8px',
-                color: saved ? '#D97706' : '#64748B',
-                cursor: 'pointer',
-                transition: 'all 120ms ease',
-              }}
-            >
-              {saved ? (
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="#D97706">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                </svg>
-              ) : (
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              )}
-            </button>
+            <button type="button" className="detail-icon-control" onClick={handleToggleFavorite} title={saved ? 'Saved in Loot Bookmarks' : 'Save deal'} aria-label={saved ? 'Remove from bookmarks' : 'Save deal to bookmarks'} aria-pressed={saved}><svg width="20" height="20" viewBox="0 0 24 24" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.8 4.8a5.4 5.4 0 0 0-7.6 0L12 6l-1.2-1.2a5.4 5.4 0 0 0-7.6 7.6L12 21l8.8-8.6a5.4 5.4 0 0 0 0-7.6Z" /></svg></button>
 
-            <button
-              onClick={handleClose}
-              aria-label="Close deal details"
-              style={{
-                width: '32px',
-                height: '32px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: 'var(--bg-surface-card)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: '8px',
-                color: 'var(--text-secondary)',
-                cursor: 'pointer',
-                flexShrink: 0,
-                transition: 'all 120ms ease',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.color = '#0F172A';
-                (e.currentTarget as HTMLButtonElement).style.borderColor = '#CBD5E1';
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F1F5F9';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.color = '#64748B';
-                (e.currentTarget as HTMLButtonElement).style.borderColor = '#E2E8F0';
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#FFFFFF';
-              }}
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
-            </button>
+            <button type="button" className="detail-icon-control" onClick={handleClose} aria-label="Close deal details"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button>
           </div>
         </div>
 
@@ -472,12 +392,13 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   position: 'absolute',
                   bottom: '8px',
                   right: '8px',
-                  fontFamily: 'var(--font-mono)',
+                  display: 'inline-flex', alignItems: 'center', gap: '5px',
+                  fontFamily: 'var(--font-body)',
                   fontSize: '11px',
                   color: '#94A3B8',
                   letterSpacing: '0.04em',
                 }}>
-                  🔍 Click to zoom
+                  <DealActionIcon kind="zoom" /> Click to zoom
                 </span>
               )}
             </button>
@@ -490,16 +411,16 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               fontSize: '11px',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#059669', fontWeight: 650 }}>
-                <span>🛡️</span>
+                <DealActionIcon kind="shield" />
                 <span>Verified {storeName}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)' }}>
-                <span>⚡</span>
+                <DealActionIcon kind="bolt" />
                 <span>Direct merchant drop</span>
               </div>
               {discount > 0 && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent-amber, #D97706)', fontWeight: 650 }}>
-                  <span>🔥</span>
+                  <DealActionIcon kind="tag" />
                   <span>{discount}% off MRP</span>
                 </div>
               )}
@@ -831,7 +752,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                           }}
                           onClick={() => openSmartStoreLink(item.url, deal.store || 'Store', undefined, false, subId)}
                         >
-                          <span>🛍️ {buttonLabel}</span>
+                          <DealActionIcon kind="store" /><span>{buttonLabel}</span>
                         </button>
                       </div>
                     );
@@ -1159,7 +1080,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   </span>
                 </div>
                 <span style={{
-                  fontFamily: 'var(--font-mono)',
+                  display: 'inline-flex', alignItems: 'center', gap: '5px',
+                  fontFamily: 'var(--font-body)',
                   fontSize: '11px',
                   fontWeight: 600,
                   color: '#0066CC',
@@ -1188,11 +1110,11 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
 
             {isMobile && (
               <div className="deal-detail-secondary-actions">
-                {asin && <button type="button" onClick={handleLockInCart}>Add to Amazon cart</button>}
+                {asin && <button type="button" className="detail-action detail-action-primary" onClick={handleLockInCart} title="Add to Amazon cart; confirm the final price there"><DealActionIcon kind="cart" /><span>{includeBundle ? 'Add bundle to cart' : 'Add to Amazon cart'}</span></button>}
                 {bundle && <label><input type="checkbox" checked={includeBundle} onChange={e => setIncludeBundle(e.target.checked)} /> Include accessory · Check price</label>}
-                <button type="button" onClick={() => openGoogleShoppingModal(deal.title)}>Compare stores</button>
-                <button type="button" onClick={handleShare}>{copyLink ? 'Copied!' : 'Copy link'}</button>
-                <button type="button" onClick={handleReportExpired} disabled={reportSent}>{reportSent ? 'Marked expired' : 'Report expired offer'}</button>
+                <button type="button" className="detail-action detail-scan-control" onClick={() => openGoogleShoppingModal(deal.title)}><DealActionIcon kind="scan" />Compare stores</button>
+                <button type="button" className="detail-action" onClick={handleShare}><DealActionIcon kind="copy" /><span>{copyLink ? 'Copied!' : 'Copy link'}</span></button>
+                <button type="button" className="detail-action detail-action-quiet" onClick={handleReportExpired} disabled={reportSent}><DealActionIcon kind="expired" /><span>{reportSent ? 'Marked expired' : 'Mark expired here'}</span></button>
               </div>
             )}
 
@@ -1211,7 +1133,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
           </div>
         </div>
 
-        {isMobile && <div className="deal-detail-mobile-buy"><button type="button" onClick={handleOpenStore}>View deal on {storeName} ↗</button></div>}
+        {isMobile && <div className="deal-detail-mobile-buy"><button type="button" className="detail-action detail-action-primary" onClick={handleOpenStore}><DealActionIcon kind="store" /><span>{isMobile ? `Open ${storeName} app` : `View at ${storeName}`}</span></button></div>}
         {/* Desktop actions */}
         <div className="deal-detail-desktop-actions" style={{
           display: 'flex',
@@ -1248,184 +1170,22 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   }}
                   title="Add accessory bundle or delivery saver"
                 >
-                  <span>{includeBundle ? '☑️' : '◻️'}</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4" />{includeBundle && <path d="m8 12 3 3 5-6" />}</svg>
                   <span>Optional accessory · Check price</span>
                 </button>
               )}
-              <button
-                type="button"
-                onClick={handleLockInCart}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '0 20px',
-                  height: '42px',
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  borderRadius: '9999px',
-                  backgroundColor: '#F59E0B',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  boxShadow: '0 2px 6px rgba(245, 158, 11, 0.3)',
-                  transition: 'all 0.15s ease',
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#D97706';
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F59E0B';
-                }}
-                title="Add to Amazon cart; confirm the final price there"
-              >
-                <span>🛒 {includeBundle ? 'Add bundle to cart' : 'Add to Amazon cart'}</span>
-              </button>
-              <button
-                type="button"
-                onClick={handleOpenStore}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  padding: '0 16px',
-                  height: '42px',
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '12.5px',
-                  fontWeight: 650,
-                  borderRadius: '9999px',
-                  backgroundColor: 'var(--surface-2)',
-                  color: 'var(--text-primary)',
-                  border: '1px solid var(--border-strong)',
-                  transition: 'all 0.15s ease',
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F1F5F9';
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F8FAFC';
-                }}
-              >
-                <span>{isMobile ? "⚡ Open App" : "View on Amazon ↗"}</span>
-                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M2 10L10 2M10 2H4M10 2V8" />
-                </svg>
-              </button>
+              <button type="button" className="detail-action detail-action-primary" onClick={handleLockInCart} title="Add to Amazon cart; confirm the final price there"><DealActionIcon kind="cart" /><span>{includeBundle ? 'Add bundle to cart' : 'Add to Amazon cart'}</span></button>
+              <button type="button" className="detail-action detail-action-primary" onClick={handleOpenStore}><DealActionIcon kind="store" /><span>{isMobile ? `Open ${storeName} app` : `View at ${storeName}`}</span></button>
             </div>
           ) : (
-            <button
-              type="button"
-              onClick={handleOpenStore}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '0 24px',
-                height: '42px',
-                fontFamily: 'var(--font-heading)',
-                fontSize: '13px',
-                fontWeight: 600,
-                borderRadius: '9999px',
-                flexShrink: 0,
-                backgroundColor: '#0066CC',
-                color: '#FFFFFF',
-                border: 'none',
-                boxShadow: '0 1px 3px rgba(0, 102, 204, 0.25)',
-                transition: 'all 0.15s ease',
-                cursor: 'pointer',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#0071E3';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#0066CC';
-              }}
-            >
-              <span>{isMobile ? `⚡ Open in ${storeName} App` : `⚡ View Deal on ${storeName} ↗`}</span>
-              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M2 10L10 2M10 2H4M10 2V8" />
-              </svg>
-            </button>
+            <button type="button" className="detail-action detail-action-primary" onClick={handleOpenStore}><DealActionIcon kind="store" /><span>{isMobile ? `Open ${storeName} app` : `View at ${storeName}`}</span></button>
           )}
 
-          <button
-            type="button"
-            onClick={() => openGoogleShoppingModal(deal.title)}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '0 14px',
-              height: '42px',
-              backgroundColor: '#EFF6FF',
-              border: '1px solid #BFDBFE',
-              borderRadius: '9999px',
-              color: '#1D4ED8',
-              fontFamily: 'var(--font-body)',
-              fontSize: '12px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              transition: 'all 120ms ease',
-            }}
-            title="Scan all Indian stores on Google Shopping Radar"
-          >
-            <span>🛍️ Scan Stores</span>
-            <span style={{ fontSize: '11px', backgroundColor: '#DBEAFE', padding: '1px 5px', borderRadius: '4px', fontWeight: 800 }}>IN-APP</span>
-          </button>
+          <button type="button" className="detail-action detail-scan-control" onClick={() => openGoogleShoppingModal(deal.title)} title="Scan all Indian stores on Google Shopping Radar"><DealActionIcon kind="scan" /><span>Scan stores</span></button>
 
-          <button
-            onClick={handleShare}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-              padding: '0 14px',
-              height: '42px',
-              backgroundColor: 'var(--bg-surface-card)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '9999px',
-              color: copyLink ? '#059669' : '#475569',
-              fontFamily: 'var(--font-body)',
-              fontSize: '12px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 120ms ease',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
-            }}
-          >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-              <circle cx="10" cy="2" r="1.5" stroke="currentColor" strokeWidth="1.2"/>
-              <circle cx="10" cy="10" r="1.5" stroke="currentColor" strokeWidth="1.2"/>
-              <circle cx="2" cy="6" r="1.5" stroke="currentColor" strokeWidth="1.2"/>
-              <path d="M8.5 2.7L3.5 5.3M8.5 9.3L3.5 6.7" stroke="currentColor" strokeWidth="1.2"/>
-            </svg>
-            {copyLink ? 'Copied!' : 'Copy Link'}
-          </button>
+          <button type="button" className="detail-action" onClick={handleShare}><DealActionIcon kind="copy" /><span>{copyLink ? 'Copied!' : 'Copy link'}</span></button>
 
-          <button
-            onClick={handleReportExpired}
-            disabled={reportSent}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-              padding: '0 14px',
-              height: '42px',
-              backgroundColor: 'var(--bg-surface-card)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '9999px',
-              color: reportSent ? '#94A3B8' : '#64748B',
-              fontFamily: 'var(--font-body)',
-              fontSize: '12px',
-              cursor: reportSent ? 'default' : 'pointer',
-              opacity: reportSent ? 0.6 : 1,
-              boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
-            }}
-          >
-            {reportSent ? '⚠ Marked expired' : '⚠ Mark expired here'}
-          </button>
+          <button type="button" className="detail-action detail-action-quiet" onClick={handleReportExpired} disabled={reportSent}><DealActionIcon kind="expired" /><span>{reportSent ? 'Marked expired' : 'Mark expired here'}</span></button>
         </div>
       </motion.div>
     </div>,

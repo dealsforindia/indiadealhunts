@@ -1,6 +1,16 @@
 # Current state and next work
 
-Updated 2026-10-31. This is a handoff, not a completion report. Current status below supersedes dated historical entries.
+Updated 2026-11-02. Product-detail action controls now use an authored SVG family in `src/components/DealActionIcon.tsx` for store scanning, cart, merchant links, copy, expiry, zoom and trust markers. `DealDetailModal.tsx` uses the family across header, mobile and desktop actions; CSS gives the controls shared 44px touch targets, theme-aware glass/accent states, keyboard focus, pressed feedback, a restrained scan-line hover and reduced-motion fallback. No IconScout asset or dependency was added. `npm run check`, `npm run test:ui` (6/6) and `npm run build` pass. Rendered light/dark desktop and mobile verification remains pending because local browser use is disabled again in the current Work session; do not treat the build as visual proof.
+
+- Replaced the loading/error card's yellow lightning emoji and hard-coded white/navy surfaces with the authored bolt SVG and shared emerald/porcelain material tokens. The refresh action now has the same accent, focus and reduced-motion treatment. `npm run check`, `npm run test:ui` (6/6) and `npm run build` pass after this slice. Browser visual verification is still pending.
+
+Updated 2026-11-01. This is a handoff, not a completion report. Current status below supersedes dated historical entries.
+
+## Owner code transfer — 2026-11-01
+- Read both new HTML attachments; detailed mapping and limitations in USER-CODE-TRANSFER.md. Applied their layered dark/light materials and fine chart treatment to existing ProductPriceHistoryContent; real data and step-after geometry retained. No demo balances, randomized graphs, AI chat, microphone fallback or new packages imported.
+- Corrected portal styling scope and a legacy dark.bg-white navy background conflict. Period controls, grid, ticks, tooltip and active dot now use shared theme tokens. Short coverage displays minutes instead of incorrectly pluralized1hrs.
+- Actual preview: real product history in light/dark desktop and393px phone. All103checks→7days3checks; no page overflow on phone. Screenshots output/material-refinement/. Tooltip interaction and full-site matrix remain open.
+- Prior character/profile/category/footer production build and14focused regressions passed. New history TypeScript,4evidence/range tests and final production build pass. CSS detector reports no remaining non-advisory findings after documented scoped exceptions. Main742kB and lazy Three557kB warnings remain; no real-device performance claim.
 
 ## Active repair status — 2026-10-31
 - Owner approved both catcher and connected-wing ball designs. Approved holding art is integrated;107 existing drawings have shared body-height/foot registration. Original assets remain intact.
@@ -118,3 +128,5 @@ Root cause: reactToHover required complete phase, reached only after throw/revea
 - Character reaction playback slowed from1.8s to3.6s; wing SVG root/transform origin moved to midline and overlaps sphere; throw enlargement softened and reveal card entry slowed. Rendered motion verification pending.
 - External results history callback opens existing lookup URL. Label now Available price history, not a guarantee of90days. Backend coverage for specific pictured products not established.
 - Full site makeover/contrast audit remains open; these are specific source fixes, not a claim every screen is verified.
+
+2026-11-02: Owner-requested daily visitor counter integration (R01: preserve shopping flows). Added production-only anonymous daily browser tracking for the DealFlow header; no storefront visual change. TypeScript check/build and focused tracker regression pass. Backend and Vercel deployment remain pending; no historical visitor claims. See ../dealflow/docs/VISITOR-COUNTER-IMPLEMENTATION.md from workspace root.
