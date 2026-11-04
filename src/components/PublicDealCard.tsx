@@ -1,5 +1,6 @@
 import { useModalSurface } from '../utils/useModalSurface';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import { createPortal } from 'react-dom';
 import { ArrowUpRight, Bell, Bookmark, Check, Copy, Heart, Image, Layers, MoreHorizontal, Repeat2, Share2, ShoppingBag, ShoppingCart, Star, X } from 'lucide-react';
 import { useAutomaticReviews } from '../utils/reviewEvidence';
@@ -25,6 +26,7 @@ function relativeTime(timestamp?: number) {
 const money = (value: number) => `₹${value.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
 export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0, isSaved: suppliedSaved, isComparing = false, onOpenImage, onSelectDeal, onToggleSave, onToggleCompare, onOpenPriceAlert, onOpenExchange, onShowToast }) => {
   const [imageFailed, setImageFailed] = useState(false);
+  const reducedMotion = useReducedMotion();
   const [localSaved, setLocalSaved] = useState(() => isDealSaved(deal.id));
   const [menuOpen, setMenuOpen] = useState(false);
   const [multiSheetOpen, setMultiSheetOpen] = useState(false);
@@ -90,10 +92,10 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
   return <article ref={card} style={{ '--card-delay': `${Math.min(index % 40, 7) * 35}ms` } as React.CSSProperties} className={`commerce-card commerce-card-reveal${expired ? ' is-expired' : ''}${isComparing ? ' is-comparing' : ''}`}>
     <div className="commerce-card-photo">
       <button type="button" className="commerce-photo-button" onClick={details} aria-label={`View details for ${title}`}>
-        {photo && !imageFailed ? <img src={photo} alt={title} loading="lazy" decoding="async" onError={() => setImageFailed(true)} /> : <span className="commerce-image-fallback"><Image size={30} strokeWidth={1.2} /><span>Offer Preview</span></span>}
+        {photo && !imageFailed ? <motion.img layoutId={reducedMotion ? undefined : `deal-photo-${deal.id}`} initial={false} transition={{ layout: { duration: 0.36, ease: [0.22, 1, 0.36, 1] } }} src={photo} alt={title} loading="lazy" decoding="async" onError={() => setImageFailed(true)} /> : <span className="commerce-image-fallback"><Image size={30} strokeWidth={1.2} /><span>Offer Preview</span></span>}
       </button>
       <span className={`commerce-store commerce-store-${store.toLowerCase().replace(/[^a-z]/g, '')}`}>{store}</span>
-      <button type="button" className={`commerce-card-save${saved ? ' is-saved' : ''}`} aria-label={`${saved ? 'Unsave' : 'Save'} ${title}`} aria-pressed={saved} onClick={save}><Bookmark className="desktop-save-icon" size={18} fill={saved ? 'currentColor' : 'none'} /><Heart className="mobile-save-icon" size={20} fill={saved ? 'currentColor' : 'none'} /></button>
+      <motion.button initial={false} whileTap={reducedMotion ? undefined : { scale: 0.88 }} transition={{ type: 'spring', stiffness: 450, damping: 24 }} type="button" className={`commerce-card-save${saved ? ' is-saved' : ''}`} aria-label={`${saved ? 'Unsave' : 'Save'} ${title}`} aria-pressed={saved} onClick={save}><Bookmark className="desktop-save-icon" size={18} fill={saved ? 'currentColor' : 'none'} /><Heart className="mobile-save-icon" size={20} fill={saved ? 'currentColor' : 'none'} /></motion.button>
       {expired ? (
         <span className="commerce-discount">Ended</span>
       ) : deal.is_arbitrage && deal.arbitrage?.net_profit ? (

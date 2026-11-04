@@ -2,7 +2,7 @@ import { useModalSurface } from '../utils/useModalSurface';
 import { publicShareUrl, publicStoreUrl } from '../utils/publicLinks';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { motion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import { Star, Sparkles } from 'lucide-react';
 import { DealActionIcon } from './DealActionIcon';
 import { PublicDeal } from '../types';
@@ -58,6 +58,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   onOpenTool,
 }) => {
   const [imgLoaded, setImgLoaded] = useState(false);
+  const reducedMotion = useReducedMotion();
   const [imgError, setImgError] = useState(false);
   const [copiedCoupon, setCopiedCoupon] = useState(false);
   const [copyLink, setCopyLink] = useState(false);
@@ -129,8 +130,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
 
   const handleClose = useCallback(() => {
     setVisible(false);
-    setTimeout(onClose, 200);
-  }, [onClose]);
+    setTimeout(onClose, reducedMotion ? 0 : 200);
+  }, [onClose, reducedMotion]);
 
   const dialogRef = useModalSurface(!!deal, handleClose);
 
@@ -236,11 +237,12 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
     >
       <motion.div
         ref={dialogRef}
+        layoutRoot
         className="pro-card deal-detail-sheet"
-        initial={{ opacity: 0, y: 20, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
+        initial={reducedMotion ? false : { opacity: 0, y: 16, scale: 0.985 }}
+        animate={{ opacity: visible ? 1 : 0, y: reducedMotion || visible ? 0 : 10, scale: reducedMotion || visible ? 1 : 0.985 }}
         exit={{ opacity: 0, y: 10, scale: 0.98 }}
-        transition={{ duration: 0.25, ease: 'easeOut' }}
+        transition={{ duration: reducedMotion ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
         style={{
           width: '100%',
           maxWidth: '740px',
@@ -368,18 +370,20 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               }}
             >
               {!imgError && cleanImage ? (
-                <img
+                <motion.img
+                  layoutId={reducedMotion ? undefined : `deal-photo-${deal.id}`}
+                  initial={false}
+                  transition={{ layout: { duration: 0.36, ease: [0.22, 1, 0.36, 1] } }}
                   src={cleanImage}
                   alt={deal.title}
-                  loading="lazy"
+                  loading="eager"
                   onLoad={() => setImgLoaded(true)}
                   onError={() => setImgError(true)}
                   style={{
                     maxWidth: '100%',
                     maxHeight: '100%',
                     objectFit: 'contain',
-                    opacity: imgLoaded ? 1 : 0,
-                    transition: 'opacity 150ms ease',
+                    opacity: imgLoaded || !reducedMotion ? 1 : 0,
                   }}
                 />
               ) : (

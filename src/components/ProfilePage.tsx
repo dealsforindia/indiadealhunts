@@ -484,8 +484,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     setCheckingAlertId(alert.id);
     playTactileClick();
     try {
+      const token = localStorage.getItem('idh_auth_token');
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
       const res = await fetch(`${PUBLIC_API_BASE}/api/v1/alerts/${alert.id}/check`, {
         method: 'POST',
+        headers,
       });
       if (res.ok) {
         const data = await res.json();

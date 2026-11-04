@@ -1,4 +1,5 @@
 import React, { FormEvent } from 'react';
+import { ArrowRight, Search, X } from 'lucide-react';
 
 interface SearchResultsHeaderProps {
   query: string;
@@ -27,11 +28,11 @@ export const SearchResultsHeader: React.FC<SearchResultsHeaderProps> = ({ query,
           <div className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">{verifiedCount} directory result{verifiedCount === 1 ? '' : 's'}</div>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-4 flex max-w-3xl items-center gap-2 rounded-2xl border border-[var(--border-subtle)] dark:border-white/20 bg-white dark:bg-[var(--surface)] p-1.5 shadow-sm focus-within:border-[var(--border-subtle)] focus-within:ring-4 focus-within:ring-blue-100">
-          <span className="pl-3 text-[var(--text-secondary)]" aria-hidden="true">⌕</span>
-          <input id="search-results-input" aria-label="Search products" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Search products across the deal directory and stores…" className="min-w-0 flex-1 bg-transparent px-2 py-2 text-sm text-[var(--text-primary)] dark:text-[var(--text-primary)] outline-none" autoFocus />
-          <button type="submit" className="rounded-xl bg-[var(--idh-action-solid)] px-4 py-2.5 text-xs font-bold text-white transition hover:bg-[var(--idh-action-solid)]">Search</button>
-          <button type="button" onClick={onClear} className="rounded-xl px-3 py-2.5 text-xs font-bold text-[var(--text-secondary)] transition hover:bg-[var(--surface-2)] dark:bg-[var(--surface-2)] hover:text-[var(--text-primary)] dark:text-[var(--text-primary)]">Clear</button>
+        <form onSubmit={handleSubmit} className="results-search" role="search" aria-label="Refine product search">
+          <Search className="results-search-icon" size={19} strokeWidth={1.7} aria-hidden="true" />
+          <input id="search-results-input" aria-label="Search products" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Search products or paste a link…" autoFocus />
+          <button type="submit" className="results-search-submit"><span>Search</span><ArrowRight size={17} aria-hidden="true" /></button>
+          <button type="button" onClick={onClear} className="results-search-clear" aria-label="Clear search"><X size={17} aria-hidden="true" /><span>Clear</span></button>
         </form>
       </div>
     </section>
