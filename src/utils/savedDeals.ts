@@ -51,13 +51,38 @@ export function removeSavedDealId(id: string): string[] {
   }
 }
 
-/** Saved cards remain available after pagination, filtering, and a page reload. */
+/** Saved cards remain available after pagination, filtering, and a page reload.
+ *
+ * A saved id with no snapshot is a deal this browser has not seen since it was
+ * saved (cleared storage, another device). It is left out rather than dressed
+ * up as a card: inventing a title, a store and a "posted just now" for a product
+ * we know nothing about is the one thing a deal feed must never do. The id
+ * stays saved, so the card reappears the moment the deal shows up in a feed.
+ */
 export function getSavedDealSnapshots(): PublicDeal[] {
   if (typeof window === 'undefined') return [];
   try {
-    const records = JSON.parse(localStorage.getItem(SNAPSHOT_KEY) || '[]');
-    const ids = new Set(getSavedDealIds());
-    return Array.isArray(records) ? records.filter(deal => deal && ids.has(deal.id) && isDisplayableOffer(deal)).map(publicDeal) : [];
+    const raw = localStorage.getItem(SNAPSHOT_KEY);
+    const records: any[] = raw ? JSON.parse(raw) : [];
+    const ids = getSavedDealIds();
+    const idSet = new Set(ids);
+    const existingMap = new Map<string, PublicDeal>();
+
+    if (Array.isArray(records)) {
+      for (const d of records) {
+        if (d && d.id && idSet.has(d.id) && isDisplayableOffer(d)) {
+          existingMap.set(d.id, publicDeal(d));
+        }
+      }
+    }
+
+    // Most recently saved first: that is the order the shopper built.
+    const result: PublicDeal[] = [];
+    for (const id of ids) {
+      const snapshot = existingMap.get(id);
+      if (snapshot) result.push(snapshot);
+    }
+    return result;
   } catch { return []; }
 }
 

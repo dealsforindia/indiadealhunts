@@ -1,5 +1,5 @@
 import { useModalSurface } from '../utils/useModalSurface';
-import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicStoreUrl, lookupTargetUrl } from '../utils/publicLinks';
+import { PUBLIC_API_BASE, PUBLIC_EDGE_BASE, publicStoreUrl, publicShareUrl, lookupTargetUrl } from '../utils/publicLinks';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PublicDeal } from '../types';
@@ -23,7 +23,6 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
     deal?.price ? Math.round(deal.price * 0.85).toString() : ''
   );
   const [contact, setContact] = useState<string>('');
-  const [contactType, setContactType] = useState<'telegram' | 'email'>('telegram');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -45,25 +44,15 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
     e.preventDefault();
     const cleanContact = contact.trim();
     if (!cleanContact) {
-      setErrorMsg(contactType === 'telegram' ? 'Please enter your Telegram handle (e.g. @username)' : 'Please enter your email address');
+      setErrorMsg('Please enter your email address');
       return;
     }
-    let normalizedContact = cleanContact;
-    if (contactType === 'email') {
-      const emailLower = cleanContact.toLowerCase();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailLower)) {
-        setErrorMsg('Please enter a valid email address (e.g. name@gmail.com)');
-        return;
-      }
-      normalizedContact = emailLower;
-    } else {
-      const handle = cleanContact.startsWith('@') ? cleanContact.slice(1) : cleanContact;
-      if (!/^[a-zA-Z0-9_]{5,32}$/.test(handle)) {
-        setErrorMsg('Please enter a valid Telegram username (5-32 characters, letters, numbers, underscores)');
-        return;
-      }
-      normalizedContact = `@${handle}`;
+    const emailLower = cleanContact.toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailLower)) {
+      setErrorMsg('Please enter a valid email address (e.g. name@gmail.com)');
+      return;
     }
+    const normalizedContact = emailLower;
     const tPrice = parseFloat(targetPrice);
     if (isNaN(tPrice) || tPrice <= 0) {
       setErrorMsg('Please enter a valid target price');
@@ -75,10 +64,9 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
 
     try {
       const payload = {
-        product_url: deal.url,
+        product_url: publicShareUrl(deal.url),
         target_price: tPrice,
         contact: normalizedContact,
-        contact_type: contactType,
         product_title: deal.title,
         current_price: deal.price,
         store: deal.store || 'Store',
@@ -91,7 +79,10 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
       });
 
       if (!res.ok) {
-        throw new Error(`Server returned status ${res.status}`);
+        // The API explains itself (no merchant page, no email, rate limited);
+        // repeating "check your connection" hid every one of those.
+        const detail = await res.json().catch(() => null);
+        throw new Error(typeof detail?.detail === 'string' ? detail.detail : `Server returned status ${res.status}`);
       }
 
       const confirmation = await res.json();
@@ -101,14 +92,14 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
 
       setSuccess(true);
       if (onSuccessToast) {
-        onSuccessToast(`🎯 Price alert set! We will notify you if ${deal.title.slice(0, 25)} drops to ₹${tPrice}.`);
+        onSuccessToast(`🎯 Price alert set! We will email you if ${deal.title.slice(0, 25)} drops to ₹${tPrice}.`);
       }
       setTimeout(() => {
         onClose();
         setSuccess(false);
       }, 1800);
     } catch (err: any) {
-      setErrorMsg('Unable to schedule alert at this time. Please check your connection and try again.');
+      setErrorMsg(err?.message || 'Unable to schedule alert at this time. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -195,8 +186,8 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
                     />
                   </div>
                   <div className="flex gap-2 mt-1.5">
-                    {[0.9, 0.8, 0.7].map((pct) => {
-                      const quickVal = Math.round(deal.price * pct);
+                    {cleanPrice > 0 && [0.9, 0.8, 0.7].map((pct) => {
+                      const quickVal = Math.round(cleanPrice * pct);
                       return (
                         <button
                           key={pct}
@@ -213,41 +204,21 @@ export const PriceDropAlertModal: React.FC<PriceDropAlertModalProps> = ({
 
                 {/* Notification Channel */}
                 <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="block text-xs font-mono uppercase text-[var(--text-secondary)] font-semibold">
-                      Notify Me Via
-                    </label>
-                    <div className="flex gap-2 text-xs">
-                      <button
-                        type="button"
-                        onClick={() => setContactType('telegram')}
-                        className={`font-semibold cursor-pointer ${contactType === 'telegram' ? 'text-[var(--idh-accent)] underline' : 'text-[var(--text-secondary)]'}`}
-                      >
-                        Telegram
-                      </button>
-                      <span className="text-[var(--text-secondary)]">·</span>
-                      <button
-                        type="button"
-                        onClick={() => setContactType('email')}
-                        className={`font-semibold cursor-pointer ${contactType === 'email' ? 'text-[var(--idh-accent)] underline' : 'text-[var(--text-secondary)]'}`}
-                      >
-                        Email
-                      </button>
-                    </div>
-                  </div>
+                  <label className="block text-xs font-mono uppercase text-[var(--text-secondary)] font-semibold mb-1">
+                    Email for the alert
+                  </label>
                   <input
-                    type="text"
+                    type="email"
                     value={contact}
                     onChange={(e) => setContact(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-subtle)] dark:border-white/20 focus:border-[var(--border-subtle)] focus:ring-3 focus:ring-blue-100 outline-none text-sm text-[var(--text-primary)] dark:text-[var(--text-primary)]"
-                    placeholder={contactType === 'telegram' ? '@your_telegram_username' : 'you@example.com'}
+                    placeholder="you@example.com"
+                    autoComplete="email"
                     required
                   />
-                  {contactType === 'telegram' && (
-                    <p className="text-[11px] text-[var(--text-secondary)] dark:text-[var(--text-secondary)] mt-1.5 flex items-center gap-1">
-                      <span>💡</span> Make sure to click <a href="https://t.me/dealsforindiabot" target="_blank" rel="noopener noreferrer" className="text-[var(--idh-accent)] underline font-semibold">Start on @dealsforindiabot</a> on Telegram so we can DM your alerts!
-                    </p>
-                  )}
+                  <p className="text-[11px] text-[var(--text-secondary)] dark:text-[var(--text-secondary)] mt-1.5">
+                    We check the price on a schedule and email you once it drops to your target.
+                  </p>
                 </div>
 
                 {errorMsg && (

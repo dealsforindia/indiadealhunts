@@ -218,22 +218,9 @@ export const DealLookupModal: React.FC<DealLookupModalProps> = ({
       setWatches(nextWatches); setWatchSaved(true);
     } catch { setError('Device storage is unavailable. This price goal was not saved.'); }
 
-    // Sync to backend 24/7 price scraper & email radar if email/telegram provided
-    if (contactInfo.trim()) {
-      fetch(`${API_BASE}/api/v1/alerts`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          product_url: newWatch.url,
-          target_price: newWatch.targetPrice,
-          contact: contactInfo.trim().toLowerCase(),
-          product_title: newWatch.title,
-          current_price: newWatch.currentPrice,
-          store: newWatch.store,
-          image_url: result.image || null,
-        }),
-      }).catch((err) => console.warn('Backend alert sync skipped:', err));
-    }
+    // The goal above is device-only on purpose: this field is a note, not an
+    // address. The server radar lives in PriceDropAlertModal, which asks for an
+    // email and sends a link the backend can resolve to a merchant page.
   };
 
   const handleRemoveWatch = (id: string) => {

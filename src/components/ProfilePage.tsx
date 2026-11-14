@@ -454,7 +454,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       });
 
       if (!res.ok) {
-        throw new Error(`Server returned ${res.status}`);
+        const detail = await res.json().catch(() => null);
+        throw new Error(typeof detail?.detail === 'string' ? detail.detail : `Server returned ${res.status}`);
       }
 
       playSuccessChime();
@@ -473,7 +474,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       setInspectPreview(null);
       fetchUserAlerts(cleanEmail);
     } catch (err: any) {
-      onShowToast?.('Could not arm price drop scraper. Please check connection and retry.');
+      onShowToast?.(err?.message || 'Could not arm price drop scraper. Please check connection and retry.');
     } finally {
       setIsArmingScraper(false);
     }
