@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Bookmark, Check, ChevronRight, Copy, GitCompareArrows, MoreHorizontal, Send, ShoppingBag, Zap, ShoppingCart, Plus, CheckSquare, Square } from 'lucide-react';
 import { PublicDeal } from '../types';
+import { couponOffer } from '../utils/couponOffer';
 import { copyDealLink, shareToTelegram, shareToWhatsApp } from '../utils/shareDeal';
 import {
   extractAmazonAsin,
@@ -54,12 +55,13 @@ export function MobileDealCardContent(props: Props) {
 
   const handleOpenInApp = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const text = deal.original_text || deal.aff_text || '';
-    const couponMatch = text.match(/\b([A-Z0-9]{5,12})\b/g);
-    const possibleCoupon = couponMatch ? couponMatch.find(c => c.length >= 5 && !/^\d+$/.test(c) && !['HTTP', 'HTTPS', 'PRICE', 'DISCOUNT'].includes(c)) : null;
-    if (possibleCoupon && navigator.clipboard) {
-      navigator.clipboard.writeText(possibleCoupon).catch(() => {});
-      if (onToast) onToast(`Copied '${possibleCoupon}' to clipboard! Paste at checkout.`);
+    // The deal payload never carries raw post text (original_text/aff_text are
+    // withheld to keep channel handles and affiliate URLs off the storefront),
+    // so mine the coupon field the API does send instead.
+    const coupon = couponOffer(deal);
+    if (coupon?.kind === 'code' && navigator.clipboard) {
+      navigator.clipboard.writeText(coupon.code).catch(() => {});
+      if (onToast) onToast(`Copied '${coupon.code}' to clipboard! Paste at checkout.`);
     }
     openSmartStoreLink(deal.url, store, asin || undefined, false, subId);
   };
