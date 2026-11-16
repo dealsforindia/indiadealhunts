@@ -85,7 +85,11 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
   const handleViewDeal = () => {
     let targetUrl = deal.url;
     if (!targetUrl || targetUrl.includes('.css') || targetUrl.includes('static-assets-web')) {
-      targetUrl = `https://www.flipkart.com/search?q=${encodeURIComponent(title)}`;
+      const q = encodeURIComponent(title);
+      if (/amazon/i.test(store)) targetUrl = `https://www.amazon.in/s?k=${q}&tag=rudranil0a-21`;
+      else if (/myntra/i.test(store)) targetUrl = `https://www.myntra.com/search?q=${q}`;
+      else if (/ajio/i.test(store)) targetUrl = `https://www.ajio.com/search/?text=${q}`;
+      else targetUrl = `https://www.flipkart.com/search?q=${q}`;
     }
     openSmartStoreLink(targetUrl, store, asin || undefined, false, subId);
   };
@@ -138,7 +142,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
           📦 Multiple Deals ({validMultiItems.length} Items)
         </span>
       ) : discount != null && discount > 0 ? (
-        <span className="commerce-discount">{discount}% below MRP</span>
+        <span className="commerce-discount">{price > 0 ? `${discount}% below MRP` : `Up to ${discount}% OFF`}</span>
       ) : (deal.sellout_prediction?.urgency_label || deal.velocity_prediction?.urgency_label) ? (
         <span className="commerce-discount is-urgent" title="Estimated by the deal model, not merchant-confirmed stock">
           {deal.velocity_prediction?.urgency_label || deal.sellout_prediction?.urgency_label}

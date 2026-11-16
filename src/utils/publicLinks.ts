@@ -43,10 +43,18 @@ export function sanitizeStoreUrl(value: string, title?: string, store?: string):
   if (!value) return '';
   const low = value.toLowerCase();
   if (isAssetUrl(value) || low.includes('ambhedeal.in.net')) {
-    if (store?.toLowerCase().includes('amazon')) {
-      return `https://www.amazon.in/s?k=${encodeURIComponent(title || 'deals')}&tag=rudranil0a-21`;
+    const s = (store || '').toLowerCase();
+    const q = encodeURIComponent(title || 'deals');
+    if (s.includes('amazon')) {
+      return `https://www.amazon.in/s?k=${q}&tag=rudranil0a-21`;
     }
-    return `https://www.flipkart.com/search?q=${encodeURIComponent(title || 'deals')}`;
+    if (s.includes('myntra')) {
+      return `https://www.myntra.com/search?q=${q}`;
+    }
+    if (s.includes('ajio')) {
+      return `https://www.ajio.com/search/?text=${q}`;
+    }
+    return `https://www.flipkart.com/search?q=${q}`;
   }
   return value;
 }
