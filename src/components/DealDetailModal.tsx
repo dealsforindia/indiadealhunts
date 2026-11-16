@@ -138,11 +138,12 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   if (!deal) return null;
 
   const cleanImage = getCleanImageUrl(deal.image);
-  const price = Number(deal.price ?? deal.sale_price ?? deal.prices?.sale) || 0;
+  const hasPrice = Boolean((deal.price && deal.price > 0) || (deal.sale_price && deal.sale_price > 0) || (deal.prices?.sale && deal.prices.sale > 0));
+  const price = hasPrice ? Number(deal.price ?? deal.sale_price ?? deal.prices?.sale) : 0;
   const rawMrp = deal.mrp ?? deal.prices?.mrp;
-  const mrp = (rawMrp && rawMrp > price) ? rawMrp : undefined;
-  const discount = deal.discount_pct || (mrp ? Math.round((mrp - price) / mrp * 100) : 0);
-  const savings = mrp ? mrp - price : 0;
+  const mrp = (hasPrice && rawMrp && rawMrp > price) ? rawMrp : undefined;
+  const discount = deal.discount_pct || (hasPrice && mrp ? Math.round((mrp - price) / mrp * 100) : 0);
+  const savings = hasPrice && mrp ? mrp - price : 0;
   const storeName = getStoreDisplayName(deal.store);
   const coupon = couponOffer(deal);
 
@@ -197,7 +198,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   };
 
   const handleShare = () => {
-    const text = `${deal.title}\n₹${price.toLocaleString('en-IN')} on ${storeName}\n${publicShareUrl(deal.url)}`;
+    const priceStr = hasPrice ? `₹${price.toLocaleString('en-IN')}` : (discount > 0 ? `Up to ${discount}% OFF` : 'Check price');
+    const text = `${deal.title}\n${priceStr} on ${storeName}\n${publicShareUrl(deal.url)}`;
     if (navigator.share) {
       navigator.share({ title: deal.title, text, url: publicShareUrl(deal.url) }).catch(() => {});
     } else {
@@ -319,7 +321,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   transition={{ duration: 0.35, ease: 'easeOut' }}
                 />
               </svg>
-              Directory offer
+              {validMultiItems.length > 1 || !hasPrice ? 'Directory offer' : 'Verified offer'}
             </span>
           </div>
 
@@ -501,9 +503,9 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   color: 'var(--text-primary)',
                   lineHeight: 1,
                 }}>
-                  ₹{price.toLocaleString('en-IN')}
+                  {hasPrice ? `₹${price.toLocaleString('en-IN')}` : (validMultiItems.length > 1 ? 'Multiple prices' : 'Check price')}
                 </span>
-                {mrp && (
+                {hasPrice && mrp && (
                   <span style={{
                     fontFamily: 'var(--font-mono)',
                     fontVariantNumeric: 'tabular-nums',
@@ -525,11 +527,11 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                     border: '1px solid #FECACA',
                     borderRadius: '6px',
                   }}>
-                    -{discount}% OFF
+                    {hasPrice ? `-${discount}% OFF` : `Up to ${discount}% OFF`}
                   </span>
                 )}
               </div>
-              {savings > 0 && (
+              {hasPrice && savings > 0 && (
                 <span style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: '12px',
@@ -539,10 +541,18 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   Savings vs MRP: ₹{savings.toLocaleString('en-IN')}
                 </span>
               )}
+              {!hasPrice && (
+                <span style={{
+                  fontSize: '12px',
+                  color: 'var(--text-secondary)',
+                }}>
+                  {validMultiItems.length > 1 ? `${validMultiItems.length} offers inside · Confirm price at checkout` : 'Confirm price at checkout'}
+                </span>
+              )}
             </div>
 
             {/* Weibull Survival Analysis & Flash Loot Urgency Indicator */}
-            {survivalData && (
+            {survivalData && hasPrice && (
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -917,7 +927,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             )}
 
             {/* Verified Multi-Store Price History & Trends Graph */}
-            <ProductPriceHistory url={deal.url} dealId={deal.fp_hash || deal.id} currentPrice={price} mrp={mrp} />
+            <ProductPriceHistory url={deal.url} dealId={deal.fp_hash || deal.id} currentPrice={hasPrice ? price : undefined} mrp={hasPrice ? mrp : undefined} />
             <ProductReviews url={deal.url} id={deal.id} />
 
             {/* Multi-Store Real-Time Live Check Matrix */}
