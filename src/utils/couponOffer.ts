@@ -1,8 +1,12 @@
 import type { PublicDeal } from '../types';
 
 /** Coupon text describes activation; coupon_discount is often an amount in rupees. */
-export function couponOffer(deal: Pick<PublicDeal, 'coupon' | 'store'>) {
-  const text = (deal.coupon || '').trim();
+export function couponOffer(deal: Pick<PublicDeal, 'coupon' | 'store'> & { title?: string }) {
+  let text = (deal.coupon || '').trim();
+  if (!text && deal.title) {
+    const m = deal.title.match(/(\d+%\s*(?:off\s*)?with\s*coupon|\d+%\s*coupon)/i);
+    if (m) text = m[0];
+  }
   if (!text) return null;
   const percent = text.match(/(\d+(?:\.\d+)?)\s*%/);
   const amount = text.match(/(?:₹|rs\.?|inr)\s*(\d[\d,]*(?:\.\d+)?)/i);

@@ -187,6 +187,16 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
 
   const hasValidMultiDeals = Boolean(deal.is_multi_deal && validMultiItems.length >= 2);
 
+  const cleanSearchTitle = useMemo(() => {
+    return (deal.title || '')
+      .replace(/^[\s\u{1F300}-\u{1FAFF}\u2600-\u27BF\uFE0F]+/u, '')
+      .replace(/^(?:upto|up to|flat|min(?:imum)?\.?)\s*\d+%\s*(?:off\s*)?(?:on\s*)?/i, '')
+      .replace(/\s*\+\s*\d+%\s*(?:off\s*)?with\s*coupon.*$/i, '')
+      .replace(/\s*\(?(?:apply|use)?\s*coupon:?[^\)]*\)?/i, '')
+      .replace(/@\s*₹?\s*[\d,]+/g, '')
+      .trim() || deal.title || 'deals';
+  }, [deal.title]);
+
   const handleCopyCoupon = () => {
     if (coupon?.kind !== 'code') return;
     if (!navigator.clipboard?.writeText) { onShowToast?.('Clipboard unavailable. Select and copy the code.'); return; }
@@ -326,7 +336,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <button type="button" className="detail-icon-control detail-scan-control" onClick={() => openGoogleShoppingModal(deal.title)} title="Scan other stores" aria-label="Scan other stores for this product"><DealActionIcon kind="scan" /></button>
+            <button type="button" className="detail-icon-control detail-scan-control" onClick={() => openGoogleShoppingModal(cleanSearchTitle)} title="Scan other stores" aria-label="Scan other stores for this product"><DealActionIcon kind="scan" /></button>
 
             <button type="button" className="detail-icon-control" onClick={handleToggleFavorite} title={saved ? 'Saved in Loot Bookmarks' : 'Save deal'} aria-label={saved ? 'Remove from bookmarks' : 'Save deal to bookmarks'} aria-pressed={saved}><svg width="20" height="20" viewBox="0 0 24 24" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.8 4.8a5.4 5.4 0 0 0-7.6 0L12 6l-1.2-1.2a5.4 5.4 0 0 0-7.6 7.6L12 21l8.8-8.6a5.4 5.4 0 0 0 0-7.6Z" /></svg></button>
 
@@ -427,7 +437,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               {discount > 0 && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent-amber, #D97706)', fontWeight: 650 }}>
                   <DealActionIcon kind="tag" />
-                  <span>{discount}% off MRP</span>
+                  <span>{hasPrice ? `${discount}% off MRP` : `Up to ${discount}% OFF`}</span>
                 </div>
               )}
             </div>
@@ -927,8 +937,27 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             )}
 
             {/* Verified Multi-Store Price History & Trends Graph */}
-            <ProductPriceHistory url={deal.url} dealId={deal.fp_hash || deal.id} currentPrice={hasPrice ? price : undefined} mrp={hasPrice ? mrp : undefined} />
-            <ProductReviews url={deal.url} id={deal.id} />
+            {hasPrice && !deal.store?.toLowerCase().includes('amazon') ? (
+              <ProductPriceHistory url={deal.url} dealId={deal.fp_hash || deal.id} currentPrice={price} mrp={mrp || undefined} />
+            ) : !hasPrice ? (
+              <div style={{
+                padding: '14px 16px',
+                borderRadius: '12px',
+                backgroundColor: 'var(--surface-2)',
+                border: '1px solid var(--border-subtle)',
+                fontSize: '12.5px',
+                color: 'var(--text-secondary)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                lineHeight: 1.5,
+              }}>
+                <span style={{ fontSize: '18px' }}>🛍️</span>
+                <span><strong>Multi-Product Directory:</strong> Prices and discounts vary across individual items in this catalog drop. Confirm specific model pricing directly on {storeName}.</span>
+              </div>
+            ) : null}
+
+            {hasPrice && <ProductReviews url={deal.url} id={deal.id} />}
 
             {/* Multi-Store Real-Time Live Check Matrix */}
             {arbitrage && (
@@ -1008,7 +1037,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                         {q.store === 'Google Shopping' ? (
                           <button
                             type="button"
-                            onClick={() => openGoogleShoppingModal(deal?.title || '')}
+                            onClick={() => openGoogleShoppingModal(cleanSearchTitle)}
                             style={{
                               fontFamily: 'var(--font-mono)',
                               fontSize: '12px',
@@ -1126,7 +1155,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
               <div className="deal-detail-secondary-actions">
                 {asin && <button type="button" className="detail-action detail-action-primary" onClick={handleLockInCart} title="Add to Amazon cart; confirm the final price there"><DealActionIcon kind="cart" /><span>{includeBundle ? 'Add bundle to cart' : 'Add to Amazon cart'}</span></button>}
                 {bundle && <label><input type="checkbox" checked={includeBundle} onChange={e => setIncludeBundle(e.target.checked)} /> Include accessory · Check price</label>}
-                <button type="button" className="detail-action detail-scan-control" onClick={() => openGoogleShoppingModal(deal.title)}><DealActionIcon kind="scan" />Compare stores</button>
+                <button type="button" className="detail-action detail-scan-control" onClick={() => openGoogleShoppingModal(cleanSearchTitle)}><DealActionIcon kind="scan" />Compare stores</button>
                 <button type="button" className="detail-action" onClick={handleShare}><DealActionIcon kind="copy" /><span>{copyLink ? 'Copied!' : 'Copy link'}</span></button>
                 <button type="button" className="detail-action detail-action-quiet" onClick={handleReportExpired} disabled={reportSent}><DealActionIcon kind="expired" /><span>{reportSent ? 'Marked expired' : 'Mark expired here'}</span></button>
               </div>
@@ -1195,7 +1224,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             <button type="button" className="detail-action detail-action-primary" onClick={handleOpenStore}><DealActionIcon kind="store" /><span>{isMobile ? `Open ${storeName} app` : `View at ${storeName}`}</span></button>
           )}
 
-          <button type="button" className="detail-action detail-scan-control" onClick={() => openGoogleShoppingModal(deal.title)} title="Scan all Indian stores on Google Shopping Radar"><DealActionIcon kind="scan" /><span>Scan stores</span></button>
+          <button type="button" className="detail-action detail-scan-control" onClick={() => openGoogleShoppingModal(cleanSearchTitle)} title="Scan all Indian stores on Google Shopping Radar"><DealActionIcon kind="scan" /><span>Scan stores</span></button>
 
           <button type="button" className="detail-action" onClick={handleShare}><DealActionIcon kind="copy" /><span>{copyLink ? 'Copied!' : 'Copy link'}</span></button>
 

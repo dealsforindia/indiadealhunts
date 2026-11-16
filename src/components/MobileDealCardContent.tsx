@@ -74,7 +74,7 @@ export function MobileDealCardContent(props: Props) {
     </div>
     <button type="button" className="phone-card-image" onClick={onDetails} aria-label={`Open details for ${title}`}>
       {image && !imageFailed ? <img src={image} alt={title} loading="lazy" onError={() => setImageFailed(true)} /> : <div className="phone-image-missing"><ShoppingBag size={30} /><span>Offer Preview</span></div>}
-      {expired ? <span className="phone-discount is-expired">Expired</span> : deal.sellout_prediction?.urgency_label ? <span className="phone-discount is-urgent">{deal.sellout_prediction.urgency_label}</span> : discount > 0 && <span className="phone-discount">{discount}% off MRP</span>}
+      {expired ? <span className="phone-discount is-expired">Expired</span> : deal.sellout_prediction?.urgency_label ? <span className="phone-discount is-urgent">{deal.sellout_prediction.urgency_label}</span> : discount > 0 && <span className="phone-discount">{price > 0 ? `${discount}% off MRP` : `Up to ${discount}% OFF`}</span>}
     </button>
     <div className="phone-card-body">
       <button type="button" className="phone-card-title" onClick={onDetails}>{title}</button>
