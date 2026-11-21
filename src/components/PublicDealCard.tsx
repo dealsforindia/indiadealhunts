@@ -103,42 +103,15 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
       {expired ? (
         <span className="commerce-discount">Ended</span>
       ) : deal.is_arbitrage && deal.arbitrage?.net_profit ? (
-        <span
-          className="commerce-discount"
-          style={{
-            background: 'linear-gradient(135deg, #059669, #10b981)',
-            color: '#ffffff',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            fontWeight: 700,
-            boxShadow: '0 2px 8px rgba(16, 185, 129, 0.35)',
-          }}
-        >
+        <span className="commerce-discount">
           💰 ₹{Number(deal.arbitrage.net_profit).toLocaleString('en-IN')} Flip Profit
         </span>
       ) : deal.trick_steps && deal.trick_steps.length > 0 ? (
-        <span
-          className="commerce-discount"
-          style={{
-            background: 'linear-gradient(135deg, #d97706, #f59e0b)',
-            color: '#ffffff',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            fontWeight: 700,
-            boxShadow: '0 2px 8px rgba(245, 158, 11, 0.35)',
-          }}
-        >
+        <span className="commerce-discount">
           🎯 Trick ({deal.trick_steps.length} Steps)
         </span>
       ) : isMulti ? (
-        <span
-          className="commerce-discount"
-          style={{
-            background: 'linear-gradient(135deg, #4338ca, #6d28d9)',
-            color: '#ffffff',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            fontWeight: 700,
-            boxShadow: '0 2px 8px rgba(79, 70, 229, 0.35)',
-          }}
-        >
+        <span className="commerce-discount">
           📦 Multiple Deals ({validMultiItems.length} Items)
         </span>
       ) : discount != null && discount > 0 ? (
@@ -173,13 +146,6 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
           <button
             type="button"
             className="commerce-store-button"
-            style={{
-              background: 'linear-gradient(135deg, #3730a3, #6366f1)',
-              color: '#ffffff',
-              border: 'none',
-              boxShadow: '0 2px 10px rgba(99, 102, 241, 0.35)',
-              fontWeight: 650,
-            }}
             aria-label={`More Buy Now Options for ${deal.multi_items?.length} items`}
             onClick={() => {
               playTactileClick();
@@ -251,7 +217,7 @@ export const PublicDealCard: React.FC<PublicDealCardProps> = ({ deal, index = 0,
                   gap: '5px',
                   padding: '8px 14px',
                   borderRadius: '8px',
-                  background: 'linear-gradient(135deg, #0066cc, #2563eb)',
+                  backgroundColor: 'var(--color-primary, #0066cc)',
                   color: '#ffffff',
                   border: 'none',
                   fontSize: '13px',

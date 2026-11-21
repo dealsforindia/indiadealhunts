@@ -15,7 +15,6 @@ import { MobileNav } from './components/MobileNav';
 import { Footer } from './components/Footer';
 import { DealDetailModal } from './components/DealDetailModal';
 import { DealActionIcon } from './components/DealActionIcon';
-import { SharkMosaicCanvas } from './components/SharkMosaicCanvas';
 import { ImageModal } from './components/ImageModal';
 import { DealLookupModal } from './components/DealLookupModal';
 import { SubmitDeal } from './components/SubmitDeal';
@@ -622,13 +621,13 @@ const App: React.FC = () => {
           params.set('skip', String(page));
           let res: Response | null = null;
           try {
-            res = await fetch(`${API_BASE}/api/v1/deals/public?${params.toString()}`, { signal: controller.signal, cache: 'no-store' });
+            res = await fetch(`${API_BASE}/api/v1/deals/public?${params.toString()}`, { signal: controller.signal });
           } catch {
             res = null;
           }
           if (controller.signal.aborted) { if (timedOut) throw new Error('Request timed out'); return; }
           if (!res || !res.ok) {
-            res = await fetch(`${EDGE_API}/deals?${params.toString()}`, { signal: controller.signal, cache: 'no-store' });
+            res = await fetch(`${EDGE_API}/deals?${params.toString()}`, { signal: controller.signal });
           }
           if (!res.ok) throw new Error(`API returned status ${res.status}`);
           data = await res.json() as PublicDealsResponse;
@@ -993,9 +992,8 @@ const App: React.FC = () => {
         flexDirection: 'column',
       }}
     >
-      {/* ── 0. Global Ambient Mesh Background & Procedural Shark Mosaic ── */}
+      {/* ── 0. Global Ambient Mesh Background ── */}
       <div className="ambient-mesh"></div>
-      <SharkMosaicCanvas />
 
 
 

@@ -90,6 +90,16 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
 
   const arbitrage = useMemo(() => (deal ? analyzeArbitrage(deal) : null), [deal]);
 
+  const cleanSearchTitle = useMemo(() => {
+    return (deal?.title || '')
+      .replace(/^[\s\u{1F300}-\u{1FAFF}\u2600-\u27BF\uFE0F]+/u, '')
+      .replace(/^(?:upto|up to|flat|min(?:imum)?\.?)\s*\d+%\s*(?:off\s*)?(?:on\s*)?/i, '')
+      .replace(/\s*\+\s*\d+%\s*(?:off\s*)?with\s*coupon.*$/i, '')
+      .replace(/\s*\(?(?:apply|use)?\s*coupon:?[^\)]*\)?/i, '')
+      .replace(/@\s*₹?\s*[\d,]+/g, '')
+      .trim() || deal?.title || 'deals';
+  }, [deal?.title]);
+
   useEffect(() => {
     if (deal) {
       setImgLoaded(false);
@@ -186,16 +196,6 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
     .filter(item => Boolean(item.url) && !item.isPreviewOrAsset && item.label !== '[' && item.label !== ']');
 
   const hasValidMultiDeals = Boolean(deal.is_multi_deal && validMultiItems.length >= 2);
-
-  const cleanSearchTitle = useMemo(() => {
-    return (deal.title || '')
-      .replace(/^[\s\u{1F300}-\u{1FAFF}\u2600-\u27BF\uFE0F]+/u, '')
-      .replace(/^(?:upto|up to|flat|min(?:imum)?\.?)\s*\d+%\s*(?:off\s*)?(?:on\s*)?/i, '')
-      .replace(/\s*\+\s*\d+%\s*(?:off\s*)?with\s*coupon.*$/i, '')
-      .replace(/\s*\(?(?:apply|use)?\s*coupon:?[^\)]*\)?/i, '')
-      .replace(/@\s*₹?\s*[\d,]+/g, '')
-      .trim() || deal.title || 'deals';
-  }, [deal.title]);
 
   const handleCopyCoupon = () => {
     if (coupon?.kind !== 'code') return;

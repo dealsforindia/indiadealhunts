@@ -13,7 +13,7 @@ interface NavbarProps {
   onOpenCompareTools?: () => void;
   isAudioEnabled?: boolean; onToggleAudio?: () => void; savedCount?: number;
 }
-export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, onSelectCategory, onOpenLookup, onOpenSubmit, onFocusSearch, onOpenToolsHub, onOpenCommandPalette, onOpenWatches, onBrowseCollections, onOpenCompareTools, isAudioEnabled = true, onToggleAudio, savedCount = 0 }) => {
+export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, onSelectCategory, onOpenLookup, onOpenSubmit, onFocusSearch, onOpenToolsHub, onOpenCommandPalette, onOpenWatches, onBrowseCollections, onOpenCompareTools, isAudioEnabled = false, onToggleAudio, savedCount = 0 }) => {
   const reduced = useReducedMotion();
   const telegramRingId = useId();
   const [open, setOpen] = useState(false);

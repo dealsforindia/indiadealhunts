@@ -4,7 +4,6 @@ import { PublicDeal } from '../types';
 import { getCleanImageUrl } from '../utils/imageUrl';
 import { selectTickerDeals } from '../utils/publicLinks';
 import { openGoogleShoppingModal } from '../utils/googleShopping';
-import { DealOrb } from './DealOrb';
 
 interface HeroBannerProps {
   searchQuery: string;
@@ -40,6 +39,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ searchQuery, onSearch, o
   };
   const spotlightImage = spotlight ? getCleanImageUrl(spotlight.image) : null;
   const reference = spotlight?.mrp && spotlight.mrp > spotlight.price ? spotlight.mrp : null;
+
   return <section className="premium-hero" aria-label="Discover your next deal">
     <div className={`premium-hero-frame${!spotlight ? ' has-no-spotlight' : ''}`}>
       <div className="premium-hero-copy">
@@ -59,19 +59,50 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ searchQuery, onSearch, o
         </div>
         <div className="premium-store-line"><span>Find offers from</span><strong>amazon</strong><i aria-hidden="true" /><strong>Flipkart</strong><i aria-hidden="true" /><strong>Myntra</strong></div>
       </div>
-      <div className="hero-orb-stage">
-        <div className="hero-orb-orbit" aria-hidden="true" />
-        <DealOrb onReveal={reveal} disabled={!candidates.length} />
-      </div>
-    </div>
-      {revealedId && spotlight && spotlightImage && <aside className="orb-reveal" aria-label="Your surprise offer" aria-live="polite">
-        <button className="orb-reveal-close" type="button" aria-label="Close surprise offer" onClick={() => setRevealedId(null)}><X size={18} /></button>
-        <img src={spotlightImage} alt="" onError={() => setFailedImages(previous => new Set([...previous, spotlightImage]))} />
-        <div><span className="orb-reveal-label">A FIND FOR YOU · {spotlight.store}</span><h2>{spotlight.title}</h2>
-          <div className="orb-reveal-price"><strong>₹{spotlight.price.toLocaleString('en-IN')}</strong>{reference && <s>₹{reference.toLocaleString('en-IN')}</s>}</div>
-          <small>Confirm price at checkout</small>
-          <div className="orb-reveal-actions">{onSelectDeal ? <button type="button" onClick={() => onSelectDeal(spotlight)}>Explore deal <ArrowRight size={16} /></button> : <a href={spotlight.url} target="_blank" rel="noopener noreferrer">View deal <ArrowUpRight size={16} /></a>}<button type="button" onClick={reveal}>Another find</button></div>
+      
+      {spotlight && spotlightImage ? (
+        <div className="hero-spotlight-stage" aria-label="Featured deal spotlight">
+          <div className="hero-spotlight-card">
+            <div className="hero-spotlight-header">
+              <span className="hero-spotlight-pill">🔥 FEATURED LOOT</span>
+              <span className="hero-spotlight-store">{spotlight.store}</span>
+            </div>
+            <div className="hero-spotlight-media">
+              <img
+                src={spotlightImage}
+                alt={spotlight.title}
+                onError={() => setFailedImages(previous => new Set([...previous, spotlightImage]))}
+              />
+              {spotlight.discount_pct ? (
+                <span className="hero-spotlight-discount">−{spotlight.discount_pct}%</span>
+              ) : null}
+            </div>
+            <div className="hero-spotlight-body">
+              <h2 title={spotlight.title}>{spotlight.title}</h2>
+              <div className="hero-spotlight-pricing">
+                <strong>₹{spotlight.price.toLocaleString('en-IN')}</strong>
+                {reference && <s>₹{reference.toLocaleString('en-IN')}</s>}
+              </div>
+              <div className="hero-spotlight-actions">
+                {onSelectDeal ? (
+                  <button type="button" className="hero-spotlight-btn-primary" onClick={() => onSelectDeal(spotlight)}>
+                    Explore deal <ArrowRight size={15} />
+                  </button>
+                ) : (
+                  <a href={spotlight.url} target="_blank" rel="noopener noreferrer" className="hero-spotlight-btn-primary">
+                    View deal <ArrowUpRight size={15} />
+                  </a>
+                )}
+                {candidates.length > 1 && (
+                  <button type="button" className="hero-spotlight-btn-secondary" onClick={reveal} title="Show another find">
+                    Next offer
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
-      </aside>}
+      ) : null}
+    </div>
   </section>;
 };
