@@ -19,6 +19,7 @@ import { ImageModal } from './components/ImageModal';
 import { DealLookupModal } from './components/DealLookupModal';
 import { SubmitDeal } from './components/SubmitDeal';
 import { LegalModal, LegalDocType } from './components/LegalModal';
+import { SharkMosaicCanvas } from './components/SharkMosaicCanvas';
 
 
 
@@ -992,8 +993,9 @@ const App: React.FC = () => {
         flexDirection: 'column',
       }}
     >
-      {/* ── 0. Global Ambient Mesh Background ── */}
+      {/* ── 0. Global Ambient Mesh Background & Procedural Shark Mosaic ── */}
       <div className="ambient-mesh"></div>
+      <SharkMosaicCanvas />
 
 
 
